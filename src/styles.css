@@ -1,0 +1,12 @@
+/* You can add global styles to this file, and also import other style files */
+
+@import "tailwindcss";
+
+@plugin "daisyui";
+
+
+@font-face {
+    font-family: "Montserrat";
+    src: url("/public/assests/fonts/bebas-neue/bebas-neue-regular.ttf")
+        format("truetype");
+}
