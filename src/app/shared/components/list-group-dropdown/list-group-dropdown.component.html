@@ -1,0 +1,41 @@
+@if (title()) {
+    <label class="block mb-2 text-sm text-slate-600">
+            {{title() | titlecase }} <span class="text-red-500">*</span>
+    </label>
+}
+<input class="w-full bg-transparent text-slate-700 text-sm border 
+        rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 
+        shadow-sm focus:shadow"
+        placeholder="Buscar"
+        type="text"
+        [(ngModel)]="searchOption"
+        (ngModelChange)="onSearchChange()"
+/>
+
+@if (showDropdown()) {
+    <div class="absolute z-50 flex flex-col rounded-lg bg-white shadow-sm border border-slate-200">
+            <nav class="flex min-w-[140px] flex-col gap-1 p-1.5">
+                @for (item of filteredOptions(); track $index) {
+                    <a class="text-initial" (click)="selectedItem(item)">
+                            <div
+                                role="button"
+                                class="text-slate-800 flex w-full items-center rounded-md p-2 text-xs
+                                transition-all hover:bg-slate-100">
+                                {{ item }}
+                            </div>
+                    </a>
+                }
+            
+                <a class="text-initial">
+                    <div
+                        role="button"
+                        class="flex w-full items-center rounded-md p-3 transition-all 
+                        hover:bg-slate-100 text-xs text-blue-600">
+                        <i class="fa-solid fa-plus mr-1 font-bold"></i>
+                            Crear {{ title() }}
+                    </div>
+                </a>
+            </nav>
+    </div>
+}
+

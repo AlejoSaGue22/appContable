@@ -1,0 +1,37 @@
+import { Routes } from "@angular/router";
+import { ClientsPageComponent } from "./clientes/clients-page.component";
+import { ClientsFormPageComponent } from "./clientes/clients-form-page/clients-form-page.component";
+import { ComprobanteVentasComponent } from "./comprobante-ventas/comprobante-ventas.component";
+import { ComprobanteVentasFormsPageComponent } from "./comprobante-ventas/comprobante-ventas-forms-page/comprobante-ventas-forms-page.component";
+import { ProductosServiciosComponent } from "./productos-servicios/productos-servicios.component";
+
+
+export const ventasRoutes: Routes = [
+                    {
+                        path: 'clients',
+                        component: ClientsPageComponent
+                    },
+                    {
+                        path: 'clients/:id',
+                        component: ClientsFormPageComponent
+                    },
+                    {
+                        path: 'comprobantes',
+                        component: ComprobanteVentasComponent
+                    },
+                    {
+                        path: 'comprobantes/:id',
+                        component: ComprobanteVentasFormsPageComponent
+                    },
+                    {
+                        path: 'products_services',
+                        component: ProductosServiciosComponent
+                    },
+                    {
+                        path: '**',
+                        redirectTo: 'clients'
+                    }
+]
+
+export default ventasRoutes;
+

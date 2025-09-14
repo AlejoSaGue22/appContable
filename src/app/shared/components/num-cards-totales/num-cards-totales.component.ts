@@ -2,7 +2,7 @@ import { Component, input } from '@angular/core';
 
 export interface CardsTotales {
       title: string;
-      valor: number;
+      valor: string;
       percent: string;
 }
 
@@ -94,6 +94,7 @@ export interface CardsTotales {
   `
 })
 export class NumCardsTotalesComponent {
-
-    itemsValores = input.required<CardsTotales[]>()
- }
+    
+  itemsValores = input.required<CardsTotales[]>();
+    
+}

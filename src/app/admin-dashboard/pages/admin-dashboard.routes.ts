@@ -1,7 +1,6 @@
 import { Routes } from "@angular/router";
-import AdminLayoutsComponent from "./layouts/admin-layouts/admin-layouts.component";
-import { DashboargPageComponent } from "./pages/dashboard/dashboarg-page.component";
-import { ClientsPageComponent } from "./pages/clientes/clients-page.component";
+import AdminLayoutsComponent from "@dashboard/layouts/admin-layouts/admin-layouts.component";
+import { DashboargPageComponent } from "./dashboard/dashboarg-page.component";
 
 export const routes: Routes = [
     {
@@ -13,12 +12,12 @@ export const routes: Routes = [
                 component: DashboargPageComponent
             },
             {
-                path: 'clients',
-                component: ClientsPageComponent
+                path: 'ventas',
+                loadChildren: () => import('./ventas/ventas.routes')
             },
             {
                 path: '**',
-                redirectTo: 'dashboard'
+                redirectTo: 'index'
             }
         ]
     }

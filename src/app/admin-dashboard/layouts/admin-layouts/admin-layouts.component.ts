@@ -1,46 +1,91 @@
 import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MenuPerfilComponent } from "../../components/menu-perfil/menu-perfil.component";
+import { BarralateralMenuComponent } from "@dashboard/components/barralateral-menu/barralateral-menu.component";
 
-interface MenuOption {
+export interface MenuOption {
   name: string
   route: string
   icon: string
 }
 
+interface Sidebar {
+  name: string;
+  icon: string;
+  defaultOpen?: boolean;
+  subItems: MenuOption[];
+}
+
 @Component({
   selector: 'app-admin-layouts',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, MenuPerfilComponent],
+  imports: [RouterOutlet, MenuPerfilComponent, BarralateralMenuComponent],
   templateUrl: './admin-layouts.component.html',
 })
 export default class AdminLayoutsComponent {
 
-    menuItems: MenuOption[] = [
+  activeMenu: string | null = 'Dashboard';
+
+  toggleActiveMenu(menuId: string){
+    if (this.activeMenu === menuId) {
+      this.activeMenu = null; 
+    } else {
+      this.activeMenu = menuId; 
+    }
+  }
+  
+  menuLateral: Sidebar[] = [
       {
         name: 'Dashboard',
-        route: '/dashboard/index',
-        icon: 'fa-solid fa-layer-group'
+        icon: '<i class="fa-solid fa-chart-simple"></i>',
+        subItems: [
+            {
+              name: 'Indice',
+              route: '/dashboard/index',
+              icon: 'fa-solid fa-layer-group'
+            }
+        ]
       },
       {
-        name: 'Clientes',
-        route: '/dashboard/clients',
-        icon: 'fa-solid fa-users'
+        name: 'Ventas',
+        icon: '<i class="fa-solid fa-hand-holding-dollar"></i>',
+        subItems: [
+            {
+              name: 'Clientes',
+              route: '/dashboard/ventas/clients',
+              icon: 'fa-solid fa-users'
+            },
+            {
+              name: 'Comprobante de venta',
+              route: '/dashboard/ventas/comprobantes',
+              icon: 'fa-solid fa-users'
+            },
+            {
+              name: 'Productos y Servicios',
+              route: '/dashboard/ventas/products_services',
+              icon: 'fa-solid fa-users'
+            }
+        ]
       },
       {
-        name: 'Ingresos',
-        route: '/dashboard/income',
-        icon: 'fa-solid fa-dollar-sign'
-      },
-      {
-        name: 'Gastos',
-        route: '/dashboard/gastos',
-        icon: 'fa-solid fa-circle-dollar-to-slot'
-      },
-      {
-        name: 'Colaboradores',
-        route: '/dashboard/colaborators',
-        icon: 'fa-solid fa-landmark'
+        name: 'Compras y gastos',
+        icon: '<i class="fa-solid fa-money-bill-1-wave"></i>',
+        subItems: [
+            {
+              name: 'Comprobastes de compra',
+              route: '/dashboard/compra',
+              icon: 'fa-solid fa-users'
+            },
+            {
+              name: 'Proveedores',
+              route: '/dashboard/proveedor',
+              icon: 'fa-solid fa-warehouse'
+            }
+        ]
       }
-    ]
+  ]
+
+
+
+
 
  }
