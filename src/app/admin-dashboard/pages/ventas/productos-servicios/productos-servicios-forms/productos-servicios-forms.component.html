@@ -1,0 +1,179 @@
+<header-title-page [titleHead]="headTitle" />
+
+<div class="w-full">
+    <form>
+        <div class=" bg-white rounded-xl shadow-lg overflow-hidden mt-6">
+                <div class="p-6">
+                        <div class="mb-8">
+                            <h3 class="text-lg font-medium text-slate-700 border-b pb-2 mb-4 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" width="24" height="24" viewBox="0 0 24 24">
+                                    <mask id="SVGqnE2TcjN"><g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                        <path fill="#fff" fill-opacity="0" stroke-dasharray="64" stroke-dashoffset="64" d="M9 7h11c0.55 0 1 0.45 1 1v11c0 0.55 -0.45 1 -1 1h-16c-0.55 0 -1 -0.45 -1 -1v-11c0 -0.55 0.45 -1 1 -1Z"><animate fill="freeze" attributeName="fill-opacity" begin="0.9s" dur="0.5s" values="0;1"/><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="64;0"/></path><path stroke-dasharray="16" stroke-dashoffset="16" d="M9 7v-3c0 -0.55 0.45 -1 1 -1h4c0.55 0 1 0.45 1 1v3"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.7s" dur="0.2s" values="16;0"/></path><path fill="#000" fill-opacity="0" stroke="none" d="M19 13c3.31 0 6 2.69 6 6c0 3.31 -2.69 6 -6 6c-3.31 0 -6 -2.69 -6 -6c0 -3.31 2.69 -6 6 -6Z"><set fill="freeze" attributeName="fill-opacity" begin="1.4s" to="1"/></path><path stroke-dasharray="8" stroke-dashoffset="8" d="M16 19h6"><animate fill="freeze" attributeName="stroke-dashoffset" begin="1.4s" dur="0.2s" values="8;0"/></path><path stroke-dasharray="8" stroke-dashoffset="8" d="M19 16v6"><animate fill="freeze" attributeName="stroke-dashoffset" begin="1.6s" dur="0.2s" values="8;0"/>
+                                        </path></g>
+                                    </mask><rect width="24" height="24" fill="currentColor" mask="url(#SVGqnE2TcjN)"/>
+                                </svg>
+                                Datos Generales
+                            </h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                                    <div>
+                                        <label class="block mb-2 text-sm text-slate-600">
+                                            Categoria <span class="text-red-500">*</span>
+                                        </label>
+                                        <div class="relative">
+                                            <select
+                                                class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded 
+                                                pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm
+                                                focus:shadow-md cursor-pointer" formControlName="categoria">
+                                                <option value="producto">Producto</option>
+                                                <option value="servicio">Servicio</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="relative">
+                                        <label class="block mb-2 text-sm text-slate-600">
+                                            Nombre <span class="text-red-500">*</span>
+                                        </label>
+                                        <input class="w-full bg-transparent text-slate-700 text-sm border rounded-md px-3 py-2 transition 
+                                            duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 
+                                            shadow-sm focus:shadow" 
+                                            placeholder="ej: Pera" 
+                                            type="text"
+                                            formControlName="nombre"
+                                            min="1"/>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block mb-2 text-sm text-slate-600">
+                                            Codigo
+                                        </label>
+                                        <input class="w-full bg-transparent text-slate-700 text-sm border 
+                                        rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 
+                                        hover:border-slate-300 shadow-sm focus:shadow"  
+                                        formControlName="codigo"
+                                        type="text"/>
+                                    </div>
+
+                                    <div>
+                                        <label class="block mb-2 text-sm text-slate-600">
+                                            Unidad de medida <span class="text-red-500">*</span>
+                                        </label>
+                                        <div class="relative">
+                                            <select
+                                                class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200
+                                                rounded pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400
+                                                hover:border-slate-400 shadow-sm focus:shadow-md cursor-pointer" formControlName="unidadmedida">
+                                                <option value="unidad">Unidad</option>
+                                                <option value="centimetro">Centimetro</option>
+                                                <option value="metro">Metro</option>
+                                                <option value="metrocuadrado">Metro cuadrado</option>
+                                                <option value="metrocubico">Metro Cubico</option>
+                                                <option value="centimetrocuadrado">Centimetro cuadrado</option>
+                                                <option value="pulgada">Pulgada</option>
+                                                <option value="gramo">Gramo</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                            <label class="block mb-2 text-sm text-slate-600">
+                                                Impuesto <span class="text-red-500">*</span>
+                                            </label>
+                                            <div class="relative">
+                                                <select
+                                                    class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded 
+                                                    pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm
+                                                    focus:shadow-md cursor-pointer" formControlName="impuesto">
+                                                    <option value="IVA-19">IVA 19%</option>
+                                                    <option value="IVA-6">IVA 6%</option>
+                                                    <option value="IVA-16">IVA 16%</option>
+                                                    <option value="N">No aplica</option>
+                                                </select>
+                                            </div>
+                                    </div>
+
+                                    <div>
+                                            <label class="block mb-2 text-sm text-slate-600">
+                                                Retencion <span class="text-red-500">*</span>
+                                            </label>
+                                            <div class="relative">
+                                                <select class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border
+                                                border-slate-200 rounded pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none 
+                                                focus:border-slate-400 hover:border-slate-400 shadow-sm focus:shadow-md cursor-pointer" 
+                                                  formControlName="retencion">
+                                                    <option value="RET-15">Retencion 15%</option>
+                                                    <option value="RET-5">Retencion 5%</option>
+                                                    <option value="RET-4">Retencion 4%</option>
+                                                    <option value="RET-6">Retencion 6%</option>
+                                                    <option value="RET-7">Retencion 7%</option>
+                                                    <option value="RET-10">Retencion 10%</option>
+                                                    <option value="N">No aplica</option>
+                                                </select>
+                                            </div>
+                                    </div>
+
+                            </div>
+
+
+                        </div>
+
+                        <div class="mb-8">
+                            <h3 class="text-lg font-medium text-slate-700 border-b pb-2 mb-4 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" width="24" height="24" viewBox="0 0 24 24">
+                                    <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                        <path stroke-dasharray="72" stroke-dashoffset="72" d="M12 3h7v18h-14v-18h7Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="72;0"/></path><path stroke-dasharray="12" stroke-dashoffset="12" stroke-width="1" d="M14.5 3.5v3h-5v-3"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.7s" dur="0.2s" values="12;0"/></path><path stroke-dasharray="8" stroke-dashoffset="8" d="M9 13h6"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.9s" dur="0.2s" values="8;0"/></path><path stroke-dasharray="8" stroke-dashoffset="8" d="M12 10v6"><animate fill="freeze" attributeName="stroke-dashoffset" begin="1.1s" dur="0.2s" values="8;0"/>
+                                        </path>
+                                    </g>
+                                    <path fill="currentColor" fill-opacity="0" d="M6 4H10V6H14V4H18V20H6V4Z">
+                                        <animate fill="freeze" attributeName="fill-opacity" begin="1.4s" dur="0.15s" values="0;0.3"/>
+                                    </path>
+                                </svg>
+                                Datos Adicionales
+                            </h3>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                           <label class="block mb-2 text-sm text-slate-600">
+                                                Precio de Venta 1
+                                            </label>
+                                            <input class="w-full bg-transparent text-slate-700 text-sm border 
+                                            rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 
+                                            hover:border-slate-300 shadow-sm focus:shadow"  
+                                            formControlName="contacto"
+                                            placeholder="$2.000"
+                                            type="text"/>
+                                    </div>
+
+                                    <div>
+                                           <label class="block mb-2 text-sm text-slate-600">
+                                                Precio de Venta 2
+                                            </label>
+                                            <input class="w-full bg-transparent text-slate-700 text-sm border 
+                                            rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 
+                                            hover:border-slate-300 shadow-sm focus:shadow"  
+                                            formControlName="contacto"
+                                            placeholder="$2.000"
+                                            type="text"/>
+                                    </div>
+
+                                    <div>
+                                            <label class="block mb-2 text-sm font-medium text-slate-600">
+                                                Observacion
+                                            </label>
+                                            <textarea class="w-full bg-white text-slate-700 text-sm border rounded-lg px-4 py-3 
+                                                transition duration-300 ease focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
+                                                placeholder=""
+                                                formControlName="observacion">
+                                            </textarea>
+                                    </div>
+                            </div>
+                            
+                        </div>
+
+
+                </div>
+        </div>
+    </form>
+</div>

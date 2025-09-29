@@ -1,11 +1,15 @@
-<!-- From Uiverse.io by Yaya12085 --> 
  <div class="flex gap-7 mb-6">
      @for (item of itemsValores(); track item.title) {
         <div class="bg-white p-6 rounded-xl shadow-sm">
-                  <div class="flex items-center justify-between">
+                  <div class="flex gap-4 items-center justify-between">
                     <div>
-                      <p class="text-sm font-medium text-gray-500">{{ item.title }}</p>
-                      <p class="mt-1 text-2xl font-semibold text-gray-900"><i class="fa-solid fa-dollar-sign"></i> {{item.valor}}</p>
+                        <p class="text-sm font-medium text-gray-500">{{ item.title }}</p>
+                        <p class="mt-1 text-2xl font-semibold text-gray-900">
+                            @if (iconDolar() == 'S') {
+                                <i class="fa-solid fa-dollar-sign"></i>
+                            }
+                             {{item.valor}}
+                        </p>
                     </div>
                     <span class="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">{{item.percent}}%</span>
                   </div>

@@ -6,17 +6,17 @@ import { CardsTotales, NumCardsTotalesComponent } from "@shared/components/num-c
 const cardNum: CardsTotales[] = [
    {
       title: 'Balance General',
-      valor: '$ 1.000.000',
+      valor: '1.000.000',
       percent: '30%'
    },
    {
       title: 'Flujo de Caja',
-      valor: '$12.000.000',
+      valor: '12.000.000',
       percent: '20%'
    },
    {
       title: 'Total Facturas',
-      valor: '$2.000.000',
+      valor: '2.000.000',
       percent: '40%'
    },
 ]

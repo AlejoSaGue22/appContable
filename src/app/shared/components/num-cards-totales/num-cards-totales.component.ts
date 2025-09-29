@@ -6,6 +6,8 @@ export interface CardsTotales {
       percent: string;
 }
 
+type optionIcon = 'S' | 'N';
+
 @Component({
   selector: 'num-cards-totales',
   imports: [],
@@ -96,5 +98,6 @@ export interface CardsTotales {
 export class NumCardsTotalesComponent {
     
   itemsValores = input.required<CardsTotales[]>();
+  iconDolar = input<optionIcon>('S');
     
 }

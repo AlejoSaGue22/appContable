@@ -1,282 +1,320 @@
 <header-title-page [titleHead]="headTitle" />
 
 <div class="w-full">
-        <form >
+        <form [formGroup]="formVentas" (ngSubmit)="onSubmit()">
+            <div class=" bg-white rounded-xl shadow-lg overflow-hidden mt-6">
+                <div class="p-6">
+                    <!-- Sección: Información básica -->
+                        <div class="mb-8">
+                            <h3 class="text-lg font-medium text-slate-700 border-b pb-2 mb-4 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" width="24" height="24" viewBox="0 0 24 24">
+                                    <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                        <path stroke-dasharray="64" stroke-dashoffset="64" d="M13 3l6 6v12h-14v-18h8">
+                                            <animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="64;0"/>
+                                        </path>
+                                        <path stroke-dasharray="14" stroke-dashoffset="14" stroke-width="1" d="M12.5 3v5.5h6.5">
+                                            <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.7s" dur="0.2s" values="14;0"/>
+                                        </path>
+                                    </g>
+                                </svg>
+                                Nuevo Documento
+                            </h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div class="relative">
+                                        <app-list-group-dropdown title="Cliente" [dataList]="['Terpel', 'Primax']" formControlName="cliente"/>
+                                    </div>
 
-        </form>
-</div>
+                                    <div class="relative">
+                                         <label class="block mb-2 text-sm text-slate-600">
+                                            Número <span class="text-red-500">*</span>
+                                        </label>
+                                        <input class="w-full bg-transparent text-slate-700 text-sm border rounded-md px-3 py-2 transition 
+                                        duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 
+                                        shadow-sm focus:shadow" 
+                                        placeholder="N° Comprobante" 
+                                        type="number"
+                                        formControlName="numero"
+                                        min="1"/>
 
-<div class="bg-white rounded-lg shadow-xl p-8 w-full relative">
-    <form [formGroup]="formVentas" (ngSubmit)="onSubmit()">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6  py-6 px-10">
-            <div>
-                <app-list-group-dropdown title="Cliente" [dataList]="['Terpel', 'Primax']" formControlName="cliente"/>
-            </div>
+                                        <form-error-label [errorType]="formVentas.get('numero')!" />
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block mb-2 text-sm text-slate-600">
+                                            Contacto
+                                        </label>
+                                        <input class="w-full bg-transparent text-slate-700 text-sm border 
+                                        rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 
+                                        hover:border-slate-300 shadow-sm focus:shadow"  
+                                        formControlName="contacto"
+                                        type="text"/>
 
-            <div>
-                <label class="block mb-2 text-sm text-slate-600">
-                    Número <span class="text-red-500">*</span>
-                </label>
-                <input class="w-full bg-transparent text-slate-700 text-sm border 
-                  rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 
-                  shadow-sm focus:shadow" 
-                  placeholder="N° Comprobante" 
-                  type="number" 
-                  formControlName="numero"
-                  min="1"/>
-            </div>
-            
-        </div>
+                                        <form-error-label [errorType]="formVentas.get('contacto')!" />
+                                    </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6 py-6 px-10">
+                                    <div>
+                                        <label class="block mb-2 text-sm text-slate-600">
+                                            Vendedor <span class="text-red-500">*</span>
+                                        </label>
+                                        <input class="w-full bg-transparent text-slate-700 text-sm border 
+                                        rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 
+                                        shadow-sm focus:shadow" 
+                                        formControlName="vendedor"
+                                        type="text" />
 
-            <div>
-                <label class="block mb-2 text-sm text-slate-600">
-                    Contacto
-                </label>
-                <input class="w-full bg-transparent text-slate-700 text-sm border 
-                  rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 
-                  shadow-sm focus:shadow"  
-                  formControlName="contacto"
-                  type="text"/>
-            </div>
+                                        <form-error-label [errorType]="formVentas.get('vendedor')!" />
+                                    </div>
 
-            <div>
-                <label class="block mb-2 text-sm text-slate-600">
-                    Vendedor <span class="text-red-500">*</span>
-                </label>
-                <input class="w-full bg-transparent text-slate-700 text-sm border 
-                  rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 
-                  shadow-sm focus:shadow" 
-                  formControlName="vendedor"
-                  type="text" />
-            </div>
-            
-            <div>
-                <label class="block mb-2 text-sm text-slate-600">
-                    Forma de Pago <span class="text-red-500">*</span>
-                </label>
-                <div class="relative">
-                    <select
-                        class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded 
-                        pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm
-                         focus:shadow-md appearance-none cursor-pointer" formControlName="formaPago">
-                        <option value="credito">Efectivo</option>
-                        <option value="london">Tarjeta Debito</option>
-                        <option value="washington">Tarjeta Credito</option>
-                        <option value="washington">Transferencia</option>
-                        <option value="washington">Otros</option>
-                        <option value="washington">Pago a credito</option>
-                    </select>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.2" stroke="currentColor" class="h-5 w-5 ml-1 absolute top-2 right-2.5 text-slate-700">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15 12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
-                    </svg>
+                                    <div>
+                                        <label class="block mb-2 text-sm text-slate-600">
+                                            Forma de Pago <span class="text-red-500">*</span>
+                                        </label>
+                                        <div class="relative">
+                                            <select
+                                                class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded 
+                                                pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm
+                                                focus:shadow-md cursor-pointer" formControlName="formaPago">
+                                                <option value="efectivo">Efectivo</option>
+                                                <option value="tarjetaDebito">Tarjeta Debito</option>
+                                                <option value="washington">Tarjeta Credito</option>
+                                                <option value="washington">Transferencia</option>
+                                                <option value="washington">Otros</option>
+                                                <option value="washington">Pago a credito</option>
+                                            </select>
+                                        </div>
+
+                                        <form-error-label [errorType]="formVentas.get('formaPago')!" />
+                                    </div>
+
+                                    <div>
+                                        <label class="block mb-2 text-sm text-slate-600">
+                                            Fecha <span class="text-red-500">*</span>
+                                        </label>
+                                        <input class="w-full bg-transparent text-slate-700 text-sm border 
+                                        rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 
+                                        shadow-sm focus:shadow" 
+                                        formControlName="fecha"
+                                        type="date"/>
+                                        
+                                        <form-error-label [errorType]="formVentas.get('fecha')!" />
+                                    </div>
+
+                                    <div>
+                                        <label class="block mb-2 text-sm text-slate-600">
+                                            Canal de venta
+                                        </label>
+                                        <input class="w-full bg-transparent text-slate-700 text-sm border 
+                                        rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 
+                                        shadow-sm focus:shadow" 
+                                        placeholder="Canal" 
+                                        formControlName="canal"
+                                        type="text"/>
+
+                                        <form-error-label [errorType]="formVentas.get('canal')!" />
+                                    </div>
+
+
+                            </div>
+                        </div>
                 </div>
-            </div>
 
-            <div>
-                <label class="block mb-2 text-sm text-slate-600">
-                    Canal de venta
-                </label>
-                <input class="w-full bg-transparent text-slate-700 text-sm border 
-                  rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 
-                  shadow-sm focus:shadow" 
-                  placeholder="Canal" 
-                  formControlName="canal"
-                  type="text"/>
-            </div>
-
-            <div>
-                <label class="block mb-2 text-sm text-slate-600">
-                    Fecha <span class="text-red-500">*</span>
-                </label>
-                <input class="w-full bg-transparent text-slate-700 text-sm border 
-                  rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 
-                  shadow-sm focus:shadow" 
-                  formControlName="fecha"
-                  type="date"/>
-            </div>
-
-        </div>
-        
-        <div class="w-full h-full overflow-scroll text-gray-700 bg-white shadow-md rounded-xl">
-            <table class="w-full text-left table-auto">
-                <thead>
-                <tr>
-                    <th class="p-4 border-r border-gray-300 bg-gray-200">
-                    <p class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-95">
-                        Producto
-                    </p>
-                    </th>
-                    <th class="p-4 border-r border-gray-300 bg-gray-200">
-                    <p class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-95">
-                        Descripcion
-                    </p>
-                    </th>
-                    <th class="p-4 border-r border-gray-300 bg-gray-200">
-                    <p class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-95">
-                        Cant.
-                    </p>
-                    </th>
-                    <th class="p-4 border-r border-gray-300 bg-gray-200">
-                    <p class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-95">
-                        Valor Unitario
-                    </p>
-                    </th>
-                    <th class="p-4 border-r border-gray-300 bg-gray-200">
-                    <p class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-95">
-                        % Desc.
-                    </p>
-                    </th>
-                    <th class="p-4 border-r border-gray-300 bg-gray-200">
-                    <p class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-95">
-                        Impuestos
-                    </p>
-                    </th>
-                    <th class="p-4 border-r border-gray-300 bg-gray-200">
-                    <p class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-95">
-                        Valor Total
-                    </p>
-                    </th>
-                </tr>
-                </thead>
-                <tbody [formGroup]="productosItemsForm">
-                    <tr>
-                       <td class="w-[295px]">
-                            <div class="m-4">
-                                <app-list-group-dropdown title="" [dataList]="['Terpel', 'Primax']" formControlName="producto"/>
-                            </div>
-                       </td>
-                       <td>
-                            <div class="m-4">
-                               <textarea class="min-h-[40px] text-sm border rounded-md px-3 py-2 transition duration-300 ease shadow-sm focus:shadow"
-                                formControlName="descripcion">
-                               </textarea>
-                            </div>
-                       </td>
-                       <td>
-                            <input class="w-4/5 bg-transparent text-slate-700 text-sm border 
-                            rounded-md px-3 py-2 transition duration-300 ease 
-                            shadow-sm focus:shadow" 
-                            placeholder="0.00"
-                            formControlName="cantidad"
-                            type="number" min="1"/>
-                       </td>
-                       <td>
-                            <input class="w-4/5 bg-transparent text-slate-700 text-sm border 
-                            rounded-md px-3 py-2 transition duration-300 ease 
-                            shadow-sm focus:shadow" 
-                            placeholder="0.00"
-                            formControlName="valorUnitario"
-                            type="number"
-                            min="1"/>
-                       </td>
-                       <td>
-                            <input class="w-4/5 bg-transparent text-slate-700 text-sm border 
-                            rounded-md px-3 py-2 transition duration-300 ease 
-                            shadow-sm focus:shadow" 
-                            placeholder="0.00" 
-                            type="number" 
-                            formControlName="descuento"
-                            min="1"/>
-                       </td>
-                       <td>
-                            <input class="w-4/5 bg-transparent text-slate-700 text-sm border 
-                            rounded-md px-3 py-2 transition duration-300 ease 
-                            shadow-sm focus:shadow" 
-                            placeholder="0.00" 
-                            type="number"
-                            formControlName="impuestos" 
-                            min="1"/>
-                       </td>
-                       <td>
-                            <input class="w-4/5 bg-transparent text-slate-700 text-sm border 
-                            rounded-md px-3 py-2 transition duration-300 ease 
-                            shadow-sm focus:shadow" 
-                            placeholder="0.00" 
-                            type="number"
-                            min="1"/>
-                       </td>
-                    </tr>
-                     
-                    @for (item of factura()?.productos; track $index) {
+                <div class="p-6">
+                    <table class="w-full text-left table-auto shadow-md rounded-xl">
+                        <thead>
                             <tr>
-                                <td class="p-4 border-b border-blue-gray-50">
-                                    <p class="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                                        {{ item.producto }}
+                                <th class="p-4 border-r border-gray-300 bg-gray-200" colspan="2">
+                                    <p class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-95">
+                                        Producto
                                     </p>
-                                </td>
-                                <td class="p-4 border-b border-blue-gray-50">
-                                    <p class="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                                        {{ item.descripcion }}
+                                </th>
+                                <th class="p-4 border-r border-gray-300 bg-gray-200">
+                                    <p class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-95">
+                                        Descripcion
                                     </p>
-                                </td>
-                                <td class="p-4 border-b border-blue-gray-50">
-                                    <p class="block font-sans text-sm antialiased font-normal leading-normal text-blue-gray-900">
-                                        {{ item.cantidad }}
+                                </th>
+                                <th class="p-4 border-r border-gray-300 bg-gray-200">
+                                    <p class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-95">
+                                        Cant.
                                     </p>
+                                </th>
+                                <th class="p-4 border-r border-gray-300 bg-gray-200">
+                                    <p class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-95">
+                                        Valor Unitario
+                                    </p>
+                                </th>
+                                <th class="p-4 border-r border-gray-300 bg-gray-200">
+                                    <p class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-95">
+                                        % Desc.
+                                    </p>
+                                </th>
+                                <th class="p-4 border-r border-gray-300 bg-gray-200">
+                                    <p class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-95">
+                                        Impuestos
+                                    </p>
+                                </th>
+                                <th class="p-4 border-r border-gray-300 bg-gray-200" colspan="2">
+                                    <p class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-95">
+                                        Valor Total
+                                    </p>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody [formGroup]="productosItemsForm">
+                            <tr>
+                                <td></td>
+                                <td class="w-[295px]">
+                                        <div class="m-4">
+                                            <app-list-group-dropdown title="" [dataList]="['Terpel', 'Primax']" formControlName="producto"/>
+                                        </div>
                                 </td>
-                                <td class="p-4 border-b border-blue-gray-50">
-                                    <a href="#" class="block font-sans text-sm antialiased font-medium leading-normal text-blue-gray-900">
-                                        {{ item.valorUnitario }}
-                                    </a>
+                                <td>
+                                    <div class="m-4">
+                                        <textarea class="min-h-[40px] text-sm border rounded-md px-3 py-2 transition duration-300 ease shadow-sm focus:shadow"
+                                            formControlName="descripcion">
+                                        </textarea>
+                                    </div>
                                 </td>
-                                <td class="p-4 border-b border-blue-gray-50">
-                                    <a href="#" class="block font-sans text-sm antialiased font-medium leading-normal text-blue-gray-900">
-                                        {{ item.descuento }}
-                                    </a>
+                                <td>
+                                        <input class="w-4/5 bg-transparent text-slate-700 text-sm border 
+                                        rounded-md px-3 py-2 transition duration-300 ease 
+                                        shadow-sm focus:shadow" 
+                                        placeholder="0.00"
+                                        formControlName="cantidad"
+                                        type="number" min="1"/>
                                 </td>
-                                <td class="p-4 border-b border-blue-gray-50">
-                                    <a href="#" class="block font-sans text-sm antialiased font-medium leading-normal text-blue-gray-900">
-                                        {{ item.impuestos }}
-                                    </a>
+                                <td>
+                                        <input class="w-4/5 bg-transparent text-slate-700 text-sm border 
+                                        rounded-md px-3 py-2 transition duration-300 ease 
+                                        shadow-sm focus:shadow" 
+                                        placeholder="0.00"
+                                        formControlName="valorUnitario"
+                                        type="number"
+                                        min="1"/>
                                 </td>
-                                <td class="p-4 border-b border-blue-gray-50">
-                                    <a href="#" class="block font-sans text-sm antialiased font-medium leading-normal text-blue-gray-900">
-                                        {{ item.valorTotal }}
-                                    </a>
+                                <td>
+                                        <input class="w-4/5 bg-transparent text-slate-700 text-sm border 
+                                        rounded-md px-3 py-2 transition duration-300 ease shadow-sm focus:shadow" 
+                                        placeholder="0.00" 
+                                        type="number" 
+                                        formControlName="descuento"
+                                        min="1"/> 
+                                </td>
+                                <td>
+                                    <select class="bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 
+                                        rounded pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm
+                                        focus:shadow-md cursor-pointer" formControlName="impuestos">
+                                            <option value="IVA-19">IVA 19% General</option>
+                                            <option value="IVA-5">IVA 5%</option>
+                                            <option value="IMPOCONSUMO-8">Impoconsumo 8%</option>
+                                            <option value="IVA-19">IVA 19% por compras</option>
+                                    </select>
+                                </td>
+                                <td class="w-[100px] text-center"> 
+                                    <span class="text-sm p-2 text-center text-slate-700">
+                                        {{ calcularItemTotal() | currency }}
+                                    </span>
+                                </td>
+                                <td class="cursor-pointer pr-2" (click)="setProductos()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="text-blue-200 hover:text-blue-500">
+                                        <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path stroke-dasharray="64" stroke-dashoffset="64" d="M4 12v-7c0 -0.55 0.45 -1 1 -1h14c0.55 0 1 0.45 1 1v14c0 0.55 -0.45 1 -1 1h-14c-0.55 0 -1 -0.45 -1 -1Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="64;0"/></path><path stroke-dasharray="12" stroke-dashoffset="12" d="M7 12h10"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="12;0"/></path><path stroke-dasharray="12" stroke-dashoffset="12" d="M12 7v10"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.8s" dur="0.2s" values="12;0"/></path>
+                                        </g>
+                                    </svg> 
                                 </td>
                             </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+                            
+                            @for (item of productSeleccionados(); track $index) {
+                                <tr>
+                                    <td class="p-4 border-t border-gray-200" (click)="deleteProducto(item.id)">
+                                        <div class="pl-3 cursor-pointer">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="text-red-300 hover:text-red-500">
+                                                <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                                    <path stroke-dasharray="64" stroke-dashoffset="64" d="M12 3c4.97 0 9 4.03 9 9c0 4.97 -4.03 9 -9 9c-4.97 0 -9 -4.03 -9 -9c0 -4.97 4.03 -9 9 -9Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="64;0"/></path><path stroke-dasharray="8" stroke-dashoffset="8" d="M12 12l4 4M12 12l-4 -4M12 12l-4 4M12 12l4 -4"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s" dur="0.2s" values="8;0"/></path>
+                                                </g>
+                                            </svg>
+                                        </div>
+                                    </td>
+                                    <td class="p-4 border-t border-gray-200 border-r">
+                                        <p class="block font-sans text-sm antialiased leading-normal text-blue-gray-900">
+                                            {{ item.producto }}
+                                        </p>
+                                    </td>
+                                    <td class="p-4 border-t border-r border-gray-200">
+                                        <p class="block font-sans text-sm antialiased leading-normal text-blue-gray-900">
+                                            {{ item.descripcion }}
+                                        </p>
+                                    </td>
+                                    <td class="p-4 border-t border-gray-200 border-r">
+                                        <p class="block font-sans text-sm antialiased leading-normal text-blue-gray-900">
+                                            {{ item.cantidad }}
+                                        </p>
+                                    </td>
+                                    <td class="p-4 border-t border-gray-200 border-r">
+                                        <a class="block font-sans text-sm antialiased text-blue-gray-900">
+                                            {{ item.valorUnitario | currency}}
+                                        </a>
+                                    </td>
+                                    <td class="p-4 border-t border-gray-200 border-r">
+                                        <a class="block font-sans text-sm antialiased text-blue-gray-900">
+                                            {{ item.descuento }}
+                                        </a>
+                                    </td>
+                                    <td class="p-4 border-t border-gray-200 border-r">
+                                        <a class="block font-sans text-sm antialiased text-blue-gray-900">
+                                            {{ item.impuestos }}
+                                        </a>
+                                    </td>
+                                    <td class="p-4 border-t border-gray-200 border-r">
+                                        <a class="block font-sans text-sm antialiased text-blue-gray-900">
+                                            {{ item.valorTotal | currency }}
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </form>
 
-        <div class="p-6 mt-4 self-end w-full sm:w-1/2 md:w-1/3">
-          <div class="grid grid-cols-2 gap-2 text-lg font-bold border-t border-gray-300 pt-4">
-            <p>Subtotal:</p>
-            <span class="text-blue-500">$ 2.000.000</span>
-            <p>Total IVA:</p>
-            <span class="text-blue-500">$ 2.000.000</span>
-            <p>Total Retenciones:</p>
-            <span class="text-blue-500">0.00</span>
-            <p>Otros impuestos:</p>
-            <span class="text-blue-500">0.00</span>
-            <p>Total de la Factura:</p>
-            <span class="text-blue-500">$ 2.000.000</span>
-          </div>
-        </div>
+            <div class="p-6 mt-4 self-end w-full sm:w-1/2 md:w-1/3">
+                    <div class="grid grid-cols-2 gap-2 text-lg font-bold border-t border-gray-300 pt-4">
+                        <p>Subtotal:</p>
+                        <span class="text-blue-500">{{ totales.subtotal | currency}}</span>
+                        <p>Total IVA:</p>
+                        <span class="text-blue-500">{{ totales.totalIVA | currency }}</span>
+                        <p>Total Retenciones:</p>
+                        <span class="text-blue-500">{{ totales.retenciones | currency }}</span>
+                        <p>Otros impuestos:</p>
+                        <span class="text-blue-500">{{ totales.impuestos }}</span>
+                        <p>Total de la Factura:</p>
+                        <span class="text-blue-500">{{ totales.facturaTotal | currency }}</span>
+                    </div>
+            </div>
 
-        <div class="row flex w-1/2">
-            <button
-                class="rounded-md w-full rounded-r-none bg-red-600 py-2 px-4 border border-transparent 
-                text-center text-sm text-white transition-all shadow-md hover:shadow-lg
-                 focus:bg-red-500 focus:shadow-none active:bg-red-500 hover:bg-red-500 
-                 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-                type="button"
-            >
-                Cancelar
-            </button>
-            <button
-                class="rounded-none w-full bg-blue-500 py-2 px-4 border-l border-r border-blue-400
-                 text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-blue-400 
-                 focus:shadow-none active:bg-blue-400 hover:bg-blue-400 active:shadow-none disabled:pointer-events-none 
-                 disabled:opacity-50 disabled:shadow-none"
-                type="submit"
-            >
-                Guardar
-            </button>
-          
-        </div>
-    </form>
+            <div class="row flex w-1/2 px-4">
+                <button
+                    class="rounded-md w-full rounded-r-none bg-red-600 py-2 px-4 border border-transparent 
+                    text-center text-sm text-white transition-all shadow-md hover:shadow-lg
+                    focus:bg-red-500 focus:shadow-none active:bg-red-500 hover:bg-red-500 
+                    active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                    type="button"
+                >
+                    Cancelar
+                </button>
+                <button
+                    class="rounded-none w-full bg-blue-500 py-2 px-4 border-l border-r border-blue-400
+                    text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-blue-400 
+                    focus:shadow-none active:bg-blue-400 hover:bg-blue-400 active:shadow-none disabled:pointer-events-none 
+                    disabled:opacity-50 disabled:shadow-none"
+                    type="submit"
+                >
+                    Guardar
+                </button>
+            
+            </div>
 </div>
+
+<!-- <div class="bg-white rounded-lg shadow-xl p-8 w-full relative mt-6">
+    
+</div> -->

@@ -4,6 +4,7 @@ import { ClientsFormPageComponent } from "./clientes/clients-form-page/clients-f
 import { ComprobanteVentasComponent } from "./comprobante-ventas/comprobante-ventas.component";
 import { ComprobanteVentasFormsPageComponent } from "./comprobante-ventas/comprobante-ventas-forms-page/comprobante-ventas-forms-page.component";
 import { ProductosServiciosComponent } from "./productos-servicios/productos-servicios.component";
+import { ProductosServiciosFormsComponent } from "./productos-servicios/productos-servicios-forms/productos-servicios-forms.component";
 
 
 export const ventasRoutes: Routes = [
@@ -26,6 +27,10 @@ export const ventasRoutes: Routes = [
                     {
                         path: 'products_services',
                         component: ProductosServiciosComponent
+                    },
+                    {
+                        path: 'products_services/:id',
+                        component: ProductosServiciosFormsComponent
                     },
                     {
                         path: '**',

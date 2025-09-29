@@ -8,11 +8,13 @@ export interface Factura {
 }
 
 export interface ProductoFactura {
+    id: string;
     producto: string;
     descripcion: string;
     cantidad: number;
     valorUnitario: number;
     descuento: number;
-    impuestos: number;
+    impuestos: string;
+    subtotal: number;
     valorTotal: number;
 }

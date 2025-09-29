@@ -8,7 +8,7 @@ import { TableListComponent } from "@shared/components/table-list/table-list.com
 const cardNum: CardsTotales[] = [
    {
       title: 'Total Clientes',
-      valor: '$ 1.0000',
+      valor: '1.0000',
       percent: '20%'
    },
    {
@@ -18,7 +18,7 @@ const cardNum: CardsTotales[] = [
    },
    {
       title: 'Total Clientes',
-      valor: '$2.0000',
+      valor: '2.0000',
       percent: '20%'
    },
 ]

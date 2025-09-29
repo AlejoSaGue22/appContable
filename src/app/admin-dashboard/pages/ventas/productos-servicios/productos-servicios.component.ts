@@ -16,7 +16,7 @@ const cardNum: CardsTotales[] = [
    },
    {
       title: 'Total Servicios',
-      valor: '$2.0000',
+      valor: '2.0000',
       percent: '20'
    },
 ]

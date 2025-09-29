@@ -27,6 +27,8 @@ export class ClientsFormPageComponent {
       direccion: ['', Validators.required],
       ciudad: ['', Validators.required],
       telefono: ['', Validators.required, Validators.min(1), Validators.maxLength(10)],
+      email: ['', Validators.required],
+      observacion: [''],
       condicionIva: ['', Validators.required],
   })
 

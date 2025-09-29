@@ -15,9 +15,6 @@ export class FormUtils {
                         return 'Este campo es requerido';
                     
                     case 'minlength':
-                        return 'Este campo es requerido';
-
-                    case 'minlength':
                         return `Mínimo de ${errors['minlength'].requiredLength} caracteres.`;
 
                     case 'min':
