@@ -1,10 +1,13 @@
 import { Component, inject } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HeaderInput, HeaderTitlePageComponent } from "@dashboard/components/header-title-page/header-title-page.component";
+import { ProductosService } from '../../services/productos.service';
+import { Router } from '@angular/router';
+import { ProductosInterface } from '@dashboard/interfaces/productos-interface';
 
 @Component({
   selector: 'app-productos-servicios-forms',
-  imports: [HeaderTitlePageComponent],
+  imports: [HeaderTitlePageComponent, FormsModule, ReactiveFormsModule],
   templateUrl: './productos-servicios-forms.component.html',
 })
 export class ProductosServiciosFormsComponent {
@@ -15,6 +18,8 @@ export class ProductosServiciosFormsComponent {
     }
     
     private fb = inject(FormBuilder);
+    productoService = inject(ProductosService);
+    router = inject(Router);
 
     formProductos = this.fb.group({
       categoria: [''],
@@ -23,9 +28,32 @@ export class ProductosServiciosFormsComponent {
       unidadmedida: [''],
       impuesto: [''],
       retencion: [''],
-      precioventa: [[]],
+      precioventa1: [''],
+      precioventa2: [''],
       observacion: ['']
     })
+
+    async onSubmit(){
+      
+      this.formProductos.markAllAsTouched();
+
+      if(this.formProductos.invalid) return;    
+
+      const producto = this.formProductos.value;
+
+      console.log(producto);
+      this.productoService.agregarProducto(producto as Partial<ProductosInterface>);
+      this.formProductos.reset();
+
+      await this.router.navigateByUrl('/dashboard/ventas/products_services');
+
+    }
+
+    onCancel(){
+      this.formProductos.reset();
+      this.router.navigateByUrl('/dashboard/ventas/products_services');
+    }
+
 
     
 

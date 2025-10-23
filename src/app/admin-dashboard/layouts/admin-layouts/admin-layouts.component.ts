@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MenuPerfilComponent } from "../../components/menu-perfil/menu-perfil.component";
 import { BarralateralMenuComponent } from "@dashboard/components/barralateral-menu/barralateral-menu.component";
+import { OptionBarralateralComponent } from "@dashboard/components/option-barralateral/option-barralateral.component";
+import { FlowbiteService } from 'src/app/utils/services/flowbite.service';
 
 export interface MenuOption {
   name: string
@@ -18,12 +20,14 @@ interface Sidebar {
 
 @Component({
   selector: 'app-admin-layouts',
-  imports: [RouterOutlet, MenuPerfilComponent, BarralateralMenuComponent],
+  imports: [RouterOutlet, MenuPerfilComponent, BarralateralMenuComponent, OptionBarralateralComponent],
   templateUrl: './admin-layouts.component.html',
 })
 export default class AdminLayoutsComponent {
 
   activeMenu: string | null = 'Dashboard';
+
+  flowbiteService = inject(FlowbiteService);
 
   toggleActiveMenu(menuId: string){
     if (this.activeMenu === menuId) {

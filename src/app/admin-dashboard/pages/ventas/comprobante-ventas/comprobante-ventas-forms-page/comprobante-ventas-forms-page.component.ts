@@ -1,23 +1,55 @@
 import { CurrencyPipe } from '@angular/common';
 import { Factura, ProductoFactura } from './../../../../interfaces/documento-venta-interface';
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, effect, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HeaderInput, HeaderTitlePageComponent } from "@dashboard/components/header-title-page/header-title-page.component";
 import { ListGroupDropdownComponent } from "@shared/components/list-group-dropdown/list-group-dropdown.component";
-import { tap } from 'rxjs';
-import { FormErrorLabelComponent } from "@shared/components/form-error-label/form-error-label.component";
+import { forkJoin, tap } from 'rxjs';
+import { ProductosService } from '../../services/productos.service';
+import { ClientesService } from '../../services/clientes.service';
+import { ClientesInterface } from '../../../../interfaces/clientes-interface';
+import { ProductosInterface } from '@dashboard/interfaces/productos-interface';
+import { FormErrorLabelComponent } from '@utils/components/form-error-label/form-error-label.component';
 
 @Component({
   selector: 'app-comprobante-ventas-forms-page',
   imports: [HeaderTitlePageComponent, ReactiveFormsModule, ListGroupDropdownComponent, CurrencyPipe, FormErrorLabelComponent],
   templateUrl: './comprobante-ventas-forms-page.component.html',
 })
-export class ComprobanteVentasFormsPageComponent {
+export class ComprobanteVentasFormsPageComponent implements OnInit {
 
     headTitle: HeaderInput = {
         title: 'Crear documento de venta',
         slog: 'Se registra nueva factura de venta al sistema'
     }
+
+    private productosService = inject(ProductosService);
+    private clienteService = inject(ClientesService);
+    factura = signal<Factura | null>(null);
+    productSeleccionados = signal<ProductoFactura[]>([]);
+
+    productos = signal<ProductosInterface[]>([]);
+    clientes = signal<ClientesInterface[]>([]);
+    private fb = inject(FormBuilder);
+
+    ngOnInit(): void {
+
+        const productos$ = this.productosService._productos;
+        const clientes$ = this.clienteService._clientes;
+
+        this.productos.set(productos$);
+        this.clientes.set(clientes$);
+            console.log("Productos: ", this.productosService._productos);
+            console.log("Clientes: ", this.clienteService._clientes); 
+    }
+
+    onProductFrom = effect((onCleanup) => {
+        const valorTotal = this.onValorTotal();
+
+        onCleanup(() => {
+          valorTotal?.unsubscribe();
+        })
+    })
 
     totales = {
       subtotal: 0,
@@ -27,19 +59,6 @@ export class ComprobanteVentasFormsPageComponent {
       retenciones: 0,
       facturaTotal: 0,
     }
-
-    factura = signal<Factura | null>(null);
-    productSeleccionados = signal<ProductoFactura[]>([]);
-
-    private fb = inject(FormBuilder);
-
-    onProductFrom = effect((onCleanup) => {
-        const valorTotal = this.onValorTotal();
-
-        onCleanup(() => {
-          valorTotal?.unsubscribe();
-        })
-    })
 
     formVentas = this.fb.group({
       cliente: ['', Validators.required],

@@ -1,5 +1,5 @@
 <header-title-page [titleHead]="headTitleCliente"/>
 
-<num-cards-totales [itemsValores]="cardValor()" iconDolar="N"/>
+<num-cards-totales [itemsValores]="cardValor" iconDolar="N"/>
 
-<app-table-list [columns]="columnsTable" [dataTable]="[]" rutaLink="/dashboard/ventas/products_services/1" />
+<app-table-list [columns]="columnsTable" [dataTable]="productService._productos" rutaLink="/dashboard/ventas/products_services/1" />

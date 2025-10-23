@@ -1,33 +1,14 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* Configuración específica para Flowbite */
+@import "flowbite/src/themes/default";
+@plugin "flowbite/plugin";
+@source "../node_modules/flowbite";
 
 
-@font-face {
-    font-family: "Montserrat";
-    src: url("/public/assests/fonts/bebas-neue/bebas-neue-regular.ttf")
-        format("truetype");
-}
+
+
 
 *{
     font-family: Arial, Helvetica, sans-serif
-}
-    
-/* @property --tw-border-style {
-    syntax: "*";
-    inherits: false;
-    initial-value: solid;
-} */
-
-.input-pryme{
-    border-style: var(--tw-border-style);
-    border-width: 1px;
-    border-radius: var(--radius-md);
-    /* color: gray; */
-    padding-left: calc(var(--spacing) * 3) /* 2rem = 32px */;
-    padding-right: calc(var(--spacing) * 4) /* 1rem = 16px */;
-    padding-block: calc(var(--spacing) * 1) /* 0.5rem = 8px */;
-    border-color: var(--color-gray-200) /* oklch(92.8% 0.006 264.531) = #e5e7eb */;
-    /* font-size: var(--text-sm) 0.875rem = 14px; */
-    line-height: var(--tw-leading, var(--text-sm--line-height) /* calc(1.25 / 0.875) ≈ 1.4286 */);
 }

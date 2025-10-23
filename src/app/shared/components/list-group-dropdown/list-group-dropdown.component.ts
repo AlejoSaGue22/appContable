@@ -17,9 +17,10 @@ import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/f
 export class ListGroupDropdownComponent implements OnInit, ControlValueAccessor {
 
   title = input.required<string>();
-  dataList = input<string[]>([]);
+  dataList = input<any[]>([]);
+  propiedadABuscar = input<string>('nombre'); // Propiedad del objeto por la cual se va a filtrar
 
-  public filteredOptions = signal<string[]>([]);
+  public filteredOptions = signal<any[]>([]);
   showDropdown = signal<boolean>(false);
   searchOption: string = '';
 
@@ -63,19 +64,32 @@ export class ListGroupDropdownComponent implements OnInit, ControlValueAccessor 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     if (!this.elementRef.nativeElement.contains(event.target)) {
+      this.filteredOptions.set(this.dataList());
       this.showDropdown.set(false);
     }
   }
 
   onSearchChange() {
-    const dataFilter = this.dataList().filter(item => item.toLowerCase().includes(this.searchOption.toLowerCase()));
+    if (!this.searchOption) {
+      this.filteredOptions.set(this.dataList());
+      // this.showDropdown.set(false);
+      this.onChange(this.searchOption);
+      return;
+    }
+
+    if(this.searchOption.length < 2) {
+      this.filteredOptions.set([]);
+      return
+    }
+
+    const dataFilter = this.dataList().filter(item => item[this.propiedadABuscar()].toLowerCase().includes(this.searchOption.toLowerCase()));
     this.filteredOptions.set(dataFilter);
     this.showDropdown.set(true);
     this.onChange(this.searchOption);
   }
 
-  selectedItem(item: string) {
-    this.searchOption = item;
+  selectedItem(item: any) {
+    this.searchOption = item[this.propiedadABuscar()];
     this.value = item; // Esto llama al setter y notifica a los cambios del formulario
     this.showDropdown.set(false);
   }

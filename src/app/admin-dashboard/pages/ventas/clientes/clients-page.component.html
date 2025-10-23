@@ -2,7 +2,6 @@
 <header-title-page [titleHead]="headTitle"/>
 
 <!-- Cards Total -->
-<num-cards-totales [itemsValores]="cardsTotales"/>
+<num-cards-totales [itemsValores]="cardsTotales" iconDolar="N"/>
 
-
-<app-table-list [columns]="columnsTable" [dataTable]="[]" [hasAction]="true" rutaLink="/dashboard/ventas/clients/1"/>
+<app-table-list [columns]="columnsTable" [dataTable]="clienteServices._clientes" [hasAction]="true" rutaLink="/dashboard/ventas/clients/1"/>

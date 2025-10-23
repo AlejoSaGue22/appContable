@@ -22,7 +22,11 @@
                             
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     <div class="relative">
-                                        <app-list-group-dropdown title="Cliente" [dataList]="['Terpel', 'Primax']" formControlName="cliente"/>
+                                        <app-list-group-dropdown 
+                                         title="Cliente" 
+                                         [dataList]="clientes()" 
+                                         propiedadABuscar="razonSocial"
+                                         formControlName="cliente"/>
                                     </div>
 
                                     <div class="relative">
@@ -165,7 +169,10 @@
                                 <td></td>
                                 <td class="w-[295px]">
                                         <div class="m-4">
-                                            <app-list-group-dropdown title="" [dataList]="['Terpel', 'Primax']" formControlName="producto"/>
+                                            <app-list-group-dropdown 
+                                            title="" 
+                                            [dataList]="productos()" 
+                                            formControlName="producto"/>
                                         </div>
                                 </td>
                                 <td>
