@@ -1,37 +1,38 @@
 <div class="relative block w-full">
-            <div role="button" (click)="toggleMenu()"
-                class="flex items-center w-full p-0 leading-tight mb-1 transition-all rounded-lg outline-none text-start hover:bg-gray-800 hover:text-white">
-                <button type="button"
-                    class="flex items-center justify-between w-full p-3 font-sans text-xl antialiased font-semibold leading-snug text-left transition-colors border-b-0 select-none border-b-blue-gray-100 text-blue-gray-700 hover:text-blue-gray-900">
-                    <div class="grid mr-4 place-items-center" [innerHTML]="IconSVG()"></div>
-                    <p class="block mr-auto font-sans text-base antialiased font-normal leading-relaxed text-blue-gray-900">
-                        {{ title() }}
-                    </p>
-                    <span class="ml-4 w-4 h-4 mx-auto transition-transform" [ngClass]="{'rotate-180': isOpen}">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
-                        stroke="currentColor" aria-hidden="true" class="w-4 h-4 mx-auto transition-transform">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path>
-                        </svg>
-                    </span>
-                </button>
-            </div>
+    <div role="button" (click)="toggleMenu()"
+        class="flex items-center w-full p-0 leading-tight mb-1 transition-all rounded-lg outline-none text-start">
+        <button 
+            type="button"
+            class="flex items-center p-2 w-full text-base font-normal text-gray-300 rounded-lg transition duration-75 group 
+                    hover:bg-gray-700 cursor-pointer">
 
-            <div class="overflow-hidden">
-                <div class="block w-full py-1 font-sans text-sm antialiased font-light leading-normal" [ngClass]="{'max-h-96': isOpen, 'hidden': !isOpen }">
-                    <nav class="flex min-w-[240px] flex-col gap-1 p-0 font-sans text-base font-normal">
-                        @for (item of subItems(); track $index) {
-                            <div role="button" [routerLink]="item.route" routerLinkActive="bg-gray-700 text-white"
-                                class="flex items-end w-full p-2 leading-tight transition-all rounded-lg outline-none text-center text-gray-300
-                                 hover:bg-gray-700 hover:text-white ml-4 text-sm">
-                                <div class="grid mr-4 place-items-stretch">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                                        <path fill="currentColor" d="M12 7a2 2 0 1 0-2-2a2 2 0 0 0 2 2m0 10a2 2 0 1 0 2 2a2 2 0 0 0-2-2m0-7a2 2 0 1 0 2 2a2 2 0 0 0-2-2"/>
-                                    </svg>
-                                </div>
-                                {{ item.name }}
-                            </div>
-                        }
-                    </nav>
-                </div>
+            <div class="flex-shrink-0 w-6 h-6 text-gray-200 transition duration-75
+             dark:text-gray-400 dark:group-hover:text-white" [innerHTML]="IconSVG()">
             </div>
+            <span class="flex-1 ml-3 text-left whitespace-nowrap">
+                {{ title() }}
+            </span>
+             <svg aria-hidden="true" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd">
+             </path>
+            </svg>
+        </button>
+    </div>
+
+    <div class="overflow-hidden">
+        <div class="block w-full py-1 font-sans text-sm antialiased font-light leading-normal" [ngClass]="{'max-h-96': isOpen, 'hidden': !isOpen }">
+            <nav class="flex min-w-[240px] flex-col gap-1 p-0 font-sans text-base">
+              @for (item of subItems(); track $index) {
+                  <div>
+                      <a [routerLink]="item.route" routerLinkActive="bg-gray-700"
+                          class="flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group
+                               hover:bg-gray-700 text-white cursor-pointer">
+                          {{ item.name }}
+                      </a>
+                  </div>
+              }
+            </nav>
+
+        </div>
+    </div>
 </div>

@@ -1,18 +1,23 @@
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { Factura, ProductoFactura } from './../../../../interfaces/documento-venta-interface';
-import { Component, effect, inject, signal } from '@angular/core';
+import { AfterContentInit, Component, effect, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HeaderInput, HeaderTitlePageComponent } from "@dashboard/components/header-title-page/header-title-page.component";
 import { ListGroupDropdownComponent } from "@shared/components/list-group-dropdown/list-group-dropdown.component";
-import { tap } from 'rxjs';
-import { FormErrorLabelComponent } from "@shared/components/form-error-label/form-error-label.component";
+import { forkJoin, tap } from 'rxjs';
+import { FormErrorLabelComponent } from "src/app/utils/components/form-error-label/form-error-label.component";
+import { ClientesService } from '../../services/clientes.service';
+import { ProductosService } from '../../services/productos.service';
+import { GetProductosDetalle, ProductosInterface } from '@dashboard/interfaces/productos-interface';
+import { ClientesInterface } from '@dashboard/interfaces/clientes-interface';
 
 @Component({
   selector: 'app-comprobante-ventas-forms-page',
-  imports: [HeaderTitlePageComponent, ReactiveFormsModule, ListGroupDropdownComponent, CurrencyPipe, FormErrorLabelComponent],
+  imports: [HeaderTitlePageComponent, ReactiveFormsModule, ListGroupDropdownComponent, CurrencyPipe,
+            DecimalPipe, FormErrorLabelComponent],
   templateUrl: './comprobante-ventas-forms-page.component.html',
 })
-export class ComprobanteVentasFormsPageComponent {
+export class ComprobanteVentasFormsPageComponent implements OnInit {
 
     headTitle: HeaderInput = {
         title: 'Crear documento de venta',
@@ -20,29 +25,56 @@ export class ComprobanteVentasFormsPageComponent {
     }
 
     totales = {
-      subtotal: 0,
-      totalIVA: 0,
-      descuentoTotal: 0,
-      impuestos: 0,
-      retenciones: 0,
-      facturaTotal: 0,
+        subtotal: 0,
+        totalIVA: 0,
+        descuentoTotal: 0,
+        impuestos: 0,
+        retenciones: 0,
+        facturaTotal: 0,
+        importe: 0
     }
 
+    private fb = inject(FormBuilder);
+    clienteServicios = inject(ClientesService);
+    productoServicios = inject(ProductosService);
     factura = signal<Factura | null>(null);
     productSeleccionados = signal<ProductoFactura[]>([]);
+    getAllProductos = signal<ProductosInterface[]>([]);
+    getAllClientes = signal<ClientesInterface[]>([]);
 
-    private fb = inject(FormBuilder);
+    // onProductFrom = effect((onCleanup) => {
+    //     const valorTotal = this.onValorTotal();
 
-    onProductFrom = effect((onCleanup) => {
-        const valorTotal = this.onValorTotal();
+    //     onCleanup(() => {
+    //       valorTotal?.unsubscribe();
+    //     })
+    // });
 
-        onCleanup(() => {
-          valorTotal?.unsubscribe();
-        })
-    })
+    ngOnInit(): void {
+          forkJoin({
+            clientes: this.clienteServicios.getClientes({ limit: 10000, offset: 0}),
+            productos: this.productoServicios.getProductos({ limit: 10000, offset: 0})
+          }).subscribe({
+            next: ({clientes, productos}) => {
+                const clienteMap = clientes.clientes.map((item) => {
+                    return {
+                        nombre: item.nombre + item.apellido
+                    }
+                })
+                this.getAllClientes.set(clientes.clientes);
+                this.getAllProductos.set(productos.productos);
+            },
+            error: (error) => {
+                console.log("Error Comprobantes Ventas: ", error)
+            }
+          });
+    }
+
+
 
     formVentas = this.fb.group({
       cliente: ['', Validators.required],
+      identificacion: ['', Validators.required],
       numero: ['', Validators.required],
       contacto: [''],
       vendedor: [''],
@@ -54,10 +86,10 @@ export class ComprobanteVentasFormsPageComponent {
 
     productosItemsForm = this.fb.group({
         producto: ['', Validators.required],
-        descripcion: ['', Validators.required],
+        descripcion: [''],
         cantidad: [0, [Validators.required, Validators.min(1)]],
         valorUnitario: [0, [Validators.required, Validators.min(0)]],
-        descuento: [0, [Validators.min(0), Validators.max(100)]],
+        descuento: [0, [Validators.min(0), Validators.maxLength(3)]],
         impuestos: ['', [Validators.min(0)]],
     })
 
@@ -65,38 +97,42 @@ export class ComprobanteVentasFormsPageComponent {
         return this.productSeleccionados();
     }
 
-    onValorTotal(){
-      console.log("Cantidad", this.productosItemsForm.controls.cantidad.value)
-      console.log("Valor unitario", this.productosItemsForm.controls.valorUnitario.value)
-      // if(!this.productosItemsForm.controls.cantidad.value || !this.productosItemsForm.controls.valorUnitario.value) return
+    // onValorTotal(){
+    //   console.log("Cantidad 2", this.productosItemsForm.controls.cantidad.value)
+    //   console.log("Valor unitario", this.productosItemsForm.controls.valorUnitario.value)
+    //   // if(!this.productosItemsForm.controls.cantidad.value || !this.productosItemsForm.controls.valorUnitario.value) return
 
-      return this.productosItemsForm.valueChanges.pipe(
-        tap((valor) => console.log("Valor: ", valor)),
-        tap((valor) => console.log("Cantidad", this.productosItemsForm.controls.cantidad.value)),
-      )
-      .subscribe((valor) => {
-        const cantidad = this.productosItemsForm.get('cantidad')?.value;
-        const unitario = this.productosItemsForm.get('valorUnitario')?.value;
+    //   return this.productosItemsForm.valueChanges.pipe(
+    //     tap((valor) => console.log("Valor: ", valor)),
+    //     tap((valor) => console.log("Cantidad", this.productosItemsForm.controls.cantidad.value)),
+    //   )
+    //   .subscribe((valor) => {
+    //     const cantidad = this.productosItemsForm.get('cantidad')?.value;
+    //     const unitario = this.productosItemsForm.get('valorUnitario')?.value;
           
-        if (cantidad && unitario) {
+    //     if (cantidad && unitario) {
           
-        }
-      })
-    }
+    //     }
+    //   })
+    // }
 
     async setProductos(){
       if(!this.productosItemsForm.valid) return;
 
       const valores = this.productosItemsForm.value as ProductoFactura;
       const valorItemTotal = this.calcularItemTotal();
-      const impuesto = this.productosItemsForm.value.impuestos?.split("-")[1] ?? '0';
+      const valorItemImporte = this.calcularDescuentoImporte();
+      const impuesto = this.productosItemsForm.value.impuestos ?? '0';
       const nuevoItemConId = {
         ...valores,
         id: crypto.randomUUID(),
         subtotal: this.productosItemsForm.value.cantidad! * this.productosItemsForm.value.valorUnitario!,
-        impuestos: (((this.productosItemsForm.value.cantidad! * this.productosItemsForm.value.valorUnitario!) * 
-                   (1 - this.productosItemsForm.value.descuento! / 100)) * (parseInt(impuesto) / 100)).toString(),
-        //valorBruto: (this.nuevoItemForm.value.  * this.nuevoItemForm.value.valorUnitario) * (1 - this.nuevoItemForm.value.descuento / 100),
+        impuesto: impuesto,
+        importe: valorItemImporte,
+        iva_valor: ((this.productosItemsForm.value.cantidad! * this.productosItemsForm.value.valorUnitario!) *
+                                                                                 (parseInt(impuesto) / 100)),
+        descuento_valor: ((this.productosItemsForm.value.cantidad! * this.productosItemsForm.value.valorUnitario!) * 
+                                                                                  (valores.descuento / 100)),
         valorTotal: valorItemTotal
       }
       
@@ -104,11 +140,10 @@ export class ComprobanteVentasFormsPageComponent {
       this.calcularTotal();
       this.reiniciarProducto();
 
-      console.log("Array: ", this.productSeleccionados());
     }
 
     calcularItemTotal(): number {
-        const impuesto = this.productosItemsForm.value.impuestos?.split("-")[1] ?? '0';
+        const impuesto = this.productosItemsForm.value.impuestos ?? '0';
 
         const valorNeto = this.productosItemsForm.value.cantidad! * this.productosItemsForm.value.valorUnitario!;
         const descuentoAplicado = valorNeto * (this.productosItemsForm.value.descuento! / 100);
@@ -116,6 +151,15 @@ export class ComprobanteVentasFormsPageComponent {
         const impuestoAplicado = valorDescontado * (parseInt(impuesto) / 100);
         
         return valorDescontado + impuestoAplicado;
+    }
+
+    calcularDescuentoImporte(): number {
+
+        const valorNeto = this.productosItemsForm.value.cantidad! * this.productosItemsForm.value.valorUnitario!;
+        const descuentoAplicado = valorNeto * (this.productosItemsForm.value.descuento! / 100);
+        const valorDescontado = valorNeto - descuentoAplicado;
+        
+        return valorDescontado;
     }
 
     deleteProducto(id: string){
@@ -128,22 +172,36 @@ export class ComprobanteVentasFormsPageComponent {
     }
 
     reiniciarProducto(){
-        this.productosItemsForm.reset({
-            producto: '',
-            descripcion: '',
-            cantidad: 0,
-            valorUnitario: 0,
-            descuento: 0,
-            impuestos: '0',
+          this.productosItemsForm.reset({
+                producto: '',
+                descripcion: '',
+                cantidad: 0,
+                valorUnitario: 0,
+                descuento: 0,
+                impuestos: '0',
+          })
+    }
+
+    onClienteSeleccionado(cliente: Partial<ClientesInterface>){
+        this.formVentas.patchValue({
+          contacto: cliente.email,
+          identificacion: cliente.numeroDocumento
+        })
+    }
+
+    onProductoSeleccionado(producto: Partial<GetProductosDetalle>){
+        this.productosItemsForm.patchValue({
+            valorUnitario: parseInt(producto.precioventa1 ?? '0'),
+            impuestos: producto.iva_percent,
         })
     }
 
     calcularTotal(){
         this.totales.facturaTotal = this.productSeleccionados().reduce((accumulator, currentValue) =>  accumulator + currentValue.valorTotal, 0);
-        this.totales.impuestos = this.productSeleccionados().reduce((accu, current) => accu + parseInt(current.impuestos), 0);
         this.totales.subtotal = this.productSeleccionados().reduce((accu, current) => accu + current.subtotal, 0);
         this.totales.retenciones =  0;
-        this.totales.descuentoTotal = this.productSeleccionados().reduce((accu, current) => accu + current.descuento, 0);
+        this.totales.totalIVA = this.productSeleccionados().reduce((accu, current) => accu + current.iva_valor, 0);
+        this.totales.descuentoTotal = this.productSeleccionados().reduce((accu, current) => accu + current.descuento_valor, 0);
     }
 
     async onSubmit(){
@@ -152,6 +210,5 @@ export class ComprobanteVentasFormsPageComponent {
 
         console.log("valueFormFactura: ",valueFormFactura);
         console.log("valueFormProductos: ",valueFormProductos);
-        
     }
  }

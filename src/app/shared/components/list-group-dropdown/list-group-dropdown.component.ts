@@ -1,10 +1,11 @@
-import { CommonModule, TitleCasePipe } from '@angular/common';
-import {  Component, effect, ElementRef, forwardRef, HostListener, input, OnInit, output, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Component, ElementRef, forwardRef, HostListener, input, signal, effect, computed, output } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
   selector: 'app-list-group-dropdown',
-  imports: [TitleCasePipe, FormsModule, CommonModule],
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './list-group-dropdown.component.html',
   providers: [
     {
@@ -14,32 +15,47 @@ import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/f
     }
   ]
 })
-export class ListGroupDropdownComponent implements OnInit, ControlValueAccessor {
+export class ListGroupDropdownComponent<T extends Record<string, any>> implements ControlValueAccessor {
 
   title = input.required<string>();
-  dataList = input<string[]>([]);
-
-  public filteredOptions = signal<string[]>([]);
+  dataList = input<T[]>([]);
+  labelKey = input<string[]>(['nombre']);
+  objectSelect = output<T>();
+  searchOption = signal<string>('');
   showDropdown = signal<boolean>(false);
-  searchOption: string = '';
+  // filteredOptions = signal<T[]>([]);
 
-  private _value: any = '';
+  filteredOptions = computed(() => {
+    const list = this.dataList();
+    const term = this.searchOption().toLowerCase();
+
+    if (!term.trim()) return list;
+
+    return list.filter(item =>
+      this.buildLabel(item).toLowerCase().includes(term)
+    );
+  });
+
+  buildLabel(item: T): string {
+    const keys = this.labelKey();
+    return keys
+      .map(key => String(item[key] ?? '').trim())
+      .filter(Boolean)
+      .join(' ');
+  }
+  
+
+  constructor(private elementRef: ElementRef) {}
+
+  // ------- CONTROL VALUE ACCESSOR ------- //
+  private _value: T | null = null;
   onChange = (_: any) => {};
   onTouched = () => {};
 
-  constructor(private elementRef: ElementRef) {
-      effect(() => {
-        this.filteredOptions.set(this.dataList());
-        this.searchOption = this.value;
-      });
-  }
-
-  ngOnInit(): void {}
-
-  writeValue(value: any): void {
-    if (value !== undefined && value !== null) {
-      this._value = value;
-      this.searchOption = value;
+  writeValue(value: T | null): void {
+    this._value = value;
+    if (value) {
+      this.searchOption.set(this.buildLabel(value));
     }
   }
 
@@ -51,39 +67,37 @@ export class ListGroupDropdownComponent implements OnInit, ControlValueAccessor 
     this.onTouched = fn;
   }
 
-  get value(): any {
+  set value(val: T | null) {
+    this._value = val;
+    this.onChange(val);
+    if (val) {
+      this.searchOption.set(val[this.buildLabel(val)]);
+    }
+  }
+
+  get value(): T | null {
     return this._value;
   }
 
-  set value(val: any) {
-    this._value = val;
-    this.onChange(val);
+  // ------- FUNCIONES DEL COMPONENTE ------- //
+
+  onSearchChange(event: any) {
+    this.searchOption.set(event.target.value);
+    this.showDropdown.set(true);
   }
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent) {
+  selectedItem(item: T) {
+    this.value = item[this.labelKey()[0]];
+    this.objectSelect.emit(item);
+    this.searchOption.set(item[this.labelKey()[0]]);
+    this.showDropdown.set(false);
+  }
+
+   @HostListener('document:click', ['$event'])
+  onClickOutside(event: MouseEvent) {
+    // console.log(this.dataList());
     if (!this.elementRef.nativeElement.contains(event.target)) {
       this.showDropdown.set(false);
     }
   }
-
-  onSearchChange() {
-    const dataFilter = this.dataList().filter(item => item.toLowerCase().includes(this.searchOption.toLowerCase()));
-    this.filteredOptions.set(dataFilter);
-    this.showDropdown.set(true);
-    this.onChange(this.searchOption);
-  }
-
-  selectedItem(item: string) {
-    this.searchOption = item;
-    this.value = item; // Esto llama al setter y notifica a los cambios del formulario
-    this.showDropdown.set(false);
-  }
-
-  toggleDropdown() {
-    this.showDropdown.set(!this.showDropdown());
-    if (this.showDropdown()) {
-      this.filteredOptions.set(this.dataList());
-    }
-  }
- }
+}

@@ -1,13 +1,13 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./src/**/*.{html,ts}",
-    // Nueva ruta para incluir las clases de Material Tailwind
-    "./node_modules/@material-tailwind/html/dist/**/*.js",
+    "./src/**/*.{html,ts}", // Esto lee tus archivos de Angular
+    "./node_modules/flowbite-angular/**/*.js" // <-- Esto es para Flowbite-Angular
   ],
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    require('flowbite/plugin') // <-- Así se añade el plugin
+  ],
 };
-

@@ -1,49 +1,88 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { HeaderInput, HeaderTitlePageComponent } from '@dashboard/components/header-title-page/header-title-page.component';
 import { CardsTotales, NumCardsTotalesComponent } from '@shared/components/num-cards-totales/num-cards-totales.component';
 import { TableListComponent } from "@shared/components/table-list/table-list.component";
+import { ProductosService } from '../services/productos.service';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { LoaderComponent } from "src/app/utils/components/loader/loader.component";
+import { PaginationService } from '@shared/components/pagination/pagination.service';
+import { firstValueFrom, tap } from 'rxjs';
+import { ModalComponents } from "@shared/components/modal.components/modal.components";
+import { modalOpen } from '@shared/interfaces/services.interfaces';
 
-const cardNum: CardsTotales[] = [
-   {
-      title: 'Total Productos',
-      valor: '10',
-      percent: '40'
-   },
-   {
-      title: 'Nuevos este Mes',
-      valor: '0',
-      percent: '20'
-   },
-   {
-      title: 'Total Servicios',
-      valor: '2.0000',
-      percent: '20'
-   },
-]
 
 @Component({
   selector: 'app-productos-servicios',
-  imports: [HeaderTitlePageComponent, TableListComponent, NumCardsTotalesComponent],
+  imports: [HeaderTitlePageComponent, TableListComponent, NumCardsTotalesComponent, LoaderComponent, ModalComponents],
   templateUrl: './productos-servicios.component.html',
 })
 export class ProductosServiciosComponent {
+
     headTitleCliente: HeaderInput = {
         title: 'Productos y Servicios',
         slog: 'Administra la información de tus productos y servicios'
     }
 
-    cardValor = signal<CardsTotales[]>(cardNum);
+    paginationService = inject(PaginationService);
+    productoServicio = inject(ProductosService);
+    totalProducto = signal(0);
+    idProductoToModal = signal<string>('');
+    isModalEdit = false;
+    cardValor = signal<CardsTotales[]>([])
 
-    get columnsTable(){
+    productorxResource = rxResource({
+         request: () => ({ page: this.paginationService.currentPage() - 1, limit: 10 }),
+         loader: ({ request }) => {
+            return this.productoServicio.getProductos({ offset: request.page * 9, limit: request.limit }).pipe(
+               tap((p) => {
+                  this.totalProducto.set(p.count);
+                  this.cardValor.set([
+                        { title: 'Total Productos', valor: this.totalProducto().toString(), percent: '100'},
+                        { title: 'Nuevos este Mes', valor: '0', percent: '20' },
+                        { title: 'Total Servicios', valor: '0', percent: '20' }
+                  ]);
+               })
+            )
+         }
+    })
+
+
+   openModal(event: modalOpen){
+         this.isModalEdit = event.open;
+         this.idProductoToModal.set(event.id);
+   }
+
+   get columnsTable(){
       return [
-         { key:'fecha', header: 'Fecha' },
-         { key:'tipo', header: 'Tipo' },
-         { key:'nombre', header: 'Cod. Nombre' },
-         { key:'unidad', header: 'Unidad' },
-         { key:'precio', header: 'Precio' },
-         { key:'impuestos', header: 'Impuestos' },
-         { key:'estado', header: 'Estado' },
+         { key:'codigo', header: 'Codigo' },
+         { key:'nombre', header: 'Nombre' },
+         { key:'categoria', header: 'Categoria' },
+         { key:'precioventa1', header: 'Precio', type: 'number'},
+         { key:'iva_percent', header: 'Impuestos' },
+         { key:'rete_percent', header: 'Retencion' },
+         { key:'unidadmedida', header: 'Medida' },
       ]
-    }
+   }
+
+   async deleteProducto(){
+            const ID = this.idProductoToModal();
+            if (!ID) {
+                alert("No se obtuvo el Producto o Servicio");
+                return;
+            }
+
+            const product = await firstValueFrom( this.productoServicio.deleteProducto(ID) );
+            this.isModalEdit = false;
+            if (product.success == false) {
+                this.isModalEdit = false;
+                alert(`Hubo un error al guardar el Producto o Servicio ${product.error.message}`);
+                return;
+            } 
+
+            alert("Eliminado exitosamente");
+            setTimeout(() => {
+               window.location.reload();
+            }, 600);
+   }
 
  }

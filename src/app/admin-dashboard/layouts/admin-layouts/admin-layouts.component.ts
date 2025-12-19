@@ -1,7 +1,10 @@
-import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MenuPerfilComponent } from "../../components/menu-perfil/menu-perfil.component";
 import { BarralateralMenuComponent } from "@dashboard/components/barralateral-menu/barralateral-menu.component";
+import { OptionBarralateral } from "@dashboard/components/option-barralateral/option-barralateral.component";
+import { FlowbiteService } from 'src/app/utils/services/flowbite.service';
+import { Subscription } from 'rxjs';
 
 export interface MenuOption {
   name: string
@@ -18,12 +21,31 @@ interface Sidebar {
 
 @Component({
   selector: 'app-admin-layouts',
-  imports: [RouterOutlet, MenuPerfilComponent, BarralateralMenuComponent],
+  imports: [RouterOutlet, MenuPerfilComponent, BarralateralMenuComponent, OptionBarralateral],
   templateUrl: './admin-layouts.component.html',
 })
-export default class AdminLayoutsComponent {
+export default class AdminLayoutsComponent implements OnInit, OnDestroy{
 
   activeMenu: string | null = 'Dashboard';
+  private routeSubscription: Subscription | null = null;
+  router = inject(Router);
+
+  ngOnInit(): void {
+    this.routeSubscription = this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.setActiveMenuBasedOnRoute();
+      }
+    });
+
+    this.setActiveMenuBasedOnRoute();
+  }
+
+  ngOnDestroy() {
+    if (this.routeSubscription) {
+      this.routeSubscription.unsubscribe();
+    }
+  }
+
 
   toggleActiveMenu(menuId: string){
     if (this.activeMenu === menuId) {
@@ -82,10 +104,23 @@ export default class AdminLayoutsComponent {
             }
         ]
       }
-  ]
+  ];
+
+  setActiveMenuBasedOnRoute() {
+    const currentRoute = this.router.url.split('?')[0];  // Remove query params
+    const currentRoute2 = this.router.url.includes('new-Item') ? this.router.url.split('/') : [];  // Remove params
+    currentRoute2.pop();
+
+    for (const sidebar of this.menuLateral) {
+      const matchingItem = sidebar.subItems.find(item => item.route === currentRoute || item.route === currentRoute2.join("/") );
+
+      if (matchingItem) {
+        this.activeMenu = sidebar.name;
+        break;
+      }
+    }
+  }
 
 
 
-
-
- }
+}

@@ -17,6 +17,7 @@ export class BarralateralMenuComponent {
     activeMenu = input<string | null>(null);
     menuId = input<string>();
     menuToggled = output<string>();
+    
 
     get isOpen(): boolean {
       return this.activeMenu() === this.menuId();

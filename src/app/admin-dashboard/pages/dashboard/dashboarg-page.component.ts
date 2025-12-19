@@ -45,6 +45,10 @@ export class DashboargPageComponent {
       {
         title: 'Clientes',
         ruta: '/dashboard/ventas/clients'
+      },
+      {
+         title: 'Servicios',
+        ruta: '/dashboard/ventas/products_services'
       }
     ]
 

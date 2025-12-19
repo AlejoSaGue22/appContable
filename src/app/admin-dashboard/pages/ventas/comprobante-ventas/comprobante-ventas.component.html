@@ -1,7 +1,18 @@
-<header-title-page [titleHead]="headTitle" />
+@if ( comprobanteVentasResource.isLoading() ) {
+     <div class="flex justify-center items-center h-screen">
+            <app-loader/>  
+    </div>
+}
 
-<!-- Cards Total -->
-<num-cards-totales [itemsValores]="cardsTotales"/>
 
+@if (comprobanteVentasResource.hasValue() ) {
+    <header-title-page [titleHead]="headTitle" />
+    
+    <num-cards-totales [itemsValores]="cardsTotales()"/>
+    
+    <app-table-list  
+        [columns]="columnsTable" 
+        [dataTable]="comprobanteVentasResource.value().comprobantes" 
+        rutaLink="/dashboard/ventas/comprobantes/" />
+}
 
-<app-table-list  [columns]="columnsTable" rutaLink="/dashboard/ventas/comprobantes/1" />
