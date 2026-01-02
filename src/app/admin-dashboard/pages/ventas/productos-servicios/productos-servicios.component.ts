@@ -23,6 +23,7 @@ export class ProductosServiciosComponent {
         slog: 'Administra la información de tus productos y servicios'
     }
 
+
     paginationService = inject(PaginationService);
     productoServicio = inject(ProductosService);
     totalProducto = signal(0);

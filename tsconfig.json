@@ -6,7 +6,8 @@
     "baseUrl": "./",
     "paths": {
       "@shared/*": ["./src/app/shared/*"],
-      "@dashboard/*": ["./src/app/admin-dashboard/*"]
+      "@dashboard/*": ["./src/app/admin-dashboard/*"],
+      "@utils/*": ["./src/app/utils/*"]
     },
     "outDir": "./dist/out-tsc",
     "strict": true,

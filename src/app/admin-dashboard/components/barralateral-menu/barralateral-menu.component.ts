@@ -1,5 +1,5 @@
 import { NgClass } from '@angular/common';
-import { Component, input, linkedSignal, output, signal } from '@angular/core';
+import { Component, inject, input, linkedSignal, output, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MenuOption } from '@dashboard/layouts/admin-layouts/admin-layouts.component';
 
@@ -9,6 +9,7 @@ import { MenuOption } from '@dashboard/layouts/admin-layouts/admin-layouts.compo
   templateUrl: './barralateral-menu.component.html',
 })
 export class BarralateralMenuComponent {
+
 
     title =  input.required<string>();
     IconSVG = input();

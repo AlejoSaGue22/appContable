@@ -17,7 +17,4 @@ export class AppComponent {
 
     //  flowbiteService = inject(FlowbiteService);
 
-
 }
-
-

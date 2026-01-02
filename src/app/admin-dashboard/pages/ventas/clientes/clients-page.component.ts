@@ -85,9 +85,4 @@ export class ClientsPageComponent {
         }, 600);
     }
 
-
-    
-
-    
-
  }

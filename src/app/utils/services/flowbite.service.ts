@@ -15,10 +15,8 @@ export class FlowbiteService {
   }
 
   private initializeFlowbiteGlobal() {
-    // Inicializar en la carga inicial
     this.initializeOnce();
 
-    // Reinicializar en cada cambio de ruta
     this.router.events
       .pipe(
         filter(event => event instanceof NavigationEnd),

@@ -18,8 +18,9 @@ export interface Column {
 })
 
 export class TableListComponent implements OnInit {
+
     
-    columns = input.required<Column[]>();
+  columns = input.required<Column[]>();
     dataTable = input<any[]>([]);
     hasAction = input<boolean>(true);
     pages = input<number>(1);
@@ -30,9 +31,7 @@ export class TableListComponent implements OnInit {
     dataTableTemp = signal<any[]>([]);
     paginationServices = inject(PaginationService);
 
-    ngOnInit(): void {
-        this.dataTableTemp.set(this.dataTable());
-    }
+
 
     debouncedTime = effect((onCleanup) => {
           const value = this.inputValue();
@@ -44,9 +43,15 @@ export class TableListComponent implements OnInit {
           onCleanup(() => clearTimeout(timeout));
     });
 
+
+
+    ngOnInit(): void {
+        this.dataTableTemp.set(this.dataTable());
+    }
+
+
     get messageHead(){
       const pages = this.rutaLink().split('/')[3];
-      
       return pages;
     }
 

@@ -24,6 +24,34 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
         slog: 'Se registra nueva factura de venta al sistema'
     }
 
+    private productosService = inject(ProductosService);
+    private clienteService = inject(ClientesService);
+    factura = signal<Factura | null>(null);
+    productSeleccionados = signal<ProductoFactura[]>([]);
+
+    productos = signal<ProductosInterface[]>([]);
+    clientes = signal<ClientesInterface[]>([]);
+    private fb = inject(FormBuilder);
+
+    ngOnInit(): void {
+
+        const productos$ = this.productosService._productos;
+        const clientes$ = this.clienteService._clientes;
+
+        this.productos.set(productos$);
+        this.clientes.set(clientes$);
+            console.log("Productos: ", this.productosService._productos);
+            console.log("Clientes: ", this.clienteService._clientes); 
+    }
+
+    onProductFrom = effect((onCleanup) => {
+        const valorTotal = this.onValorTotal();
+
+        onCleanup(() => {
+          valorTotal?.unsubscribe();
+        })
+    })
+
     totales = {
         subtotal: 0,
         totalIVA: 0,
@@ -34,13 +62,14 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
         importe: 0
     }
 
-    private fb = inject(FormBuilder);
-    clienteServicios = inject(ClientesService);
-    productoServicios = inject(ProductosService);
-    factura = signal<Factura | null>(null);
-    productSeleccionados = signal<ProductoFactura[]>([]);
-    getAllProductos = signal<ProductosInterface[]>([]);
-    getAllClientes = signal<ClientesInterface[]>([]);
+
+    // private fb = inject(FormBuilder);
+    // clienteServicios = inject(ClientesService);
+    // productoServicios = inject(ProductosService);
+    // factura = signal<Factura | null>(null);
+    // productSeleccionados = signal<ProductoFactura[]>([]);
+    // getAllProductos = signal<ProductosInterface[]>([]);
+    // getAllClientes = signal<ClientesInterface[]>([]);
 
     // onProductFrom = effect((onCleanup) => {
     //     const valorTotal = this.onValorTotal();
@@ -50,29 +79,28 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     //     })
     // });
 
-    ngOnInit(): void {
-          forkJoin({
-            clientes: this.clienteServicios.getClientes({ limit: 10000, offset: 0}),
-            productos: this.productoServicios.getProductos({ limit: 10000, offset: 0})
-          }).subscribe({
-            next: ({clientes, productos}) => {
-                const clienteMap = clientes.clientes.map((item) => {
-                    return {
-                        nombre: item.nombre + item.apellido
-                    }
-                })
-                this.getAllClientes.set(clientes.clientes);
-                this.getAllProductos.set(productos.productos);
-            },
-            error: (error) => {
-                console.log("Error Comprobantes Ventas: ", error)
-            }
-          });
-    }
+    // ngOnInit(): void {
+    //       forkJoin({
+    //         clientes: this.clienteServicios.getClientes({ limit: 10000, offset: 0}),
+    //         productos: this.productoServicios.getProductos({ limit: 10000, offset: 0})
+    //       }).subscribe({
+    //         next: ({clientes, productos}) => {
+    //             const clienteMap = clientes.clientes.map((item) => {
+    //                 return {
+    //                     nombre: item.nombre + item.apellido
+    //                 }
+    //             })
+    //             this.getAllClientes.set(clientes.clientes);
+    //             this.getAllProductos.set(productos.productos);
+    //         },
+    //         error: (error) => {
+    //             console.log("Error Comprobantes Ventas: ", error)
+    //         }
+    //       });
+    // }
 
 
-
-    formVentas = this.fb.group({
+   formVentas = this.fb.group({
       cliente: ['', Validators.required],
       identificacion: ['', Validators.required],
       numero: ['', Validators.required],
@@ -97,24 +125,24 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
         return this.productSeleccionados();
     }
 
-    // onValorTotal(){
-    //   console.log("Cantidad 2", this.productosItemsForm.controls.cantidad.value)
-    //   console.log("Valor unitario", this.productosItemsForm.controls.valorUnitario.value)
-    //   // if(!this.productosItemsForm.controls.cantidad.value || !this.productosItemsForm.controls.valorUnitario.value) return
+    onValorTotal(){
+      console.log("Cantidad 2", this.productosItemsForm.controls.cantidad.value)
+      console.log("Valor unitario", this.productosItemsForm.controls.valorUnitario.value)
+      // if(!this.productosItemsForm.controls.cantidad.value || !this.productosItemsForm.controls.valorUnitario.value) return
 
-    //   return this.productosItemsForm.valueChanges.pipe(
-    //     tap((valor) => console.log("Valor: ", valor)),
-    //     tap((valor) => console.log("Cantidad", this.productosItemsForm.controls.cantidad.value)),
-    //   )
-    //   .subscribe((valor) => {
-    //     const cantidad = this.productosItemsForm.get('cantidad')?.value;
-    //     const unitario = this.productosItemsForm.get('valorUnitario')?.value;
+      return this.productosItemsForm.valueChanges.pipe(
+        tap((valor) => console.log("Valor: ", valor)),
+        tap((valor) => console.log("Cantidad", this.productosItemsForm.controls.cantidad.value)),
+      )
+      .subscribe((valor) => {
+        const cantidad = this.productosItemsForm.get('cantidad')?.value;
+        const unitario = this.productosItemsForm.get('valorUnitario')?.value;
           
-    //     if (cantidad && unitario) {
+        if (cantidad && unitario) {
           
-    //     }
-    //   })
-    // }
+        }
+      })
+    }
 
     async setProductos(){
       if(!this.productosItemsForm.valid) return;
