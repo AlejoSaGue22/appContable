@@ -8,6 +8,7 @@ import { ProductosInterface } from '@dashboard/interfaces/productos-interface';
 import { FormErrorLabelComponent } from "src/app/utils/components/form-error-label/form-error-label.component";
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { LoaderComponent } from "src/app/utils/components/loader/loader.component";
+import { NotificationService } from '@shared/services/notification.service';
 
 @Component({
   selector: 'app-productos-servicios-forms',
@@ -24,6 +25,7 @@ export class ProductosServiciosFormsComponent {
     
     private fb = inject(FormBuilder);
     productoServicios = inject(ProductosService);
+    notificacionService = inject(NotificationService);
     router = inject(Router);
     activateRoute = inject(ActivatedRoute);
 
@@ -64,7 +66,11 @@ export class ProductosServiciosFormsComponent {
       this.formProductos.markAllAsTouched();
 
       if (!valid) {
-          alert("Formulario incompleto");
+          this.notificacionService.error(
+                     `Formulario incompleto`,
+                     'Error',
+                     5000
+          );
           return
       }
 
@@ -82,11 +88,19 @@ export class ProductosServiciosFormsComponent {
             const product = await firstValueFrom( this.productoServicios.agregarProducto(formValue as Partial<ProductosInterface>) );
    
             if (product.success == false) {
-              alert(`Hubo un error al guardar el producto ${product.error.message}`)
+              this.notificacionService.error(
+                     `Hubo un error al guardar el producto ${product.error.message}`,
+                     'Error',
+                     5000
+              );
               return;
             }
     
-            alert("Registro exitosamente");
+            this.notificacionService.success(
+               'Producto agregado correctamente',
+               'Completado!',
+               3000
+            );
             await this.router.navigateByUrl('/dashboard/ventas/products_services');  
 
         }else{
@@ -96,11 +110,19 @@ export class ProductosServiciosFormsComponent {
 
             if (product.success == false) {
                 console.log(product.error);
-                alert(`Hubo un error al guardar este item ${product.error.message}`)
+                this.notificacionService.error(
+                     `Hubo un error al guardar este item ${product.error.message}`,
+                     'Error',
+                     5000
+                );
                 return;
             }
       
-            alert("Registro Actualizado Correctamente");
+            this.notificacionService.success(
+               'Producto actualizado correctamente',
+               'Completado!',
+               3000
+            );
             await this.router.navigateByUrl('/dashboard/ventas/products_services');   
     
         }

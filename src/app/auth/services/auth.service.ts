@@ -61,9 +61,9 @@ export class AuthService {
       }
 
       return this.http.get<LoginResponse>(`${baseURL}/auth/check-status`,{
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+        // headers: {
+        //   Authorization: `Bearer ${token}`
+        // }
       }).pipe(
         map((resp) => {
           const result = this.handleAuthSuccess(resp)
@@ -83,7 +83,7 @@ export class AuthService {
     sessionStorage.removeItem('token');
   }
 
-  private handleAuthSuccess({ token, user}: LoginResponse){
+  private handleAuthSuccess({ token, user }: LoginResponse){
       this._user.set(user);
       this._token.set(token);
       this._authStatus.set('authenticated');

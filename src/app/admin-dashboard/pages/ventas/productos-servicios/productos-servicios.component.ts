@@ -9,6 +9,7 @@ import { PaginationService } from '@shared/components/pagination/pagination.serv
 import { firstValueFrom, tap } from 'rxjs';
 import { ModalComponents } from "@shared/components/modal.components/modal.components";
 import { modalOpen } from '@shared/interfaces/services.interfaces';
+import { NotificationService } from '@shared/services/notification.service';
 
 
 @Component({
@@ -26,6 +27,7 @@ export class ProductosServiciosComponent {
 
     paginationService = inject(PaginationService);
     productoServicio = inject(ProductosService);
+    notificacionService = inject(NotificationService);
     totalProducto = signal(0);
     idProductoToModal = signal<string>('');
     isModalEdit = false;
@@ -68,7 +70,11 @@ export class ProductosServiciosComponent {
    async deleteProducto(){
             const ID = this.idProductoToModal();
             if (!ID) {
-                alert("No se obtuvo el Producto o Servicio");
+                  this.notificacionService.error(
+                     'No se obtuvo el Producto o Servicio',
+                     'Error',
+                     5000
+                  );
                 return;
             }
 
@@ -76,11 +82,19 @@ export class ProductosServiciosComponent {
             this.isModalEdit = false;
             if (product.success == false) {
                 this.isModalEdit = false;
-                alert(`Hubo un error al guardar el Producto o Servicio ${product.error.message}`);
+                  this.notificacionService.error(
+                     `Hubo un error al guardar el Producto o Servicio ${product.error.message}`,
+                     'Error',
+                     5000
+                  );
                 return;
             } 
 
-            alert("Eliminado exitosamente");
+            this.notificacionService.success(
+               'Se ha eliminado el producto correctamente',
+               'Eliminado!',
+               3000
+            );
             setTimeout(() => {
                window.location.reload();
             }, 600);

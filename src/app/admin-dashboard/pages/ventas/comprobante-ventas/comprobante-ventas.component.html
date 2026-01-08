@@ -4,15 +4,16 @@
     </div>
 }
 
-
+<!-- Header -->
 @if (comprobanteVentasResource.hasValue() ) {
-    <header-title-page [titleHead]="headTitle" />
-    
-    <num-cards-totales [itemsValores]="cardsTotales()"/>
-    
-    <app-table-list  
-        [columns]="columnsTable" 
-        [dataTable]="comprobanteVentasResource.value().comprobantes" 
-        rutaLink="/dashboard/ventas/comprobantes/" />
+    <div class="p-4 sm:p-6 lg:p-8">
+        <app-header-title-invoices />
+
+        <app-table-invoices [invoiceData]="comprobanteVentasResource.value().data" />
+    </div>
+}
+
+@if (comprobanteVentasResource.error()) {
+    <app-error-pages/>
 }
 

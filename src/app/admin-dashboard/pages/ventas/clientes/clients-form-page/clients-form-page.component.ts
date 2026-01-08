@@ -20,30 +20,28 @@ import { ErrorPageComponent } from "src/app/utils/components/error-page/error-pa
   templateUrl: './clients-form-page.component.html',
 })
 export class ClientsFormPageComponent implements OnInit { 
-
   
-  private fb = inject(FormBuilder);
-  clienteService = inject(ClientesService);
-  router = inject(Router);
-  activateRoute = inject(ActivatedRoute);
-  headTitleCliente: HeaderInput = { title: 'Crear Cliente', slog: 'Registra un nuevo cliente al sistema' };
+    private fb = inject(FormBuilder);
+    clienteService = inject(ClientesService);
+    router = inject(Router);
+    activateRoute = inject(ActivatedRoute);
+    headTitleCliente: HeaderInput = { title: 'Crear Cliente', slog: 'Registra un nuevo cliente al sistema' };
 
-  clientsForm = this.fb.group({
-      nombre: ['', Validators.required],
-      apellido: ['', Validators.required],
-      tipoDocumento: ['', Validators.required],
-      numeroDocumento: ['', Validators.required],
-      tipoPersona: ['', Validators.required],
-      razonSocial: ['', Validators.required],
-      direccion: ['', Validators.required],
-      ciudad: ['', Validators.required],
-      telefono: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(10)]],
-      email: ['', Validators.required],
-      observacion: [''],
-      responsableFiscal: ['', Validators.required],
-  })
+    clientsForm = this.fb.group({
+        nombre: ['', Validators.required],
+        apellido: ['', Validators.required],
+        tipoDocumento: ['', Validators.required],
+        numeroDocumento: ['', Validators.required],
+        tipoPersona: ['', Validators.required],
+        razonSocial: ['', Validators.required],
+        direccion: ['', Validators.required],
+        ciudad: ['', Validators.required],
+        telefono: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(10)]],
+        email: ['', Validators.required],
+        observacion: [''],
+        responsableFiscal: ['', Validators.required],
+    })
 
-    
     clienteID = toSignal(
       this.activateRoute.params.pipe(map((params) => params['id'] ))
     )
@@ -87,12 +85,11 @@ export class ClientsFormPageComponent implements OnInit {
 
     async onSubmit(){
       const isValid = this.clientsForm.valid;
-
       this.clientsForm.markAllAsTouched();
 
       if (!isValid) {
-          alert("Formulario incompleto");
-          return;
+        alert("Formulario incompleto");
+        return;
       }
 
       try {
@@ -100,7 +97,7 @@ export class ClientsFormPageComponent implements OnInit {
           const formValue = {
               ...this.clientsForm.value,
               telefono: this.clientsForm.get("telefono")?.value?.toString()
-          }
+          };
 
           if (this.clienteID() == 'new-Item') {
                 const client = await firstValueFrom(this.clienteService.agregarCliente(formValue as Partial<ClientesInterface>));
@@ -116,7 +113,7 @@ export class ClientsFormPageComponent implements OnInit {
 
           } else{
               const clientUpdate = await firstValueFrom( 
-                    this.clienteService.actualizarClientes(this.clienteID(), formValue as Partial<ClientesInterface>)
+                  this.clienteService.actualizarClientes(this.clienteID(), formValue as Partial<ClientesInterface>)
               );
 
               if (clientUpdate.success == false) {

@@ -18,9 +18,8 @@ export interface Column {
 })
 
 export class TableListComponent implements OnInit {
-
     
-  columns = input.required<Column[]>();
+    columns = input.required<Column[]>();
     dataTable = input<any[]>([]);
     hasAction = input<boolean>(true);
     pages = input<number>(1);

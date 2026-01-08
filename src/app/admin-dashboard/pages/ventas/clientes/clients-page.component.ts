@@ -10,6 +10,7 @@ import { LoaderComponent } from "src/app/utils/components/loader/loader.componen
 import { firstValueFrom, map, tap } from 'rxjs';
 import { modalOpen } from '@shared/interfaces/services.interfaces';
 import { PaginationService } from '@shared/components/pagination/pagination.service';
+import { NotificationService } from '@shared/services/notification.service';
 
 @Component({
   selector: 'app-clients-page',
@@ -26,6 +27,7 @@ export class ClientsPageComponent {
     paginationService = inject(PaginationService);
     flowbiteService = inject(FlowbiteService);
     clienteServices = inject(ClientesService);
+    notificacionService = inject(NotificationService);
     cardsTotales = signal<CardsTotales[]>([]);
     totalCliente = signal(0);
     idClienteToModal = signal<string>('');
@@ -68,18 +70,31 @@ export class ClientsPageComponent {
     async deleteCliente(){
         const ID = this.idClienteToModal();
         if (!ID) {
-            alert("No se obtuvo el cliente");
+            this.notificacionService.error(
+                     `No se obtuvo el ID del cliente`,
+                     'Error',
+                     5000
+              );
             return;
         }
+        
         const client = await firstValueFrom( this.clienteServices.deleteCliente(ID) );
         this.isModalEdit = false;
         if (client.success == false) {
             this.isModalEdit = false;
-            alert(`Hubo un error al guardar el cliente ${client.error.message}`);
+            this.notificacionService.error(
+                     `Hubo un error al guardar el cliente ${client.error.message}`,
+                     'Error',
+                     5000
+            );
             return;
         } 
 
-        alert("Eliminado exitosamente");
+        this.notificacionService.success(
+               'Producto eliminado correctamente',
+               'Completado!',
+               3000
+        );
         setTimeout(() => {
             window.location.reload();
         }, 600);

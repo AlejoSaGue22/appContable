@@ -4,6 +4,7 @@ import { AuthService } from '../../services/auth.service';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LoaderService } from 'src/app/utils/services/loader.service';
 import { FormErrorLabelComponent } from "src/app/utils/components/form-error-label/form-error-label.component";
+import { NotificationService } from '@shared/services/notification.service';
 
 @Component({
   selector: 'app-login-page.component',
@@ -15,6 +16,7 @@ export class LoginPageComponent {
     private fb = inject(FormBuilder);
     authService = inject(AuthService);
     loader = inject(LoaderService);
+    notificacionService = inject(NotificationService);
     router = inject(Router);
 
     private _isLoading = signal<boolean>(false);
@@ -30,7 +32,11 @@ export class LoginPageComponent {
         this.formLogin.markAllAsTouched();
 
         if (!valid) {
-          alert('Formulario Invalido');
+          this.notificacionService.error(
+              'Por favor, completa los campos requeridos.',
+              'Campos no validos',
+              5000
+          );
           return
         }
         
@@ -40,13 +46,22 @@ export class LoginPageComponent {
 
         this.authService.login(email!, password!).subscribe(async (isAuthenticaded) => {
             if (isAuthenticaded.success == true) {
-              await this.router.navigateByUrl('/dashboard/index');
-              this.loader.hide();
-              return;
+                this.notificacionService.success(
+                  'Has iniciado sesíon correctamente',
+                  '¡Bienvenido!',
+                  3000
+                );
+                await this.router.navigateByUrl('/dashboard/index');
+                this.loader.hide();
+                return;
             }
                 
             this.loader.hide();
-            alert(isAuthenticaded.error.message)
+            this.notificacionService.error(
+               isAuthenticaded.error.message,
+              'Error de autenticación',
+              5000
+            );
         })
     }
 

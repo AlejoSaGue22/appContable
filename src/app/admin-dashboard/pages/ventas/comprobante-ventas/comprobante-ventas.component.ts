@@ -8,10 +8,13 @@ import { PaginationService } from '@shared/components/pagination/pagination.serv
 import { rxResource } from '@angular/core/rxjs-interop';
 import { tap } from 'rxjs';
 import { LoaderComponent } from "src/app/utils/components/loader/loader.component";
+import { ErrorPages } from "@shared/components/error-pages/error-pages.component";
+import { HeaderTitleInvoices } from "./components/header-title-invoices/header-title-invoices.component";
+import { TableInvoices } from "./components/table-invoices/table-invoices.component";
 
 @Component({
   selector: 'app-comprobante-ventas',
-  imports: [HeaderTitlePageComponent, TableListComponent, NumCardsTotalesComponent, LoaderComponent],
+  imports: [NumCardsTotalesComponent, LoaderComponent, ErrorPages, HeaderTitleInvoices, TableInvoices],
   templateUrl: './comprobante-ventas.component.html',
 })
 export class ComprobanteVentasComponent {
@@ -21,10 +24,16 @@ export class ComprobanteVentasComponent {
         slog: 'Administra la información de tus facturas'
     }
 
+      // Paginación
+   currentPage = signal(1);
+   totalPages = signal(1);
+   totalItems = signal(0);
+   pageSize = signal(10);
+
     flowbiteService = inject(FlowbiteService);
     comprobantesVentasService = inject(ComprobantesVentasService);
     paginationService = inject(PaginationService);
-    totalComprobantes = signal(0);
+    totalComprobantes = signal<number>(0);
     cardsTotales = signal<CardsTotales[]>([]);
 
     comprobanteVentasResource = rxResource({
@@ -32,7 +41,7 @@ export class ComprobanteVentasComponent {
          loader: ({ request }) => this.comprobantesVentasService.getComprobanteVentas({ offset: request.page * 9, limit: request.limit })
                   .pipe(
                      tap((el) => {
-                           this.totalComprobantes.set(el.count);
+                           this.totalComprobantes.set(el.meta?.total ?? 0);
                            this.cardsTotales.set([
                               { title: 'Total Facturas', valor: this.totalComprobantes().toString(), percent: '0' },
                               { title: 'Balance General', valor: '0', percent: '0' },
@@ -40,6 +49,24 @@ export class ComprobanteVentasComponent {
                      })
                   )
     })
+
+    formatCurrency(value: number): string {
+      return new Intl.NumberFormat('es-CO', {
+         style: 'currency',
+         currency: 'COP',
+         minimumFractionDigits: 0
+      }).format(value);
+   }
+
+//    getStatusLabel(status: InvoiceStatus): string {
+//     const labels: Record<InvoiceStatus, string> = {
+//       [InvoiceStatus.DRAFT]: 'Borrador',
+//       [InvoiceStatus.ISSUED]: 'Emitida',
+//       [InvoiceStatus.PAID]: 'Pagada',
+//       [InvoiceStatus.CANCELLED]: 'Cancelada'
+//     };
+//     return labels[status];
+//   }
 
     get columnsTable(){
       return [

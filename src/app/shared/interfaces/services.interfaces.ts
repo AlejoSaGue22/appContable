@@ -5,6 +5,6 @@ export interface Options {
     offset?: number;
 }
 
-export type ResponseResult =  | { success: true, data?: any } | { success: false; error: ErrorAuthResponse };
+export type ResponseResult =  | { success: true, data?: any, message?: string } | { success: false; error: ErrorAuthResponse };
 
 export type modalOpen = { open: boolean, id: string };

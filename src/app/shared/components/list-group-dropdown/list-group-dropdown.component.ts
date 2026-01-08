@@ -23,7 +23,7 @@ export class ListGroupDropdownComponent<T extends Record<string, any>> implement
   labelKey = input<string[]>(['nombre']);
   objectSelect = output<T>();
   searchOption = signal<string>('');
-showDropdown = signal<boolean>(false);
+  showDropdown = signal<boolean>(false);
   // filteredOptions = signal<T[]>([]);
 
   filteredOptions = computed(() => {
