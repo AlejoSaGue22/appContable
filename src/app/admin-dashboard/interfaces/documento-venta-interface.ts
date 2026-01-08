@@ -9,7 +9,7 @@ export interface ComprobanteVentaResponseTemp {
 
 export interface ComprobanteVentaResponse {
   success: boolean;
-  data: FacturaVenta[];
+  data: FacturaVenta[] ;
   message?: string;
   meta?: {
     page: number;
@@ -72,7 +72,7 @@ export interface FacturaVenta {
   status: InvoiceStatus;
   vendedor: string;
   canalventa: string;
-  fecha: string | Date;
+  fecha: string;
   formapago: string;
   items: ItemFactura[];
   iva: number;

@@ -84,7 +84,7 @@
             </tr>
           </thead>
           <tbody>
-            @if (invoiceData().length == 0) {
+            @if (invoiceDataArray.length == 0) {
               <tr>
                 <td colspan="6" class="px-6 py-12 text-center">
                   <div class="flex flex-col items-center justify-center">
@@ -97,7 +97,7 @@
               </tr>
             }
             
-            @for (invoice of invoiceData(); track $index) {
+            @for (invoice of invoiceDataArray; track $index) {
                 <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
                     {{ invoice.comprobante_completo  }}
@@ -119,6 +119,7 @@
                   <td class="px-6 py-4">
                     <div class="flex items-center gap-2">
                       <a
+                        [routerLink]="['/dashboard/ventas/comprobantes/', invoice.id, 'details']"
                         class="inline-flex items-center rounded-lg p-2 text-sm text-blue-600 hover:bg-blue-50 dark:text-blue-500 dark:hover:bg-gray-700"
                         title="Ver detalle"
                       >
@@ -130,7 +131,7 @@
                       
                       @if (0 === 0) {
                         <a
-                          
+                          [routerLink]="['/dashboard/ventas/comprobantes/', invoice.id]"
                           class="inline-flex items-center rounded-lg p-2 text-sm text-green-600 hover:bg-green-50 dark:text-green-500 dark:hover:bg-gray-700"
                           title="Editar"
                         >

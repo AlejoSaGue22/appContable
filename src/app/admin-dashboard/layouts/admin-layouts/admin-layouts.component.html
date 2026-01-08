@@ -8,7 +8,7 @@
         <nav class="flex min-w-[240px] flex-col gap-1 p-2 font-sans text-base font-normal text-white">
             @for (option of menuLateral; track $index) {
                 <app-barralateral-menu [title]="option.name" 
-                    [subItems]="option.subItems" 
+                    [subItems]="option.subItems ?? []" 
                     [IconSVG]="option.icon" 
                     (menuToggled)="toggleActiveMenu($event)"
                     [activeMenu]="activeMenu" 

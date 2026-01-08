@@ -5,6 +5,7 @@ import { BarralateralMenuComponent } from "@dashboard/components/barralateral-me
 import { OptionBarralateral } from "@dashboard/components/option-barralateral/option-barralateral.component";
 import { FlowbiteService } from 'src/app/utils/services/flowbite.service';
 import { Subscription } from 'rxjs';
+import { Permission } from '@dashboard/interfaces/permission-interface';
 
 export interface MenuOption {
   name: string
@@ -12,11 +13,15 @@ export interface MenuOption {
   icon: string
 }
 
-interface Sidebar {
+export interface Sidebar {
   name: string;
   icon: string;
+  route?: string;
   defaultOpen?: boolean;
-  subItems: MenuOption[];
+  permission?: Permission | Permission[]; // Permiso(s) requerido(s)
+  subItems?: Sidebar[];
+  badge?: string;
+  badgeColor?: 'blue' | 'green' | 'red' | 'yellow' | 'gray';
 }
 
 @Component({
@@ -112,7 +117,7 @@ export default class AdminLayoutsComponent implements OnInit, OnDestroy{
     currentRoute2.pop();
 
     for (const sidebar of this.menuLateral) {
-      const matchingItem = sidebar.subItems.find(item => item.route === currentRoute || item.route === currentRoute2.join("/") );
+      const matchingItem = sidebar.subItems?.find(item => item.route === currentRoute || item.route === currentRoute2.join("/") );
 
       if (matchingItem) {
         this.activeMenu = sidebar.name;

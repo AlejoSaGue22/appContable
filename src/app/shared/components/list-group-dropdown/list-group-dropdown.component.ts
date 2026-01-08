@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, forwardRef, HostListener, input, signal, effect, computed, output } from '@angular/core';
+import { Component, ElementRef, forwardRef, HostListener, input, signal, effect, computed, output, OnChanges, SimpleChanges } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
@@ -15,26 +15,30 @@ import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/f
     }
   ]
 })
-export class ListGroupDropdownComponent<T extends Record<string, any>> implements ControlValueAccessor {
+export class ListGroupDropdownComponent<T extends Record<string, any>> implements ControlValueAccessor, OnChanges {
 
   title = input.required<string>();
 
   dataList = input<T[]>([]);
+  valueInput = input<string>('');
   labelKey = input<string[]>(['nombre']);
   objectSelect = output<T>();
   searchOption = signal<string>('');
   showDropdown = signal<boolean>(false);
-  // filteredOptions = signal<T[]>([]);
+
+  ngOnChanges(changes: SimpleChanges): void {
+      this.searchOption.set(this.valueInput());
+  }
 
   filteredOptions = computed(() => {
-    const list = this.dataList();
-    const term = this.searchOption().toLowerCase();
+      const list = this.dataList();
+      const term = this.searchOption().toLowerCase();
 
-    if (!term.trim()) return list;
+      if (!term.trim()) return list;
 
-    return list.filter(item =>
-      this.buildLabel(item).toLowerCase().includes(term)
-    );
+      return list.filter(item =>
+        this.buildLabel(item).toLowerCase().includes(term)
+      );
   });
 
   buildLabel(item: T): string {
@@ -44,7 +48,6 @@ export class ListGroupDropdownComponent<T extends Record<string, any>> implement
       .filter(Boolean)
       .join(' ');
   }
-  
 
   constructor(private elementRef: ElementRef) {}
 
@@ -96,7 +99,6 @@ export class ListGroupDropdownComponent<T extends Record<string, any>> implement
 
    @HostListener('document:click', ['$event'])
   onClickOutside(event: MouseEvent) {
-    // console.log(this.dataList());
     if (!this.elementRef.nativeElement.contains(event.target)) {
       // this.filteredOptions.set(this.dataList());
       this.showDropdown.set(false);

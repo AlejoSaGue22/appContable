@@ -14,6 +14,7 @@ import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { NotificationService } from '@shared/services/notification.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ComprobantesVentasService } from '../../services/comprobantes-ventas.service';
+import { LoaderService } from '@utils/services/loader.service';
 
 @Component({
   selector: 'app-comprobante-ventas-forms-page',
@@ -48,6 +49,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     getAllProductos = signal<ProductosInterface[]>([]);
     getAllClientes = signal<ClientesInterface[]>([]);
     activateRoute = inject(ActivatedRoute);
+    loaderservice = inject(LoaderService);
     router = inject(Router);
     loading = signal<boolean>(false);
 
@@ -58,7 +60,21 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     );
 
     ngOnInit(): void {
-          forkJoin({
+          this.loaderservice.show()
+          this.getClientesAndProductos();
+
+          if (this.invoiceID() == 'new-Item') {
+              this.formVentas.reset();
+              this.productosItemsForm.reset();
+              this.loaderservice.hide();
+              return;
+          }
+
+          this.loadInvoice(this.invoiceID());
+    }
+
+    getClientesAndProductos(){
+        forkJoin({
             clientes: this.clienteServicios.getClientes({ limit: 10000, offset: 0}),
             productos: this.productoServicios.getProductos({ limit: 10000, offset: 0})
           }).subscribe({
@@ -72,11 +88,42 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
                 this.getAllProductos.set(productos.productos);
             },
             error: (error) => {
-                console.log("Error Comprobantes Ventas: ", error)
+                console.log("Error Comprobantes Ventas: ", error);
             }
           });
     }
 
+    loadInvoice(id: string): void {
+      
+        this.ventaServices.getInvoiceById(id).subscribe({
+            next: (response) => {
+
+              const invoice = response.data[0];
+              
+              while (this.productSeleccionados().length > 0) {
+                this.productSeleccionados().splice(0, 1);
+              }
+
+              this.formVentas.patchValue({
+                cliente: invoice.clientId,
+                tipoDocumento: invoice.client.tipoDocumento,
+                identificacion: invoice.client.numeroDocumento,
+                clienteSearch: invoice.client.nombre + ' ' + invoice.client.apellido,
+                contacto: invoice.client.email,
+                vendedor: invoice.vendedor,
+                canal: invoice.canalventa,
+                fecha: invoice.fecha,
+                formaPago: invoice.formapago
+              });
+
+              this.productSeleccionados.set(invoice.items)
+              this.calcularTotal()
+            },
+            error: (err) => {
+              this.loading.set(false);
+            }
+        });
+    }
 
    formVentas = this.fb.group({
       cliente: ['', Validators.required],
@@ -117,6 +164,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       if(!this.productosItemsForm.valid) return;
 
       const valores = this.productosItemsForm.value as ItemFactura;
+      console.log(valores);
       const valorItemTotal = this.calcularItemTotal();
       const valorItemImporte = this.calcularDescuentoImporte();
       const impuestoIva = this.productosItemsForm.value.iva ?? 0;
@@ -215,7 +263,6 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       const validFactura = this.formVentas.valid;
       const validProduct = this.productosItemsForm.valid;
       this.formVentas.markAllAsTouched();
-      // this.productosItemsForm.markAllAsTouched();
 
       if(!validFactura) {
         this.notificacionService.error(
@@ -236,8 +283,9 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       }
 
       this.loading.set(true)
-      const valueFormFactura = this.formVentas.value ;
+      const valueFormFactura = this.formVentas.value;
       const productos = this.productSeleccionados();
+
       console.log("Formulario Value: ", valueFormFactura);
       console.log("Productos seleccionado: ", productos);
 
@@ -289,11 +337,8 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
         })
 
       }else{
-        
+
       }
-
-
-
 
     }
  }

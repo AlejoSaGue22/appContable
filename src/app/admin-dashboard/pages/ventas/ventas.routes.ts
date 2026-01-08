@@ -5,6 +5,7 @@ import { ComprobanteVentasComponent } from "./comprobante-ventas/comprobante-ven
 import { ComprobanteVentasFormsPageComponent } from "./comprobante-ventas/comprobante-ventas-forms-page/comprobante-ventas-forms-page.component";
 import { ProductosServiciosComponent } from "./productos-servicios/productos-servicios.component";
 import { ProductosServiciosFormsComponent } from "./productos-servicios/productos-servicios-forms/productos-servicios-forms.component";
+import { InvoiceDetailsComponent } from "./comprobante-ventas/components/invoice-details/invoice-details.component";
 
 
 export const ventasRoutes: Routes = [
@@ -23,6 +24,10 @@ export const ventasRoutes: Routes = [
                     {
                         path: 'comprobantes/:id',
                         component: ComprobanteVentasFormsPageComponent
+                    },
+                    {
+                        path: 'comprobantes/:id/details',
+                        component: InvoiceDetailsComponent
                     },
                     {
                         path: 'products_services',

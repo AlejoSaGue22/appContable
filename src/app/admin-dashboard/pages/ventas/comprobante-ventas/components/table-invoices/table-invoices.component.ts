@@ -1,14 +1,21 @@
 import { Component, input } from '@angular/core';
 import { FacturaVenta, InvoiceStatus } from '@dashboard/interfaces/documento-venta-interface';
+import { RouterLink } from "@angular/router";
 
 @Component({
   selector: 'app-table-invoices',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './table-invoices.component.html',
 })
 export class TableInvoices {
 
   invoiceData = input.required<FacturaVenta[]>();
+
+  get invoiceDataArray(): FacturaVenta[] {
+    const data = this.invoiceData();
+
+    return Array.isArray(data) ? data : [data];
+  }
 
   readonly statuses = [
     { value: '', label: 'Todos los estados' },

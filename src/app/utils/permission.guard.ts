@@ -3,8 +3,11 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { Permission, UserRole } from '@dashboard/interfaces/permission-interface';
+import { AuthService } from '../auth/services/auth.service';
 
 // Mapeo de permisos por rol (igual que en el backend)
+    const authService = inject(AuthService)
+
 const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
   [UserRole.SUPER_ADMIN]: Object.values(Permission),
   [UserRole.ADMIN]: [
@@ -67,11 +70,12 @@ export const permissionGuard = (requiredPermissions: Permission[]): CanActivateF
 
 // Helper para verificar permisos en componentes
 export function hasPermission(permission: Permission): boolean {
-  const userStr = localStorage.getItem('user');
+//   const userStr = localStorage.getItem('user');
+  const userStr = authService.user();
   if (!userStr) return false;
 
-  const user = JSON.parse(userStr);
-  const userPermissions = ROLE_PERMISSIONS[user.role as UserRole] || [];
+//   const user = JSON.parse(userStr.toString());
+  const userPermissions = ROLE_PERMISSIONS[userStr.role as UserRole] || [];
   
   return userPermissions.includes(permission);
 }

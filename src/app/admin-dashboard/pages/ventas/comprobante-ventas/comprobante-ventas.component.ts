@@ -50,7 +50,7 @@ export class ComprobanteVentasComponent {
                   )
     })
 
-    formatCurrency(value: number): string {
+   formatCurrency(value: number): string {
       return new Intl.NumberFormat('es-CO', {
          style: 'currency',
          currency: 'COP',
@@ -58,15 +58,15 @@ export class ComprobanteVentasComponent {
       }).format(value);
    }
 
-//    getStatusLabel(status: InvoiceStatus): string {
-//     const labels: Record<InvoiceStatus, string> = {
-//       [InvoiceStatus.DRAFT]: 'Borrador',
-//       [InvoiceStatus.ISSUED]: 'Emitida',
-//       [InvoiceStatus.PAID]: 'Pagada',
-//       [InvoiceStatus.CANCELLED]: 'Cancelada'
-//     };
-//     return labels[status];
-//   }
+   //    getStatusLabel(status: InvoiceStatus): string {
+   //     const labels: Record<InvoiceStatus, string> = {
+   //       [InvoiceStatus.DRAFT]: 'Borrador',
+   //       [InvoiceStatus.ISSUED]: 'Emitida',
+   //       [InvoiceStatus.PAID]: 'Pagada',
+   //       [InvoiceStatus.CANCELLED]: 'Cancelada'
+   //     };
+   //     return labels[status];
+   //   }
 
     get columnsTable(){
       return [

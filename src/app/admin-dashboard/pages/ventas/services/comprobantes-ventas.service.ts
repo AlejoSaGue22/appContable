@@ -36,4 +36,15 @@ export class ComprobantesVentasService {
 
   }
 
+
+  getInvoiceById(id: string){
+    return this.http.get<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}`)
+      // .pipe(
+      //       map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+      //       catchError((error: any): Observable<ResponseResult> => of({ success: false, error}))
+      // );
+  }
+
+
+
 }
