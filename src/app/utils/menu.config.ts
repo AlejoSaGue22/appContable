@@ -4,18 +4,39 @@
 import { Permission } from "@dashboard/interfaces/permission-interface";
 
 
+// export interface MenuItem {
+//   label: string;
+//   icon: string;
+//   route?: string;
+//   permission?: Permission | Permission[]; // Permiso(s) requerido(s)
+//   children?: MenuItem[];
+//   badge?: string;
+//   badgeColor?: 'blue' | 'green' | 'red' | 'yellow' | 'gray';
+// }
+
 export interface MenuItem {
-  label: string;
+  id: string;
+  title: string;
   icon: string;
-  route?: string;
-  permission?: Permission | Permission[]; // Permiso(s) requerido(s)
+  route: string;
+  requiredPermission: Permission;
   children?: MenuItem[];
-  badge?: string;
-  badgeColor?: 'blue' | 'green' | 'red' | 'yellow' | 'gray';
+  isActive: boolean;
+  badge?: {
+    count: number;
+    color: 'primary' | 'accent' | 'warn';
+  };
+}
+
+export interface MenuResponse {
+  success: boolean;
+  data: MenuItem[];
+  message?: string;
 }
 
 // 📋 CONFIGURACIÓN COMPLETA DE MENÚS
-export const MENU_ITEMS: MenuItem[] = [
+// export const MENU_ITEMS: MenuItem[] = [
+export const MENU_ITEMS = [
   // ============================================
   // DASHBOARD
   // ============================================
@@ -200,47 +221,47 @@ export const MENU_ITEMS: MenuItem[] = [
 /**
  * Filtra los menús según los permisos del usuario
  */
-export function filterMenusByPermissions(
-  menuItems: MenuItem[],
-  userPermissions: Permission[]
-): MenuItem[] {
-  return menuItems.filter(item => {
-    // Si no requiere permiso, siempre es visible
-    if (!item.permission) return true;
+// export function filterMenusByPermissions(
+//   menuItems: MenuItem[],
+//   userPermissions: Permission[]
+// ): MenuItem[] {
+//   return menuItems.filter(item => {
+//     // Si no requiere permiso, siempre es visible
+//     if (!item.permission) return true;
 
-    // Si requiere un permiso
-    if (typeof item.permission === 'string') {
-      const hasPermission = userPermissions.includes(item.permission);
+//     // Si requiere un permiso
+//     if (typeof item.permission === 'string') {
+//       const hasPermission = userPermissions.includes(item.permission);
       
-      // Si tiene hijos, filtrarlos también
-      if (hasPermission && item.children) {
-        item.children = filterMenusByPermissions(item.children, userPermissions);
-      }
+//       // Si tiene hijos, filtrarlos también
+//       if (hasPermission && item.children) {
+//         item.children = filterMenusByPermissions(item.children, userPermissions);
+//       }
       
-      return hasPermission;
-    }
+//       return hasPermission;
+//     }
 
-    // Si requiere múltiples permisos (OR - cualquiera)
-    if (Array.isArray(item.permission)) {
-      const hasAnyPermission = item.permission.some(perm => 
-        userPermissions.includes(perm)
-      );
+//     // Si requiere múltiples permisos (OR - cualquiera)
+//     if (Array.isArray(item.permission)) {
+//       const hasAnyPermission = item.permission.some(perm => 
+//         userPermissions.includes(perm)
+//       );
       
-      if (hasAnyPermission && item.children) {
-        item.children = filterMenusByPermissions(item.children, userPermissions);
-      }
+//       if (hasAnyPermission && item.children) {
+//         item.children = filterMenusByPermissions(item.children, userPermissions);
+//       }
       
-      return hasAnyPermission;
-    }
+//       return hasAnyPermission;
+//     }
 
-    return false;
-  });
-}
+//     return false;
+//   });
+// }
 
 /**
  * Obtiene menús visibles para un rol específico
  */
-export function getMenusForRole(role: string, rolePermissions: Record<string, Permission[]>): MenuItem[] {
-  const userPermissions = rolePermissions[role] || [];
-  return filterMenusByPermissions(MENU_ITEMS, userPermissions);
-}
+// export function getMenusForRole(role: string, rolePermissions: Record<string, Permission[]>): MenuItem[] {
+//   const userPermissions = rolePermissions[role] || [];
+//   return filterMenusByPermissions(MENU_ITEMS, userPermissions);
+// }

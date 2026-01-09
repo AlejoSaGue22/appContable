@@ -6,6 +6,7 @@ import { ComprobanteVentasFormsPageComponent } from "./comprobante-ventas/compro
 import { ProductosServiciosComponent } from "./productos-servicios/productos-servicios.component";
 import { ProductosServiciosFormsComponent } from "./productos-servicios/productos-servicios-forms/productos-servicios-forms.component";
 import { InvoiceDetailsComponent } from "./comprobante-ventas/components/invoice-details/invoice-details.component";
+import { ErrorPageComponent } from "@utils/components/error-page/error-page.component";
 
 
 export const ventasRoutes: Routes = [
@@ -39,7 +40,7 @@ export const ventasRoutes: Routes = [
                     },
                     {
                         path: '**',
-                        redirectTo: 'clients'
+                        component: ErrorPageComponent
                     }
 ]
 

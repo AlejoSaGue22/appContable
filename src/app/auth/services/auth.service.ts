@@ -1,10 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { catchError, delay, map, Observable, of } from 'rxjs';
+import { catchError, delay, map, Observable, of, Subject, tap } from 'rxjs';
 import { environment } from 'src/app/environments/environment';
-import { ErrorAuthResponse, LoginResponse } from '../interfaces/auth-response.interface';
+import { ErrorAuthResponse, JwtPayload, LoginResponse } from '../interfaces/auth-response.interface';
 import { User } from '../interfaces/user.interface';
 import { ResponseResult } from '@shared/interfaces/services.interfaces';
+import { MenuService } from '@utils/services/menu.service';
+import { jwtDecode } from 'jwt-decode';
+import { Permission, UserRole } from '@dashboard/interfaces/permission-interface';
+import { Router } from '@angular/router';
 
 
 const baseURL = environment.baseUrl;
@@ -16,12 +20,18 @@ type AuthStatus = 'checking' | 'authenticated' | 'not-authenticated';
 export class AuthService {
 
   private http = inject(HttpClient);
+  // private menuService = inject(MenuService);
+  private router = inject(Router);
   private _authStatus = signal<AuthStatus>('checking');
   private _user = signal<User | null>(null);
   private _token = signal<string | null>(sessionStorage.getItem('token'));
 
   token = computed(() => this._token());
   user = computed(() => this._user());
+  authStatus = computed(() => this._authStatus());
+
+  private authEvents = new Subject<'login' | 'logout'>();
+  authEvents$ = this.authEvents.asObservable();
 
   login(email: string, password: string): Observable<ResponseResult>{
 
@@ -33,7 +43,7 @@ export class AuthService {
               return { success: true }
           }),
           catchError((error: any): Observable<ResponseResult> => {
-            this.logout()
+            this.logout();
             const errorResp: ErrorAuthResponse = error?.error ?? {
               message: 'Error desconocido en autenticación',
               error: 'Unknown',
@@ -76,19 +86,36 @@ export class AuthService {
   }
 
   logout(){
+    sessionStorage.removeItem('token');
     this._user.set(null);
     this._token.set(null);
-    this._authStatus.set('not-authenticated')
-
-    sessionStorage.removeItem('token');
+    this._authStatus.set('not-authenticated');
+    this.authEvents.next('logout');
+    // this.menuService.menuReset();
+    
   }
 
-  private handleAuthSuccess({ token, user }: LoginResponse){
-      this._user.set(user);
+  private handleAuthSuccess({ token, user, menu }: LoginResponse){
+      sessionStorage.setItem('token', token);
+      const decoded = jwtDecode<JwtPayload>(token);
+
+      const userAuth: User = {
+        id: decoded.sub,
+        email: decoded.email,
+        fullName: user.fullName,
+        role: decoded.role,
+        permissions: decoded.permissions,
+        lastLogin: new Date(),
+        createdAt: user.createdAt
+      };
+      
+      this._user.set(userAuth);
       this._token.set(token);
+      this.authEvents.next('login');
       this._authStatus.set('authenticated');
 
-      sessionStorage.setItem('token', token);
+      // Cargar menú dinámico
+      // this.menuService.fetchMenu().subscribe();
 
       return true;
   }
@@ -98,6 +125,29 @@ export class AuthService {
     console.log(error);
 
     return of(false);
+  }
+
+  hasPermission(permission: Permission): boolean {
+    const user = this._user(); 
+    return user?.permissions?.includes(permission) || false;
+  }
+
+  hasRole(role: UserRole): boolean {
+    return this._user()?.role === role;
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
+  refreshToken(): Observable<any> {
+    return this.http.post(`${baseURL}/auth/refresh`, {}).pipe(
+      tap((response: any) => {
+        if (response.token) {
+          localStorage.setItem('token', response.token);
+        }
+      })
+    );
   }
 
 }

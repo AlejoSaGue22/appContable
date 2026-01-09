@@ -83,9 +83,18 @@ export interface FacturaVenta {
   total: number;
   cufe?: string;
   dianStatus: DianStatus;
-  createdBy?: string;
+  createdBy?: CreatedBy;
   createdById: string;
   createdAt: Date;
+}
+
+interface CreatedBy {
+  id: "e5f05bfc-97c1-4397-8ee9-6489c73ce829",
+  email: "tejodeveloper@gmail.com",
+  fullName: "Tejo Dev",
+  isActive: true,
+  role: "viewer",
+  deleteAt: null
 }
 
 export enum InvoiceStatus {

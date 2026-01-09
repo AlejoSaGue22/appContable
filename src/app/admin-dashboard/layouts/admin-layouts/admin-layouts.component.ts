@@ -64,13 +64,7 @@ export default class AdminLayoutsComponent implements OnInit, OnDestroy{
       {
         name: 'Dashboard',
         icon: '<i class="fa-solid fa-chart-simple"></i>',
-        subItems: [
-            {
-              name: 'Indice',
-              route: '/dashboard/index',
-              icon: 'fa-solid fa-layer-group'
-            }
-        ]
+        route: '/dashboard/index',
       },
       {
         name: 'Ventas',
