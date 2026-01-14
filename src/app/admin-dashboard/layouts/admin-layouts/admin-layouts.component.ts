@@ -14,7 +14,7 @@ export interface MenuOption {
 }
 
 export interface Sidebar {
-  name: string;
+  title: string;
   icon: string;
   route?: string;
   defaultOpen?: boolean;
@@ -51,7 +51,6 @@ export default class AdminLayoutsComponent implements OnInit, OnDestroy{
     }
   }
 
-
   toggleActiveMenu(menuId: string){
     if (this.activeMenu === menuId) {
       this.activeMenu = null; 
@@ -62,42 +61,42 @@ export default class AdminLayoutsComponent implements OnInit, OnDestroy{
   
   menuLateral: Sidebar[] = [
       {
-        name: 'Dashboard',
+        title: 'Dashboard',
         icon: '<i class="fa-solid fa-chart-simple"></i>',
         route: '/dashboard/index',
       },
       {
-        name: 'Ventas',
+        title: 'Ventas',
         icon: '<i class="fa-solid fa-hand-holding-dollar"></i>',
         subItems: [
             {
-              name: 'Clientes',
+              title: 'Clientes',
               route: '/dashboard/ventas/clients',
               icon: 'fa-solid fa-users'
             },
             {
-              name: 'Comprobante de venta',
+              title: 'Comprobante de venta',
               route: '/dashboard/ventas/comprobantes',
               icon: 'fa-solid fa-users'
             },
             {
-              name: 'Productos y Servicios',
+              title: 'Productos y Servicios',
               route: '/dashboard/ventas/products_services',
               icon: 'fa-solid fa-users'
             }
         ]
       },
       {
-        name: 'Compras y gastos',
+        title: 'Compras y gastos',
         icon: '<i class="fa-solid fa-money-bill-1-wave"></i>',
         subItems: [
             {
-              name: 'Comprobastes de compra',
+              title: 'Comprobantes de compra',
               route: '/dashboard/compra',
               icon: 'fa-solid fa-users'
             },
             {
-              name: 'Proveedores',
+              title: 'Proveedores',
               route: '/dashboard/proveedor',
               icon: 'fa-solid fa-warehouse'
             }
@@ -114,7 +113,7 @@ export default class AdminLayoutsComponent implements OnInit, OnDestroy{
       const matchingItem = sidebar.subItems?.find(item => item.route === currentRoute || item.route === currentRoute2.join("/") );
 
       if (matchingItem) {
-        this.activeMenu = sidebar.name;
+        this.activeMenu = sidebar.title;
         break;
       }
     }

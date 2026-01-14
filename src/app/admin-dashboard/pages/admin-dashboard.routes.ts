@@ -8,7 +8,7 @@ export const routes: Routes = [
         component: AdminLayoutsComponent,
         children: [
             {
-                path: 'index',
+                path: '',
                 component: DashboargPageComponent
             },
             {
