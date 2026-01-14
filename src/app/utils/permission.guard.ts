@@ -6,7 +6,7 @@ import { Permission, UserRole } from '@dashboard/interfaces/permission-interface
 import { AuthService } from '../auth/services/auth.service';
 
 // Mapeo de permisos por rol (igual que en el backend)
-    const authService = inject(AuthService)
+const authService = inject(AuthService)
 
 const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
   [UserRole.SUPER_ADMIN]: Object.values(Permission),
@@ -48,8 +48,8 @@ export const permissionGuard = (requiredPermissions: Permission[]): CanActivateF
     
     const userStr = localStorage.getItem('user');
     if (!userStr) {
-      router.navigate(['/login']);
-      return false;
+        router.navigate(['/login']);
+        return false;
     }
 
     const user = JSON.parse(userStr);

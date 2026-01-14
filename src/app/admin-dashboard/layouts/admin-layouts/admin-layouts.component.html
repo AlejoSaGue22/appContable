@@ -6,13 +6,13 @@
 
         <!-- Navigation -->
         <nav class="flex min-w-[240px] flex-col gap-1 p-2 font-sans text-base font-normal text-white">
-            @for (option of menuLateral; track $index) {
-                <app-barralateral-menu [title]="option.name" 
-                    [subItems]="option.subItems ?? []" 
-                    [IconSVG]="option.icon" 
+            @for (option of menuLateral(); track $index) {
+                <app-barralateral-menu [title]="option.title" 
+                    [subItems]="option.children ?? []" 
+                    [menuSection]="option"
                     (menuToggled)="toggleActiveMenu($event)"
                     [activeMenu]="activeMenu" 
-                    [menuId]="option.name"/>
+                    [menuId]="option.title"/>
             }
 
             <hr class="my-2 border-blue-gray-50" />

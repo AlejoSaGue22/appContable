@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authenticatedGuardGuard } from './auth/guards/authenticated-guard.guard';
 import { notAuthenticatedGuard } from './auth/guards/notAuthenticated.guard';
+import { ErrorPageComponent } from '@utils/components/error-page/error-page.component';
 
 export const routes: Routes = [
     {

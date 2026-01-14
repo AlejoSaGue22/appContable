@@ -1,7 +1,8 @@
 import { NgClass } from '@angular/common';
-import { Component, inject, input, linkedSignal, output, signal } from '@angular/core';
+import { Component, computed, inject, input, linkedSignal, output, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { MenuOption, Sidebar } from '@dashboard/layouts/admin-layouts/admin-layouts.component';
+import { MenuOption } from '@dashboard/layouts/admin-layouts/admin-layouts.component';
+import { MenuItem } from '@utils/menu.config';
 
 @Component({
   selector: 'app-barralateral-menu',
@@ -11,12 +12,16 @@ import { MenuOption, Sidebar } from '@dashboard/layouts/admin-layouts/admin-layo
 export class BarralateralMenuComponent {
 
     title =  input.required<string>();
-    IconSVG = input();
-    subItems = input.required<Sidebar[]>();
+    menuSection = input<MenuItem>();
+    subItems = input.required<MenuItem[]>();
     defaultOpen = input<boolean>(false);
     activeMenu = input<string | null>(null);
     menuId = input<string>();
     menuToggled = output<string>();
+
+    children = computed(() => {
+      return this.menuSection()?.children ?? [];
+    });
 
     get isOpen(): boolean {
       return this.activeMenu() === this.menuId();
@@ -25,5 +30,7 @@ export class BarralateralMenuComponent {
     toggleMenu(){
         this.menuToggled.emit(this.menuId()!)
     } 
+
+    
 
 }

@@ -3,17 +3,6 @@
 
 import { Permission } from "@dashboard/interfaces/permission-interface";
 
-
-// export interface MenuItem {
-//   label: string;
-//   icon: string;
-//   route?: string;
-//   permission?: Permission | Permission[]; // Permiso(s) requerido(s)
-//   children?: MenuItem[];
-//   badge?: string;
-//   badgeColor?: 'blue' | 'green' | 'red' | 'yellow' | 'gray';
-// }
-
 export interface MenuItem {
   id: string;
   title: string;
@@ -41,7 +30,8 @@ export const MENU_ITEMS = [
   // DASHBOARD
   // ============================================
   {
-    label: 'Dashboard',
+    id: 'dashboard',
+    title: 'Dashboard',
     icon: `<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
       <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
     </svg>`,
@@ -227,11 +217,11 @@ export const MENU_ITEMS = [
 // ): MenuItem[] {
 //   return menuItems.filter(item => {
 //     // Si no requiere permiso, siempre es visible
-//     if (!item.permission) return true;
+//     if (!item.requiredPermission) return true;
 
 //     // Si requiere un permiso
-//     if (typeof item.permission === 'string') {
-//       const hasPermission = userPermissions.includes(item.permission);
+//     if (typeof item.requiredPermission === 'string') {
+//       const hasPermission = userPermissions.includes(item.requiredPermission);
       
 //       // Si tiene hijos, filtrarlos también
 //       if (hasPermission && item.children) {
@@ -242,8 +232,8 @@ export const MENU_ITEMS = [
 //     }
 
 //     // Si requiere múltiples permisos (OR - cualquiera)
-//     if (Array.isArray(item.permission)) {
-//       const hasAnyPermission = item.permission.some(perm => 
+//     if (Array.isArray(item.requiredPermission)) {
+//       const hasAnyPermission = item.requiredPermission.some(perm => 
 //         userPermissions.includes(perm)
 //       );
       

@@ -19,8 +19,8 @@ type AuthStatus = 'checking' | 'authenticated' | 'not-authenticated';
 })
 export class AuthService {
 
-  private http = inject(HttpClient);
   // private menuService = inject(MenuService);
+  private http = inject(HttpClient);
   private router = inject(Router);
   private _authStatus = signal<AuthStatus>('checking');
   private _user = signal<User | null>(null);
