@@ -2,6 +2,8 @@
     <div role="button" (click)="toggleMenu()"
         class="flex items-center w-full p-0 leading-tight mb-1 transition-all rounded-lg outline-none text-start">
         <button 
+            [routerLink]="children().length > 0 ? null : menuSection()?.route"
+            routerLinkActive="bg-gray-700"
             type="button"
             class="flex items-center p-2 w-full text-base font-normal text-gray-300 rounded-lg transition duration-75 group 
                     hover:bg-gray-700 cursor-pointer">
@@ -22,6 +24,7 @@
         </button>
     </div>
 
+    @if(children().length > 0){
    <div class="overflow-hidden">
         <div class="block w-full py-1 font-sans text-sm antialiased font-light leading-normal" [ngClass]="{'max-h-96': isOpen, 'hidden': !isOpen }">
             <nav class="flex min-w-[240px] flex-col gap-1 p-0 font-sans text-base">
@@ -38,6 +41,7 @@
 
         </div>
     </div>
+    }
 </div>
 
 

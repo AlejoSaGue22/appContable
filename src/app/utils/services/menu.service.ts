@@ -21,8 +21,19 @@ export class MenuService {
 
   constructor() {
     this.authService.authEvents$.subscribe(event => {
-      if (event === 'login') this.fetchMenu().subscribe();
-      if (event === 'logout') this.menuReset();
+      console.log('event en AuthService',event);
+      
+      if (event === 'login') {
+        // Only fetch menu on actual login
+        this.fetchMenu().subscribe();
+      } else if (event === 'status-changed') {
+        // On status check, only fetch if menu is empty
+        if (this.menuItemsSignal().length === 0) {
+          this.fetchMenu().subscribe();
+        }
+      } else if (event === 'logout') {
+        this.menuReset();
+      }
     });
   }
   
@@ -64,6 +75,8 @@ export class MenuService {
 
   // Obtener menú desde backend
   fetchMenu(): Observable<MenuItem[]> {
+    console.log('fetchMenu');
+    
     this.loadingSignal.set(true);
     this.errorSignal.set(null);
     

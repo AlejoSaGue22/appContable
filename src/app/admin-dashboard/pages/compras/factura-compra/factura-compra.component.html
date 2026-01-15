@@ -1,0 +1,18 @@
+@if ( facturasCompraResource.isLoading() ) {
+     <div class="flex justify-center items-center h-screen">
+            <app-loader/>  
+    </div>
+}
+
+<!-- Header -->
+@if (facturasCompraResource.hasValue() ) {
+    <div class="p-4 sm:p-6 lg:p-8">
+        <app-header-title-compras />
+
+        <app-table-compras [compraData]="facturasCompraResource.value().data" />
+    </div>
+}
+
+@if (facturasCompraResource.error()) {
+    <app-error-pages/>
+}

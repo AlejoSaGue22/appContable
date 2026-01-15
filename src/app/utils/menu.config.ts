@@ -9,6 +9,8 @@ export interface MenuItem {
   icon: string;
   route: string;
   requiredPermission: Permission;
+  other?: string;
+  order?: number;
   children?: MenuItem[];
   isActive: boolean;
   badge?: {

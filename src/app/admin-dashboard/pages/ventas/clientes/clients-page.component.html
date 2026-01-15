@@ -11,9 +11,9 @@
     <header-title-page [titleHead]="headTitle" />
     
     <!-- Cards Totales -->
-    <num-cards-totales 
+    <!-- <num-cards-totales 
         [itemsValores]="cardsTotales()" 
-        iconDolar="N" />
+        iconDolar="N" /> -->
     
     <!-- Tabla -->
     <app-table-list 
@@ -22,7 +22,7 @@
         [hasAction]="true"
         (modalOpen)="openModal($event)"
         [pages]="clientesResource.value().pages"
-        rutaLink="/dashboard/ventas/clients/" />
+        rutaLink="/panel/ventas/clients/" />
 }
     
 <app-modal [(visible)]="isModalEdit">

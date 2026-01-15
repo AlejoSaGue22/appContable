@@ -14,7 +14,7 @@ import { NotificationService } from '@shared/services/notification.service';
 
 @Component({
   selector: 'app-productos-servicios',
-  imports: [HeaderTitlePageComponent, TableListComponent, NumCardsTotalesComponent, LoaderComponent, ModalComponents],
+  imports: [HeaderTitlePageComponent, TableListComponent, LoaderComponent, ModalComponents],
   templateUrl: './productos-servicios.component.html',
 })
 export class ProductosServiciosComponent {

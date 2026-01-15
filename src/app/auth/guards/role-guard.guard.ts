@@ -16,7 +16,7 @@ export const roleGuard = (allowedRoles: string[]): CanActivateFn => {
     }
 
     if (!allowedRoles.includes(user.role)) {
-      router.navigate(['/dashboard']);
+      router.navigate(['/panel/dashboard']);
       return false;
     }
 

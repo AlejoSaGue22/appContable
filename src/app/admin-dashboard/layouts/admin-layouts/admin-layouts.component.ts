@@ -9,6 +9,7 @@ import { Permission } from '@dashboard/interfaces/permission-interface';
 import { MenuService } from '@utils/services/menu.service';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { MenuItem } from '@utils/menu.config';
+import { LoaderComponent } from "@utils/components/loader/loader.component";
 
 export interface MenuOption {
   name: string
@@ -29,7 +30,7 @@ export interface MenuOption {
 
 @Component({
   selector: 'app-admin-layouts',
-  imports: [RouterOutlet, MenuPerfilComponent, BarralateralMenuComponent, OptionBarralateral],
+  imports: [RouterOutlet, MenuPerfilComponent, BarralateralMenuComponent, OptionBarralateral, LoaderComponent],
   templateUrl: './admin-layouts.component.html',
 })
 export default class AdminLayoutsComponent implements OnInit, OnDestroy{
@@ -40,7 +41,8 @@ export default class AdminLayoutsComponent implements OnInit, OnDestroy{
 
   activeMenu: string | null = 'Dashboard';
   private routeSubscription: Subscription | null = null;
-  menuItems = this.menuService.menuItems();
+  menuItems = computed(() => this.menuService.menuItems().filter(item => item.other !== 'SI').sort((a, b) => a.order! - b.order!));
+  menuItemsOther = computed(() => this.menuService.menuItems().filter(item => item.other === 'SI').sort((a, b) => a.order! - b.order!));
   isLoading = this.menuService.isLoading();
   currentUser = this.authService.user();
 
@@ -50,10 +52,18 @@ export default class AdminLayoutsComponent implements OnInit, OnDestroy{
 
 
   ngOnInit(): void {
+    // Fetch menu if authenticated but menu is empty
+    if (this.authService.authStatus() === 'authenticated' && this.menuItems().length === 0) {
+      this.menuService.fetchMenu().subscribe();
+    }
+
     this.routeSubscription = this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: any) => {
-        this.activeRoute.set(event.url);
+        if (event instanceof NavigationEnd) {
+          this.setActiveMenuBasedOnRoute();
+        }
+        // this.activeRoute.set(event.url);
         this.updateExpandedPanels(event.url);
       });
 
@@ -73,10 +83,6 @@ export default class AdminLayoutsComponent implements OnInit, OnDestroy{
       this.activeMenu = menuId; 
     }
   }
-  
-  menuLateral = computed(() => {
-    return this.menuItems;
-  });
   
   // menuLateral: Sidebar[] = [
   //     {
@@ -144,7 +150,7 @@ export default class AdminLayoutsComponent implements OnInit, OnDestroy{
       return false;
     };
     
-    findAndExpandParent(this.menuItems, currentUrl);
+    findAndExpandParent(this.menuItems(), currentUrl);
     this.expandedPanels.set(newExpanded);
   }
 
@@ -162,8 +168,21 @@ export default class AdminLayoutsComponent implements OnInit, OnDestroy{
     return this.activeRoute() === item.route;
   }
 
-  
+  setActiveMenuBasedOnRoute() {
+    const currentRoute = this.router.url.split('?')[0];  // Remove query params
+    const currentRoute2 = this.router.url.includes('new-Item') ? this.router.url.split('/') : [];  // Remove params
+    currentRoute2.pop();
 
+    for (const sidebar of this.menuItems()) {
+      const matchingItem = sidebar.children?.find((item: MenuItem) => item.route === currentRoute || item.route === currentRoute2.join("/") );
+
+      if (matchingItem) {
+        this.activeMenu = sidebar.title;
+        break;
+      }
+    }
+  }
+  
 }
 
 

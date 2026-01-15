@@ -10,7 +10,7 @@ export const routes: Routes = [
         canMatch: [notAuthenticatedGuard]
     },
     {
-        path: 'dashboard',
+        path: 'panel',
         loadChildren: () => import('./admin-dashboard/pages/admin-dashboard.routes'),
         canMatch: [authenticatedGuardGuard]
     },

@@ -6,7 +6,7 @@
 
         <!-- Navigation -->
         <nav class="flex min-w-[240px] flex-col gap-1 p-2 font-sans text-base font-normal text-white">
-            @for (option of menuLateral(); track $index) {
+            @for (option of menuItems(); track $index) {
                 <app-barralateral-menu [title]="option.title" 
                     [subItems]="option.children ?? []" 
                     [menuSection]="option"
@@ -16,7 +16,7 @@
             }
 
             <hr class="my-2 border-blue-gray-50" />
-                <app-option-barralateral/>
+                <app-option-barralateral [menuItemsOther]="menuItemsOther()"/>
         </nav>
     </div>
 

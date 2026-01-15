@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators, ɵInternalFormsSharedModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HeaderInput, HeaderTitlePageComponent } from "@dashboard/components/header-title-page/header-title-page.component";
@@ -16,6 +16,10 @@ import { NotificationService } from '@shared/services/notification.service';
   templateUrl: './productos-servicios-forms.component.html',
 })
 export class ProductosServiciosFormsComponent {
+
+    isModal = input<boolean>(false);
+    saveSuccess = output<any>();
+    cancel = output<void>();
 
 
     headTitle: HeaderInput = {
@@ -101,7 +105,12 @@ export class ProductosServiciosFormsComponent {
                'Completado!',
                3000
             );
-            await this.router.navigateByUrl('/dashboard/ventas/products_services');  
+
+            if (this.isModal()) {
+                this.saveSuccess.emit(product.data);
+            } else {
+                await this.router.navigateByUrl('/dashboard/ventas/products_services');  
+            }
 
         }else{
             const product = await firstValueFrom( 
@@ -123,7 +132,7 @@ export class ProductosServiciosFormsComponent {
                'Completado!',
                3000
             );
-            await this.router.navigateByUrl('/dashboard/ventas/products_services');   
+            await this.router.navigateByUrl('/panel/ventas/products_services');   
     
         }
 
@@ -134,7 +143,11 @@ export class ProductosServiciosFormsComponent {
     
     async onCancel(){
       this.formProductos.reset();
-      await this.router.navigateByUrl('/dashboard/ventas/products_services');   
+      if (this.isModal()) {
+          this.cancel.emit();
+      } else {
+          await this.router.navigateByUrl('/panel/ventas/products_services');   
+      }
     }
 
 }

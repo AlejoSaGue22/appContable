@@ -23,6 +23,7 @@ export class ListGroupDropdownComponent<T extends Record<string, any>> implement
   valueInput = input<string>('');
   labelKey = input<string[]>(['nombre']);
   objectSelect = output<T>();
+  createOption = output<void>(); // Evento para crear nuevo
   searchOption = signal<string>('');
   showDropdown = signal<boolean>(false);
 
@@ -94,6 +95,11 @@ export class ListGroupDropdownComponent<T extends Record<string, any>> implement
     this.value = item[this.labelKey()[0]];
     this.objectSelect.emit(item);
     this.searchOption.set(item[this.labelKey()[0]]);
+    this.showDropdown.set(false);
+  }
+
+  onCreateNew() {
+    this.createOption.emit();
     this.showDropdown.set(false);
   }
 

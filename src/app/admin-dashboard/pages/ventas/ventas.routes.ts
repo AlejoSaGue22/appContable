@@ -8,7 +8,6 @@ import { ProductosServiciosFormsComponent } from "./productos-servicios/producto
 import { InvoiceDetailsComponent } from "./comprobante-ventas/components/invoice-details/invoice-details.component";
 import { ErrorPageComponent } from "@utils/components/error-page/error-page.component";
 
-
 export const ventasRoutes: Routes = [
                     {
                         path: 'clients',

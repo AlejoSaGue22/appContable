@@ -51,7 +51,7 @@ export class LoginPageComponent {
                   '¡Bienvenido!',
                   3000
                 );
-                await this.router.navigateByUrl('/dashboard/index');
+                await this.router.navigateByUrl('/panel/dashboard');
                 this.loader.hide();
                 return;
             }

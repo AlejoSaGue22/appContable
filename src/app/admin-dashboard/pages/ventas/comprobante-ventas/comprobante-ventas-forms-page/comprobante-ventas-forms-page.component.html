@@ -28,6 +28,7 @@
                                             [labelKey]="['fullName', 'numeroDocumento']"
                                             (objectSelect)="onClienteSeleccionado($event)"
                                             [valueInput]="formVentas.controls.clienteSearch.value ?? ''"
+                                            (createOption)="openClientModal()"
                                              />
                                     </div>
 
@@ -248,6 +249,7 @@
                                                 title="" 
                                                 [dataList]="getAllProductos()" 
                                                 (objectSelect)="onProductoSeleccionado($event)"
+                                                (createOption)="openProductModal()"
                                                 formControlName="producto"/>
                                             </div>
                                     </td>
@@ -404,7 +406,7 @@
 
         <div class="row flex w-1/2 px-4">
             <button
-                routerLink="/dashboard/ventas/comprobantes"
+                routerLink="/panel/ventas/comprobantes"
                 class="rounded-md w-full rounded-r-none bg-red-600 py-2 px-4 border border-transparent cursor-pointer
                 text-center text-sm text-white transition-all shadow-md hover:shadow-lg hover:bg-red-400"
                 type="button">
@@ -428,5 +430,31 @@
         
         </div>
 </div>
+
+<!-- Modals -->
+<app-modal 
+    [(visible)]="isClientModalVisible" 
+    title="Crear Nuevo Cliente"
+    width="max-w-4xl"
+>
+    <app-clients-form-page
+        [isModal]="true"
+        (saveSuccess)="onClientSaved($event)"
+        (cancel)="closeClientModal()"
+    ></app-clients-form-page>
+</app-modal>
+
+<app-modal 
+    [(visible)]="isProductModalVisible" 
+    title="Crear Nuevo Producto/Servicio"
+    width="max-w-4xl"
+>
+    <!-- We reuse the Products/Services Form Page Component here -->
+    <app-productos-servicios-forms
+        [isModal]="true"
+        (saveSuccess)="onProductSaved($event)"
+        (cancel)="closeProductModal()"
+    ></app-productos-servicios-forms>
+</app-modal>
 
 

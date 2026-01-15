@@ -8,7 +8,7 @@ export const routes: Routes = [
         component: AdminLayoutsComponent,
         children: [
             {
-                path: '',
+                path: 'dashboard',
                 component: DashboargPageComponent
             },
             {
@@ -16,8 +16,12 @@ export const routes: Routes = [
                 loadChildren: () => import('./ventas/ventas.routes')
             },
             {
+                path: 'compras',
+                loadChildren: () => import('./compras/compras.routes')
+            },
+            {
                 path: '**',
-                redirectTo: 'index'
+                redirectTo: 'dashboard'
             }
         ]
     }

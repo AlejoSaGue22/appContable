@@ -19,7 +19,6 @@ type AuthStatus = 'checking' | 'authenticated' | 'not-authenticated';
 })
 export class AuthService {
 
-  // private menuService = inject(MenuService);
   private http = inject(HttpClient);
   private router = inject(Router);
   private _authStatus = signal<AuthStatus>('checking');
@@ -30,7 +29,7 @@ export class AuthService {
   user = computed(() => this._user());
   authStatus = computed(() => this._authStatus());
 
-  private authEvents = new Subject<'login' | 'logout'>();
+  private authEvents = new Subject<'login' | 'logout' | 'status-changed'>();
   authEvents$ = this.authEvents.asObservable();
 
   login(email: string, password: string): Observable<ResponseResult>{
@@ -39,7 +38,7 @@ export class AuthService {
       .pipe(
           delay(3000),
           map((auth: LoginResponse): ResponseResult => {
-              this.handleAuthSuccess(auth)
+              this.handleAuthSuccess(auth, true) // true = initial login
               return { success: true }
           }),
           catchError((error: any): Observable<ResponseResult> => {
@@ -64,11 +63,12 @@ export class AuthService {
 
   checkStatus(): Observable<boolean>{
       const token = sessionStorage.getItem("token");
-
+      
       if (!token) {
         this.logout();
         return of(false);
       }
+      this._authStatus.set('checking'); 
 
       return this.http.get<LoginResponse>(`${baseURL}/auth/check-status`,{
         // headers: {
@@ -76,8 +76,7 @@ export class AuthService {
         // }
       }).pipe(
         map((resp) => {
-          const result = this.handleAuthSuccess(resp)
-
+          const result = this.handleAuthSuccess(resp, false) // false = status check
           return result;
         }),
         catchError((error: any) => this.handleAuthError(error))
@@ -91,11 +90,10 @@ export class AuthService {
     this._token.set(null);
     this._authStatus.set('not-authenticated');
     this.authEvents.next('logout');
-    // this.menuService.menuReset();
     
   }
 
-  private handleAuthSuccess({ token, user, menu }: LoginResponse){
+  private handleAuthSuccess({ token, user, menu }: LoginResponse, isInitialLogin: boolean = false){
       sessionStorage.setItem('token', token);
       const decoded = jwtDecode<JwtPayload>(token);
 
@@ -111,11 +109,15 @@ export class AuthService {
       
       this._user.set(userAuth);
       this._token.set(token);
-      this.authEvents.next('login');
+      
+      // Only emit 'login' event on actual login, not on status checks
+      if (isInitialLogin) {
+        this.authEvents.next('login');
+      } else if (this._authStatus() === 'checking') {
+        this.authEvents.next('status-changed');
+      }
+      
       this._authStatus.set('authenticated');
-
-      // Cargar menú dinámico
-      // this.menuService.fetchMenu().subscribe();
 
       return true;
   }

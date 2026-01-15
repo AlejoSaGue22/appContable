@@ -14,10 +14,21 @@ export enum Permission {
   PRODUCT_DELETE = 'product:delete',
   REPORT_READ = 'report:read',
   REPORT_EXPORT = 'report:export',
+  PURCHASE_CREATE = 'purchase:create',
+  PURCHASE_READ = 'purchase:read',
+  PURCHASE_UPDATE = 'purchase:update',
+  PURCHASE_DELETE = 'purchase:delete',
+  PURCHASE_EXPORT = 'purchase:export',
+  PROVIDER_CREATE = 'provider:create',
+  PROVIDER_READ = 'provider:read',
+  PROVIDER_UPDATE = 'provider:update',
+  PROVIDER_DELETE = 'provider:delete',
+  PROVIDER_EXPORT = 'provider:export',
   USER_MANAGE = 'user:manage',
   ROLE_MANAGE = 'role:manage',
   SETTINGS_MANAGE = 'settings:manage'
 }
+
 
 export enum UserRole {
   SUPER_ADMIN = 'super_admin',

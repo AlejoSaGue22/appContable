@@ -40,15 +40,15 @@ export class DashboargPageComponent {
     accesoRapido = [
       {
         title: 'Facturas de Venta',
-        ruta: '/dashboard/ventas/comprobantes'
+        ruta: '/panel/ventas/comprobantes'
       },
       {
         title: 'Clientes',
-        ruta: '/dashboard/ventas/clients'
+        ruta: '/panel/ventas/clients'
       },
       {
          title: 'Servicios',
-        ruta: '/dashboard/ventas/products_services'
+        ruta: '/panel/ventas/products_services'
       }
     ]
 

@@ -1,6 +1,6 @@
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { FacturaVenta, ItemFactura } from './../../../../interfaces/documento-venta-interface';
-import { AfterContentInit, Component, effect, inject, OnInit, signal } from '@angular/core';
+import { AfterContentInit, Component, effect, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HeaderInput, HeaderTitlePageComponent } from "@dashboard/components/header-title-page/header-title-page.component";
 import { ListGroupDropdownComponent } from "@shared/components/list-group-dropdown/list-group-dropdown.component";
@@ -15,11 +15,25 @@ import { NotificationService } from '@shared/services/notification.service';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ComprobantesVentasService } from '../../services/comprobantes-ventas.service';
 import { LoaderService } from '@utils/services/loader.service';
+import { ModalComponent } from '@shared/components/modal/modal.component';
+import { ClientsFormPageComponent } from '../../clientes/clients-form-page/clients-form-page.component';
+import { ProductosServiciosFormsComponent } from '../../productos-servicios/productos-servicios-forms/productos-servicios-forms.component';
 
 @Component({
   selector: 'app-comprobante-ventas-forms-page',
-  imports: [HeaderTitlePageComponent, ReactiveFormsModule, ListGroupDropdownComponent, CurrencyPipe,
-    DecimalPipe, FormErrorLabelComponent, RouterLink],
+  standalone: true,
+  imports: [
+    HeaderTitlePageComponent, 
+    ReactiveFormsModule, 
+    ListGroupDropdownComponent, 
+    CurrencyPipe,
+    DecimalPipe, 
+    FormErrorLabelComponent, 
+    RouterLink,
+    ModalComponent,
+    ClientsFormPageComponent,
+    ProductosServiciosFormsComponent
+  ],
   templateUrl: './comprobante-ventas-forms-page.component.html',
 })
 export class ComprobanteVentasFormsPageComponent implements OnInit {
@@ -58,6 +72,53 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
         map((param) => param['id'])
       )
     );
+
+    // Modal State
+    isClientModalVisible = signal<boolean>(false);
+    isProductModalVisible = signal<boolean>(false);
+
+    // --- Client Modal Methods ---
+    openClientModal() {
+        this.isClientModalVisible.set(true);
+    }
+
+    closeClientModal() {
+        this.isClientModalVisible.set(false);
+    }
+
+    onClientSaved(newClient: any) {
+        // Add to the list
+        // Note: getAllClientes is currently set from a service response. 
+        // We might simply want to re-fetch or append. For now, appending locally.
+        this.getAllClientes.update(list => [...list, newClient]);
+        
+        // Select it
+        this.onClienteSeleccionado(newClient);
+        
+        this.closeClientModal();
+        this.notificacionService.success('Cliente creado y seleccionado', 'Éxito');
+    }
+
+    // --- Product Modal Methods ---
+    openProductModal() {
+        this.isProductModalVisible.set(true);
+    }
+
+    closeProductModal() {
+        this.isProductModalVisible.set(false);
+    }
+
+    onProductSaved(newProduct: any) {
+         // Appending locally.
+         this.getAllProductos.update(list => [...list, newProduct]);
+         
+         // Select it
+         this.onProductoSeleccionado(newProduct);
+         
+         this.closeProductModal();
+         this.notificacionService.success('Producto creado y seleccionado', 'Éxito');
+    }
+
 
     ngOnInit(): void {
           this.loaderservice.show()
@@ -176,9 +237,9 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
         iva: impuestoIva,
         valor_iva: ((this.productosItemsForm.value.quantity! * this.productosItemsForm.value.unitPrice!) *
                                                                                  (impuestoIva / 100)),
-        discount: valores.discount,                                                                          
-        valor_discount: ((this.productosItemsForm.value.quantity! * this.productosItemsForm.value.unitPrice!) * 
-                                                                                  (valores.discount! / 100)),
+        discount: valores.discount ?? 0,                                                                          
+        valor_discount: valores.discount ? ((this.productosItemsForm.value.quantity! * this.productosItemsForm.value.unitPrice!) * 
+                                                                                  (valores.discount! / 100)) : 0,
         total: valorItemTotal
       }
       

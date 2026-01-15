@@ -1,0 +1,337 @@
+<header-title-page [titleHead]="headTitle" />
+
+<div class="w-full">
+    <form [formGroup]="formCompra">
+        <div class=" bg-white rounded-xl shadow-lg overflow-hidden mt-6">
+            <div class="p-6">
+                <!-- Sección: Información básica -->
+                <div class="mb-8">
+                    <h3 class="text-lg font-medium text-slate-700 border-gray-300 border-b pb-2 mb-4 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" width="24" height="24" viewBox="0 0 24 24">
+                            <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                <path stroke-dasharray="64" stroke-dashoffset="64" d="M13 3l6 6v12h-14v-18h8">
+                                    <animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="64;0"/>
+                                </path>
+                                <path stroke-dasharray="14" stroke-dashoffset="14" stroke-width="1" d="M12.5 3v5.5h6.5">
+                                    <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.7s" dur="0.2s" values="14;0"/>
+                                </path>
+                            </g>
+                        </svg>
+                        Datos del Proveedor y Factura
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-5">
+                        <div class="relative">
+                            <app-list-group-dropdown 
+                                title="Proveedor" 
+                                [dataList]="proveedoresList()" 
+                                [labelKey]="['nombre', 'identificacion']"
+                                (objectSelect)="onProviderSaved($event)"
+                                [valueInput]="formCompra.controls.proveedorSearch.value ?? ''"
+                                (createOption)="openProviderModal()"
+                            />
+                        </div>
+
+                        <div class="relative">
+                            <label class="block mb-2 text-sm text-slate-600">
+                                Identificación (NIT/CC)
+                            </label>
+                            <input class="w-full bg-transparent text-slate-700 text-sm border rounded-md px-3 py-2 transition 
+                            duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 
+                            shadow-sm focus:shadow" 
+                            type="text"
+                            readonly/>
+
+                            <!-- <form-error-label [errorType]="formCompra.get('identificacion')!" /> -->
+                        </div>
+
+                        <div class="relative">
+                            <label class="block mb-2 text-sm text-slate-600">
+                                Email / Contacto
+                            </label>
+                            <input class="w-full bg-transparent text-slate-700 text-sm border rounded-md px-3 py-2 transition 
+                            duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 
+                            shadow-sm focus:shadow"
+                            type="text"
+                            readonly/>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div>
+                            <label class="block mb-2 text-sm text-slate-600">
+                                Teléfono
+                            </label>
+                            <input class="w-full bg-transparent text-slate-700 text-sm border 
+                            rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 
+                            hover:border-slate-300 shadow-sm focus:shadow" 
+                            readonly
+                            type="text"/>
+                        </div>
+
+                        <div>
+                            <label class="block mb-2 text-sm text-slate-600">
+                                N° Factura Proveedor <span class="text-red-500">*</span>
+                            </label>
+                            <input class="w-full bg-transparent text-slate-700 text-sm border 
+                            rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 
+                            shadow-sm focus:shadow" 
+                            formControlName="referencia"
+                            placeholder="Ej: FE-1234"
+                            type="text" />
+
+                            <form-error-label [errorType]="formCompra.get('referencia')!" />
+                        </div>
+
+                        <div>
+                            <label class="block mb-2 text-sm text-slate-600">
+                                Forma de Pago <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <select
+                                    class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded 
+                                    pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm
+                                    focus:shadow-md cursor-pointer" formControlName="metodoPago">
+                                    <option value="Contado">Contado</option>
+                                    <option value="Crédito">Crédito 15 días</option>
+                                    <option value="Crédito 30">Crédito 30 días</option>
+                                    <option value="Transferencia">Transferencia</option>
+                                </select>
+                            </div>
+
+                            <form-error-label [errorType]="formCompra.get('metodoPago')!" />
+                        </div>
+
+                        <div>
+                            <label class="block mb-2 text-sm text-slate-600">
+                                Fecha Emisión <span class="text-red-500">*</span>
+                            </label>
+                            <input class="w-full bg-transparent text-slate-700 text-sm border 
+                            rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 
+                            shadow-sm focus:shadow" 
+                            formControlName="fechaEmision"
+                            type="date"/>
+                            
+                            <form-error-label [errorType]="formCompra.get('fechaEmision')!" />
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <label class="block mb-2 text-sm text-slate-600">
+                            Observaciones
+                        </label>
+                        <textarea class="w-full bg-transparent text-slate-700 text-sm border 
+                        rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 
+                        shadow-sm focus:shadow" formControlName="observaciones" rows="2"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <form [formGroup]="formCompra" (ngSubmit)="onSubmit()" class="space-y-6">
+            <div class="mt-4 self-end w-full">
+                    <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+                        <h3 class="text-lg font-medium text-slate-700 border-b border-gray-300 pb-2 mb-4 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" width="24" height="24" viewBox="0 0 24 24">
+                                <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                                    <path d="M9 7h11c0.55 0 1 0.45 1 1v11c0 0.55 -0.45 1 -1 1h-16c-0.55 0 -1 -0.45 -1 -1v-11c0 -0.55 0.45 -1 1 -1Z"/>
+                                    <path d="M12 7v10M7 12h10"/>
+                                </g>
+                            </svg>
+                            Detalle de Productos / Servicios
+                        </h3>
+                            
+                        <div class="w-full px-4 sm:px-6 lg:px-8 py-6">
+                            <div class="max-w-7xl mx-auto">   
+                                <!-- Agregar Items -->
+                                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                                        <div class="border-b border-gray-100 bg-gray-50/50 px-6 py-4">
+                                            <h3 class="text-base font-semibold leading-6 text-gray-900">Items de la Factura</h3>
+                                        </div>
+                                    
+                                        <div class="p-6">
+                                            <!-- Formulario de Item -->
+                                            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end mb-6" [formGroup]="productosItemsForm">
+                                                
+                                                <!-- Producto Selector -->
+                                                <div class="md:col-span-4">
+                                                    <app-list-group-dropdown
+                                                        title="Producto / Servicio"
+                                                        [dataList]="productosList()"
+                                                        [labelKey]="['nombre', 'codigo']"
+                                                        formControlName="producto"
+                                                        (objectSelect)="productosItemsForm.patchValue({ producto: $event })"
+                                                        (createOption)="openProductModal()"
+                                                    ></app-list-group-dropdown>
+                                                </div>
+
+                                                <!-- Cantidad -->
+                                                <div class="md:col-span-1">
+                                                    <label class="block text-xs font-medium text-gray-700 mb-1">Cant.</label>
+                                                    <input type="number" formControlName="quantity" min="1"
+                                                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                                </div>
+
+                                                <!-- Precio Unitario -->
+                                                <div class="md:col-span-2">
+                                                    <label class="block text-xs font-medium text-gray-700 mb-1">Precio Unit.</label>
+                                                    <input type="number" formControlName="unitPrice" min="0"
+                                                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                                </div>
+
+                                                <!-- IVA % -->
+                                                <div class="md:col-span-1">
+                                                    <label class="block text-xs font-medium text-gray-700 mb-1">IVA %</label>
+                                                    <input type="number" formControlName="iva" min="0" max="100"
+                                                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                                </div>
+
+                                                <!-- Descuento % -->
+                                                <div class="md:col-span-1">
+                                                    <label class="block text-xs font-medium text-gray-700 mb-1">Desc %</label>
+                                                    <input type="number" formControlName="discount" min="0" max="100"
+                                                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                                                </div>
+
+                                                <!-- Total Item (Readonly) -->
+                                                <div class="md:col-span-2">
+                                                    <label class="block text-xs font-medium text-gray-700 mb-1">Total Item</label>
+                                                    <div class="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 border-l-4 border-l-blue-500">
+                                                        {{ productosItemsForm.get('total')?.value | currency:'USD':'symbol':'1.0-0' }}
+                                                    </div>
+                                                </div>
+
+                                                <!-- Add Button -->
+                                                <div class="md:col-span-1 flex justify-end">
+                                                    <button type="button" (click)="addItem()" [disabled]="productosItemsForm.invalid"
+                                                        class="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <!-- Tabla de Items Agregados -->
+                                            @if (items.controls.length > 0) {
+                                                <div class="overflow-x-auto rounded-lg border border-gray-200">
+                                                    <table class="min-w-full divide-y divide-gray-200">
+                                                        <thead class="bg-gray-50">
+                                                            <tr>
+                                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
+                                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cant.</th>
+                                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio U.</th>
+                                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Desc.</th>
+                                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IVA</th>
+                                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subtotal</th>
+                                                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acción</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody class="bg-white divide-y divide-gray-200">
+                                                            @for (item of items.controls; track $index) {
+                                                                <tr>
+                                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ item.value.productoNombre }}</td>
+                                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.value.cantidad }}</td>
+                                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.value.precioUnitario | currency:'USD':'symbol':'1.0-0' }}</td>
+                                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.value.descuento }}%</td>
+                                                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.value.iva }}%</td>
+                                                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ item.value.subtotal | currency:'USD':'symbol':'1.0-0' }}</td>
+                                                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                                        <button type="button" (click)="removeItem($index)" class="text-red-600 hover:text-red-900">
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                                            </svg>
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            } @else {
+                                                <div class="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                                                    <p class="text-sm text-gray-500">No hay items agregados. Usa el formulario de arriba para añadir productos.</p>
+                                                </div>
+                                            }
+                                        </div>
+                                </div>
+                            </div>
+                        </div>          
+                            
+                    </div>
+            </div>
+
+            <div class="mt-4 self-end w-full sm:w-1/2 md:w-1/2">
+                <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                    <!-- Resumen Totales -->
+                    <div class="mt-8 flex justify-end">
+                        <div class="w-full bg-gray-50 p-6 rounded-lg space-y-3">
+                            <div class="flex justify-between text-sm text-gray-600">
+                                <span>Subtotal</span>
+                                <span>{{ resumenTotales().subtotal | currency:'USD':'symbol':'1.0-0' }}</span>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-600">
+                                <span>Descuentos</span>
+                                <span class="text-green-600">- {{ resumenTotales().descuentos | currency:'USD':'symbol':'1.0-0' }}</span>
+                            </div>
+                            <div class="flex justify-between text-sm text-gray-600">
+                                <span>Impuestos (IVA)</span>
+                                <span>{{ resumenTotales().impuestos | currency:'USD':'symbol':'1.0-0' }}</span>
+                            </div>
+                            <div class="pt-3 border-t border-gray-200 flex justify-between text-lg font-bold text-gray-900">
+                                <span>Total a Pagar</span>
+                                <span>{{ resumenTotales().total | currency:'USD':'symbol':'1.0-0' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex justify-end gap-3 pt-2 border-t border-gray-100">
+                <button type="button" routerLink="/panel/ventas/purchases" 
+                    class="rounded-lg border border-gray-300 cursor-pointer bg-white px-5 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all">
+                    Cancelar
+                </button>
+                <button type="submit" [disabled]="loading()"
+                    class="inline-flex items-center justify-center rounded-lg cursor-pointer bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                    
+                    @if (loading()) {
+                        <svg class="mr-2 h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    }
+                    Guardar Factura
+                </button>
+            </div>  
+        </form>
+     
+
+<!-- Modals -->
+<app-modal 
+    [(visible)]="isProviderModalVisible" 
+    title="Crear Nuevo Proveedor"
+    width="max-w-4xl"
+>
+    <!-- We reuse the Provider Form Page Component here -->
+    <app-proveedores-forms-page
+        [isModal]="true"
+        (saveSuccess)="onProviderSaved($event)"
+        (cancel)="closeProviderModal()"
+    ></app-proveedores-forms-page>
+</app-modal>
+
+<app-modal 
+    [(visible)]="isProductModalVisible" 
+    title="Crear Nuevo Producto/Servicio"
+    width="max-w-4xl"
+>
+    <!-- We reuse the Products/Services Form Page Component here -->
+    <app-productos-servicios-forms
+        [isModal]="true"
+        (saveSuccess)="onProductSaved($event)"
+        (cancel)="closeProductModal()"
+    ></app-productos-servicios-forms>
+</app-modal>
+

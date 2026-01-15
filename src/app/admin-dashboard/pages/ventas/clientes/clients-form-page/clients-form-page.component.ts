@@ -1,19 +1,17 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, input, output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HeaderInput, HeaderTitlePageComponent } from "@dashboard/components/header-title-page/header-title-page.component";
 import { FormErrorLabelComponent } from "src/app/utils/components/form-error-label/form-error-label.component";
 import { ClientesService } from '../../services/clientes.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ClientesInterface } from '@dashboard/interfaces/clientes-interface';
-import { FlowbiteService } from 'src/app/utils/services/flowbite.service';
 import { firstValueFrom, map, tap } from 'rxjs';
-import { JsonPipe } from '@angular/common';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { LoaderComponent } from "src/app/utils/components/loader/loader.component";
 import { ErrorPageComponent } from "src/app/utils/components/error-page/error-page.component";
+import { NotificationService } from '@shared/services/notification.service';
 
   
-
 @Component({
   selector: 'app-clients-form-page',
   imports: [HeaderTitlePageComponent, FormErrorLabelComponent, ReactiveFormsModule, LoaderComponent, ErrorPageComponent],
@@ -21,6 +19,11 @@ import { ErrorPageComponent } from "src/app/utils/components/error-page/error-pa
 })
 export class ClientsFormPageComponent implements OnInit { 
   
+    isModal = input<boolean>(false);
+    saveSuccess = output<ClientesInterface>();
+    notificationService = inject(NotificationService);
+    cancel = output<void>();
+
     private fb = inject(FormBuilder);
     clienteService = inject(ClientesService);
     router = inject(Router);
@@ -58,6 +61,11 @@ export class ClientsFormPageComponent implements OnInit {
           if(!value) return;
           this.toggleValidations(value);
         });
+
+        // Initialize resource even if no route param (for new item in modal)
+        if (this.isModal()) {
+             // Logic to handle new item in modal if needed, or just let form be empty
+        }
     }
 
     toggleValidations(tipo: string) {
@@ -88,7 +96,7 @@ export class ClientsFormPageComponent implements OnInit {
       this.clientsForm.markAllAsTouched();
 
       if (!isValid) {
-        alert("Formulario incompleto");
+        this.notificationService.error('Formulario incompleto', 'Error');
         return;
       }
 
@@ -99,17 +107,22 @@ export class ClientsFormPageComponent implements OnInit {
               telefono: this.clientsForm.get("telefono")?.value?.toString()
           };
 
-          if (this.clienteID() == 'new-Item') {
+          if (this.clienteID() == 'new-Item' || this.isModal()) {
                 const client = await firstValueFrom(this.clienteService.agregarCliente(formValue as Partial<ClientesInterface>));
           
                 if (client.success == false) {
                     console.log(client.error);
-                    alert(`Hubo un error al guardar el cliente ${client.error.message}`)
+                    this.notificationService.error(`Hubo un error al guardar el cliente ${client.error.message}`, 'Error');
                     return;
                 }
           
-                alert("Registro exitosamente");
-                await this.router.navigateByUrl('/dashboard/ventas/clients');   
+                this.notificationService.success("Registro exitosamente", 'Éxito');
+
+                if (this.isModal()) {
+                    this.saveSuccess.emit(client.data);
+                } else {
+                    await this.router.navigateByUrl('/panel/ventas/clients');   
+                }
 
           } else{
               const clientUpdate = await firstValueFrom( 
@@ -117,23 +130,27 @@ export class ClientsFormPageComponent implements OnInit {
               );
 
               if (clientUpdate.success == false) {
-                  alert(`Hubo un error al guardar el cliente ${clientUpdate.error.message}`)
+                  this.notificationService.error(`Hubo un error al guardar el cliente ${clientUpdate.error.message}`, 'Error');
                   return;
               }
         
-              alert("Registro Actualizado Correctamente");
-              await this.router.navigateByUrl('/dashboard/ventas/clients');   
+              this.notificationService.success("Registro Actualizado Correctamente", 'Éxito');
+              await this.router.navigateByUrl('/panel/ventas/clients');   
           }
         
       } catch (error: any) {
-         alert(error.message)
+         this.notificationService.error(error.message, 'Error');
       }
   
   }
   
   async onCancel(){
       this.clientsForm.reset();
-      await this.router.navigateByUrl('/dashboard/ventas/clients');   
+      if (this.isModal()) {
+          this.cancel.emit();
+      } else {
+          await this.router.navigateByUrl('/panel/ventas/clients');
+      }
  }
 
 

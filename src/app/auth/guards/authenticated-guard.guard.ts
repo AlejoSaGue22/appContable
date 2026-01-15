@@ -19,11 +19,11 @@ export const authenticatedGuardGuard: CanMatchFn = async (route, segments) => {
   console.log(segments);
   console.log(segments.join('/'));
 
-  const url = '/' + segments.join('/');
-  if (!menuService.hasAccessToRoute(url)) {
-    await router.navigateByUrl("/");
-    return false;
-  }
+  // const url = '/' + segments.join('/');
+  // if (!menuService.hasAccessToRoute(url)) {
+  //   await router.navigateByUrl("/");
+  //   return false;
+  // }
 
   return true;
 
