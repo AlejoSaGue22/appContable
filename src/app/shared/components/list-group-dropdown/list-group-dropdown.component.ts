@@ -28,18 +28,18 @@ export class ListGroupDropdownComponent<T extends Record<string, any>> implement
   showDropdown = signal<boolean>(false);
 
   ngOnChanges(changes: SimpleChanges): void {
-      this.searchOption.set(this.valueInput());
+    this.searchOption.set(this.valueInput());
   }
 
   filteredOptions = computed(() => {
-      const list = this.dataList();
-      const term = this.searchOption().toLowerCase();
+    const list = this.dataList();
+    const term = this.searchOption().toLowerCase();
 
-      if (!term.trim()) return list;
+    if (!term.trim()) return list;
 
-      return list.filter(item =>
-        this.buildLabel(item).toLowerCase().includes(term)
-      );
+    return list.filter(item =>
+      this.buildLabel(item).toLowerCase().includes(term)
+    );
   });
 
   buildLabel(item: T): string {
@@ -50,12 +50,12 @@ export class ListGroupDropdownComponent<T extends Record<string, any>> implement
       .join(' ');
   }
 
-  constructor(private elementRef: ElementRef) {}
+  constructor(private elementRef: ElementRef) { }
 
   // ------- CONTROL VALUE ACCESSOR ------- //
   private _value: T | null = null;
-  onChange = (_: any) => {};
-  onTouched = () => {};
+  onChange = (_: any) => { };
+  onTouched = () => { };
 
   writeValue(value: T | null): void {
     this._value = value;
@@ -103,7 +103,7 @@ export class ListGroupDropdownComponent<T extends Record<string, any>> implement
     this.showDropdown.set(false);
   }
 
-   @HostListener('document:click', ['$event'])
+  @HostListener('document:click', ['$event'])
   onClickOutside(event: MouseEvent) {
     if (!this.elementRef.nativeElement.contains(event.target)) {
       // this.filteredOptions.set(this.dataList());

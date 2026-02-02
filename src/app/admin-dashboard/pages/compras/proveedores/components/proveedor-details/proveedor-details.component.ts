@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, signal, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { of } from 'rxjs';
+import { ProveedoresService } from '@dashboard/pages/compras/services/proveedores.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-proveedor-details',
@@ -15,35 +16,30 @@ export class ProveedorDetailsComponent implements OnInit {
   error = signal<string | null>(null);
 
   constructor(
-    private route: ActivatedRoute
-  ) {}
+    private route: ActivatedRoute,
+    private proveedoresService: ProveedoresService
+  ) { }
 
   ngOnInit(): void {
     const id = this.route.snapshot.params['id'];
     this.loadProveedor(id);
   }
 
-  loadProveedor(id: string): void {
+
+  async loadProveedor(id: string) {
     this.loading.set(true);
     this.error.set(null);
 
-    // TODO: Connect to real service
-    // Simulating API call
-    setTimeout(() => {
-        this.proveedor.set({
-            id: id,
-            identificacion: '900123456',
-            nombre: 'Proveedor Ejemplo SAS',
-            telefono: '3001234567',
-            email: 'contacto@proveedor.com',
-            direccion: 'Calle 123 # 45-67',
-            ciudad: 'Bogotá',
-            estado: 'activo',
-            createdAt: new Date(),
-            updatedAt: new Date()
-        });
-        this.loading.set(false);
-    }, 1000);
+    try {
+
+      const proveedor = await firstValueFrom(this.proveedoresService.getProveedoresById(id));
+      this.proveedor.set(proveedor);
+      this.loading.set(false);
+
+    } catch (error: any) {
+      this.error.set(error.message);
+      this.loading.set(false);
+    }
   }
 
   print(): void {

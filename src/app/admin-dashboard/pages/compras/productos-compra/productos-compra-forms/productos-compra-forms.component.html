@@ -1,222 +1,150 @@
 @if ( productoIdRxResourse.isLoading() ) {
-    <div class="flex justify-center items-center h-screen">
-            <app-loader/>  
-    </div>
+<div class="flex justify-center items-center h-screen">
+    <app-loader />
+</div>
 }
 
 @if ( productoIdRxResourse.hasValue() ) {
-    @if (!isModal()) {
-        <header-title-page [titleHead]="headTitle" />
-    }
+@if (!isModal()) {
+<header-title-page [titleHead]="headTitle" />
+}
 
-    <div class="w-full">
-        <form [formGroup]="formProductos" (ngSubmit)="onSubmit()">
-            <div [class]="isModal() ? 'bg-white rounded-xl shadow-none overflow-hidden mt-0' : 'bg-white rounded-xl shadow-lg overflow-hidden mt-6'">
-                    <div class="p-6">
-                            <div class="mb-8">
-                                <h3 class="text-lg font-medium text-slate-700 border-gray-300 border-b pb-2 mb-4 flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" width="24" height="24" viewBox="0 0 24 24">
-                                        <mask id="SVGqnE2TcjN"><g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                                            <path fill="#fff" fill-opacity="0" stroke-dasharray="64" stroke-dashoffset="64" d="M9 7h11c0.55 0 1 0.45 1 1v11c0 0.55 -0.45 1 -1 1h-16c-0.55 0 -1 -0.45 -1 -1v-11c0 -0.55 0.45 -1 1 -1Z"><animate fill="freeze" attributeName="fill-opacity" begin="0.9s" dur="0.5s" values="0;1"/><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="64;0"/></path><path stroke-dasharray="16" stroke-dashoffset="16" d="M9 7v-3c0 -0.55 0.45 -1 1 -1h4c0.55 0 1 0.45 1 1v3"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.7s" dur="0.2s" values="16;0"/></path><path fill="#000" fill-opacity="0" stroke="none" d="M19 13c3.31 0 6 2.69 6 6c0 3.31 -2.69 6 -6 6c-3.31 0 -6 -2.69 -6 -6c0 -3.31 2.69 -6 6 -6Z"><set fill="freeze" attributeName="fill-opacity" begin="1.4s" to="1"/></path><path stroke-dasharray="8" stroke-dashoffset="8" d="M16 19h6"><animate fill="freeze" attributeName="stroke-dashoffset" begin="1.4s" dur="0.2s" values="8;0"/></path><path stroke-dasharray="8" stroke-dashoffset="8" d="M19 16v6"><animate fill="freeze" attributeName="stroke-dashoffset" begin="1.6s" dur="0.2s" values="8;0"/>
-                                            </path></g>
-                                        </mask><rect width="24" height="24" fill="currentColor" mask="url(#SVGqnE2TcjN)"/>
-                                    </svg>
-                                    Datos Generales
-                                </h3>
-                                
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="w-full">
+    <form [formGroup]="formProductos" (ngSubmit)="onSubmit()">
+        <div
+            [class]="isModal() ? 'bg-white rounded-xl shadow-none overflow-hidden mt-0' : 'bg-white rounded-xl shadow-lg overflow-hidden mt-6'">
+            <div class="p-6">
+                <div class="mb-8">
+                    <h3 class="text-lg font-medium text-slate-700 border-gray-300 border-b pb-2 mb-4 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" width="24"
+                            height="24" viewBox="0 0 24 24">
+                            <mask id="SVGqnE2TcjN">
+                                <g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2">
+                                    <path fill="#fff" fill-opacity="0" stroke-dasharray="64" stroke-dashoffset="64"
+                                        d="M9 7h11c0.55 0 1 0.45 1 1v11c0 0.55 -0.45 1 -1 1h-16c-0.55 0 -1 -0.45 -1 -1v-11c0 -0.55 0.45 -1 1 -1Z">
+                                        <animate fill="freeze" attributeName="fill-opacity" begin="0.9s" dur="0.5s"
+                                            values="0;1" />
+                                        <animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s"
+                                            values="64;0" />
+                                    </path>
+                                    <path stroke-dasharray="16" stroke-dashoffset="16"
+                                        d="M9 7v-3c0 -0.55 0.45 -1 1 -1h4c0.55 0 1 0.45 1 1v3">
+                                        <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.7s" dur="0.2s"
+                                            values="16;0" />
+                                    </path>
+                                    <path fill="#000" fill-opacity="0" stroke="none"
+                                        d="M19 13c3.31 0 6 2.69 6 6c0 3.31 -2.69 6 -6 6c-3.31 0 -6 -2.69 -6 -6c0 -3.31 2.69 -6 6 -6Z">
+                                        <set fill="freeze" attributeName="fill-opacity" begin="1.4s" to="1" />
+                                    </path>
+                                    <path stroke-dasharray="8" stroke-dashoffset="8" d="M16 19h6">
+                                        <animate fill="freeze" attributeName="stroke-dashoffset" begin="1.4s" dur="0.2s"
+                                            values="8;0" />
+                                    </path>
+                                    <path stroke-dasharray="8" stroke-dashoffset="8" d="M19 16v6">
+                                        <animate fill="freeze" attributeName="stroke-dashoffset" begin="1.6s" dur="0.2s"
+                                            values="8;0" />
+                                    </path>
+                                </g>
+                            </mask>
+                            <rect width="24" height="24" fill="currentColor" mask="url(#SVGqnE2TcjN)" />
+                        </svg>
+                        Datos Generales
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-sm font-semibold text-slate-600">Nombre del Producto <span
+                                    class="text-red-500">*</span></label>
+                            <input type="text" formControlName="nombre"
+                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                                placeholder="Ingrese el nombre del artículo">
+                        </div>
 
-                                        <div>
-                                            <label class="block mb-2 text-sm text-slate-600">
-                                                Categoria <span class="text-red-500">*</span>
-                                            </label>
-                                            <div class="relative">
-                                                <select [class.border-red-500]="formProductos.get('categoria')?.errors ?? false"
-                                                    class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border rounded
-                                                    pl-3 pr-8 py-2 transition duration-300 ease hover:border-slate-400 shadow-sm cursor-pointer" 
-                                                    formControlName="categoria">
-                                                    <option value="producto">Producto</option>
-                                                    <option value="servicio">Servicio</option>
-                                                </select>
-                                            </div>
-                                            <form-error-label [errorType]="formProductos.get('categoria')!" />
-                                            
-                                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-sm font-semibold text-slate-600">Código / SKU</label>
+                            <input type="text" formControlName="codigo"
+                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                                placeholder="Código identificador">
+                        </div>
 
-                                        <div class="relative">
-                                            <label class="block mb-2 text-sm text-slate-600">
-                                                Nombre <span class="text-red-500">*</span>
-                                            </label>
-                                            <input [class.border-red-500]="formProductos.get('nombre')?.errors ?? false"
-                                                class="w-full bg-transparent text-slate-700 text-sm border rounded-md px-3 py-2 transition 
-                                                duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 
-                                                shadow-sm focus:shadow" 
-                                                placeholder="ej: Pera" 
-                                                type="text"
-                                                formControlName="nombre"
-                                                min="1"/>
-                                            
-                                            <form-error-label [errorType]="formProductos.get('nombre')!" />
-                                        </div>
-                                        
-                                        <div>
-                                            <label class="block mb-2 text-sm text-slate-600">
-                                                Codigo
-                                            </label>
-                                            <input 
-                                                class="w-full bg-transparent text-slate-700 text-sm border 
-                                                rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 
-                                                hover:border-slate-300 shadow-sm focus:shadow"  
-                                                formControlName="codigo"
-                                                type="text"/>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-sm font-semibold text-slate-600">Categoría <span
+                                    class="text-red-500">*</span></label>
+                            <select [class.border-red-500]="formProductos.get('categoria')?.errors ?? false"
+                                class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border rounded
+                                pl-3 pr-8 py-2 transition duration-300 ease hover:border-slate-400 shadow-sm cursor-pointer" formControlName="categoria">
+                                @for (item of categorias; track $index) {
+                                <option value="{{item.value}}">{{item.label}}</option>
+                                }
+                            </select>
 
-                                                <!-- <form-error-label [errorType]="formProductos.get('codigo')!" /> -->
-                                        </div>
+                            <form-error-label [errorType]="formProductos.get('categoria')!" />
+                        </div>
 
-                                        <div>
-                                            <label class="block mb-2 text-sm text-slate-600">
-                                                Unidad de medida <span class="text-red-500">*</span>
-                                            </label>
-                                            <div class="relative">
-                                                <select [class.border-red-500]="formProductos.get('unidadmedida')?.errors ?? false"
-                                                    class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm 
-                                                    rounded pl-3 pr-8 py-2 transition duration-300 ease hover:border-slate-400 shadow-sm cursor-pointer"
-                                                    formControlName="unidadmedida">
-                                                        <option value="unidad">Unidad</option>
-                                                        <option value="centimetro">Centimetro</option>
-                                                        <option value="metro">Metro</option>
-                                                        <option value="metrocuadrado">Metro cuadrado</option>
-                                                        <option value="metrocubico">Metro Cubico</option>
-                                                        <option value="centimetrocuadrado">Centimetro cuadrado</option>
-                                                        <option value="pulgada">Pulgada</option>
-                                                        <option value="gramo">Gramo</option>
-                                                </select>
-                                            </div>
-                                            <form-error-label [errorType]="formProductos.get('unidadmedida')!" />
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-sm font-semibold text-slate-600">Unidad de Medida <span
+                                    class="text-red-500">*</span></label>
+                            <select [class.border-red-500]="formProductos.get('unidadmedida')?.errors ?? false"
+                                class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm 
+                                rounded pl-3 pr-8 py-2 transition duration-300 ease hover:border-slate-400 shadow-sm cursor-pointer" formControlName="unidadmedida">
+                                <option value="unidad">Unidad</option>
+                                <option value="centimetro">Centimetro</option>
+                                <option value="metro">Metro</option>
+                                <option value="metrocuadrado">Metro cuadrado</option>
+                                <option value="metrocubico">Metro Cubico</option>
+                                <option value="centimetrocuadrado">Centimetro cuadrado</option>
+                                <option value="pulgada">Pulgada</option>
+                                <option value="gramo">Gramo</option>
+                            </select>
+                        </div>
 
-                                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-sm font-semibold text-slate-600">IVA (%)</label>
+                            <select [class.border-red-500]="formProductos.get('impuesto')?.errors ?? false" class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border rounded 
+                                    pl-3 pr-8 py-2 transition duration-300 ease hover:border-slate-400 shadow-sm
+                                    cursor-pointer" formControlName="impuesto">
+                                <option value="19">IVA 19%</option>
+                                <option value="16">IVA 16%</option>
+                                <option value="6">IVA 6%</option>
+                                <option value="0">No aplica</option>
+                            </select>
+                        </div>
 
-                                        <div>
-                                                <label class="block mb-2 text-sm text-slate-600">
-                                                    Impuesto <span class="text-red-500">*</span>
-                                                </label>
-                                                <div class="relative">
-                                                    <select [class.border-red-500]="formProductos.get('impuesto')?.errors ?? false"
-                                                        class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border rounded 
-                                                        pl-3 pr-8 py-2 transition duration-300 ease hover:border-slate-400 shadow-sm
-                                                        cursor-pointer" formControlName="impuesto">
-                                                        <option value="19">IVA 19%</option>
-                                                        <option value="16">IVA 16%</option>
-                                                        <option value="6">IVA 6%</option>
-                                                        <option value="0">No aplica</option>
-                                                    </select>
-                                                </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-sm font-semibold text-slate-600">Precio Referencial</label>
+                            <input type="number" formControlName="precio_referencial"
+                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                                placeholder="0.00">
+                        </div>
 
-                                            <form-error-label [errorType]="formProductos.get('impuesto')!" />
-
-                                        </div>
-
-                                        <div>
-                                                <label class="block mb-2 text-sm text-slate-600">
-                                                    Retencion <span class="text-red-500">*</span>
-                                                </label>
-                                                <div class="relative">
-                                                    <select [class.border-red-500]="formProductos.get('retencion')?.errors ?? false"
-                                                    class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border
-                                                    rounded pl-3 pr-8 py-2 transition duration-300 ease hover:border-slate-400 shadow-sm
-                                                    cursor-pointer" 
-                                                    formControlName="retencion">
-                                                        <option value="15">Retencion 15%</option>
-                                                        <option value="5">Retencion 5%</option>
-                                                        <option value="4">Retencion 4%</option>
-                                                        <option value="6">Retencion 6%</option>
-                                                        <option value="7">Retencion 7%</option>
-                                                        <option value="10">Retencion 10%</option>
-                                                        <option value="0">No aplica</option>
-                                                    </select>
-                                                </div>
-
-                                                <form-error-label [errorType]="formProductos.get('retencion')!" />
-                                        </div>
-
-                                </div>
-
-
-                            </div>
-
-                            <div class="mb-8">
-                                <h3 class="text-lg font-medium text-slate-700 border-gray-300 border-b pb-2 mb-4 flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" width="24" height="24" viewBox="0 0 24 24">
-                                        <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                                            <path stroke-dasharray="72" stroke-dashoffset="72" d="M12 3h7v18h-14v-18h7Z"><animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="72;0"/></path><path stroke-dasharray="12" stroke-dashoffset="12" stroke-width="1" d="M14.5 3.5v3h-5v-3"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.7s" dur="0.2s" values="12;0"/></path><path stroke-dasharray="8" stroke-dashoffset="8" d="M9 13h6"><animate fill="freeze" attributeName="stroke-dashoffset" begin="0.9s" dur="0.2s" values="8;0"/></path><path stroke-dasharray="8" stroke-dashoffset="8" d="M12 10v6"><animate fill="freeze" attributeName="stroke-dashoffset" begin="1.1s" dur="0.2s" values="8;0"/>
-                                            </path>
-                                        </g>
-                                        <path fill="currentColor" fill-opacity="0" d="M6 4H10V6H14V4H18V20H6V4Z">
-                                            <animate fill="freeze" attributeName="fill-opacity" begin="1.4s" dur="0.15s" values="0;0.3"/>
-                                        </path>
-                                    </svg>
-                                    Datos Adicionales
-                                </h3>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" formGroupName="precioventa">
-                                        <div>
-                                            <label class="block mb-2 text-sm text-slate-600">
-                                                    Precio de Compra <span class="text-red-500">*</span>
-                                                </label>
-                                                <input [class.border-red-500]="formProductos.get('precio1')?.errors ?? false"
-                                                    class="w-full bg-transparent text-slate-700 text-sm border 
-                                                    rounded-md px-3 py-2 transition duration-300 ease hover:border-slate-300 shadow-sm"  
-                                                    formControlName="precio1"
-                                                    placeholder="$2.000"
-                                                    type="text"/>
-
-                                                <form-error-label [errorType]="formProductos.get('precio1')!" />
-                                        </div>
-
-                                        <div>
-                                            <label class="block mb-2 text-sm text-slate-600">
-                                                    Precio de Venta Sugerido
-                                                </label>
-                                                <input class="w-full bg-transparent text-slate-700 text-sm border 
-                                                rounded-md px-3 py-2 transition duration-300 ease hover:border-slate-300 shadow-sm"  
-                                                formControlName="precio2"
-                                                placeholder="$2.000"
-                                                type="text"/>
-                                        </div>
-
-                                </div>
-
-                                <div>
-                                        <label class="block m-2.5 text-sm font-medium text-slate-600">
-                                            Observacion
-                                        </label>
-                                        <textarea class="w-full bg-white text-slate-700 text-sm border rounded-lg px-4 py-3 
-                                            transition duration-300 ease shadow-sm"
-                                            placeholder=""
-                                            formControlName="observacion">
-                                        </textarea>
-                                </div>
-
-                                <!-- Botones de acción -->
-                                <div class="flex justify-end space-x-4 pt-4 border-t border-slate-200">
-                                    <button type="button" 
-                                            (click)="onCancel()"
-                                            class="px-6 py-2.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg
-                                            shadow-sm hover:bg-slate-50 transition-colors duration-300 cursor-pointer">
-                                    Cancelar
-                                    </button>
-                                    <button type="submit" 
-                                            class="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg shadow-sm
-                                            hover:bg-blue-700 transition-colors duration-300 cursor-pointer">
-                                        Guardar
-                                    </button>
-                                </div>
-                                
-                     </div>
-
-
+                        <div class="md:col-span-2 flex flex-col gap-1.5">
+                            <label class="text-sm font-semibold text-slate-600">Descripción</label>
+                            <textarea formControlName="observacion" rows="2"
+                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                                placeholder="Detalles adicionales del producto..."></textarea>
+                        </div>
                     </div>
+
+                    <div class="mt-10 flex justify-end items-center gap-3">
+                        <button type="button" (click)="onCancel()"
+                            class="px-5 py-2.5 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
+                            Cancelar
+                        </button>
+                        <button type="submit"
+                            class="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                            {{ productosID() != 'new-Item' ? 'Actualizar Producto' : 'Registrar Producto' }}
+                        </button>
+                    </div>
+
+
+
+                </div>
+
+
+
+
             </div>
-        </form>
-    </div>
+        </div>
+    </form>
+</div>
 }

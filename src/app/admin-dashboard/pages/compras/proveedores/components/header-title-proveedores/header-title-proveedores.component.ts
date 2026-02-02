@@ -31,7 +31,7 @@ import { RouterLink } from '@angular/router';
       </div>
 
       <a
-        routerLink="/panel/ventas/proveedores/new-Item"
+        routerLink="/panel/compras/proveedores/new-Item"
         class="inline-flex items-center rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300"
       >
         <svg class="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -43,4 +43,4 @@ import { RouterLink } from '@angular/router';
   `,
   standalone: true
 })
-export class HeaderTitleProveedoresComponent {}
+export class HeaderTitleProveedoresComponent { }

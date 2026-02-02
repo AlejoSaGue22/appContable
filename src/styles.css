@@ -1,12 +1,17 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+    color-scheme: light;
+}
+
 /* Configuración específica para Flowbite */
 @import "flowbite/src/themes/default";
 @plugin "flowbite/plugin";
 @source "../node_modules/flowbite";
 
 
-*{
+* {
     font-family: Arial, Helvetica, sans-serif
 }
-    

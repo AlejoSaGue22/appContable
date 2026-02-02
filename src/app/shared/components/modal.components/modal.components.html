@@ -1,25 +1,24 @@
 @if (modalActive()) {
-    <div tabindex="-1" aria-hidden="true"
-        class="fixed inset-0 z-50 flex justify-center items-center w-full h-full bg-black/5 backdrop-blur-xs">
-        
-        <div class="relative w-full max-w-2xl mx-4 md:mx-0">
+<div tabindex="-1" aria-hidden="true"
+    class="fixed inset-0 z-50 flex justify-center items-center w-full h-full bg-black/5 backdrop-blur-xs">
+
+    <div class="relative w-full max-w-2xl mx-4 md:mx-0">
         <div class="bg-white rounded-lg shadow-lg dark:bg-gray-700 overflow-hidden">
-            
+
             <!-- Modal Header -->
             <div class="flex items-center justify-between p-4 border-b dark:border-gray-600 border-gray-200">
-            <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                Informacion
-            </h3>
-            <button 
-                type="button" 
-                (click)="close()"
-                class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg 
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                    Informacion
+                </h3>
+                <button type="button" (click)="close()" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg 
                 text-sm p-2 cursor-pointer">
-                <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-                </svg>
-                <span class="sr-only">Close modal</span>
-            </button>
+                    <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
             </div>
 
             <!-- Modal Body -->
@@ -27,8 +26,7 @@
                 <ng-content></ng-content>
             </div>
         </div>
-        </div>
     </div>
+
+</div>
 }
-
-

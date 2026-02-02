@@ -11,14 +11,14 @@ import { LoaderComponent } from "src/app/utils/components/loader/loader.componen
 import { ErrorPageComponent } from "src/app/utils/components/error-page/error-page.component";
 import { NotificationService } from '@shared/services/notification.service';
 
-  
+
 @Component({
-  selector: 'app-clients-form-page',
-  imports: [HeaderTitlePageComponent, FormErrorLabelComponent, ReactiveFormsModule, LoaderComponent, ErrorPageComponent],
-  templateUrl: './clients-form-page.component.html',
+    selector: 'app-clients-form-page',
+    imports: [HeaderTitlePageComponent, FormErrorLabelComponent, ReactiveFormsModule, LoaderComponent, ErrorPageComponent],
+    templateUrl: './clients-form-page.component.html',
 })
-export class ClientsFormPageComponent implements OnInit { 
-  
+export class ClientsFormPageComponent implements OnInit {
+
     isModal = input<boolean>(false);
     saveSuccess = output<ClientesInterface>();
     notificationService = inject(NotificationService);
@@ -46,44 +46,57 @@ export class ClientsFormPageComponent implements OnInit {
     })
 
     clienteID = toSignal(
-      this.activateRoute.params.pipe(map((params) => params['id'] ))
+        this.activateRoute.params.pipe(map((params) => params['id']))
     )
 
     clienteIdResource = rxResource({
-      request: () => ({ id: this.clienteID() }),
-      loader: ({ request }) => this.clienteService.getClientesById( request.id ).pipe(
-        tap((el) => this.clientsForm.reset(el))
-      )
+        request: () => {
+            // Solo cargar si NO está en modo modal
+            if (this.isModal()) {
+                return null;
+            }
+            return { id: this.clienteID() };
+        },
+        loader: ({ request }) => {
+            if (!request) {
+                // Si no hay request (modo modal), retornar un observable vacío
+                return this.clienteService.getClientesById('new-Item');
+            }
+            return this.clienteService.getClientesById(request.id).pipe(
+                tap((el) => this.clientsForm.reset(el))
+            );
+        }
     })
 
     ngOnInit() {
         this.clientsForm.get('tipoPersona')?.valueChanges.subscribe(value => {
-          if(!value) return;
-          this.toggleValidations(value);
+            if (!value) return;
+            this.toggleValidations(value);
         });
 
-        // Initialize resource even if no route param (for new item in modal)
         if (this.isModal()) {
-             // Logic to handle new item in modal if needed, or just let form be empty
+            this.clientsForm.reset();
+            this.headTitleCliente.title = 'Crear Cliente';
+            this.headTitleCliente.slog = 'Registra un nuevo cliente al sistema';
         }
     }
 
     toggleValidations(tipo: string) {
-      const nombreControl = this.clientsForm.get('nombre');
-      const apellidoControl = this.clientsForm.get('apellido');
-      const razonSocialControl = this.clientsForm.get('razonSocial');
+        const nombreControl = this.clientsForm.get('nombre');
+        const apellidoControl = this.clientsForm.get('apellido');
+        const razonSocialControl = this.clientsForm.get('razonSocial');
 
-      if (tipo === 'PN') {
-          nombreControl?.setValidators([Validators.required]);
-          apellidoControl?.setValidators([Validators.required]);
-          razonSocialControl?.clearValidators();  
+        if (tipo === 'PN') {
+            nombreControl?.setValidators([Validators.required]);
+            apellidoControl?.setValidators([Validators.required]);
+            razonSocialControl?.clearValidators();
 
-      } else if (tipo === 'PJ') {
-          // Si el tipo es 'juridica', se requiere 'razonSocial'
-          razonSocialControl?.setValidators([Validators.required]);
-          nombreControl?.clearValidators(); 
-          apellidoControl?.clearValidators(); 
-      }
+        } else if (tipo === 'PJ') {
+            // Si el tipo es 'juridica', se requiere 'razonSocial'
+            razonSocialControl?.setValidators([Validators.required]);
+            nombreControl?.clearValidators();
+            apellidoControl?.clearValidators();
+        }
 
         nombreControl?.updateValueAndValidity();
         apellidoControl?.updateValueAndValidity();
@@ -91,67 +104,67 @@ export class ClientsFormPageComponent implements OnInit {
     }
 
 
-    async onSubmit(){
-      const isValid = this.clientsForm.valid;
-      this.clientsForm.markAllAsTouched();
+    async onSubmit() {
+        const isValid = this.clientsForm.valid;
+        this.clientsForm.markAllAsTouched();
 
-      if (!isValid) {
-        this.notificationService.error('Formulario incompleto', 'Error');
-        return;
-      }
+        if (!isValid) {
+            this.notificationService.error('Formulario incompleto', 'Error');
+            return;
+        }
 
-      try {
+        try {
 
-          const formValue = {
-              ...this.clientsForm.value,
-              telefono: this.clientsForm.get("telefono")?.value?.toString()
-          };
+            const formValue = {
+                ...this.clientsForm.value,
+                telefono: this.clientsForm.get("telefono")?.value?.toString()
+            };
 
-          if (this.clienteID() == 'new-Item' || this.isModal()) {
+            if (this.clienteID() == 'new-Item' || this.isModal()) {
                 const client = await firstValueFrom(this.clienteService.agregarCliente(formValue as Partial<ClientesInterface>));
-          
+
                 if (client.success == false) {
                     console.log(client.error);
                     this.notificationService.error(`Hubo un error al guardar el cliente ${client.error.message}`, 'Error');
                     return;
                 }
-          
-                this.notificationService.success("Registro exitosamente", 'Éxito');
+
+                this.notificationService.success("Cliente guardado exitosamente", 'Éxito');
 
                 if (this.isModal()) {
                     this.saveSuccess.emit(client.data);
                 } else {
-                    await this.router.navigateByUrl('/panel/ventas/clients');   
+                    await this.router.navigateByUrl('/panel/ventas/clients');
                 }
 
-          } else{
-              const clientUpdate = await firstValueFrom( 
-                  this.clienteService.actualizarClientes(this.clienteID(), formValue as Partial<ClientesInterface>)
-              );
+            } else {
+                const clientUpdate = await firstValueFrom(
+                    this.clienteService.actualizarClientes(this.clienteID(), formValue as Partial<ClientesInterface>)
+                );
 
-              if (clientUpdate.success == false) {
-                  this.notificationService.error(`Hubo un error al guardar el cliente ${clientUpdate.error.message}`, 'Error');
-                  return;
-              }
-        
-              this.notificationService.success("Registro Actualizado Correctamente", 'Éxito');
-              await this.router.navigateByUrl('/panel/ventas/clients');   
-          }
-        
-      } catch (error: any) {
-         this.notificationService.error(error.message, 'Error');
-      }
-  
-  }
-  
-  async onCancel(){
-      this.clientsForm.reset();
-      if (this.isModal()) {
-          this.cancel.emit();
-      } else {
-          await this.router.navigateByUrl('/panel/ventas/clients');
-      }
- }
+                if (clientUpdate.success == false) {
+                    this.notificationService.error(`Hubo un error al guardar el cliente ${clientUpdate.error.message}`, 'Error');
+                    return;
+                }
+
+                this.notificationService.success("Cliente actualizado exitosamente", 'Éxito');
+                await this.router.navigateByUrl('/panel/ventas/clients');
+            }
+
+        } catch (error: any) {
+            this.notificationService.error(error.message, 'Error');
+        }
+
+    }
+
+    async onCancel() {
+        this.clientsForm.reset();
+        if (this.isModal()) {
+            this.cancel.emit();
+        } else {
+            await this.router.navigateByUrl('/panel/ventas/clients');
+        }
+    }
 
 
 }

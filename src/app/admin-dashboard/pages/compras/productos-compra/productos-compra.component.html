@@ -1,42 +1,37 @@
 @if ( productorxResource.isLoading() ) {
-    <div class="flex justify-center items-center h-screen">
-            <app-loader/>  
-    </div>
+<div class="flex justify-center items-center h-screen">
+    <app-loader />
+</div>
 }
 
 
 @if ( productorxResource.hasValue() ) {
+<div class="p-4 sm:p-6 lg:p-8">
+    <app-header-title-productos-compra />
 
-    <div class="p-4 sm:p-6 lg:p-8">
-        <app-header-title-compras />
-
-        <app-table-list 
-            [columns]="columnsTable"
-            [dataTable]="productorxResource.value().productos"
-            [pages]="productorxResource.value().pages"
-            (modalOpen)="openModal($event)"
-            rutaLink="/panel/compras/products_purchase/" />
-    </div>
+    <app-table-productos-compra [productoData]="productorxResource.value().articulos" (delete)="openModal($event)" />
+</div>
 }
 
 <app-modal [(visible)]="isModalEdit">
     <div class="relative text-center">
-       <svg class="text-gray-400 dark:text-gray-500 w-11 h-11 mb-3.5 mx-auto" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
-            <p class="mb-4 text-gray-500 dark:text-gray-300">Estas seguro de eliminar este Producto o Servicio?</p>
+        <svg class="text-gray-400 dark:text-gray-500 w-11 h-11 mb-3.5 mx-auto" aria-hidden="true" fill="currentColor"
+            viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd"
+                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                clip-rule="evenodd"></path>
+        </svg>
+        <p class="mb-4 text-gray-500 dark:text-gray-300">Estas seguro de eliminar este Producto o Servicio?</p>
 
-            <div class="flex justify-center items-center space-x-4">
-                <button type="button" 
-                (click)="isModalEdit = false"
-                class="py-2 px-3 text-sm font-medium text-gray-500 bg-white rounded-lg border border-gray-200
+        <div class="flex justify-center items-center space-x-4">
+            <button type="button" (click)="isModalEdit = false" class="py-2 px-3 text-sm font-medium text-gray-500 bg-white rounded-lg border border-gray-200
                     hover:bg-gray-100 hover:text-gray-900 cursor-pointer">
-                    No, cancelar
-                </button>
-                <button type="submit" 
-                    (click)="deleteProducto()"
-                    class="py-2 px-3 text-sm font-medium text-center text-white bg-red-600 rounded-lg 
+                No, cancelar
+            </button>
+            <button type="submit" (click)="deleteProducto()" class="py-2 px-3 text-sm font-medium text-center text-white bg-red-600 rounded-lg 
                     hover:bg-red-700 cursor-pointer">
-                    Si, Estoy seguro
-                </button>
-            </div>
+                Si, Estoy seguro
+            </button>
+        </div>
     </div>
 </app-modal>

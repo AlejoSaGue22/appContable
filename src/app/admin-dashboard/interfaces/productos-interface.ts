@@ -1,20 +1,22 @@
-export interface ProductosResponse {
-    count:    number;
-    pages:    number;
-    productos: ProductosInterface[];
+export interface ArticulosResponse {
+    count: number;
+    pages: number;
+    articulos: GetProductosDetalle[];
 }
 
-export interface ProductosInterface {
-      id: string,
-      categoria: string,
-      nombre: string,
-      codigo: string,
-      unidadmedida: string,
-      impuesto: string,
-      retencion: string,
-      precioventa1: string,
-      precioventa2: string,
-      observacion: string,
+export interface ArticulosInterface {
+    id: string,
+    categoria: string,
+    nombre: string,
+    codigo: string,
+    unidadmedida: string,
+    impuesto: number,
+    tipoCodigo?: string,
+    tipo?: string,
+    // retencion: string,
+    precio: string,
+    precioventa2: string,
+    observacion: string,
 }
 
 
@@ -26,7 +28,7 @@ export interface GetProductosDetalle {
     unidadmedida: string;
     impuesto: string;
     retencion: string;
-    precioventa1: string;
+    precio: number;
     precioventa2: string;
     isActive: boolean;
     observacion: string;
@@ -34,5 +36,7 @@ export interface GetProductosDetalle {
     iva_percent: string;
     rete_percent: string;
     estado: string;
+    tipo: string;
+    tipoCodigo: string;
     ind: string;
 }

@@ -1,6 +1,8 @@
-import { Component, input } from '@angular/core';
+import { Component, input, Output, EventEmitter } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { ProveedoresInterface } from '@dashboard/interfaces/proveedores-interface';
+import { modalOpen } from '@shared/interfaces/services.interfaces';
 
 @Component({
   selector: 'app-table-proveedores',
@@ -9,5 +11,11 @@ import { CommonModule } from '@angular/common';
   standalone: true
 })
 export class TableProveedoresComponent {
-  proveedorData = input<any[]>([]);
+
+  proveedorData = input<ProveedoresInterface[]>([]);
+  @Output() delete = new EventEmitter<modalOpen>();
+
+  onDeleteProveedor(id: string) {
+    this.delete.emit({ open: true, id });
+  }
 }

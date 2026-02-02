@@ -22,7 +22,7 @@ import { RouterLink } from '@angular/router';
 
     <div class="mb-6 flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        <h1 class="text-2xl font-bold text-gray-900">
           Gestión de Facturas de Compra
         </h1>
         <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -43,4 +43,4 @@ import { RouterLink } from '@angular/router';
   `,
   standalone: true
 })
-export class HeaderTitleComprasComponent {}
+export class HeaderTitleComprasComponent { }

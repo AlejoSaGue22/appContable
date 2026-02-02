@@ -3,8 +3,9 @@ import { ErrorAuthResponse } from "src/app/auth/interfaces/auth-response.interfa
 export interface Options {
     limit?: number;
     offset?: number;
+    venta_compra?: 'venta' | 'compra';
 }
 
-export type ResponseResult =  | { success: true, data?: any, message?: string } | { success: false; error: ErrorAuthResponse };
+export type ResponseResult = | { success: true, data?: any, message?: string } | { success: false; error: ErrorAuthResponse };
 
 export type modalOpen = { open: boolean, id: string };

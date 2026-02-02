@@ -6,19 +6,22 @@ import { HeaderInput, HeaderTitlePageComponent } from "@dashboard/components/hea
 import { FormErrorLabelComponent } from "src/app/utils/components/form-error-label/form-error-label.component";
 import { NotificationService } from '@shared/services/notification.service';
 import { LoaderService } from '@utils/services/loader.service';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { map } from 'rxjs';
+import { rxResource, toSignal } from '@angular/core/rxjs-interop';
+import { firstValueFrom, map, tap } from 'rxjs';
+import { ProveedoresInterface } from '@dashboard/interfaces/proveedores-interface';
+import { ProveedoresService } from '../../services/proveedores.service';
+import { LoaderComponent } from "@utils/components/loader/loader.component";
 
 @Component({
   selector: 'app-proveedores-forms-page',
-  imports: [CommonModule, ReactiveFormsModule, HeaderTitlePageComponent, FormErrorLabelComponent],
+  imports: [CommonModule, ReactiveFormsModule, HeaderTitlePageComponent, FormErrorLabelComponent, LoaderComponent],
   templateUrl: './proveedores-forms-page.component.html',
   standalone: true
 })
 export class ProveedoresFormsPageComponent implements OnInit {
-  
+
   isModal = input<boolean>(false);
-  saveSuccess = output<any>(); // Replace 'any' with proper Interface if available
+  saveSuccess = output<ProveedoresInterface>();
   cancel = output<void>();
 
   headTitle: HeaderInput = {
@@ -31,9 +34,9 @@ export class ProveedoresFormsPageComponent implements OnInit {
   loaderService = inject(LoaderService);
   router = inject(Router);
   activatedRoute = inject(ActivatedRoute);
-
+  private proveedoresService = inject(ProveedoresService);
   loading = signal<boolean>(false);
-  
+
   proveedorId = toSignal(
     this.activatedRoute.params.pipe(
       map((param) => param['id'])
@@ -51,69 +54,97 @@ export class ProveedoresFormsPageComponent implements OnInit {
     nombreContacto: [''],
     telefonoContacto: [''],
     observaciones: [''],
-    estado: ['Activo']
+    estado: ['A']
   });
 
   ngOnInit(): void {
-    if (this.proveedorId() && this.proveedorId() !== 'new') {
-       this.loadProveedor(this.proveedorId());
-       this.headTitle.title = 'Editar Proveedor';
+    if (this.proveedorId() && this.proveedorId() !== 'new-Item') {
+      this.loadProveedor(this.proveedorId());
+      this.headTitle.title = 'Editar Proveedor';
     } else {
-       this.headTitle.title = 'Nuevo Proveedor';
+      this.headTitle.title = 'Nuevo Proveedor';
+    }
+
+    if (this.isModal()) {
+      this.formProveedor.reset();
     }
   }
 
-  loadProveedor(id: string) {
+  proveedorIdResource = rxResource({
+    request: () => ({ id: this.proveedorId() }),
+    loader: ({ request }) => this.proveedoresService.getProveedoresById(request.id).pipe(
+      tap((el) => this.loadProveedor(el))
+    )
+  })
+
+  loadProveedor(proveedor: ProveedoresInterface) {
     this.loaderService.show();
-    // Simulate loading data
-    setTimeout(() => {
-        // Mock data
-        this.formProveedor.patchValue({
-            tipoDocumento: 'NIT',
-            identificacion: '900123456',
-            nombre: 'Proveedor Ejemplo SAS',
-            email: 'contacto@proveedor.com',
-            telefono: '3001234567',
-            direccion: 'Calle 123 # 45-67',
-            ciudad: 'Bogotá',
-            estado: 'Activo'
-        });
-        this.loaderService.hide();
-    }, 1000);
+    this.formProveedor.patchValue(proveedor);
+    this.formProveedor.get("estado")?.setValue(proveedor.isActive ? 'A' : 'I');
+    this.loaderService.hide();
   }
 
-  onSubmit() {
-    if (this.formProveedor.invalid) {
+  async onSubmit() {
+    const valid = this.formProveedor.valid
+    if (!valid) {
       this.formProveedor.markAllAsTouched();
       this.notificationService.error('Por favor revise los campos obligatorios', 'Formulario Inválido');
       return;
     }
 
-    this.loading.set(true);
-    // Simulate API call
-    setTimeout(() => {
-      this.loading.set(false);
-      const action = this.proveedorId() === 'new' || !this.proveedorId() ? 'creado' : 'actualizado';
-      this.notificationService.success(`Proveedor ${action} exitosamente`, 'Éxito');
-      
-      const mockProveedor = this.formProveedor.value; // In real app this comes from API
+    this.loaderService.show();
 
-      if (this.isModal()) {
-          this.saveSuccess.emit(mockProveedor);
-      } else {
-           setTimeout(() => {
-              this.router.navigate(['/panel/compras/proveedores']);
-          }, 1000);
+    try {
+      const formValue = {
+        ...this.formProveedor.value,
+        isActive: this.formProveedor.get("estado")?.value === 'Activo' ? true : false,
+        telefono: this.formProveedor.get("telefono")?.value?.toString()
       }
 
-    }, 1500);
+      delete formValue.estado;
+
+      if (this.proveedorId() == 'new-Item' || this.isModal()) {
+        const client = await firstValueFrom(this.proveedoresService.createProveedor(formValue as Partial<ProveedoresInterface>));
+
+        this.loaderService.hide();
+        if (client.success == false) {
+          console.log(client.error);
+          this.notificationService.error(`Hubo un error al guardar el proveedor ${client.error.message}`, 'Error');
+          return;
+        }
+
+        this.notificationService.success("Proveedor guardado exitosamente", 'Éxito');
+
+        if (this.isModal()) {
+          this.saveSuccess.emit(client.data);
+        } else {
+          await this.router.navigateByUrl('/panel/compras/proveedores');
+        }
+
+      } else {
+        const client = await firstValueFrom(this.proveedoresService.updateProveedor(this.proveedorId(), formValue as Partial<ProveedoresInterface>));
+
+        if (client.success == false) {
+          console.log(client.error);
+          this.notificationService.error(`Hubo un error al guardar el proveedor ${client.error.message}`, 'Error');
+          return;
+        }
+
+        this.notificationService.success("Proveedor actualizado exitosamente", 'Éxito');
+        await this.router.navigateByUrl('/panel/compras/proveedores');
+      }
+
+    } catch (error: any) {
+      this.notificationService.error(error.message, 'Error');
+    }
+
   }
 
   onCancel() {
-      if (this.isModal()) {
-          this.cancel.emit();
-      } else {
-          this.router.navigate(['/panel/compras/proveedores']);
-      }
+    if (this.isModal()) {
+      this.cancel.emit();
+    } else {
+      this.router.navigate(['/panel/compras/proveedores']);
+    }
   }
 }

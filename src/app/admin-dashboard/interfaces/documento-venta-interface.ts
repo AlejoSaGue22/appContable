@@ -1,15 +1,15 @@
 import { ClientesInterface } from "./clientes-interface";
-import { ProductosInterface } from "./productos-interface";
+import { ArticulosInterface } from "./productos-interface";
 
 export interface ComprobanteVentaResponseTemp {
-    count:    number;
-    pages:    number;
-    comprobantes: FacturaVenta[];
+  count: number;
+  pages: number;
+  comprobantes: FacturaVenta[];
 }
 
 export interface ComprobanteVentaResponse {
   success: boolean;
-  data: FacturaVenta[] ;
+  data: FacturaVenta[];
   message?: string;
   meta?: {
     page: number;
@@ -50,8 +50,8 @@ export interface ComprobanteVentaResponse {
 
 export interface ItemFactura {
   id?: string;
-  productoId: string;
-  producto?: ProductosInterface;
+  articuloId: string;
+  articulo?: ArticulosInterface;
   description: string;
   unitPrice: number;
   iva: number;
