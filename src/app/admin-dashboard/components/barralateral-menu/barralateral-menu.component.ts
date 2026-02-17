@@ -11,26 +11,26 @@ import { MenuItem } from '@utils/menu.config';
 })
 export class BarralateralMenuComponent {
 
-    title =  input.required<string>();
-    menuSection = input<MenuItem>();
-    subItems = input.required<MenuItem[]>();
-    defaultOpen = input<boolean>(false);
-    activeMenu = input<string | null>(null);
-    menuId = input<string>();
-    menuToggled = output<string>();
+  title = input.required<string>();
+  menuSection = input<MenuItem>();
+  subItems = input.required<MenuItem[]>();
+  defaultOpen = input<boolean>(false);
+  activeMenu = input<string | null>(null);
+  menuId = input<string>();
+  menuToggled = output<string>();
 
-    children = computed(() => {
-      return this.menuSection()?.children ?? [];
-    });
+  children = computed(() => {
+    return this.menuSection()?.children ?? [];
+  });
 
-    get isOpen(): boolean {
-      return this.activeMenu() === this.menuId();
-    }
+  get isOpen(): boolean {
+    return this.activeMenu() === this.menuId();
+  }
 
-    toggleMenu(){
-        this.menuToggled.emit(this.menuId()!)
-    } 
+  toggleMenu() {
+    this.menuToggled.emit(this.menuId()!)
+  }
 
-    
+
 
 }

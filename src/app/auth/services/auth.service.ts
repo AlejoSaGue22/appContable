@@ -3,7 +3,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { catchError, delay, map, Observable, of, Subject, tap } from 'rxjs';
 import { environment } from 'src/app/environments/environment';
 import { ErrorAuthResponse, JwtPayload, LoginResponse } from '../interfaces/auth-response.interface';
-import { User } from '../interfaces/user.interface';
+import { UserAuth } from '../interfaces/user-auth.interface';
 import { ResponseResult } from '@shared/interfaces/services.interfaces';
 import { MenuService } from '@utils/services/menu.service';
 import { jwtDecode } from 'jwt-decode';
@@ -22,7 +22,7 @@ export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
   private _authStatus = signal<AuthStatus>('checking');
-  private _user = signal<User | null>(null);
+  private _user = signal<UserAuth | null>(null);
   private _token = signal<string | null>(sessionStorage.getItem('token'));
 
   token = computed(() => this._token());
@@ -32,94 +32,94 @@ export class AuthService {
   private authEvents = new Subject<'login' | 'logout' | 'status-changed'>();
   authEvents$ = this.authEvents.asObservable();
 
-  login(email: string, password: string): Observable<ResponseResult>{
+  login(email: string, password: string): Observable<ResponseResult> {
 
     return this.http.post<LoginResponse>(`${baseURL}/auth/login`, { email, password })
       .pipe(
-          delay(3000),
-          map((auth: LoginResponse): ResponseResult => {
-              this.handleAuthSuccess(auth, true) // true = initial login
-              return { success: true }
-          }),
-          catchError((error: any): Observable<ResponseResult> => {
-            this.logout();
-            const errorResp: ErrorAuthResponse = error?.error ?? {
-              message: 'Error desconocido en autenticación',
-              error: 'Unknown',
-              statusCode: 500,
-            };
+        delay(3000),
+        map((auth: LoginResponse): ResponseResult => {
+          this.handleAuthSuccess(auth, true) // true = initial login
+          return { success: true }
+        }),
+        catchError((error: any): Observable<ResponseResult> => {
+          this.logout();
+          const errorResp: ErrorAuthResponse = error?.error ?? {
+            message: 'Error desconocido en autenticación',
+            error: 'Unknown',
+            statusCode: 500,
+          };
 
-            return of({ success: false, error: errorResp })
-          }),
+          return of({ success: false, error: errorResp })
+        }),
       )
   }
 
-  register(fullname: string, email: string, password: string): Observable<boolean>{
+  register(fullname: string, email: string, password: string): Observable<boolean> {
 
     return this.http.post<LoginResponse>(`${baseURL}/auth/register`, { fullname, email, password }).pipe(
-        map((auth) => this.handleAuthSuccess(auth))
+      map((auth) => this.handleAuthSuccess(auth))
     )
   }
 
-  checkStatus(): Observable<boolean>{
-      const token = sessionStorage.getItem("token");
-      
-      if (!token) {
-        this.logout();
-        return of(false);
-      }
-      this._authStatus.set('checking'); 
+  checkStatus(): Observable<boolean> {
+    const token = sessionStorage.getItem("token");
 
-      return this.http.get<LoginResponse>(`${baseURL}/auth/check-status`,{
-        // headers: {
-        //   Authorization: `Bearer ${token}`
-        // }
-      }).pipe(
-        map((resp) => {
-          const result = this.handleAuthSuccess(resp, false) // false = status check
-          return result;
-        }),
-        catchError((error: any) => this.handleAuthError(error))
-      )
+    if (!token) {
+      this.logout();
+      return of(false);
+    }
+    this._authStatus.set('checking');
+
+    return this.http.get<LoginResponse>(`${baseURL}/auth/check-status`, {
+      // headers: {
+      //   Authorization: `Bearer ${token}`
+      // }
+    }).pipe(
+      map((resp) => {
+        const result = this.handleAuthSuccess(resp, false) // false = status check
+        return result;
+      }),
+      catchError((error: any) => this.handleAuthError(error))
+    )
 
   }
 
-  logout(){
+  logout() {
     sessionStorage.removeItem('token');
     this._user.set(null);
     this._token.set(null);
     this._authStatus.set('not-authenticated');
     this.authEvents.next('logout');
-    
+
   }
 
-  private handleAuthSuccess({ token, user, menu }: LoginResponse, isInitialLogin: boolean = false){
-      sessionStorage.setItem('token', token);
-      const decoded = jwtDecode<JwtPayload>(token);
+  private handleAuthSuccess({ token, user, menu }: LoginResponse, isInitialLogin: boolean = false) {
+    sessionStorage.setItem('token', token);
+    const decoded = jwtDecode<JwtPayload>(token);
 
-      const userAuth: User = {
-        id: decoded.sub,
-        email: decoded.email,
-        fullName: user.fullName,
-        role: decoded.role,
-        permissions: decoded.permissions,
-        lastLogin: new Date(),
-        createdAt: user.createdAt
-      };
-      
-      this._user.set(userAuth);
-      this._token.set(token);
-      
-      // Only emit 'login' event on actual login, not on status checks
-      if (isInitialLogin) {
-        this.authEvents.next('login');
-      } else if (this._authStatus() === 'checking') {
-        this.authEvents.next('status-changed');
-      }
-      
-      this._authStatus.set('authenticated');
+    const userAuth: UserAuth = {
+      id: decoded.sub,
+      email: decoded.email,
+      fullName: user.fullName,
+      role: decoded.role,
+      permissions: decoded.permissions,
+      lastLogin: new Date(),
+      createdAt: user.createdAt
+    };
 
-      return true;
+    this._user.set(userAuth);
+    this._token.set(token);
+
+    // Only emit 'login' event on actual login, not on status checks
+    if (isInitialLogin) {
+      this.authEvents.next('login');
+    } else if (this._authStatus() === 'checking') {
+      this.authEvents.next('status-changed');
+    }
+
+    this._authStatus.set('authenticated');
+
+    return true;
   }
 
   private handleAuthError(error: any) {
@@ -130,7 +130,7 @@ export class AuthService {
   }
 
   hasPermission(permission: Permission): boolean {
-    const user = this._user(); 
+    const user = this._user();
     return user?.permissions?.includes(permission) || false;
   }
 

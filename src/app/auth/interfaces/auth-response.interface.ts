@@ -1,10 +1,10 @@
 import { Permission, UserRole } from "@dashboard/interfaces/permission-interface";
-import { User } from "./user.interface";
+import { UserAuth } from "./user-auth.interface";
 
 export interface LoginResponse {
-    user:  User;
-    token: string;
-    menu?: any[];
+  user: UserAuth;
+  token: string;
+  menu?: any[];
 }
 
 export interface JwtPayload {
@@ -17,9 +17,9 @@ export interface JwtPayload {
 }
 
 export interface ErrorAuthResponse {
-    message: string;
-    error: string;
-    statusCode: number;
+  message: string;
+  error: string;
+  statusCode: number;
 }
 
 export interface registerResponse {

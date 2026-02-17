@@ -31,10 +31,10 @@ export enum Permission {
 
 
 export enum UserRole {
-  SUPER_ADMIN = 'super_admin',
-  ADMIN = 'admin',
-  MANAGER = 'manager',
-  ACCOUNTANT = 'accountant',
-  SALES = 'sales',
-  VIEWER = 'viewer'
+  SUPER_ADMIN = 'Super Admin',
+  ADMIN = 'Administrador',
+  MANAGER = 'Gerente',
+  ACCOUNTANT = 'Contador',
+  SALES = 'Vendedor',
+  VIEWER = 'Observador',
 }

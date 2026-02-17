@@ -1,0 +1,165 @@
+<div class="p-4 sm:p-6 lg:p-8">
+    <!-- Header & Search -->
+    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                Gestión de Usuarios
+            </h2>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                Administra los usuarios y sus permisos en el sistema
+            </p>
+        </div>
+
+        <div class="flex items-center space-x-3">
+            <div class="relative">
+                <input class="bg-white w-full pr-11 h-10 pl-3 py-2 placeholder:text-slate-400 text-slate-700 
+                text-sm border border-slate-200 rounded transition duration-200 ease focus:outline-none focus:border-slate-400
+                hover:border-slate-400 shadow-sm focus:shadow-md dark:bg-gray-700 dark:text-white dark:border-gray-600"
+                    placeholder="Buscar usuarios..." type="text" (keyup)="onSearch(txtSearch.value)" #txtSearch />
+                <button
+                    class="absolute h-8 w-8 right-1 top-1 my-auto px-2 flex items-center bg-white dark:bg-gray-700 rounded"
+                    type="button">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3"
+                        stroke="currentColor" class="w-8 h-8 text-slate-600 dark:text-gray-400">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                    </svg>
+                </button>
+            </div>
+
+            <a routerLink="/panel/admin/users/new-Item"
+                class="inline-flex items-center rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                <svg class="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" />
+                </svg>
+                Nuevo Usuario
+            </a>
+        </div>
+    </div>
+
+    @if (usersResource.isLoading()) {
+    <div class="flex justify-center items-center h-64">
+        <app-loader />
+    </div>
+    }
+
+    @if (usersResource.hasValue()) {
+    <div class="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 sm:rounded-lg">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-gray-500 dark:text-gray-400">
+                <thead class="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">Nombre Completo</th>
+                        <th scope="col" class="px-6 py-3">Email</th>
+                        <th scope="col" class="px-6 py-3">Rol</th>
+                        <th scope="col" class="px-6 py-3">Estado</th>
+                        <th scope="col" class="px-6 py-3">Último Acceso</th>
+                        <th scope="col" class="px-6 py-3">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (usersResource.value().data.length === 0) {
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center">
+                            <div class="flex flex-col items-center justify-center">
+                                <svg class="mb-4 h-16 w-16 text-gray-400" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                                </svg>
+                                <p class="text-lg font-semibold text-gray-900 dark:text-white">No hay usuarios
+                                    registrados</p>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Comienza agregando tu primer
+                                    usuario</p>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+
+                    @for (user of usersResource.value().data; track user.id) {
+                    <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                            {{ user.fullName | titlecase }}
+                        </td>
+                        <td class="px-6 py-4">{{ user.email }}</td>
+                        <td class="px-6 py-4">
+                            <span
+                                class="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                                {{ user.role.name | titlecase }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span [class]="user.isActive !== false 
+                        ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' 
+                        : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'"
+                                class="rounded px-2.5 py-0.5 text-xs font-medium">
+                                {{ user.isActive !== false ? 'Activo' : 'Inactivo' }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            {{ user.lastLogin ? (user.lastLogin | date: 'dd/MM/yyyy HH:mm') : 'Nunca' }}
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <a [routerLink]="['/panel/admin/users/', user.id]"
+                                    class="inline-flex items-center rounded-lg p-2 text-sm text-green-600 hover:bg-green-50 dark:text-green-500 dark:hover:bg-gray-700"
+                                    title="Editar">
+                                    <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path
+                                            d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                    </svg>
+                                </a>
+
+                                <button (click)="openDeleteModal({ open: true, id: user.id })"
+                                    class="inline-flex items-center rounded-lg p-2 text-sm cursor-pointer text-red-600 hover:bg-red-50 dark:text-red-500 dark:hover:bg-gray-700"
+                                    title="Eliminar">
+                                    <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        @if (usersResource.value().meta?.totalPages) {
+        <app-pagination [pages]="usersResource.value().meta?.totalPages || 0"
+            [currentPages]="paginationService.currentPage()" />
+        }
+    </div>
+    }
+
+    @if (usersResource.error()) {
+    <app-error-pages />
+    }
+</div>
+
+<!-- Modal de Eliminación -->
+<app-modal [(visible)]="isModalVisible">
+    <div class="relative text-center">
+        <svg class="text-gray-400 dark:text-gray-500 w-11 h-11 mb-3.5 mx-auto" aria-hidden="true" fill="currentColor"
+            viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd"
+                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                clip-rule="evenodd"></path>
+        </svg>
+        <p class="mb-4 text-gray-500 dark:text-gray-300">¿Estás seguro de eliminar este usuario?</p>
+
+        <div class="flex justify-center items-center space-x-4">
+            <button type="button" (click)="isModalVisible = false"
+                class="py-2 px-3 text-sm font-medium text-gray-500 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-gray-900 cursor-pointer">
+                No, cancelar
+            </button>
+            <button type="button" (click)="onDeleteUser()"
+                class="py-2 px-3 text-sm font-medium text-center text-white bg-red-600 rounded-lg hover:bg-red-700 cursor-pointer">
+                Sí, estoy seguro
+            </button>
+        </div>
+    </div>
+</app-modal>

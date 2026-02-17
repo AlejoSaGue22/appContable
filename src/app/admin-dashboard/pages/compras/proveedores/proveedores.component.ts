@@ -13,6 +13,7 @@ import { TableProveedoresComponent } from "./components/table-proveedores/table-
 import { ProveedoresService } from '../services/proveedores.service';
 import { modalOpen } from '@shared/interfaces/services.interfaces';
 import { ModalComponents } from '@shared/components/modal.components/modal.components';
+import { ProveedoresInterface } from '@dashboard/interfaces/proveedores-interface';
 
 @Component({
    selector: 'app-proveedores',
@@ -42,17 +43,16 @@ export class ProveedoresComponent {
    notificacionService = inject(NotificationService);
    totalProveedores = signal<number>(0);
    cardsTotales = signal<CardsTotales[]>([]);
+   proveedoresList = signal<ProveedoresInterface[]>([]);
 
    // TODO: Reemplazar con el servicio real cuando esté disponible
    proveedoresResource = rxResource({
       request: () => ({ page: this.paginationService.currentPage() - 1, limit: 10 }),
       loader: ({ request }) => this.proveedoresService.getProveedores(request).pipe(
          tap((response) => {
+            this.proveedoresList.set(response.proveedores); // TODO: Agregar el tipo de dato correcto
             this.totalProveedores.set(response.count ?? 0);
-            this.cardsTotales.set([
-               { title: 'Total Proveedores', valor: this.totalProveedores().toString(), percent: '0' },
-               { title: 'Proveedores Activos', valor: '0', percent: '0' },
-            ]);
+
          })
       )
    })
@@ -74,6 +74,16 @@ export class ProveedoresComponent {
          { key: 'email', header: 'Email' },
          { key: 'estado', header: 'Estado' },
       ]
+   }
+
+   onSearch(searchTerm: string) {
+      const proveedores = this.proveedoresList();
+      if (searchTerm.length > 0) {
+         const proveedoresFiltrados = proveedores.filter((proveedor) => proveedor.nombre.toLowerCase().includes(searchTerm.toLowerCase()));
+         this.proveedoresList.set(proveedoresFiltrados);
+      } else {
+         this.proveedoresList.set(proveedores);
+      }
    }
 
    openModal(event: modalOpen) {

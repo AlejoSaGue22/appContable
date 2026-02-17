@@ -10,11 +10,14 @@ import { LoaderService } from '@utils/services/loader.service';
 import { ModalComponent } from '@shared/components/modal/modal.component';
 import { ProveedoresFormsPageComponent } from '../../proveedores/proveedores-forms-page/proveedores-forms-page.component';
 import { ProductosServiciosFormsComponent } from '@dashboard/pages/ventas/productos-servicios/productos-servicios-forms/productos-servicios-forms.component';
-import { forkJoin } from 'rxjs';
+import { forkJoin, map } from 'rxjs';
 import { ProveedoresService } from '../../services/proveedores.service';
 import { ProductosService } from '@dashboard/pages/ventas/services/productos.service';
 import { ProveedoresInterface } from '@dashboard/interfaces/proveedores-interface';
 import { GetProductosDetalle } from '@dashboard/interfaces/productos-interface';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { FacturaCompraService } from '../../services/factura-compra.service';
+import { FacturaCompra, ItemFacturaResponse } from '@dashboard/interfaces/factura-compra-interface';
 
 @Component({
     selector: 'app-factura-compra-forms-page',
@@ -44,6 +47,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
 
     private fb = inject(FormBuilder);
     notificationService = inject(NotificationService);
+    facturaService = inject(FacturaCompraService);
     loaderService = inject(LoaderService);
     proveedoresServicios = inject(ProveedoresService);
     productoServicios = inject(ProductosService);
@@ -53,6 +57,12 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     // Modal State
     isProviderModalVisible = signal<boolean>(false);
     isProductModalVisible = signal<boolean>(false);
+
+    facturaId = toSignal(
+        this.activatedRoute.params.pipe(
+            map((params) => params['id'])
+        )
+    );
 
     totales = {
         subtotal: 0,
@@ -94,12 +104,12 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     });
 
     ngOnInit(): void {
-        const id = this.activatedRoute.snapshot.params['id'];
-        if (id && id !== 'new-Item') {
+        if (this.facturaId() && this.facturaId() !== 'new-Item') {
             this.headTitle.title = 'Editar Factura de Compra';
             this.headTitle.slog = 'Se edita factura de compra del sistema';
-            this.loadFactura(id);
+            this.loadFactura(this.facturaId());
         }
+
 
         this.getProveedoresAndProductos();
 
@@ -141,8 +151,57 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     }
 
     loadFactura(id: string) {
-        // Logic to load existing invoice would go here
-        console.log('Loading invoice', id);
+        this.loaderService.show();
+        this.facturaService.getFacturaCompraById(id).subscribe({
+            next: (factura) => {
+                if (factura.success) {
+                    console.log("Factura Compra: ", factura);
+                    const invoice = factura.data.data[0]!;
+
+                    while (this.items.length > 0) {
+                        this.items.removeAt(0);
+                    }
+
+                    invoice.items.forEach((item: ItemFacturaResponse) => {
+                        this.addItem();
+                        this.items.at(this.items.length - 1)?.patchValue({
+                            productoId: item.articuloId,
+                            productoNombre: item.articulo?.nombre,
+                            cantidad: item.quantity,
+                            precioUnitario: item.unitPrice,
+                            iva: item.porcentajeIva,
+                            descuento: item.descuento,
+                            subtotal: item.valorSubtotal,
+                            total: item.itemTotal
+                        });
+                    });
+
+                    console.log("Factura Compra 222: ", invoice)
+
+                    this.formCompra.patchValue({
+                        proveedorSearch: invoice.proveedor?.nombre,
+                        proveedor: invoice.proveedorId,
+                        nit: invoice.proveedor?.identificacion,
+                        email: invoice.proveedor?.email,
+                        telefono: invoice.proveedor?.telefono,
+                        fechaEmision: invoice.fecha,
+                        fechaVencimiento: invoice.fechaVencimiento,
+                        metodoPago: invoice.formaPago,
+                        referencia: invoice.numeroFacturaProveedor,
+                        observaciones: invoice.observaciones,
+                    });
+                    this.totales.facturaTotal = invoice.total;
+                    this.totales.subtotal = invoice.subtotal;
+                    this.totales.totalIVA = invoice.iva;
+                    this.totales.descuentoTotal = invoice.descuento;
+                    this.loaderService.hide();
+                }
+            },
+            error: (error) => {
+                console.log("Error Comprobantes Compras: ", error);
+                this.loaderService.hide();
+            }
+        });
     }
 
     calculateItemTotal() {
@@ -240,29 +299,82 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     onSubmit() {
         if (this.formCompra.invalid) {
             this.formCompra.markAllAsTouched();
-            this.notificationService.error('Complete todos los campos requeridos', 'Error');
+            this.notificationService.error(
+                'Por favor, completa los campos requeridos.',
+                'Campos no validos',
+                5000
+            );
+            return;
+        }
+
+        if (this.formCompra.controls.items.value.length === 0) {
+            this.notificationService.error(
+                'Por favor, agrega al menos un item.',
+                'Items no validos',
+                5000
+            );
             return;
         }
 
         this.loading.set(true);
+        const factura = this.formCompra.value;
+        const items = this.formCompra.controls.items.value;
 
-        // Simulate API Save
-        setTimeout(() => {
-            this.loading.set(false);
-            this.notificationService.success(
-                'Factura guardada correctamente',
-                'Éxito'
-            );
+        const invoiceData = {
+            proveedorId: factura.proveedor,
+            fecha: factura.fechaEmision,
+            numero: factura.referencia,
+            observaciones: factura.observaciones,
+            fechaVencimiento: factura.fechaVencimiento,
+            formaPago: factura.metodoPago,
+            items: items.map((item: any) => ({
+                articuloId: item.productoId,
+                quantity: item.cantidad,
+                unitPrice: item.precioUnitario,
+                iva: item.iva,
+                discount: item.descuento,
+            })),
+            subtotal: this.totales.subtotal,
+            descuento: this.totales.descuentoTotal,
+            iva: this.totales.totalIVA,
+            total: this.totales.facturaTotal,
+            // retenciones: this.totales.retenciones,
+        };
 
-            setTimeout(() => {
-                this.router.navigateByUrl('/panel/ventas/purchases')
-            }, 1500);
-        }, 1500);
+        console.log(invoiceData);
+        if (this.facturaId() == 'new-Item') {
+            this.facturaService.createFacturaCompra(invoiceData as Partial<FacturaCompra>).subscribe((response) => {
+                this.loading.set(false);
+                console.log(response);
+                if (response.success == false) {
+                    console.error('❌ Error del backend:', response.error);
+                    this.notificationService.error(
+                        'Ocurrio un problema al crear la factura',
+                        'Error',
+                        5000
+                    );
+                    return;
+                }
+
+                console.log('✅ Respuesta del backend:', response);
+                this.notificationService.success(
+                    'Factura creada con exito',
+                    'Accion Completada',
+                    5000
+                );
+
+                setTimeout(() => {
+                    this.router.navigateByUrl('/panel/compras/purchases')
+                }, 1500);
+            });
+
+        } else {
+            // this.updateFactura(this.facturaId(), invoiceData);
+        }
 
     }
 
     // --- Modal Handling ---
-
     openProviderModal() {
         this.isProviderModalVisible.set(true);
     }

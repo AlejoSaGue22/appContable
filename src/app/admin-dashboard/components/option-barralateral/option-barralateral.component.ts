@@ -13,20 +13,26 @@ export class OptionBarralateral {
 
   authService = inject(AuthService);
   router = inject(Router);
+
   menuItemsOther = input<MenuItem[]>();
+  user = this.authService.user();
 
   activeMenu: string | null = 'Dashboard';
 
-  async cerrarSesion(){
-      this.authService.logout()
-      await this.router.navigateByUrl("/")
+  async cerrarSesion() {
+    this.authService.logout()
+    await this.router.navigateByUrl("/")
   }
 
-  toggleActiveMenu(menuId: string){
+  constructor() {
+    console.log(this.user);
+  }
+
+  toggleActiveMenu(menuId: string) {
     if (this.activeMenu === menuId) {
-      this.activeMenu = null;     
+      this.activeMenu = null;
     } else {
-      this.activeMenu = menuId; 
+      this.activeMenu = menuId;
     }
   }
 

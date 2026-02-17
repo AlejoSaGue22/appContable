@@ -7,7 +7,7 @@ import { FormErrorLabelComponent } from "src/app/utils/components/form-error-lab
 import { NotificationService } from '@shared/services/notification.service';
 import { LoaderService } from '@utils/services/loader.service';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
-import { firstValueFrom, map, tap } from 'rxjs';
+import { firstValueFrom, map, of, tap } from 'rxjs';
 import { ProveedoresInterface } from '@dashboard/interfaces/proveedores-interface';
 import { ProveedoresService } from '../../services/proveedores.service';
 import { LoaderComponent } from "@utils/components/loader/loader.component";
@@ -71,10 +71,20 @@ export class ProveedoresFormsPageComponent implements OnInit {
   }
 
   proveedorIdResource = rxResource({
-    request: () => ({ id: this.proveedorId() }),
-    loader: ({ request }) => this.proveedoresService.getProveedoresById(request.id).pipe(
-      tap((el) => this.loadProveedor(el))
-    )
+    request: () => {
+      if (this.isModal()) return null;
+
+      return { id: this.proveedorId() }
+    },
+    loader: ({ request }) => {
+      if (!request) {
+        this.formProveedor.reset();
+        return of(null);
+      }
+      return this.proveedoresService.getProveedoresById(request.id).pipe(
+        tap((el) => this.loadProveedor(el))
+      )
+    }
   })
 
   loadProveedor(proveedor: ProveedoresInterface) {

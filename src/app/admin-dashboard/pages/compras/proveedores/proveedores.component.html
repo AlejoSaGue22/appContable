@@ -7,9 +7,9 @@
 <!-- Header -->
 @if (proveedoresResource.hasValue() ) {
 <div class="p-4 sm:p-6 lg:p-8">
-    <app-header-title-proveedores />
+    <app-header-title-proveedores (searchTerm)="onSearch($event)" />
 
-    <app-table-proveedores [proveedorData]="proveedoresResource.value().proveedores" (delete)="openModal($event)" />
+    <app-table-proveedores [proveedorData]="proveedoresList()" (delete)="openModal($event)" />
 </div>
 }
 

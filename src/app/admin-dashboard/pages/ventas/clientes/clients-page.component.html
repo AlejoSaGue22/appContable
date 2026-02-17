@@ -9,12 +9,6 @@
 <!-- Header -->
 <header-title-page [titleHead]="headTitle" />
 
-<!-- Cards Totales -->
-<!-- <num-cards-totales 
-        [itemsValores]="cardsTotales()" 
-        iconDolar="N" /> -->
-
-<!-- Tabla -->
 <app-table-list [columns]="columnsTable" [dataTable]="clientesResource.value().clientes" [hasAction]="true"
     (modalOpen)="openModal($event)" [pages]="clientesResource.value().pages" rutaLink="/panel/ventas/clients/" />
 }

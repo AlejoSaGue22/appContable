@@ -10,45 +10,68 @@ import { tap } from 'rxjs';
 import { LoaderComponent } from "src/app/utils/components/loader/loader.component";
 import { ErrorPages } from "@shared/components/error-pages/error-pages.component";
 import { HeaderTitleInvoices } from "./components/header-title-invoices/header-title-invoices.component";
-import { TableInvoices } from "./components/table-invoices/table-invoices.component";
+import { TableInvoices, InvoiceFilters } from "./components/table-invoices/table-invoices.component";
 
 @Component({
-  selector: 'app-comprobante-ventas',
-  imports: [NumCardsTotalesComponent, LoaderComponent, ErrorPages, HeaderTitleInvoices, TableInvoices],
-  templateUrl: './comprobante-ventas.component.html',
+   selector: 'app-comprobante-ventas',
+   imports: [LoaderComponent, ErrorPages, HeaderTitleInvoices, TableInvoices],
+   templateUrl: './comprobante-ventas.component.html',
 })
 export class ComprobanteVentasComponent {
-  
-    headTitle: HeaderInput = {
-        title: 'Gestión de Documentos de venta',
-        slog: 'Administra la información de tus facturas'
-    }
 
-      // Paginación
+   headTitle: HeaderInput = {
+      title: 'Gestión de Documentos de venta',
+      slog: 'Administra la información de tus facturas'
+   }
+
+   // Paginación
    currentPage = signal(1);
    totalPages = signal(1);
    totalItems = signal(0);
    pageSize = signal(10);
 
-    flowbiteService = inject(FlowbiteService);
-    comprobantesVentasService = inject(ComprobantesVentasService);
-    paginationService = inject(PaginationService);
-    totalComprobantes = signal<number>(0);
-    cardsTotales = signal<CardsTotales[]>([]);
+   // Filtros
+   filters = signal<InvoiceFilters>({});
 
-    comprobanteVentasResource = rxResource({
-         request: () => ({ page: this.paginationService.currentPage() - 1, limit: 10 }),
-         loader: ({ request }) => this.comprobantesVentasService.getComprobanteVentas({ offset: request.page * 9, limit: request.limit })
-                  .pipe(
-                     tap((el) => {
-                           this.totalComprobantes.set(el.meta?.total ?? 0);
-                           this.cardsTotales.set([
-                              { title: 'Total Facturas', valor: this.totalComprobantes().toString(), percent: '0' },
-                              { title: 'Balance General', valor: '0', percent: '0' },
-                           ]);
-                     })
-                  )
-    })
+   flowbiteService = inject(FlowbiteService);
+   comprobantesVentasService = inject(ComprobantesVentasService);
+   paginationService = inject(PaginationService);
+   totalComprobantes = signal<number>(0);
+   cardsTotales = signal<CardsTotales[]>([]);
+
+   comprobanteVentasResource = rxResource({
+      request: () => ({
+         page: this.paginationService.currentPage() - 1,
+         limit: 10,
+         filters: this.filters()
+      }),
+      loader: ({ request }) => this.comprobantesVentasService.getComprobanteVentas({
+         offset: request.page * 9,
+         limit: request.limit,
+         ...request.filters
+      })
+         .pipe(
+            tap((el) => {
+               this.totalComprobantes.set(el.meta?.total ?? 0);
+               this.totalItems.set(el.meta?.total ?? 0);
+               this.totalPages.set(el.meta?.totalPages ?? 1);
+               this.cardsTotales.set([
+                  { title: 'Total Facturas', valor: this.totalComprobantes().toString(), percent: '0' },
+                  { title: 'Balance General', valor: '0', percent: '0' },
+               ]);
+            })
+         )
+   })
+
+   onFilterChange(filters: InvoiceFilters): void {
+      this.filters.set(filters);
+   }
+
+   onPageChange(page: number): void {
+      // Page changes are handled by PaginationService via query params
+      // This would require navigation, which is typically handled by the pagination component
+      console.log('Page change requested:', page);
+   }
 
    formatCurrency(value: number): string {
       return new Intl.NumberFormat('es-CO', {
@@ -68,15 +91,15 @@ export class ComprobanteVentasComponent {
    //     return labels[status];
    //   }
 
-    get columnsTable(){
+   get columnsTable() {
       return [
-         { key:'fecha', header: 'Fecha' },
-         { key:'comprobante', header: 'Comprobante' },
-         { key:'identificacion', header: 'Identificacion' },
-         { key:'cliente', header: 'Cliente' },
-         { key:'total', header: 'Total' },
-         { key:'impuestos', header: 'Impuestos' },
-         { key:'estado', header: 'Estado' },
+         { key: 'fecha', header: 'Fecha' },
+         { key: 'comprobante', header: 'Comprobante' },
+         { key: 'identificacion', header: 'Identificacion' },
+         { key: 'cliente', header: 'Cliente' },
+         { key: 'total', header: 'Total' },
+         { key: 'impuestos', header: 'Impuestos' },
+         { key: 'estado', header: 'Estado' },
       ]
-    }
- }
+   }
+}

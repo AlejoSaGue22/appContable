@@ -9,7 +9,9 @@
 <div class="p-4 sm:p-6 lg:p-8">
     <app-header-title-compras />
 
-    <app-table-compras [compraData]="facturasCompraResource.value().data" />
+    <app-table-compras [compraData]="facturasCompraResource.value().data" [currentPage]="currentPage()"
+        [totalPages]="totalPages()" [totalItems]="totalItems()" [pageSize]="pageSize()"
+        (filterChange)="onFilterChange($event)" (pageChange)="onPageChange($event)" />
 </div>
 }
 

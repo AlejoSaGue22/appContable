@@ -14,35 +14,50 @@ export class ComprobantesVentasService {
 
   private http = inject(HttpClient);
 
-  getComprobanteVentas(options: Options): Observable<ComprobanteVentaResponse>{
-        const { limit = 10, offset = 0 } = options;
-  
-        return this.http.get<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas`, {
-            params: {
-                limit,
-                offset
-            }
-        }).pipe(
-            delay(800)
-        )
+  getComprobanteVentas(options: Options & {
+    status?: string;
+    type?: string;
+    clientName?: string;
+    startDate?: string;
+    endDate?: string;
+  }): Observable<ComprobanteVentaResponse> {
+    const { limit = 10, offset = 0, status, type, clientName, startDate, endDate } = options;
+
+    // Build params object, only including defined values
+    const params: any = {
+      limit,
+      offset
+    };
+
+    if (status) params.status = status;
+    if (type) params.type = type;
+    if (clientName) params.clientName = clientName;
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+
+    return this.http.get<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas`, {
+      params
+    }).pipe(
+      delay(800)
+    )
   }
 
-  createInvoice(invoice: Partial<FacturaVenta>){
+  createInvoice(invoice: Partial<FacturaVenta>) {
 
     return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas`, invoice).pipe(
-            map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
-            catchError((error: any): Observable<ResponseResult> => of({ success: false, error}))
+      map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error }))
     );
 
   }
 
 
-  getInvoiceById(id: string){
+  getInvoiceById(id: string) {
     return this.http.get<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}`)
-      // .pipe(
-      //       map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
-      //       catchError((error: any): Observable<ResponseResult> => of({ success: false, error}))
-      // );
+    // .pipe(
+    //       map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+    //       catchError((error: any): Observable<ResponseResult> => of({ success: false, error}))
+    // );
   }
 
 

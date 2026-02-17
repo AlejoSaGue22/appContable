@@ -1,0 +1,102 @@
+@if (userResource.isLoading()) {
+<div class="flex justify-center items-center h-screen">
+    <app-loader />
+</div>
+}
+
+<header-title-page [titleHead]="headTitle" />
+
+<div class="mt-4 p-4 sm:p-6 lg:p-8 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+    <form [formGroup]="formUser" (ngSubmit)="onSubmit()" class="space-y-6">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Nombres -->
+            <div>
+                <label for="firstName"
+                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre</label>
+                <input type="text" id="firstName" formControlName="firstName"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    placeholder="Ej. Juan">
+                <form-error-label [errorType]="formUser.get('firstName')!" />
+            </div>
+
+            <!-- Apellidos -->
+            <div>
+                <label for="lastName"
+                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Apellido</label>
+                <input type="text" id="lastName" formControlName="lastName"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    placeholder="Ej. Pérez">
+                <form-error-label [errorType]="formUser.get('lastName')!" />
+            </div>
+
+            <!-- Email -->
+            <div>
+                <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Correo
+                    Electrónico</label>
+                <input type="email" id="email" formControlName="email"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    placeholder="juan.perez@ejemplo.com">
+                <form-error-label [errorType]="formUser.get('email')!" />
+            </div>
+
+            <!-- Teléfono -->
+            <div>
+                <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Teléfono
+                    (Opcional)</label>
+                <input type="text" id="phone" formControlName="phone"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    placeholder="Ej. 3001234567">
+            </div>
+
+            <!-- Rol -->
+            <div>
+                <label for="role" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Rol de
+                    Usuario</label>
+                <select id="role" formControlName="role"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    <option value="" disabled selected>Seleccione un rol</option>
+                    @for (role of roles(); track role.id) {
+                    <option [value]="role.id">{{ role.name }}</option>
+                    }
+                </select>
+                <form-error-label [errorType]="formUser.get('role')!" />
+            </div>
+
+            <!-- Estado -->
+            <div class="flex items-center pt-8">
+                <label class="inline-flex items-center cursor-pointer">
+                    <input type="checkbox" formControlName="isActive" class="sr-only peer">
+                    <div
+                        class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
+                    </div>
+                    <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Usuario Activo</span>
+                </label>
+            </div>
+
+            <!-- Contraseña (Solo para nuevos) -->
+            @if (userId() === 'new-Item') {
+            <div class="md:col-span-2">
+                <label for="password"
+                    class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Contraseña</label>
+                <input type="password" id="password" formControlName="password"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    placeholder="••••••••">
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Mínimo 6 caracteres</p>
+                <form-error-label [errorType]="formUser.get('password')!" />
+            </div>
+            }
+        </div>
+
+        <div class="flex justify-end space-x-4 mt-8 border-t pt-6 dark:border-gray-700">
+            <button type="button" (click)="onCancel()"
+                class="py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 cursor-pointer">
+                Cancelar
+            </button>
+            <button type="submit"
+                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 cursor-pointer">
+                Guardar Usuario
+            </button>
+        </div>
+    </form>
+</div>

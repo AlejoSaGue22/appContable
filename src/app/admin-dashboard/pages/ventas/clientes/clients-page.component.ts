@@ -13,15 +13,15 @@ import { PaginationService } from '@shared/components/pagination/pagination.serv
 import { NotificationService } from '@shared/services/notification.service';
 
 @Component({
-  selector: 'app-clients-page',
-  imports: [HeaderTitlePageComponent, NumCardsTotalesComponent, TableListComponent, ModalComponents, LoaderComponent],
-  templateUrl: './clients-page.component.html',
+    selector: 'app-clients-page',
+    imports: [HeaderTitlePageComponent, NumCardsTotalesComponent, TableListComponent, ModalComponents, LoaderComponent],
+    templateUrl: './clients-page.component.html',
 })
 export class ClientsPageComponent {
 
     headTitle: HeaderInput = {
-      title: 'Gestión de Clientes',
-      slog: 'Administra la información de tus clientes y sus fórmulas'
+        title: 'Gestión de Clientes',
+        slog: 'Administra la información de tus clientes y sus fórmulas'
     }
 
     paginationService = inject(PaginationService);
@@ -34,70 +34,70 @@ export class ClientsPageComponent {
     isModalEdit = false;
 
     clientesResource = rxResource({
-         request: () => ({ page: this.paginationService.currentPage() - 1, limit: 10 }),
-         loader: ({ request }) => this.clienteServices.getClientes({ offset: request.page * 9, limit: request.limit }).pipe(
+        request: () => ({ page: this.paginationService.currentPage() - 1, limit: 10 }),
+        loader: ({ request }) => this.clienteServices.getClientes({ offset: request.page * 9, limit: request.limit }).pipe(
             tap((el) => {
-                  this.totalCliente.set(el.count);
-                  this.cardsTotales.set([
-                      { title: 'Total Clientes', valor: this.totalCliente().toString(), percent: '0' },
-                      { title: 'Nuevos este Mes', valor: '0', percent: '0' },
-                  ]);
+                this.totalCliente.set(el.count);
+                this.cardsTotales.set([
+                    { title: 'Total Clientes', valor: this.totalCliente().toString(), percent: '0' },
+                    { title: 'Nuevos este Mes', valor: '0', percent: '0' },
+                ]);
             })
-         )
+        )
     });
 
-    
 
-    openModal(event: modalOpen){
+
+    openModal(event: modalOpen) {
         this.isModalEdit = event.open;
         this.idClienteToModal.set(event.id);
     }
 
-    get columnsTable(){
-          return [
-              { key:'ind', header: '#' },
-              { key:'tipoPersona_nom', header: 'Tipo Persona' },
-              { key:'fullName', header: 'Nombre' },
-              { key:'tipoDocumento', header: 'Documento' },
-              { key:'numeroDocumento', header: 'Numero' },
-              { key:'estado', header: 'Estado' },
-              { key:'email', header: 'Correo' },
-              { key:'telefono', header: 'Telefono' },
-              { key:'direccion', header: 'Direccion' },
-          ];
+    get columnsTable() {
+        return [
+            { key: 'ind', header: '#' },
+            { key: 'tipoPersona_nom', header: 'Tipo Persona' },
+            { key: 'fullName', header: 'Nombre' },
+            { key: 'tipoDocumento', header: 'Documento' },
+            { key: 'numeroDocumento', header: 'Numero' },
+            { key: 'estado', header: 'Estado' },
+            { key: 'email', header: 'Correo' },
+            { key: 'telefono', header: 'Telefono' },
+            { key: 'direccion', header: 'Direccion' },
+        ];
     }
 
-    async deleteCliente(){
+    async deleteCliente() {
         const ID = this.idClienteToModal();
         if (!ID) {
             this.notificacionService.error(
-                     `No se obtuvo el ID del cliente`,
-                     'Error',
-                     5000
-              );
+                `No se obtuvo el ID del cliente`,
+                'Error',
+                5000
+            );
             return;
         }
-        
-        const client = await firstValueFrom( this.clienteServices.deleteCliente(ID) );
+
+        const client = await firstValueFrom(this.clienteServices.deleteCliente(ID));
         this.isModalEdit = false;
         if (client.success == false) {
             this.isModalEdit = false;
             this.notificacionService.error(
-                     `Hubo un error al guardar el cliente ${client.error.message}`,
-                     'Error',
-                     5000
+                `Hubo un error al guardar el cliente ${client.error.message}`,
+                'Error',
+                5000
             );
             return;
-        } 
+        }
 
         this.notificacionService.success(
-               'Producto eliminado correctamente',
-               'Completado!',
-               3000
+            'Producto eliminado correctamente',
+            'Completado!',
+            3000
         );
         setTimeout(() => {
             window.location.reload();
         }, 600);
     }
 
- }
+}

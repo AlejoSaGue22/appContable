@@ -9,38 +9,38 @@ import { InvoiceDetailsComponent } from "./comprobante-ventas/components/invoice
 import { ErrorPageComponent } from "@utils/components/error-page/error-page.component";
 
 export const ventasRoutes: Routes = [
-                    {
-                        path: 'clients',
-                        component: ClientsPageComponent
-                    },
-                    {
-                        path: 'clients/:id',
-                        component: ClientsFormPageComponent
-                    },
-                    {
-                        path: 'comprobantes',
-                        component: ComprobanteVentasComponent
-                    },
-                    {
-                        path: 'comprobantes/:id',
-                        component: ComprobanteVentasFormsPageComponent
-                    },
-                    {
-                        path: 'comprobantes/:id/details',
-                        component: InvoiceDetailsComponent
-                    },
-                    {
-                        path: 'products_services',
-                        component: ProductosServiciosComponent
-                    },
-                    {
-                        path: 'products_services/:id',
-                        component: ProductosServiciosFormsComponent
-                    },
-                    {
-                        path: '**',
-                        component: ErrorPageComponent
-                    }
+    {
+        path: 'clients',
+        component: ClientsPageComponent
+    },
+    {
+        path: 'clients/:id',
+        component: ClientsFormPageComponent
+    },
+    {
+        path: 'comprobantes',
+        component: ComprobanteVentasComponent
+    },
+    {
+        path: 'comprobantes/:id',
+        component: ComprobanteVentasFormsPageComponent
+    },
+    {
+        path: 'comprobantes/:id/details',
+        component: InvoiceDetailsComponent
+    },
+    {
+        path: 'products_services',
+        component: ProductosServiciosComponent
+    },
+    {
+        path: 'products_services/:id',
+        component: ProductosServiciosFormsComponent
+    },
+    {
+        path: '**',
+        component: ErrorPageComponent
+    }
 ]
 
 export default ventasRoutes;

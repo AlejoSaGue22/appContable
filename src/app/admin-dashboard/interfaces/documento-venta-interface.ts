@@ -19,35 +19,6 @@ export interface ComprobanteVentaResponse {
   };
 }
 
-// export interface Factura {
-//     id: string;
-//     cliente: string;
-//     vendedor: string;
-//     productos: ProductoFactura[];
-//     fecha: string;
-//     formaPago: string;
-//     canalVenta: string;
-//     subtotal: string,
-//     iva: string;
-//     descuento: string;
-//     total: string;
-// }
-
-// export interface ProductoFactura {
-//     id?: string;
-//     producto: string;
-//     descripcion: string;
-//     cantidad: number;
-//     valorUnitario: number;
-//     descuento: number;
-//     descuento_valor: number;
-//     iva: number;
-//     iva_valor: number;
-//     subtotal: number;
-//     importe: number;
-//     total: number;
-// }
-
 export interface ItemFactura {
   id?: string;
   articuloId: string;
