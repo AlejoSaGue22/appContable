@@ -26,6 +26,7 @@ export interface FacturaCompra {
     fecha: string;
     fechaVencimiento?: string;
     formapago: string;
+    metodoPago?: string;
     items: ItemFactura[];
     iva: number;
     descuento: number;

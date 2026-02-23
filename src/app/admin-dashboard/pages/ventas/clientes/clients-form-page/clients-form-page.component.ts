@@ -1,10 +1,10 @@
-import { Component, inject, OnInit, input, output } from '@angular/core';
+import { Component, inject, OnInit, input, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HeaderInput, HeaderTitlePageComponent } from "@dashboard/components/header-title-page/header-title-page.component";
 import { FormErrorLabelComponent } from "src/app/utils/components/form-error-label/form-error-label.component";
 import { ClientesService } from '../../services/clientes.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ClientesInterface } from '@dashboard/interfaces/clientes-interface';
+import { ClientesInterface, Municipality } from '@dashboard/interfaces/clientes-interface';
 import { firstValueFrom, map, tap } from 'rxjs';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { LoaderComponent } from "src/app/utils/components/loader/loader.component";
@@ -23,6 +23,7 @@ export class ClientsFormPageComponent implements OnInit {
     saveSuccess = output<ClientesInterface>();
     notificationService = inject(NotificationService);
     cancel = output<void>();
+    municipalities = signal<Municipality[]>([]);
 
     private fb = inject(FormBuilder);
     clienteService = inject(ClientesService);
@@ -42,7 +43,9 @@ export class ClientsFormPageComponent implements OnInit {
         telefono: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(10)]],
         email: ['', Validators.required],
         observacion: [''],
+        tributo: ['', Validators.required],
         responsableFiscal: ['', Validators.required],
+        dv: [''],
     })
 
     clienteID = toSignal(
@@ -69,9 +72,20 @@ export class ClientsFormPageComponent implements OnInit {
     })
 
     ngOnInit() {
+        this.loadMunicipalities();
         this.clientsForm.get('tipoPersona')?.valueChanges.subscribe(value => {
             if (!value) return;
             this.toggleValidations(value);
+        });
+
+        this.clientsForm.get('tipoDocumento')?.valueChanges.subscribe(value => {
+            this.handleTipoDocumentoChange(value);
+        });
+
+        this.clientsForm.get('numeroDocumento')?.valueChanges.subscribe(value => {
+            if (this.clientsForm.get('tipoDocumento')?.value === '6') {
+                this.updateDV(value);
+            }
         });
 
         if (this.isModal()) {
@@ -166,5 +180,50 @@ export class ClientsFormPageComponent implements OnInit {
         }
     }
 
+    private loadMunicipalities() {
+        this.clienteService.getMunicipalities().subscribe(data => {
+            this.municipalities.set(data);
+        });
+    }
+
+    private handleTipoDocumentoChange(tipo: string | null | undefined) {
+        const dvControl = this.clientsForm.get('dv');
+        if (tipo === '6') { // NIT
+            dvControl?.setValidators([Validators.required]);
+            this.updateDV(this.clientsForm.get('numeroDocumento')?.value);
+        } else {
+            dvControl?.clearValidators();
+            dvControl?.setValue('');
+        }
+        dvControl?.updateValueAndValidity();
+    }
+
+    private updateDV(nit: string | null | undefined) {
+        if (!nit) {
+            this.clientsForm.get('dv')?.setValue('');
+            return;
+        }
+        const dv = this.calculateDV(nit);
+        this.clientsForm.get('dv')?.setValue(dv);
+    }
+
+    private calculateDV(nit: string): string {
+        const vpri = [3, 7, 13, 17, 19, 23, 29, 37, 41, 43, 47, 53, 59, 67, 71];
+        const z = nit.length;
+        let x = 0;
+        let y = 0;
+
+        for (let i = 0; i < z; i++) {
+            y = parseInt(nit.substr(i, 1));
+            x += y * vpri[z - 1 - i];
+        }
+
+        y = x % 11;
+        if (y > 1) {
+            return (11 - y).toString();
+        } else {
+            return y.toString();
+        }
+    }
 
 }

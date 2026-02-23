@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { ClientesInterface, ClientesResponse } from '@dashboard/interfaces/clientes-interface';
+import { ClientesInterface, ClientesResponse, Municipality } from '@dashboard/interfaces/clientes-interface';
 import { Options, ResponseResult } from '@shared/interfaces/services.interfaces';
 import { catchError, delay, map, Observable, of, tap } from 'rxjs';
 import { environment } from 'src/app/environments/environment';
@@ -31,6 +31,7 @@ export class ClientesService {
   private http = inject(HttpClient);
   clienteRegistrados = signal<ClientesInterface[]>([]);
   private clientCache = new Map<string, ClientesResponse>();
+  private municipalitiesCache: Municipality[] | null = null;
 
   getClientes(options: Options): Observable<ClientesResponse> {
     const { limit = 10, offset = 0 } = options;
@@ -91,6 +92,20 @@ export class ClientesService {
       catchError((error: any): Observable<ResponseResult> => of({ success: false, error }))
     )
 
+  }
+
+  getMunicipalities(): Observable<Municipality[]> {
+    if (this.municipalitiesCache) {
+      return of(this.municipalitiesCache);
+    }
+
+    return this.http.get<Municipality[]>(`${baseUrl}/municipalities`).pipe(
+      tap(municipalities => this.municipalitiesCache = municipalities),
+      catchError(error => {
+        console.error('Error fetching municipalities', error);
+        return of([]);
+      })
+    );
   }
 
 }

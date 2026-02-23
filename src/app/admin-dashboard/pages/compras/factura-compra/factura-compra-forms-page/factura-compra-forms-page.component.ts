@@ -79,16 +79,31 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     formCompra = this.fb.group({
         proveedor: ['', Validators.required],
         proveedorSearch: [''],
-        nit: [''],
+        numeroIdentificacion: [''],
+        tipoIdentificacion: [''],
         email: [''],
         telefono: [''],
         fechaEmision: [new Date().toISOString().substring(0, 10), Validators.required],
         fechaVencimiento: [new Date().toISOString().substring(0, 10), Validators.required],
-        metodoPago: ['Contado', Validators.required],
+        formaPago: ['Contado', Validators.required],
+        metodoPago: [''],
         referencia: [''],
         observaciones: [''],
         items: this.fb.array([])
     });
+
+    setupPaymentLogic() {
+        this.formCompra.get('formaPago')?.valueChanges.subscribe(value => {
+            const metodoPagoControl = this.formCompra.get('metodoPago');
+            if (value === 'Contado') {
+                metodoPagoControl?.setValidators([Validators.required]);
+            } else {
+                metodoPagoControl?.clearValidators();
+                metodoPagoControl?.setValue('');
+            }
+            metodoPagoControl?.updateValueAndValidity();
+        });
+    }
 
     // Signal for loading state
     loading = signal<boolean>(false);
@@ -104,6 +119,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     });
 
     ngOnInit(): void {
+        this.setupPaymentLogic();
         if (this.facturaId() && this.facturaId() !== 'new-Item') {
             this.headTitle.title = 'Editar Factura de Compra';
             this.headTitle.slog = 'Se edita factura de compra del sistema';
@@ -181,12 +197,13 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                     this.formCompra.patchValue({
                         proveedorSearch: invoice.proveedor?.nombre,
                         proveedor: invoice.proveedorId,
-                        nit: invoice.proveedor?.identificacion,
+                        numeroIdentificacion: invoice.proveedor?.identificacion,
                         email: invoice.proveedor?.email,
                         telefono: invoice.proveedor?.telefono,
                         fechaEmision: invoice.fecha,
                         fechaVencimiento: invoice.fechaVencimiento,
-                        metodoPago: invoice.formaPago,
+                        formaPago: invoice.formaPago,
+                        metodoPago: invoice.metodoPago, // Assuming it exists in backend
                         referencia: invoice.numeroFacturaProveedor,
                         observaciones: invoice.observaciones,
                     });
@@ -326,7 +343,8 @@ export class FacturaCompraFormsPageComponent implements OnInit {
             numero: factura.referencia,
             observaciones: factura.observaciones,
             fechaVencimiento: factura.fechaVencimiento,
-            formaPago: factura.metodoPago,
+            formaPago: factura.formaPago,
+            metodoPago: factura.metodoPago,
             items: items.map((item: any) => ({
                 articuloId: item.productoId,
                 quantity: item.cantidad,
@@ -393,7 +411,8 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         this.formCompra.patchValue({
             proveedor: newProvider.id,
             proveedorSearch: newProvider.nombre,
-            nit: newProvider.identificacion,
+            numeroIdentificacion: newProvider.tipoDocumento + ' - ' + newProvider.identificacion,
+            tipoIdentificacion: newProvider.tipoDocumento,
             telefono: newProvider.telefono,
             email: newProvider.email,
         });

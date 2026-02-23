@@ -175,13 +175,14 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
         this.formVentas.patchValue({
           cliente: invoice.clientId,
           tipoDocumento: invoice.client.tipoDocumento,
-          identificacion: invoice.client.numeroDocumento,
+          identificacion: invoice.client.tipoDocumento + ' - ' + invoice.client.numeroDocumento,
           clienteSearch: invoice.client.nombre + ' ' + invoice.client.apellido,
           contacto: invoice.client.email,
           vendedor: invoice.vendedor,
           canal: invoice.canalventa,
           fecha: invoice.fecha,
-          formaPago: invoice.formapago
+          formaPago: invoice.formapago,
+          metodoPago: invoice.metodoPago // Patching new field
         });
 
         this.productSeleccionados.set(invoice.items)
@@ -203,10 +204,25 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     contacto: [''],
     vendedor: [''],
     formaPago: ['', Validators.required],
+    metodoPago: [''], // Added field
     fecha: ['', Validators.required],
     canal: [''],
     productos: [[]]
   })
+
+  // Listener for conditional validation
+  paymentLogic = effect(() => {
+    const formaPago = this.formVentas.get('formaPago')?.value;
+    const metodoPagoControl = this.formVentas.get('metodoPago');
+
+    if (formaPago === '1') { // Contado
+      metodoPagoControl?.setValidators([Validators.required]);
+    } else {
+      metodoPagoControl?.clearValidators();
+      metodoPagoControl?.setValue(''); // Reset if credit
+    }
+    metodoPagoControl?.updateValueAndValidity();
+  });
 
   productosItemsForm = this.fb.group({
     articulo: ['', Validators.required],
@@ -304,7 +320,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       clienteSearch: cliente.nombre,
       tipoDocumento: cliente.tipoDocumento,
       contacto: cliente.email,
-      identificacion: cliente.numeroDocumento
+      identificacion: cliente.tipoDocumento + ' - ' + cliente.numeroDocumento
     })
   }
 
@@ -362,6 +378,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       canalventa: valueFormFactura.canal!,
       fecha: valueFormFactura.fecha!,
       formapago: valueFormFactura.formaPago!,
+      metodoPago: valueFormFactura.metodoPago!,
       items: productos.map((item) => ({
         articuloId: item.articuloId!,
         description: item.description,

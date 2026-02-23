@@ -55,10 +55,10 @@ export class ClientsPageComponent {
 
     get columnsTable() {
         return [
-            { key: 'ind', header: '#' },
-            { key: 'tipoPersona_nom', header: 'Tipo Persona' },
+            // { key: 'ind', header: '#' },
+            { key: 'tipoPersona_nom', header: 'Tipo' },
             { key: 'fullName', header: 'Nombre' },
-            { key: 'tipoDocumento', header: 'Documento' },
+            { key: 'tipoDocumento', header: 'Tipo Doc' },
             { key: 'numeroDocumento', header: 'Numero' },
             { key: 'estado', header: 'Estado' },
             { key: 'email', header: 'Correo' },

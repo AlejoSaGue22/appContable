@@ -34,25 +34,26 @@
 
                         <div class="relative">
                             <label class="block mb-2 text-sm text-slate-600">
-                                Tipo Documento
-                            </label>
-                            <input class="w-full bg-transparent text-slate-700 text-sm border rounded-md px-3 py-2 transition 
-                                        duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 
-                                        shadow-sm focus:shadow" type="text" readonly formControlName="tipoDocumento" />
-
-                            <form-error-label [errorType]="formVentas.get('tipoDocumento')!" />
-                        </div>
-
-                        <div class="relative">
-                            <label class="block mb-2 text-sm text-slate-600">
                                 Identificacion
                             </label>
                             <input class="w-full bg-transparent text-slate-700 text-sm border rounded-md px-3 py-2 transition 
                                         duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 
-                                        shadow-sm focus:shadow" type="number" readonly formControlName="identificacion"
-                                min="1" />
+                                        shadow-sm focus:shadow" type="text" readonly
+                                formControlName="identificacion" />
 
                             <form-error-label [errorType]="formVentas.get('identificacion')!" />
+                        </div>
+
+                        <div>
+                            <label class="block mb-2 text-sm text-slate-600">
+                                Contacto
+                            </label>
+                            <input class="w-full bg-transparent text-slate-700 text-sm border 
+                                        rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 
+                                        hover:border-slate-300 shadow-sm focus:shadow" formControlName="contacto"
+                                readonly type="text" />
+
+                            <form-error-label [errorType]="formVentas.get('contacto')!" />
                         </div>
                     </div>
 
@@ -76,18 +77,6 @@
 
                         <div>
                             <label class="block mb-2 text-sm text-slate-600">
-                                Contacto
-                            </label>
-                            <input class="w-full bg-transparent text-slate-700 text-sm border 
-                                        rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 
-                                        hover:border-slate-300 shadow-sm focus:shadow" formControlName="contacto"
-                                readonly type="text" />
-
-                            <form-error-label [errorType]="formVentas.get('contacto')!" />
-                        </div>
-
-                        <div>
-                            <label class="block mb-2 text-sm text-slate-600">
                                 Vendedor
                             </label>
                             <input class="w-full bg-transparent text-slate-700 text-sm border 
@@ -105,15 +94,39 @@
                                 <select class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded 
                                                 pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm
                                                 focus:shadow-md cursor-pointer" formControlName="formaPago">
-                                    <option value="Contado">Contado</option>
-                                    <option value="Crédito">Crédito</option>
-                                    <option value="Transferencia">Transferencia</option>
-                                    <option value="Tarjeta">Tarjeta</option>
+                                    <option value="1">Contado</option>
+                                    <option value="2">Crédito</option>
                                 </select>
                             </div>
 
                             <form-error-label [errorType]="formVentas.get('formaPago')!" />
                         </div>
+
+                        @if (formVentas.get('formaPago')?.value === '1') {
+                        <div>
+                            <label class="block mb-2 text-sm text-slate-600">
+                                Metodo de Pago <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <select class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded 
+                                                    pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm
+                                                    focus:shadow-md cursor-pointer" formControlName="metodoPago">
+                                    <option value="10">Efectivo</option>
+                                    <option value="42">Consignación</option>
+                                    <option value="20">Cheque</option>
+                                    <option value="47">Transferencia</option>
+                                    <option value="71">Bonos</option>
+                                    <option value="72">Vales</option>
+                                    <option value="1">Medio de pago no definido</option>
+                                    <option value="49">Tarjeta Débito</option>
+                                    <option value="48">Tarjeta Crédito</option>
+                                    <option value="ZZZ">Otro</option>
+                                </select>
+                            </div>
+
+                            <form-error-label [errorType]="formVentas.get('metodoPago')!" />
+                        </div>
+                        }
 
                         <div>
                             <label class="block mb-2 text-sm text-slate-600">
@@ -134,10 +147,10 @@
                                 <select class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded 
                                                 pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm
                                                 focus:shadow-md cursor-pointer" formControlName="canal">
-                                    <option value="Directo">Directo</option>
-                                    <option value="Online">Online</option>
-                                    <option value="Distribuidor">Distribuidor</option>
-                                    <option value="Retail">Retail</option>
+                                    <option value="1">Directo</option>
+                                    <option value="2">Online</option>
+                                    <option value="3">Distribuidor</option>
+                                    <option value="4">Retail</option>
                                 </select>
                             </div>
 

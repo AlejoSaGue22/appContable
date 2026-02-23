@@ -19,4 +19,12 @@ export interface ClientesInterface {
     email: string;
     observacion: string;
     responsableFiscal: string;
+    dv?: string;
+}
+
+export interface Municipality {
+    id: number;
+    code: string;
+    name: string;
+    department: string;
 }

@@ -45,6 +45,7 @@ export interface FacturaVenta {
   canalventa: string;
   fecha: string;
   formapago: string;
+  metodoPago?: string;
   items: ItemFactura[];
   iva: number;
   descuento: number;
