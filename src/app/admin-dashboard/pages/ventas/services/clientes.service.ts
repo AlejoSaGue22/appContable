@@ -17,6 +17,7 @@ const emptyCliente: ClientesInterface = {
   numeroDocumento: '',
   observacion: '',
   razonSocial: '',
+  isActive: true,
   responsableFiscal: '',
   telefono: '',
   tipoDocumento: '',

@@ -69,15 +69,32 @@ interface CreatedBy {
   deleteAt: null
 }
 
+export enum TipoFactura {
+  ELECTRONICA = 'ELECTRONICA',
+  STANDARD = 'STANDARD',
+}
+
+export enum FormaPago {
+  CONTADO = 'CONTADO',
+  CREDITO = 'CREDITO',
+}
+
 export enum InvoiceStatus {
-  DRAFT = 'draft',
-  ISSUED = 'issued',
-  CANCELLED = 'cancelled',
-  PAID = 'paid'
+  DRAFT = 'draft',              // Borrador - editable
+  PENDING_DIAN = 'pending_dian', // Enviando a DIAN
+  ACCEPTED = 'accepted',         // Aceptada por DIAN (tiene CUFE)
+  REJECTED = 'rejected',         // Rechazada por DIAN (corregir y reenviar)
+  PAID = 'paid',                 // Pagada
+  CANCELLED = 'cancelled',        // Anulada (requiere nota crédito)
+  ISSUED = 'issued',             // Emitida (para facturas comunes)
+  ERROR_ASIENTO = 'error_asiento' // Error generado el asiento
 }
 
 export enum DianStatus {
-  PENDING = 'pending',
-  ACCEPTED = 'accepted',
-  REJECTED = 'rejected'
+  PENDING = 'pending',           // Esperando envío
+  SENT = 'sent',                 // Enviada a proveedor tecnológico
+  PROCESSING = 'processing',     // Proveedor validando
+  ACCEPTED = 'accepted',         // DIAN aprobó (tiene CUFE)
+  REJECTED = 'rejected',         // DIAN rechazó
+  CANCELLED = 'cancelled'        // Anulada (nota crédito enviada)
 }

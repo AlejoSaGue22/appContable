@@ -1,21 +1,24 @@
 import { Component, inject, signal } from '@angular/core';
 import { HeaderInput, HeaderTitlePageComponent } from '@dashboard/components/header-title-page/header-title-page.component';
 import { CardsTotales, NumCardsTotalesComponent } from '@shared/components/num-cards-totales/num-cards-totales.component';
-import { TableListComponent } from "@shared/components/table-list/table-list.component";
 import { ClientesService } from '../services/clientes.service';
 import { FlowbiteService } from 'src/app/utils/services/flowbite.service';
 import { ModalComponents } from "@shared/components/modal.components/modal.components";
-import { rxResource, toSignal } from '@angular/core/rxjs-interop';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { LoaderComponent } from "src/app/utils/components/loader/loader.component";
-import { firstValueFrom, map, tap } from 'rxjs';
+import { firstValueFrom, tap } from 'rxjs';
 import { modalOpen } from '@shared/interfaces/services.interfaces';
 import { PaginationService } from '@shared/components/pagination/pagination.service';
 import { NotificationService } from '@shared/services/notification.service';
+import { TableClientsComponent } from './components/table-clients/table-clients.component';
+import { Pagination as PaginationComponent } from '@shared/components/pagination/pagination';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
     selector: 'app-clients-page',
-    imports: [HeaderTitlePageComponent, NumCardsTotalesComponent, TableListComponent, ModalComponents, LoaderComponent],
+    imports: [HeaderTitlePageComponent, NumCardsTotalesComponent, TableClientsComponent, ModalComponents, LoaderComponent, PaginationComponent, RouterLink],
     templateUrl: './clients-page.component.html',
+    standalone: true
 })
 export class ClientsPageComponent {
 
@@ -25,6 +28,7 @@ export class ClientsPageComponent {
     }
 
     paginationService = inject(PaginationService);
+    router = inject(Router);
     flowbiteService = inject(FlowbiteService);
     clienteServices = inject(ClientesService);
     notificacionService = inject(NotificationService);
@@ -32,10 +36,19 @@ export class ClientsPageComponent {
     totalCliente = signal(0);
     idClienteToModal = signal<string>('');
     isModalEdit = false;
+    searchTerm = signal<string>('');
 
     clientesResource = rxResource({
-        request: () => ({ page: this.paginationService.currentPage() - 1, limit: 10 }),
-        loader: ({ request }) => this.clienteServices.getClientes({ offset: request.page * 9, limit: request.limit }).pipe(
+        request: () => ({ 
+            page: this.paginationService.currentPage() - 1, 
+            limit: 10,
+            search: this.searchTerm()
+        }),
+        loader: ({ request }) => this.clienteServices.getClientes({ 
+            offset: request.page * request.limit, 
+            limit: request.limit,
+            search: request.search 
+        }).pipe(
             tap((el) => {
                 this.totalCliente.set(el.count);
                 this.cardsTotales.set([
@@ -46,25 +59,15 @@ export class ClientsPageComponent {
         )
     });
 
-
+    onSearch(term: string) {
+        this.searchTerm.set(term);
+        // Navigate back to page 1 on search
+        this.router.navigate([], { queryParams: { page: 1 }, queryParamsHandling: 'merge' });
+    }
 
     openModal(event: modalOpen) {
         this.isModalEdit = event.open;
         this.idClienteToModal.set(event.id);
-    }
-
-    get columnsTable() {
-        return [
-            // { key: 'ind', header: '#' },
-            { key: 'tipoPersona_nom', header: 'Tipo' },
-            { key: 'fullName', header: 'Nombre' },
-            { key: 'tipoDocumento', header: 'Tipo Doc' },
-            { key: 'numeroDocumento', header: 'Numero' },
-            { key: 'estado', header: 'Estado' },
-            { key: 'email', header: 'Correo' },
-            { key: 'telefono', header: 'Telefono' },
-            { key: 'direccion', header: 'Direccion' },
-        ];
     }
 
     async deleteCliente() {
@@ -91,7 +94,7 @@ export class ClientsPageComponent {
         }
 
         this.notificacionService.success(
-            'Producto eliminado correctamente',
+            'Cliente eliminado correctamente',
             'Completado!',
             3000
         );

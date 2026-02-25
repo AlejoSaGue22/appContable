@@ -21,12 +21,12 @@ export class ComprobantesVentasService {
     startDate?: string;
     endDate?: string;
   }): Observable<ComprobanteVentaResponse> {
-    const { limit = 10, offset = 0, status, type, clientName, startDate, endDate } = options;
+    const { limit = 10, page = 1, status, type, clientName, startDate, endDate } = options;
 
     // Build params object, only including defined values
     const params: any = {
       limit,
-      offset
+      page
     };
 
     if (status) params.status = status;

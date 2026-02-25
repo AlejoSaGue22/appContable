@@ -17,6 +17,7 @@ export interface ClientesInterface {
     ciudad: string;
     telefono: string;
     email: string;
+    isActive: boolean;
     observacion: string;
     responsableFiscal: string;
     dv?: string;

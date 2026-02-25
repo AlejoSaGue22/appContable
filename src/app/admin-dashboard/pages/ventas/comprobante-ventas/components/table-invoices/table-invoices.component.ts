@@ -45,9 +45,13 @@ export class TableInvoices {
   readonly statuses = [
     { value: '', label: 'Todos los estados' },
     { value: InvoiceStatus.DRAFT, label: 'Borrador' },
-    { value: InvoiceStatus.ISSUED, label: 'Emitida' },
+    { value: InvoiceStatus.PENDING_DIAN, label: 'Pendiente DIAN' },
+    { value: InvoiceStatus.ACCEPTED, label: 'Aceptada' },
+    { value: InvoiceStatus.REJECTED, label: 'Rechazada' },
     { value: InvoiceStatus.PAID, label: 'Pagada' },
-    { value: InvoiceStatus.CANCELLED, label: 'Cancelada' }
+    { value: InvoiceStatus.CANCELLED, label: 'Cancelada' },
+    { value: InvoiceStatus.ISSUED, label: 'Emitida' },
+    { value: InvoiceStatus.ERROR_ASIENTO, label: 'Error Asiento' }
   ];
 
   applyFilters(): void {
@@ -92,9 +96,13 @@ export class TableInvoices {
   getStatusClass(status: InvoiceStatus): string {
     const classes: Record<InvoiceStatus, string> = {
       [InvoiceStatus.DRAFT]: 'bg-gray-100 text-gray-800',
+      [InvoiceStatus.PENDING_DIAN]: 'bg-yellow-100 text-yellow-800',
+      [InvoiceStatus.ACCEPTED]: 'bg-green-100 text-green-800',
+      [InvoiceStatus.REJECTED]: 'bg-red-100 text-red-800',
+      [InvoiceStatus.PAID]: 'bg-blue-100 text-blue-800',
+      [InvoiceStatus.CANCELLED]: 'bg-gray-500 text-gray-800',
       [InvoiceStatus.ISSUED]: 'bg-blue-100 text-blue-800',
-      [InvoiceStatus.PAID]: 'bg-green-100 text-green-800',
-      [InvoiceStatus.CANCELLED]: 'bg-red-100 text-red-800'
+      [InvoiceStatus.ERROR_ASIENTO]: 'bg-red-100 text-red-800'
     };
     return classes[status];
   }
@@ -102,9 +110,13 @@ export class TableInvoices {
   getStatusLabel(status: InvoiceStatus): string {
     const labels: Record<InvoiceStatus, string> = {
       [InvoiceStatus.DRAFT]: 'Borrador',
-      [InvoiceStatus.ISSUED]: 'Emitida',
+      [InvoiceStatus.PENDING_DIAN]: 'Pendiente DIAN',
+      [InvoiceStatus.ACCEPTED]: 'Aceptada',
+      [InvoiceStatus.REJECTED]: 'Rechazada',
       [InvoiceStatus.PAID]: 'Pagada',
-      [InvoiceStatus.CANCELLED]: 'Cancelada'
+      [InvoiceStatus.CANCELLED]: 'Cancelada',
+      [InvoiceStatus.ISSUED]: 'Emitida',
+      [InvoiceStatus.ERROR_ASIENTO]: 'Error Asiento'
     };
     return labels[status];
   }

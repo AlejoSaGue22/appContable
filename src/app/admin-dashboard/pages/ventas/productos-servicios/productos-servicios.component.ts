@@ -1,7 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { HeaderInput, HeaderTitlePageComponent } from '@dashboard/components/header-title-page/header-title-page.component';
 import { CardsTotales, NumCardsTotalesComponent } from '@shared/components/num-cards-totales/num-cards-totales.component';
-import { TableListComponent } from "@shared/components/table-list/table-list.component";
 import { ProductosService } from '../services/productos.service';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { LoaderComponent } from "src/app/utils/components/loader/loader.component";
@@ -10,12 +9,15 @@ import { firstValueFrom, tap } from 'rxjs';
 import { ModalComponents } from "@shared/components/modal.components/modal.components";
 import { modalOpen } from '@shared/interfaces/services.interfaces';
 import { NotificationService } from '@shared/services/notification.service';
-
+import { TableProductosComponent } from './components/table-productos/table-productos.component';
+import { Pagination as PaginationComponent } from '@shared/components/pagination/pagination';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
    selector: 'app-productos-servicios',
-   imports: [HeaderTitlePageComponent, TableListComponent, LoaderComponent, ModalComponents],
+   imports: [HeaderTitlePageComponent, TableProductosComponent, LoaderComponent, ModalComponents, PaginationComponent, RouterLink],
    templateUrl: './productos-servicios.component.html',
+   standalone: true
 })
 export class ProductosServiciosComponent {
 
@@ -24,19 +26,29 @@ export class ProductosServiciosComponent {
       slog: 'Administra la información de tus productos y servicios'
    }
 
-
    paginationService = inject(PaginationService);
+   router = inject(Router);
    productoServicio = inject(ProductosService);
    notificacionService = inject(NotificationService);
    totalProducto = signal(0);
    idProductoToModal = signal<string>('');
    isModalEdit = false;
    cardValor = signal<CardsTotales[]>([])
+   searchTerm = signal<string>('');
 
    productorxResource = rxResource({
-      request: () => ({ page: this.paginationService.currentPage() - 1, limit: 10 }),
+      request: () => ({ 
+          page: this.paginationService.currentPage() - 1, 
+          limit: 10,
+          search: this.searchTerm()
+      }),
       loader: ({ request }) => {
-         return this.productoServicio.getProductos({ offset: request.page * 9, limit: request.limit, venta_compra: 'venta' }).pipe(
+         return this.productoServicio.getProductos({ 
+             offset: request.page * request.limit, 
+             limit: request.limit, 
+             venta_compra: 'venta',
+             search: request.search
+         }).pipe(
             tap((p) => {
                this.totalProducto.set(p.count);
                this.cardValor.set([
@@ -49,22 +61,14 @@ export class ProductosServiciosComponent {
       }
    })
 
+   onSearch(term: string) {
+       this.searchTerm.set(term);
+       this.router.navigate([], { queryParams: { page: 1 }, queryParamsHandling: 'merge' });
+   }
 
    openModal(event: modalOpen) {
       this.isModalEdit = event.open;
       this.idProductoToModal.set(event.id);
-   }
-
-   get columnsTable() {
-      return [
-         { key: 'codigo', header: 'Codigo' },
-         { key: 'nombre', header: 'Nombre' },
-         { key: 'fullNameTipo', header: 'Tipo' },
-         { key: 'precio', header: 'Precio', type: 'number' },
-         { key: 'iva_percent', header: 'Impuestos' },
-         { key: 'rete_percent', header: 'Retencion' },
-         { key: 'unidadmedida', header: 'Medida' },
-      ]
    }
 
    async deleteProducto() {

@@ -41,12 +41,12 @@ export class ComprobanteVentasComponent {
 
    comprobanteVentasResource = rxResource({
       request: () => ({
-         page: this.paginationService.currentPage() - 1,
+         page: this.paginationService.currentPage(),
          limit: 10,
          filters: this.filters()
       }),
       loader: ({ request }) => this.comprobantesVentasService.getComprobanteVentas({
-         offset: request.page * 9,
+         page: request.page,
          limit: request.limit,
          ...request.filters
       })

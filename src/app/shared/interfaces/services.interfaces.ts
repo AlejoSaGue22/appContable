@@ -3,6 +3,7 @@ import { ErrorAuthResponse } from "src/app/auth/interfaces/auth-response.interfa
 export interface Options {
     limit?: number;
     offset?: number;
+    page?: number;
     venta_compra?: 'venta' | 'compra';
     search?: string;
 }
