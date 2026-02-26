@@ -172,12 +172,12 @@ export class ClientsFormPageComponent implements OnInit {
     }
 
     async onCancel() {
-        this.clientsForm.reset();
         if (this.isModal()) {
             this.cancel.emit();
         } else {
             await this.router.navigateByUrl('/panel/ventas/clients');
         }
+        this.clientsForm.reset();
     }
 
     private loadMunicipalities() {
