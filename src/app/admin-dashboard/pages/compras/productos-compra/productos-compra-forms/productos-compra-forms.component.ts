@@ -9,6 +9,7 @@ import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { LoaderComponent } from "src/app/utils/components/loader/loader.component";
 import { NotificationService } from '@shared/services/notification.service';
 import { ProductosService } from '@dashboard/pages/ventas/services/productos.service';
+import { CatalogsStore } from '@dashboard/services/catalogs.store';
 
 @Component({
   selector: 'app-productos-compra-forms',
@@ -27,11 +28,12 @@ export class ProductosCompraFormsComponent {
   notificacionService = inject(NotificationService);
   router = inject(Router);
   activateRoute = inject(ActivatedRoute);
+  catalogsStore = inject(CatalogsStore);
 
   isModal = input<boolean>(false);
   saveSuccess = output<any>();
   cancel = output<void>();
-  categorias = inject(ProductosService).categorias.filter((c) => c.tipo == 'compra');
+  categorias = inject(ProductosService).categorias().filter((c) => c.tipo == 'compra' || c.tipo == 'gasto');
 
   formProductos = this.fb.group({
     categoria: ['', Validators.required],

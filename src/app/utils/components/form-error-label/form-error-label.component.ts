@@ -14,8 +14,6 @@ export class FormErrorLabelComponent {
     get errorMessage() {
       const errors: ValidationErrors = this.errorType()?.errors || {};
 
-      // console.log(this.errorType())
-
       return this.errorType()?.touched && Object.keys(errors).length > 0 ? FormUtils.getTextError(errors) : null;
     }
 }

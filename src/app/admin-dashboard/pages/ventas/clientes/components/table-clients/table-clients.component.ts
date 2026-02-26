@@ -1,7 +1,7 @@
 import { Component, input, Output, EventEmitter } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ClientesInterface } from '@dashboard/interfaces/clientes-interface';
+import { ClientesInterfaceResponse } from '@dashboard/interfaces/clientes-interface';
 import { modalOpen } from '@shared/interfaces/services.interfaces';
 
 @Component({
@@ -12,7 +12,7 @@ import { modalOpen } from '@shared/interfaces/services.interfaces';
 })
 export class TableClientsComponent {
 
-  clientesData = input<ClientesInterface[]>([]);
+  clientesData = input<ClientesInterfaceResponse[]>([]);
   @Output() delete = new EventEmitter<modalOpen>();
 
   onDeleteCliente(id: string) {

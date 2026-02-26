@@ -8,6 +8,6 @@ export interface Options {
     search?: string;
 }
 
-export type ResponseResult = { success: true, data?: any, message?: string } | { success: false, error: ErrorAuthResponse };
+export type ResponseResult = { success: true, data?: any, message?: string } | { success: false, error: ErrorAuthResponse, message: string[] };
 
 export type modalOpen = { open: boolean, id: string };

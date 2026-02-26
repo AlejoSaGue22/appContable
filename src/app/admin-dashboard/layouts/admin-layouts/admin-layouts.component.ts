@@ -3,7 +3,6 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } fro
 import { MenuPerfilComponent } from "../../components/menu-perfil/menu-perfil.component";
 import { BarralateralMenuComponent } from "@dashboard/components/barralateral-menu/barralateral-menu.component";
 import { OptionBarralateral } from "@dashboard/components/option-barralateral/option-barralateral.component";
-import { FlowbiteService } from 'src/app/utils/services/flowbite.service';
 import { filter, Subscription } from 'rxjs';
 import { Permission } from '@dashboard/interfaces/permission-interface';
 import { MenuService } from '@utils/services/menu.service';
@@ -30,7 +29,7 @@ export interface MenuOption {
 
 @Component({
   selector: 'app-admin-layouts',
-  imports: [RouterOutlet, MenuPerfilComponent, BarralateralMenuComponent, OptionBarralateral, LoaderComponent],
+  imports: [RouterOutlet, MenuPerfilComponent, BarralateralMenuComponent, OptionBarralateral],
   templateUrl: './admin-layouts.component.html',
 })
 export default class AdminLayoutsComponent implements OnInit, OnDestroy {
@@ -52,7 +51,6 @@ export default class AdminLayoutsComponent implements OnInit, OnDestroy {
 
 
   ngOnInit(): void {
-    // Fetch menu if authenticated but menu is empty
     if (this.authService.authStatus() === 'authenticated' && this.menuItems().length === 0) {
       this.menuService.fetchMenu().subscribe();
     }

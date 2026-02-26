@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { initFlowbite } from 'flowbite';
 import { NotificationContainer } from "@shared/components/notification-container/notification-container.component";
+import { CatalogsStore } from '@dashboard/services/catalogs.store';
 
 @Component({
   selector: 'app-root',
@@ -11,11 +12,6 @@ import { NotificationContainer } from "@shared/components/notification-container
 })
 export class AppComponent {
     title = 'contableSoft';
-
-    // ngOnInit(): void {
-    //     initFlowbite();
-    // }
-
-    //  flowbiteService = inject(FlowbiteService);
+    private catalogsStore = inject(CatalogsStore);
 
 }

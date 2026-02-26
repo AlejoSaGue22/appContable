@@ -10,7 +10,7 @@ import { CurrencyPipe, DatePipe, TitleCasePipe } from '@angular/common';
 
 @Component({
    selector: 'app-dashboarg-page',
-   imports: [HeaderTitlePageComponent, RouterLink, NumCardsTotalesComponent, CurrencyPipe, TitleCasePipe, DatePipe],
+   imports: [HeaderTitlePageComponent, RouterLink, NumCardsTotalesComponent, CurrencyPipe, DatePipe],
    templateUrl: './dashboarg-page.component.html',
 })
 export class DashboargPageComponent implements OnInit {

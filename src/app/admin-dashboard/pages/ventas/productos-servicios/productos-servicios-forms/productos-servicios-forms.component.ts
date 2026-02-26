@@ -9,6 +9,7 @@ import { FormErrorLabelComponent } from "src/app/utils/components/form-error-lab
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { LoaderComponent } from "src/app/utils/components/loader/loader.component";
 import { NotificationService } from '@shared/services/notification.service';
+import { CatalogsStore } from '@dashboard/services/catalogs.store';
 
 @Component({
   selector: 'app-productos-servicios-forms',
@@ -32,6 +33,7 @@ export class ProductosServiciosFormsComponent {
   private notificacionService = inject(NotificationService);
   private router = inject(Router);
   private activateRoute = inject(ActivatedRoute);
+  catalogsStore = inject(CatalogsStore);
 
   formProductos = this.fb.group({
     categoria: ['', Validators.required],
@@ -51,7 +53,7 @@ export class ProductosServiciosFormsComponent {
   productosID = toSignal(
     this.activateRoute.params.pipe(map((param) => param['id']))
   );
-  categorias = inject(ProductosService).categorias.filter((c) => c.tipo == 'venta');
+  categorias = inject(ProductosService).categorias().filter((c) => c.tipo == 'venta');
 
   productoIdRxResourse = rxResource({
     request: () => {

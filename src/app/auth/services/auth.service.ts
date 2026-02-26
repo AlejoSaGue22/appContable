@@ -49,7 +49,7 @@ export class AuthService {
             statusCode: 500,
           };
 
-          return of({ success: false, error: errorResp })
+          return of({ success: false, error: errorResp, message: [errorResp.message] })
         }),
       )
   }

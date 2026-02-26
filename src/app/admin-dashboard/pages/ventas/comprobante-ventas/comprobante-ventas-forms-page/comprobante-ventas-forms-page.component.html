@@ -111,16 +111,10 @@
                                 <select class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded 
                                                     pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm
                                                     focus:shadow-md cursor-pointer" formControlName="metodoPago">
-                                    <option value="10">Efectivo</option>
-                                    <option value="42">Consignación</option>
-                                    <option value="20">Cheque</option>
-                                    <option value="47">Transferencia</option>
-                                    <option value="71">Bonos</option>
-                                    <option value="72">Vales</option>
-                                    <option value="1">Medio de pago no definido</option>
-                                    <option value="49">Tarjeta Débito</option>
-                                    <option value="48">Tarjeta Crédito</option>
-                                    <option value="ZZZ">Otro</option>
+                                    <option value="">Selecciona un método de pago</option>
+                                    @for (method of catalogsStore.paymentMethods(); track method.id) {
+                                        <option [value]="method.id">{{ method.nombre }}</option>
+                                    }
                                 </select>
                             </div>
 
@@ -147,10 +141,10 @@
                                 <select class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded 
                                                 pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm
                                                 focus:shadow-md cursor-pointer" formControlName="canal">
-                                    <option value="1">Directo</option>
-                                    <option value="2">Online</option>
-                                    <option value="3">Distribuidor</option>
-                                    <option value="4">Retail</option>
+                                    <option value="">Selecciona un canal</option>
+                                    @for (canal of catalogsStore.salesChannels(); track canal.id) {
+                                        <option [value]="canal.id">{{ canal.nombre }}</option>
+                                    }
                                 </select>
                             </div>
 

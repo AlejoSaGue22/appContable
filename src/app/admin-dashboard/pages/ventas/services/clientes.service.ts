@@ -1,13 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { ClientesInterface, ClientesResponse, Municipality } from '@dashboard/interfaces/clientes-interface';
+import { ClientesFormInterface, ClientesInterfaceResponse, ClientesResponse } from '@dashboard/interfaces/clientes-interface';
 import { Options, ResponseResult } from '@shared/interfaces/services.interfaces';
 import { catchError, delay, map, Observable, of, tap } from 'rxjs';
 import { environment } from 'src/app/environments/environment';
+import { Municipality } from '@dashboard/interfaces/catalogs-interface';
 
 const baseUrl = environment.baseUrl;
 
-const emptyCliente: ClientesInterface = {
+const emptyCliente: ClientesFormInterface = {
   apellido: '',
   ciudad: '',
   direccion: '',
@@ -30,7 +31,7 @@ const emptyCliente: ClientesInterface = {
 export class ClientesService {
 
   private http = inject(HttpClient);
-  clienteRegistrados = signal<ClientesInterface[]>([]);
+  clienteRegistrados = signal<ClientesInterfaceResponse[]>([]);
   private clientCache = new Map<string, ClientesResponse>();
   private municipalitiesCache: Municipality[] | null = null;
 
@@ -56,33 +57,33 @@ export class ClientesService {
   }
 
 
-  getClientesById(id: string): Observable<ClientesInterface> {
+  getClientesById(id: string): Observable<ClientesFormInterface> {
 
     if (id == 'new-Item') {
       return of(emptyCliente);
     }
 
-    return this.http.get<ClientesInterface>(`${baseUrl}/clientes/${id}`).pipe(
+    return this.http.get<ClientesFormInterface>(`${baseUrl}/clientes/${id}`).pipe(
       delay(300)
     )
 
   }
 
-  actualizarClientes(id: string, cliente: Partial<ClientesInterface>) {
+  actualizarClientes(id: string, cliente: Partial<ClientesFormInterface>) {
 
-    const clienteUpdate = cliente as ClientesInterface;
+    const clienteUpdate = cliente as ClientesFormInterface;
 
     return this.http.patch(`${baseUrl}/clientes/${id}`, clienteUpdate).pipe(
       map((client): ResponseResult => ({ success: true, data: client })),
-      catchError((error: any): Observable<ResponseResult> => of({ success: false, error }))
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
     )
   }
 
-  agregarCliente(cliente: Partial<ClientesInterface>): Observable<ResponseResult> {
+  agregarCliente(cliente: Partial<ClientesFormInterface>): Observable<ResponseResult> {
 
-    return this.http.post<ClientesInterface>(`${baseUrl}/clientes`, cliente).pipe(
+    return this.http.post<ClientesInterfaceResponse>(`${baseUrl}/clientes`, cliente).pipe(
       map((client): ResponseResult => ({ success: true, data: client })),
-      catchError((error: any): Observable<ResponseResult> => of({ success: false, error }))
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
     )
   }
 
@@ -90,7 +91,7 @@ export class ClientesService {
 
     return this.http.delete(`${baseUrl}/clientes/delete/${id}`).pipe(
       map((client): ResponseResult => ({ success: true, data: client })),
-      catchError((error: any): Observable<ResponseResult> => of({ success: false, error }))
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
     )
 
   }

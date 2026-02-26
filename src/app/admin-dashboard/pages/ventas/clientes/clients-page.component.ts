@@ -2,7 +2,6 @@ import { Component, inject, signal } from '@angular/core';
 import { HeaderInput, HeaderTitlePageComponent } from '@dashboard/components/header-title-page/header-title-page.component';
 import { CardsTotales, NumCardsTotalesComponent } from '@shared/components/num-cards-totales/num-cards-totales.component';
 import { ClientesService } from '../services/clientes.service';
-import { FlowbiteService } from 'src/app/utils/services/flowbite.service';
 import { ModalComponents } from "@shared/components/modal.components/modal.components";
 import { rxResource } from '@angular/core/rxjs-interop';
 import { LoaderComponent } from "src/app/utils/components/loader/loader.component";
@@ -13,6 +12,7 @@ import { NotificationService } from '@shared/services/notification.service';
 import { TableClientsComponent } from './components/table-clients/table-clients.component';
 import { Pagination as PaginationComponent } from '@shared/components/pagination/pagination';
 import { Router, RouterLink } from '@angular/router';
+import { HelpersUtils } from '@utils/helpers.utils';
 
 @Component({
     selector: 'app-clients-page',
@@ -29,7 +29,6 @@ export class ClientsPageComponent {
 
     paginationService = inject(PaginationService);
     router = inject(Router);
-    flowbiteService = inject(FlowbiteService);
     clienteServices = inject(ClientesService);
     notificacionService = inject(NotificationService);
     cardsTotales = signal<CardsTotales[]>([]);
@@ -86,7 +85,7 @@ export class ClientsPageComponent {
         if (client.success == false) {
             this.isModalEdit = false;
             this.notificacionService.error(
-                `Hubo un error al guardar el cliente ${client.error.message}`,
+                `Hubo un error al guardar el cliente ${HelpersUtils.getMessageError(client.message)}`,
                 'Error',
                 5000
             );

@@ -11,6 +11,7 @@ import { firstValueFrom, map, of, tap } from 'rxjs';
 import { User, Role, CreateUserDto, UpdateUserDto } from 'src/app/admin-dashboard/interfaces/users-interface';
 import { UsersService } from '../services/users.service';
 import { LoaderComponent } from "@utils/components/loader/loader.component";
+import { HelpersUtils } from '@utils/helpers.utils';
 
 @Component({
     selector: 'app-user-forms-page',
@@ -129,7 +130,7 @@ export class UserFormsPageComponent implements OnInit {
 
                 this.loaderService.hide();
                 if (!result.success) {
-                    this.notificationService.error(`Error al crear usuario: ${result.error?.message}`, 'Error');
+                    this.notificationService.error(`Error al crear usuario: ${HelpersUtils.getMessageError(result.message)}`, 'Error');
                     return;
                 }
 
@@ -155,7 +156,7 @@ export class UserFormsPageComponent implements OnInit {
 
                 this.loaderService.hide();
                 if (!result.success) {
-                    this.notificationService.error(`Error al actualizar usuario: ${result.error?.message}`, 'Error');
+                    this.notificationService.error(`Error al actualizar usuario: ${HelpersUtils.getMessageError(result.message)}`, 'Error');
                     return;
                 }
 

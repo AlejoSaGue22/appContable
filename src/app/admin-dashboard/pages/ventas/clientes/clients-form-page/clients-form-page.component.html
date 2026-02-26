@@ -65,38 +65,38 @@
 
                         <!-- Campos para Persona Natural -->
                         @if (clientsForm.value.tipoPersona == 'PN') {
-                        <div>
-                            <label class="block mb-2 text-sm font-medium text-slate-600">
-                                Nombre <span class="text-red-500">*</span>
-                            </label>
-                            <input [class.border-red-500]="clientsForm.get('nombre')?.errors ?? false"
-                                class="w-full bg-white text-slate-700 text-sm border rounded-lg px-4 py-3 transition duration-300 ease focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
-                                placeholder="Ingrese el nombre" formControlName="nombre" />
-                            <form-error-label [errorType]="clientsForm.get('nombre')!" />
-                        </div>
+                            <div>
+                                <label class="block mb-2 text-sm font-medium text-slate-600">
+                                    Nombre <span class="text-red-500">*</span>
+                                </label>
+                                <input [class.border-red-500]="clientsForm.get('nombre')?.errors ?? false"
+                                    class="w-full bg-white text-slate-700 text-sm border rounded-lg px-4 py-3 transition duration-300 ease focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
+                                    placeholder="Ingrese el nombre" formControlName="nombre" />
+                                <form-error-label [errorType]="clientsForm.get('nombre')!" />
+                            </div>
 
-                        <div>
-                            <label class="block mb-2 text-sm font-medium text-slate-600">
-                                Apellido <span class="text-red-500">*</span>
-                            </label>
-                            <input [class.border-red-500]="clientsForm.get('apellido')?.errors ?? false"
-                                class="w-full bg-white text-slate-700 text-sm border rounded-lg px-4 py-3 transition duration-300 ease focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
-                                placeholder="Ingrese el apellido" formControlName="apellido" />
-                            <form-error-label [errorType]="clientsForm.get('apellido')!" />
-                        </div>
+                            <div>
+                                <label class="block mb-2 text-sm font-medium text-slate-600">
+                                    Apellido <span class="text-red-500">*</span>
+                                </label>
+                                <input [class.border-red-500]="clientsForm.get('apellido')?.errors ?? false"
+                                    class="w-full bg-white text-slate-700 text-sm border rounded-lg px-4 py-3 transition duration-300 ease focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
+                                    placeholder="Ingrese el apellido" formControlName="apellido" />
+                                <form-error-label [errorType]="clientsForm.get('apellido')!" />
+                            </div>
                         }
 
                         <!-- Campos para Persona Jurídica -->
                         @if (clientsForm.value.tipoPersona == 'PJ') {
-                        <div class="md:col-span-2">
-                            <label class="block mb-2 text-sm font-medium text-slate-600">
-                                Razón Social <span class="text-red-500">*</span>
-                            </label>
-                            <input [class.border-red-500]="clientsForm.get('razonSocial')?.errors ?? false"
-                                class="w-full bg-white text-slate-700 text-sm border rounded-lg px-4 py-3 transition duration-300 ease focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
-                                placeholder="Ingrese la razón social" formControlName="razonSocial" />
-                            <form-error-label [errorType]="clientsForm.get('razonSocial')!" />
-                        </div>
+                            <div class="md:col-span-2">
+                                <label class="block mb-2 text-sm font-medium text-slate-600">
+                                    Razón Social <span class="text-red-500">*</span>
+                                </label>
+                                <input [class.border-red-500]="clientsForm.get('razonSocial')?.errors ?? false"
+                                    class="w-full bg-white text-slate-700 text-sm border rounded-lg px-4 py-3 transition duration-300 ease focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
+                                    placeholder="Ingrese la razón social" formControlName="razonSocial" />
+                                <form-error-label [errorType]="clientsForm.get('razonSocial')!" />
+                            </div>
                         }
 
                         <div class="relative">
@@ -107,17 +107,9 @@
                                 class="w-full bg-white text-slate-700 text-sm border rounded-lg px-4 py-3 transition duration-300 ease 
                                                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm cursor-pointer" formControlName="tipoDocumento">
                                 <option value="">Selecciona un documento</option>
-                                <option value="1">Registro civil</option>
-                                <option value="2">Tarjeta de identidad</option>
-                                <option value="3">Cédula de ciudadanía</option>
-                                <option value="4">Tarjeta de extranjería</option>
-                                <option value="5">Cédula de extranjería</option>
-                                <option value="6">NIT</option>
-                                <option value="7">Pasaporte</option>
-                                <option value="8">Documento de identificación extranjero</option>
-                                <option value="9">PEP</option>
-                                <option value="10">NIT otro país</option>
-                                <option value="11">NUIP</option>
+                                @for (doc of catalogsStore.documentTypes(); track doc.id) {
+                                    <option [value]="doc.codigo">{{ doc.nombre }}</option>
+                                }
                             </select>
 
                             <form-error-label [errorType]="clientsForm.get('tipoDocumento')!" />
@@ -183,7 +175,7 @@
                                 class="w-full bg-white text-slate-700 text-sm border rounded-lg px-4 py-3 transition duration-300 ease 
                                                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm cursor-pointer" formControlName="ciudad">
                                 <option value="">Selecciona una ciudad o municipio</option>
-                                @for (city of municipalities(); track city.id) {
+                                @for (city of catalogsStore.municipalities(); track city.id) {
                                 <option [value]="city.id">{{ city.name }} - {{ city.department }}</option>
                                 }
                             </select>

@@ -18,6 +18,8 @@ import { GetProductosDetalle } from '@dashboard/interfaces/productos-interface';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FacturaCompraService } from '../../services/factura-compra.service';
 import { FacturaCompra, ItemFacturaResponse } from '@dashboard/interfaces/factura-compra-interface';
+import { CatalogsStore } from '@dashboard/services/catalogs.store';
+import { HelpersUtils } from '@utils/helpers.utils';
 
 @Component({
     selector: 'app-factura-compra-forms-page',
@@ -53,6 +55,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     productoServicios = inject(ProductosService);
     router = inject(Router);
     activatedRoute = inject(ActivatedRoute);
+    catalogsStore = inject(CatalogsStore);
 
     // Modal State
     isProviderModalVisible = signal<boolean>(false);
@@ -365,9 +368,8 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                 this.loading.set(false);
                 console.log(response);
                 if (response.success == false) {
-                    console.error('❌ Error del backend:', response.error);
                     this.notificationService.error(
-                        'Ocurrio un problema al crear la factura',
+                        `Ocurrio un problema al crear la factura ${HelpersUtils.getMessageError(response.message)}`,
                         'Error',
                         5000
                     );

@@ -4,12 +4,15 @@ import { HeaderInput, HeaderTitlePageComponent } from "@dashboard/components/hea
 import { FormErrorLabelComponent } from "src/app/utils/components/form-error-label/form-error-label.component";
 import { ClientesService } from '../../services/clientes.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ClientesInterface, Municipality } from '@dashboard/interfaces/clientes-interface';
+import { ClientesInterfaceResponse, ClientesFormInterface } from '@dashboard/interfaces/clientes-interface';
 import { firstValueFrom, map, tap } from 'rxjs';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { LoaderComponent } from "src/app/utils/components/loader/loader.component";
 import { ErrorPageComponent } from "src/app/utils/components/error-page/error-page.component";
 import { NotificationService } from '@shared/services/notification.service';
+import { CatalogsStore } from '@dashboard/services/catalogs.store';
+import { Municipality } from '@dashboard/interfaces/catalogs-interface';
+import { HelpersUtils } from '@utils/helpers.utils';
 
 
 @Component({
@@ -20,15 +23,15 @@ import { NotificationService } from '@shared/services/notification.service';
 export class ClientsFormPageComponent implements OnInit {
 
     isModal = input<boolean>(false);
-    saveSuccess = output<ClientesInterface>();
+    saveSuccess = output<ClientesFormInterface>();
     notificationService = inject(NotificationService);
     cancel = output<void>();
-    municipalities = signal<Municipality[]>([]);
 
     private fb = inject(FormBuilder);
     clienteService = inject(ClientesService);
     router = inject(Router);
     activateRoute = inject(ActivatedRoute);
+    catalogsStore = inject(CatalogsStore);
     headTitleCliente: HeaderInput = { title: 'Crear Cliente', slog: 'Registra un nuevo cliente al sistema' };
 
     clientsForm = this.fb.group({
@@ -54,7 +57,6 @@ export class ClientsFormPageComponent implements OnInit {
 
     clienteIdResource = rxResource({
         request: () => {
-            // Solo cargar si NO está en modo modal
             if (this.isModal()) {
                 return null;
             }
@@ -62,7 +64,6 @@ export class ClientsFormPageComponent implements OnInit {
         },
         loader: ({ request }) => {
             if (!request) {
-                // Si no hay request (modo modal), retornar un observable vacío
                 return this.clienteService.getClientesById('new-Item');
             }
             return this.clienteService.getClientesById(request.id).pipe(
@@ -72,7 +73,6 @@ export class ClientsFormPageComponent implements OnInit {
     })
 
     ngOnInit() {
-        this.loadMunicipalities();
         this.clientsForm.get('tipoPersona')?.valueChanges.subscribe(value => {
             if (!value) return;
             this.toggleValidations(value);
@@ -135,11 +135,11 @@ export class ClientsFormPageComponent implements OnInit {
             };
 
             if (this.clienteID() == 'new-Item' || this.isModal()) {
-                const client = await firstValueFrom(this.clienteService.agregarCliente(formValue as Partial<ClientesInterface>));
+                const client = await firstValueFrom(this.clienteService.agregarCliente(formValue as Partial<ClientesFormInterface>));
 
+                console.log(client);
                 if (client.success == false) {
-                    console.log(client.error);
-                    this.notificationService.error(`Hubo un error al guardar el cliente ${client.error.message}`, 'Error');
+                    this.notificationService.error(`Hubo un error al guardar el cliente ${HelpersUtils.getMessageError(client.message)}`, 'Error');
                     return;
                 }
 
@@ -153,11 +153,11 @@ export class ClientsFormPageComponent implements OnInit {
 
             } else {
                 const clientUpdate = await firstValueFrom(
-                    this.clienteService.actualizarClientes(this.clienteID(), formValue as Partial<ClientesInterface>)
+                    this.clienteService.actualizarClientes(this.clienteID(), formValue as Partial<ClientesFormInterface>)
                 );
 
                 if (clientUpdate.success == false) {
-                    this.notificationService.error(`Hubo un error al guardar el cliente ${clientUpdate.error.message}`, 'Error');
+                    this.notificationService.error(`Hubo un error al guardar el cliente ${HelpersUtils.getMessageError(clientUpdate.message)}`, 'Error');
                     return;
                 }
 
@@ -178,12 +178,6 @@ export class ClientsFormPageComponent implements OnInit {
             await this.router.navigateByUrl('/panel/ventas/clients');
         }
         this.clientsForm.reset();
-    }
-
-    private loadMunicipalities() {
-        this.clienteService.getMunicipalities().subscribe(data => {
-            this.municipalities.set(data);
-        });
     }
 
     private handleTipoDocumentoChange(tipo: string | null | undefined) {

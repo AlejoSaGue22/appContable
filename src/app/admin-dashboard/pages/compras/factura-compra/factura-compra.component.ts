@@ -33,7 +33,6 @@ export class FacturaCompraComponent {
    // Filtros
    filters = signal<PurchaseInvoiceFilters>({});
 
-   flowbiteService = inject(FlowbiteService);
    paginationService = inject(PaginationService);
    facturaService = inject(FacturaCompraService);
    totalCompras = signal<number>(0);

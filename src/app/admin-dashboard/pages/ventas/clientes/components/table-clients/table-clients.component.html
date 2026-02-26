@@ -30,7 +30,7 @@
         @for (cliente of clientesData(); track cliente.id) {
         <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
           <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
-            {{ cliente.tipoDocumento }} - {{ cliente.numeroDocumento }}
+            {{ cliente.tipoDocumento_nom }} - {{ cliente.numeroDocumento }}
           </td>
           <td class="px-6 py-4">
             {{ cliente.razonSocial || (cliente.nombre + ' ' + cliente.apellido) }}

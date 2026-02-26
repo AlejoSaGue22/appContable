@@ -1,7 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { HeaderInput } from "@dashboard/components/header-title-page/header-title-page.component";
 import { CardsTotales } from "@shared/components/num-cards-totales/num-cards-totales.component";
-import { FlowbiteService } from 'src/app/utils/services/flowbite.service';
 import { NotificationService } from '@shared/services/notification.service';
 import { PaginationService } from '@shared/components/pagination/pagination.service';
 import { rxResource } from '@angular/core/rxjs-interop';
@@ -27,7 +26,6 @@ export class ProveedoresComponent {
       title: 'Gestión de Proveedores',
       slog: 'Administra la información de tus proveedores'
    }
-   flowbiteService = inject(FlowbiteService);
 
    // Paginación
    currentPage = signal(1);

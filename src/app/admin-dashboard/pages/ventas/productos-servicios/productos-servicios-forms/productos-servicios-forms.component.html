@@ -62,8 +62,9 @@
                                 <select [class.border-red-500]="formProductos.get('categoria')?.errors ?? false"
                                     class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border rounded
                                                     pl-3 pr-8 py-2 transition duration-300 ease hover:border-slate-400 shadow-sm cursor-pointer" formControlName="categoria">
+                                    <option value="">Selecciona una categoría</option>
                                     @for (categoria of categorias; track $index) {
-                                    <option value="{{categoria.value}}">{{categoria.label}}</option>
+                                    <option [value]="categoria.codigo">{{categoria.nombre}}</option>
                                     }
                                 </select>
                             </div>
@@ -104,14 +105,10 @@
                                     class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm 
                                                     rounded pl-3 pr-8 py-2 transition duration-300 ease hover:border-slate-400 shadow-sm cursor-pointer"
                                     formControlName="unidadmedida">
-                                    <option value="unidad">Unidad</option>
-                                    <option value="centimetro">Centimetro</option>
-                                    <option value="metro">Metro</option>
-                                    <option value="metrocuadrado">Metro cuadrado</option>
-                                    <option value="metrocubico">Metro Cubico</option>
-                                    <option value="centimetrocuadrado">Centimetro cuadrado</option>
-                                    <option value="pulgada">Pulgada</option>
-                                    <option value="gramo">Gramo</option>
+                                    <option value="">Selecciona una unidad</option>
+                                    @for (unit of catalogsStore.unitsMeasure(); track unit.id) {
+                                        <option [value]="unit.id">{{ unit.nombre }}</option>
+                                    }
                                 </select>
                             </div>
                             <form-error-label [errorType]="formProductos.get('unidadmedida')!" />

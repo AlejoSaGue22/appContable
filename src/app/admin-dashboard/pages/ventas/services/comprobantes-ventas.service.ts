@@ -46,7 +46,7 @@ export class ComprobantesVentasService {
 
     return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas`, invoice).pipe(
       map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
-      catchError((error: any): Observable<ResponseResult> => of({ success: false, error }))
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
     );
 
   }
@@ -54,10 +54,6 @@ export class ComprobantesVentasService {
 
   getInvoiceById(id: string) {
     return this.http.get<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}`)
-    // .pipe(
-    //       map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
-    //       catchError((error: any): Observable<ResponseResult> => of({ success: false, error}))
-    // );
   }
 
 

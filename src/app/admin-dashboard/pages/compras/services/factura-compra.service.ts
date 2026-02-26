@@ -40,28 +40,28 @@ export class FacturaCompraService {
     getFacturaCompraById(id: string): Observable<ResponseResult> {
         return this.http.get(`${baseUrl}/facturas-compras/${id}`).pipe(
             map((response): ResponseResult => ({ success: true, data: response, message: 'Factura de compra obtenida correctamente' })),
-            catchError((error: any): Observable<ResponseResult> => of({ success: false, error }))
+            catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
         )
     }
 
     createFacturaCompra(factura: Partial<FacturaCompra>): Observable<ResponseResult> {
         return this.http.post<ComprobanteCompraResponse>(`${baseUrl}/facturas-compras`, factura).pipe(
             map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
-            catchError((error: any): Observable<ResponseResult> => of({ success: false, error }))
+            catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
         )
     }
 
     updateFacturaCompra(id: string, factura: Partial<FacturaCompra>): Observable<ResponseResult> {
         return this.http.put<ComprobanteCompraResponse>(`${baseUrl}/facturas-compras/${id}`, factura).pipe(
             map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
-            catchError((error: any): Observable<ResponseResult> => of({ success: false, error }))
+            catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
         )
     }
 
     deleteFacturaCompra(id: string): Observable<ResponseResult> {
         return this.http.delete<ComprobanteCompraResponse>(`${baseUrl}/facturas-compras/${id}`).pipe(
             map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
-            catchError((error: any): Observable<ResponseResult> => of({ success: false, error }))
+            catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
         )
     }
 

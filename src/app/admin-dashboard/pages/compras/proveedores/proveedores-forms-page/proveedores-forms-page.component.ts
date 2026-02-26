@@ -11,6 +11,8 @@ import { firstValueFrom, map, of, tap } from 'rxjs';
 import { ProveedoresInterface } from '@dashboard/interfaces/proveedores-interface';
 import { ProveedoresService } from '../../services/proveedores.service';
 import { LoaderComponent } from "@utils/components/loader/loader.component";
+import { CatalogsStore } from '@dashboard/services/catalogs.store';
+import { HelpersUtils } from '@utils/helpers.utils';
 
 @Component({
   selector: 'app-proveedores-forms-page',
@@ -20,21 +22,24 @@ import { LoaderComponent } from "@utils/components/loader/loader.component";
 })
 export class ProveedoresFormsPageComponent implements OnInit {
 
-  isModal = input<boolean>(false);
-  saveSuccess = output<ProveedoresInterface>();
-  cancel = output<void>();
-
-  headTitle: HeaderInput = {
-    title: 'Gestión de Proveedor',
-    slog: 'Registra o actualiza la información de tus proveedores'
-  }
-
   private fb = inject(FormBuilder);
   notificationService = inject(NotificationService);
   loaderService = inject(LoaderService);
   router = inject(Router);
   activatedRoute = inject(ActivatedRoute);
   private proveedoresService = inject(ProveedoresService);
+  catalogsStore = inject(CatalogsStore);
+
+  
+  headTitle: HeaderInput = {
+    title: 'Gestión de Proveedor',
+    slog: 'Registra o actualiza la información de tus proveedores'
+  }
+  
+  
+  isModal = input<boolean>(false);
+  saveSuccess = output<ProveedoresInterface>();
+  cancel = output<void>();
   loading = signal<boolean>(false);
 
   proveedorId = toSignal(
@@ -119,7 +124,7 @@ export class ProveedoresFormsPageComponent implements OnInit {
         this.loaderService.hide();
         if (client.success == false) {
           console.log(client.error);
-          this.notificationService.error(`Hubo un error al guardar el proveedor ${client.error.message}`, 'Error');
+          this.notificationService.error(`Hubo un error al guardar el proveedor ${HelpersUtils.getMessageError(client.message)}`, 'Error');
           return;
         }
 
@@ -136,7 +141,7 @@ export class ProveedoresFormsPageComponent implements OnInit {
 
         if (client.success == false) {
           console.log(client.error);
-          this.notificationService.error(`Hubo un error al guardar el proveedor ${client.error.message}`, 'Error');
+          this.notificationService.error(`Hubo un error al guardar el proveedor ${HelpersUtils.getMessageError(client.message)}`, 'Error');
           return;
         }
 

@@ -52,21 +52,21 @@ export class ProveedoresService {
     createProveedor(proveedor: Partial<ProveedoresInterface>) {
         return this.http.post(`${baseUrl}/proveedores`, proveedor).pipe(
             map((proveedor): ResponseResult => ({ success: true, data: proveedor })),
-            catchError((error: any): Observable<ResponseResult> => of({ success: false, error }))
+            catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
         );
     }
 
     updateProveedor(id: string, proveedor: Partial<ProveedoresInterface>) {
         return this.http.put(`${baseUrl}/proveedores/${id}`, proveedor).pipe(
             map((proveedor): ResponseResult => ({ success: true, data: proveedor })),
-            catchError((error: any): Observable<ResponseResult> => of({ success: false, error }))
+            catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
         );
     }
 
     deleteProveedor(id: string) {
         return this.http.delete(`${baseUrl}/proveedores/${id}`).pipe(
             map((proveedor): ResponseResult => ({ success: true, data: proveedor })),
-            catchError((error: any): Observable<ResponseResult> => of({ success: false, error }))
+            catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
         );
     }
 }

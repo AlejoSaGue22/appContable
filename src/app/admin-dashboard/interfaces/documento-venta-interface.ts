@@ -1,4 +1,4 @@
-import { ClientesInterface } from "./clientes-interface";
+import { ClientesInterfaceResponse } from "./clientes-interface";
 import { ArticulosInterface } from "./productos-interface";
 
 export interface ComprobanteVentaResponseTemp {
@@ -49,7 +49,7 @@ export interface FacturaVenta {
   items: ItemFactura[];
   iva: number;
   descuento: number;
-  client: ClientesInterface;
+  client: ClientesInterfaceResponse;
   clientId: string;
   subtotal: number;
   total: number;

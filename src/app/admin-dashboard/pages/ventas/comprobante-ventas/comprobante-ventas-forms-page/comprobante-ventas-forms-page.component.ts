@@ -9,7 +9,7 @@ import { FormErrorLabelComponent } from "src/app/utils/components/form-error-lab
 import { ClientesService } from '../../services/clientes.service';
 import { ProductosService } from '../../services/productos.service';
 import { GetProductosDetalle, ArticulosInterface } from '@dashboard/interfaces/productos-interface';
-import { ClientesInterface } from '@dashboard/interfaces/clientes-interface';
+import { ClientesInterfaceResponse } from '@dashboard/interfaces/clientes-interface';
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { NotificationService } from '@shared/services/notification.service';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -18,6 +18,8 @@ import { LoaderService } from '@utils/services/loader.service';
 import { ModalComponent } from '@shared/components/modal/modal.component';
 import { ClientsFormPageComponent } from '../../clientes/clients-form-page/clients-form-page.component';
 import { ProductosServiciosFormsComponent } from '../../productos-servicios/productos-servicios-forms/productos-servicios-forms.component';
+import { CatalogsStore } from '@dashboard/services/catalogs.store';
+import { HelpersUtils } from '@utils/helpers.utils';
 
 @Component({
   selector: 'app-comprobante-ventas-forms-page',
@@ -61,10 +63,11 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   notificacionService = inject(NotificationService);
   productSeleccionados = signal<ItemFactura[]>([]);
   getAllProductos = signal<GetProductosDetalle[]>([]);
-  getAllClientes = signal<ClientesInterface[]>([]);
+  getAllClientes = signal<ClientesInterfaceResponse[]>([]);
   activateRoute = inject(ActivatedRoute);
   loaderservice = inject(LoaderService);
   router = inject(Router);
+  catalogsStore = inject(CatalogsStore);
   loading = signal<boolean>(false);
 
   invoiceID = toSignal(
@@ -175,7 +178,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
         this.formVentas.patchValue({
           cliente: invoice.clientId,
           tipoDocumento: invoice.client.tipoDocumento,
-          identificacion: invoice.client.tipoDocumento + ' - ' + invoice.client.numeroDocumento,
+          identificacion: invoice.client.tipoDocumento_nom + ' - ' + invoice.client.numeroDocumento,
           clienteSearch: invoice.client.nombre + ' ' + invoice.client.apellido,
           contacto: invoice.client.email,
           vendedor: invoice.vendedor,
@@ -314,7 +317,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     })
   }
 
-  onClienteSeleccionado(cliente: Partial<ClientesInterface>) {
+  onClienteSeleccionado(cliente: Partial<ClientesInterfaceResponse>) {
     this.formVentas.patchValue({
       cliente: cliente.id,
       clienteSearch: cliente.nombre,
@@ -399,9 +402,8 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       this.ventaServices.createInvoice(invoiceData).subscribe((response) => {
         this.loading.set(false);
         if (response.success == false) {
-          console.error('❌ Error del backend:', response.error);
           this.notificacionService.error(
-            'Ocurrio un problema al crear la factura',
+            `Ocurrio un problema al crear la factura ${HelpersUtils.getMessageError(response.message)}`,
             'Error',
             5000
           );
@@ -425,5 +427,6 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     }
 
   }
+
 }
 

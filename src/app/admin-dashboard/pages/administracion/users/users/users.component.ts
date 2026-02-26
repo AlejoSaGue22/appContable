@@ -12,6 +12,7 @@ import { ErrorPages } from "@shared/components/error-pages/error-pages.component
 import { modalOpen } from '@shared/interfaces/services.interfaces';
 import { ModalComponents } from '@shared/components/modal.components/modal.components';
 import { Pagination } from '@shared/components/pagination/pagination';
+import { HelpersUtils } from '@utils/helpers.utils';
 
 @Component({
   selector: 'app-users',
@@ -71,12 +72,12 @@ export class UsersComponent {
     this.isModalVisible = false;
 
     if (!result.success) {
-      this.notificationService.error(
-        `Error al eliminar usuario: ${result.error?.message}`,
-        'Error',
-        5000
-      );
-      return;
+        this.notificationService.error(
+          `Error al eliminar usuario: ${HelpersUtils.getMessageError(result.message)}`,
+          'Error',
+          5000
+        );
+        return;
     }
 
     this.notificationService.success(

@@ -73,8 +73,9 @@
                             <select [class.border-red-500]="formProductos.get('categoria')?.errors ?? false"
                                 class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border rounded
                                 pl-3 pr-8 py-2 transition duration-300 ease hover:border-slate-400 shadow-sm cursor-pointer" formControlName="categoria">
+                                <option value="">Selecciona una categoría</option>
                                 @for (item of categorias; track $index) {
-                                <option value="{{item.value}}">{{item.label}}</option>
+                                    <option [value]="item.codigo">{{item.nombre}}</option>
                                 }
                             </select>
 
@@ -87,13 +88,10 @@
                             <select [class.border-red-500]="formProductos.get('unidadmedida')?.errors ?? false"
                                 class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm 
                                 rounded pl-3 pr-8 py-2 transition duration-300 ease hover:border-slate-400 shadow-sm cursor-pointer" formControlName="unidadmedida">
-                                <option value="94">Unidad</option>
-                                <option value="414">Kilogramo</option>
-                                <option value="449">Libra</option>
-                                <option value="512">Metro</option>
-                                <option value="874">Galon</option>
-                                <option value="111">Metro Cubico</option>
-                                <option value="222">Pulgada</option>
+                                <option value="">Selecciona una unidad</option>
+                                @for (unit of catalogsStore.unitsMeasure(); track unit.id) {
+                                    <option [value]="unit.id">{{ unit.nombre }}</option>
+                                }
                             </select>
                         </div>
 

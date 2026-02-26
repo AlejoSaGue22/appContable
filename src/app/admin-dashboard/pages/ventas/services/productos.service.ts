@@ -4,6 +4,7 @@ import { ArticulosInterface, ArticulosResponse } from '@dashboard/interfaces/pro
 import { Options, ResponseResult } from '@shared/interfaces/services.interfaces';
 import { catchError, delay, map, Observable, of } from 'rxjs';
 import { environment } from 'src/app/environments/environment';
+import { CatalogsStore } from '@dashboard/services/catalogs.store';
 
 const baseUrl = environment.baseUrl;
 
@@ -25,45 +26,9 @@ const emptyProducto: ArticulosInterface = {
 export class ProductosService {
 
   private http = inject(HttpClient);
+  private catalogsStore = inject(CatalogsStore);
 
-  categorias = [
-    {
-      value: 'venta-productos',
-      label: 'Venta de Productos',
-      tipo: 'venta',
-      icon: '🛒'
-    },
-    {
-      value: 'venta-servicios',
-      label: 'Venta de Servicios',
-      tipo: 'venta',
-      icon: '⚙️'
-    },
-    {
-      value: 'compra-mercancia',
-      label: 'Compra de Mercancía',
-      tipo: 'compra',
-      icon: '📦'
-    },
-    {
-      value: 'compra-activos',
-      label: 'Compra de Activos Fijos',
-      tipo: 'compra',
-      icon: '📦'
-    },
-    {
-      value: 'gastos-operacionales',
-      label: 'Gastos Operacionales',
-      tipo: 'compra',
-      icon: '💰'
-    },
-    {
-      value: 'gastos-personal',
-      label: 'Gastos de Personal',
-      tipo: 'compra',
-      icon: ''
-    },
-  ];
+  categorias = computed(() => this.catalogsStore.categoriesArticles());
 
   getProductos(options: Options): Observable<ArticulosResponse> {
 
@@ -94,7 +59,7 @@ export class ProductosService {
 
     return this.http.patch(`${baseUrl}/articulos/${id}`, producto).pipe(
       map((product): ResponseResult => ({ success: true, data: product })),
-      catchError((error: any): Observable<ResponseResult> => of({ success: false, error }))
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
     )
 
   }
@@ -103,7 +68,7 @@ export class ProductosService {
 
     return this.http.post<ArticulosInterface>(`${baseUrl}/articulos`, producto).pipe(
       map((product): ResponseResult => ({ success: true, data: product })),
-      catchError((error: any): Observable<ResponseResult> => of({ success: false, error }))
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
     );
   }
 
@@ -111,7 +76,7 @@ export class ProductosService {
 
     return this.http.delete(`${baseUrl}/articulos/delete/${id}`).pipe(
       map((client): ResponseResult => ({ success: true, data: client })),
-      catchError((error: any): Observable<ResponseResult> => of({ success: false, error }))
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
     );
   }
 

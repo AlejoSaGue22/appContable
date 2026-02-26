@@ -39,21 +39,21 @@ export class UsersService {
     createUser(user: any): Observable<ResponseResult> {
         return this.http.post(`${baseUrl}/users`, user).pipe(
             map((resp): ResponseResult => ({ success: true, data: resp })),
-            catchError((error: any): Observable<ResponseResult> => of({ success: false, error }))
+            catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
         );
     }
 
     updateUser(id: string, user: any): Observable<ResponseResult> {
         return this.http.patch(`${baseUrl}/users/${id}`, user).pipe(
             map((resp): ResponseResult => ({ success: true, data: resp })),
-            catchError((error: any): Observable<ResponseResult> => of({ success: false, error }))
+            catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
         );
     }
 
     deleteUser(id: string): Observable<ResponseResult> {
         return this.http.delete(`${baseUrl}/users/${id}`).pipe(
             map((resp): ResponseResult => ({ success: true, data: resp })),
-            catchError((error: any): Observable<ResponseResult> => of({ success: false, error }))
+            catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
         );
     }
 }
