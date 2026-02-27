@@ -46,7 +46,7 @@ export class FacturaCompraComponent {
       }),
       loader: ({ request }) => this.facturaService.getFacturasCompras({
          limit: request.limit,
-         offset: request.page,
+         page: request.page,
          ...request.filters
       }).pipe(
          tap((el) => {

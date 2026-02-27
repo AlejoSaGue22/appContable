@@ -107,7 +107,7 @@
                                     formControlName="unidadmedida">
                                     <option value="">Selecciona una unidad</option>
                                     @for (unit of catalogsStore.unitsMeasure(); track unit.id) {
-                                        <option [value]="unit.id">{{ unit.nombre }}</option>
+                                        <option [value]="unit.codigo">{{ unit.nombre }}</option>
                                     }
                                 </select>
                             </div>

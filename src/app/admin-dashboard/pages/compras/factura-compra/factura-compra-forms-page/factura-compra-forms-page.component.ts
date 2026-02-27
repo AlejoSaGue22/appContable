@@ -13,7 +13,7 @@ import { ProductosServiciosFormsComponent } from '@dashboard/pages/ventas/produc
 import { forkJoin, map } from 'rxjs';
 import { ProveedoresService } from '../../services/proveedores.service';
 import { ProductosService } from '@dashboard/pages/ventas/services/productos.service';
-import { ProveedoresInterface } from '@dashboard/interfaces/proveedores-interface';
+import { ProveedoresRequest } from '@dashboard/interfaces/proveedores-interface';
 import { GetProductosDetalle } from '@dashboard/interfaces/productos-interface';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FacturaCompraService } from '../../services/factura-compra.service';
@@ -76,7 +76,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     };
 
     // Mock Data Signals
-    proveedoresList = signal<ProveedoresInterface[]>([]);
+    proveedoresList = signal<ProveedoresRequest[]>([]);
     productosList = signal<GetProductosDetalle[]>([]);
 
     formCompra = this.fb.group({
@@ -87,8 +87,8 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         email: [''],
         telefono: [''],
         fechaEmision: [new Date().toISOString().substring(0, 10), Validators.required],
-        fechaVencimiento: [new Date().toISOString().substring(0, 10), Validators.required],
-        formaPago: ['Contado', Validators.required],
+        fechaVencimiento: [''],
+        formaPago: ['1', Validators.required],
         metodoPago: [''],
         referencia: [''],
         observaciones: [''],
@@ -98,13 +98,18 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     setupPaymentLogic() {
         this.formCompra.get('formaPago')?.valueChanges.subscribe(value => {
             const metodoPagoControl = this.formCompra.get('metodoPago');
-            if (value === 'Contado') {
+            const fechaVencimientoControl = this.formCompra.get('fechaVencimiento');
+            if (value === '1') {
                 metodoPagoControl?.setValidators([Validators.required]);
+                fechaVencimientoControl?.clearValidators();
+                fechaVencimientoControl?.setValue('');
             } else {
+                fechaVencimientoControl?.setValidators([Validators.required]);
                 metodoPagoControl?.clearValidators();
                 metodoPagoControl?.setValue('');
             }
             metodoPagoControl?.updateValueAndValidity();
+            fechaVencimientoControl?.updateValueAndValidity();
         });
     }
 

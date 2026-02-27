@@ -18,12 +18,11 @@ export class FacturaCompraService {
         startDate?: string;
         endDate?: string;
     }): Observable<ComprobanteCompraResponse> {
-        const { limit = 10, offset = 0, status, type, providerName, startDate, endDate } = options;
+        const { limit = 10, page = 1, status, type, providerName, startDate, endDate } = options;
 
-        // Build params object, only including defined values
         const params: any = {
             limit,
-            offset
+            page
         };
 
         if (status) params.status = status;

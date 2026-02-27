@@ -23,7 +23,6 @@ export class ComprobantesVentasService {
   }): Observable<ComprobanteVentaResponse> {
     const { limit = 10, page = 1, status, type, clientName, startDate, endDate } = options;
 
-    // Build params object, only including defined values
     const params: any = {
       limit,
       page
@@ -50,7 +49,6 @@ export class ComprobantesVentasService {
     );
 
   }
-
 
   getInvoiceById(id: string) {
     return this.http.get<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}`)

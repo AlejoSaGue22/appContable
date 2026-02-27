@@ -12,7 +12,7 @@ import { TableProveedoresComponent } from "./components/table-proveedores/table-
 import { ProveedoresService } from '../services/proveedores.service';
 import { modalOpen } from '@shared/interfaces/services.interfaces';
 import { ModalComponents } from '@shared/components/modal.components/modal.components';
-import { ProveedoresInterface } from '@dashboard/interfaces/proveedores-interface';
+import { ProveedoresRequest } from '@dashboard/interfaces/proveedores-interface';
 
 @Component({
    selector: 'app-proveedores',
@@ -41,7 +41,7 @@ export class ProveedoresComponent {
    notificacionService = inject(NotificationService);
    totalProveedores = signal<number>(0);
    cardsTotales = signal<CardsTotales[]>([]);
-   proveedoresList = signal<ProveedoresInterface[]>([]);
+   proveedoresList = signal<ProveedoresRequest[]>([]);
 
    // TODO: Reemplazar con el servicio real cuando esté disponible
    proveedoresResource = rxResource({

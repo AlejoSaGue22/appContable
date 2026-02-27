@@ -83,32 +83,45 @@
                                 <select class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded 
                                     pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm
                                     focus:shadow-md cursor-pointer" formControlName="formaPago">
-                                    <option value="Contado">Contado</option>
-                                    <option value="Crédito">Crédito</option>
+                                    <option value="1">Contado</option>
+                                    <option value="2">Crédito</option>
                                 </select>
                             </div>
 
                             <form-error-label [errorType]="formCompra.get('formaPago')!" />
                         </div>
 
-                        @if (formCompra.get('formaPago')?.value === 'Contado') {
-                        <div>
-                            <label class="block mb-2 text-sm text-slate-600">
-                                Metodo de Pago <span class="text-red-500">*</span>
-                            </label>
-                            <div class="relative">
-                                <select class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded 
-                                                    pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm
-                                                    focus:shadow-md cursor-pointer" formControlName="metodoPago">
-                                    <option value="">Selecciona un método de pago</option>
-                                    @for (method of catalogsStore.paymentMethods(); track method.id) {
-                                        <option [value]="method.id">{{ method.nombre }}</option>
-                                    }
-                                </select>
-                            </div>
+                        @if (formCompra.get('formaPago')?.value == '1') {
+                            <div>
+                                <label class="block mb-2 text-sm text-slate-600">
+                                    Metodo de Pago <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <select class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded 
+                                                        pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm
+                                                        focus:shadow-md cursor-pointer" formControlName="metodoPago">
+                                        <option value="">Selecciona un método de pago</option>
+                                        @for (method of catalogsStore.paymentMethods(); track method.id) {
+                                            <option [value]="method.id">{{ method.nombre }}</option>
+                                        }
+                                    </select>
+                                </div>
 
-                            <form-error-label [errorType]="formCompra.get('metodoPago')!" />
-                        </div>
+                                <form-error-label [errorType]="formCompra.get('metodoPago')!" />
+                            </div>
+                        }   
+
+                        @if (formCompra.get('formaPago')?.value == '2') {
+                            <div>
+                                <label class="block mb-2 text-sm text-slate-600">
+                                    Fecha Vencimiento <span class="text-red-500">*</span>
+                                </label>
+                                <input class="w-full bg-transparent text-slate-700 text-sm border 
+                                rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 
+                                shadow-sm focus:shadow" formControlName="fechaVencimiento" type="date" />
+
+                                <form-error-label [errorType]="formCompra.get('fechaVencimiento')!" />
+                            </div>
                         }
 
                         <div>

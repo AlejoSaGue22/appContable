@@ -1,5 +1,5 @@
 
-import { DocumentType } from "./catalogs-interface";
+import { DocumentType, Municipality } from "./catalogs-interface";
 
 export interface ClientesResponse {
     count: number;
@@ -7,45 +7,47 @@ export interface ClientesResponse {
     clientes: ClientesInterfaceResponse[];
 }
 
-export interface ClientesInterfaceResponse {
+export interface ClientesFormInterface {
     id: string;
-    fullName: string;
     nombre: string;
     apellido: string;
     tipoPersona: string;
-    tipoPersona_nom: string;
     razonSocial: string;
-    tipoDocumentoRel: DocumentType
     tipoDocumento: string;
-    tipoDocumento_nom: string;
     numeroDocumento: string;
     direccion: string;
     ciudad: string;
     telefono: string;
     email: string;
     tributo: string;
-    tributo_nom: string;
     isActive: boolean;
     observacion: string;
     responsableFiscal: string;
     dv?: string;
-    deletedAt: string;
 }
 
-export interface ClientesFormInterface {
+export interface ClientesInterfaceResponse {
     id: string;
-    nombre: string;
     apellido: string;
-    tipoDocumento: string;
-    numeroDocumento: string;
-    tipoPersona: string;
-    razonSocial: string;
+    ciudad: number;
+    ciudadRel: Municipality;
+    deleteAt: string;
     direccion: string;
-    ciudad: string;
-    telefono: string;
+    dv: string;
     email: string;
+    estado: string;
+    fullName: string;
+    ind: string;
     isActive: boolean;
+    nombre: string;
+    numeroDocumento: string;
     observacion: string;
+    razonSocial: string;
     responsableFiscal: string;
-    dv?: string;
+    telefono: string;
+    tipoDocumento: string;
+    tipoDocumentoRel: DocumentType
+    tipoPersona: string;
+    tipoPersona_nom: string;
+    tributo: string;
 }

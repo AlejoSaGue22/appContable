@@ -23,6 +23,9 @@ const emptyCliente: ClientesFormInterface = {
   telefono: '',
   tipoDocumento: '',
   tipoPersona: '',
+  tributo: '',
+  dv: '',
+  
 }
 
 @Injectable({

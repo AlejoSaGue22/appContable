@@ -186,7 +186,8 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
           canal: invoice.canalventa,
           fecha: invoice.fecha,
           formaPago: invoice.formapago,
-          metodoPago: invoice.metodoPago // Patching new field
+          metodoPago: invoice.metodoPago,
+          fechaVencimiento: invoice.fechaVencimiento
         });
 
         this.productSeleccionados.set(invoice.items)
@@ -209,24 +210,28 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     vendedor: [''],
     formaPago: ['', Validators.required],
     metodoPago: [''], // Added field
+    fechaVencimiento: [''],
     fecha: ['', Validators.required],
     canal: [''],
     tipoFactura: [TipoFactura.ELECTRONICA, Validators.required],
     productos: [[]]
   })
 
-  // Listener for conditional validation
   paymentLogic = effect(() => {
     const formaPago = this.formVentas.get('formaPago')?.value;
     const metodoPagoControl = this.formVentas.get('metodoPago');
+    const fechaVencimientoControl = this.formVentas.get('fechaVencimiento');
 
     if (formaPago === '1') { // Contado
       metodoPagoControl?.setValidators([Validators.required]);
+      fechaVencimientoControl?.clearValidators();
     } else {
       metodoPagoControl?.clearValidators();
-      metodoPagoControl?.setValue(''); // Reset if credit
+      metodoPagoControl?.setValue('');
+      fechaVencimientoControl?.setValidators([Validators.required]);
     }
     metodoPagoControl?.updateValueAndValidity();
+    fechaVencimientoControl?.updateValueAndValidity();
   });
 
   productosItemsForm = this.fb.group({
@@ -237,13 +242,10 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     unitPrice: [0, [Validators.required, Validators.min(0)]],
     iva: [0, [Validators.min(0), Validators.max(100)]],
     iva_valor: [0],
-
-    // 🔧 NUEVO: Campos para descuento
-    discount: [0, [Validators.min(0), Validators.max(100)]], // % de descuento
-    descuento_valor: [0], // Valor calculado del descuento
-
+    discount: [0, [Validators.min(0), Validators.max(100)]],
+    descuento_valor: [0],
     subtotal: [0],
-    importe: [0], // Para compatibilidad con backend
+    importe: [0],
     total: [0]
   })
 
@@ -325,7 +327,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       clienteSearch: cliente.nombre,
       tipoDocumento: cliente.tipoDocumento,
       contacto: cliente.email,
-      identificacion: cliente.tipoDocumento_nom + ' - ' + cliente.numeroDocumento
+      identificacion: cliente.tipoDocumentoRel?.abreviatura + ' - ' + cliente.numeroDocumento
     })
   }
 
@@ -384,6 +386,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       fecha: valueFormFactura.fecha!,
       formapago: valueFormFactura.formaPago!,
       metodoPago: valueFormFactura.metodoPago!,
+      fechaVencimiento: valueFormFactura.fechaVencimiento!,
       tipoFactura: valueFormFactura.tipoFactura!,
       items: productos.map((item) => ({
         articuloId: item.articuloId!,
