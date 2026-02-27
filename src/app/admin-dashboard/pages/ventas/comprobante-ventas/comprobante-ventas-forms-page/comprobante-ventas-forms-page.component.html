@@ -23,7 +23,24 @@
                         Nuevo Documento
                     </h3>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-5">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-5">
+                        <div>
+                            <label class="block mb-2 text-sm text-slate-600">
+                                Tipo de Factura <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <select class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded 
+                                                pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm
+                                                focus:shadow-md cursor-pointer" formControlName="tipoFactura">
+                                    <option value="">Seleccione el tipo </option>
+                                    <option value="ELECTRONICA">Factura Electrónica</option>
+                                    <option value="ESTANDAR">Factura Standard (Interna)</option>
+                                </select>
+                            </div>
+
+                            <form-error-label [errorType]="formVentas.get('tipoFactura')!" />
+                        </div>
+
                         <div class="relative">
                             <app-list-group-dropdown title="Cliente" [dataList]="getAllClientes()"
                                 [labelKey]="['fullName', 'numeroDocumento']"

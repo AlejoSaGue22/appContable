@@ -172,8 +172,6 @@ export class MenuService {
     if (!user) return false;
     
     const menuItem = this.getMenuItemByRoute(route);
-    console.log("Menu Item: " ,menuItem);
-    console.log("User Decoded: " ,user);
     
     if (!menuItem) return false;
     

@@ -63,6 +63,7 @@
       <thead class="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
         <tr>
           <th scope="col" class="px-6 py-3">Nº Factura</th>
+          <th scope="col" class="px-6 py-3">Tipo Factura</th>
           <th scope="col" class="px-6 py-3">Cliente</th>
           <th scope="col" class="px-6 py-3">Fecha</th>
           <th scope="col" class="px-6 py-3">Estado</th>
@@ -89,6 +90,14 @@
         <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
           <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
             {{ invoice.comprobante_completo }}
+          </td>
+          <td class="px-6 py-4">
+            <span [class]="invoice.tipoFactura != 'ESTANDAR' 
+                  ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' 
+                  : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'"
+              class="rounded px-2.5 py-0.5 text-xs font-medium">
+              {{ invoice.tipoFactura }}
+            </span>
           </td>
           <td class="px-6 py-4">
             {{ invoice.client.nombre }} {{ invoice.client.apellido }}
@@ -119,13 +128,53 @@
 
 
               <a [routerLink]="['/panel/ventas/comprobantes/', invoice.id]"
-                class="inline-flex items-center rounded-lg p-2 text-sm text-green-600 hover:bg-green-50 dark:text-green-500 dark:hover:bg-gray-700"
+                class="inline-flex items-center rounded-lg p-2 text-sm text-green-600 hover:bg-green-50 dark:text-green-500 dark:hover:bg-gray-700 cursor-pointer"
                 title="Editar">
                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                   <path
                     d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                 </svg>
               </a>
+
+              <!-- Botón Emitir (Solo Electrónica en Borrador) -->
+              @if (invoice.tipoFactura === 'ELECTRONICA' && invoice.status === 'draft') {
+              <button (click)="onEmitir(invoice.id)"
+                class="inline-flex items-center rounded-lg p-2 text-sm text-purple-600 hover:bg-purple-50 dark:text-purple-500 dark:hover:bg-gray-700 cursor-pointer"
+                title="Emitir a la DIAN">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+              </button>
+              }
+
+              <!-- Botones Descarga (Solo si está aceptada o emitida) -->
+              @if (invoice.tipoFactura === 'ELECTRONICA' && (invoice.status === 'accepted' || invoice.status === 'issued' || invoice.status === 'paid')) {
+              <button (click)="onDownloadPDF(invoice.id)"
+                class="inline-flex items-center rounded-lg p-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-500 dark:hover:bg-gray-700 cursor-pointer"
+                title="Descargar PDF">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+              </button>
+              <button (click)="onDownloadXML(invoice.id)"
+                class="inline-flex items-center rounded-lg p-2 text-sm text-orange-600 hover:bg-orange-50 dark:text-orange-500 dark:hover:bg-gray-700 cursor-pointer"
+                title="Descargar XML">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                </svg>
+              </button>
+              }
+
+              <!-- Botón Anular (Si no está ya cancelada) -->
+              @if (invoice.status !== 'cancelled') {
+                <button (click)="onAnular(invoice.id)"
+                  class="inline-flex items-center rounded-lg p-2 text-sm text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 cursor-pointer"
+                  title="Anular Factura">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              }
 
             </div>
           </td>

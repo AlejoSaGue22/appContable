@@ -6,6 +6,7 @@
           <th scope="col" class="px-6 py-3">Código</th>
           <th scope="col" class="px-6 py-3">Nombre</th>
           <th scope="col" class="px-6 py-3">Categoría</th>
+          <th scope="col" class="px-6 py-3">Unidad Medida</th>
           <th scope="col" class="px-6 py-3 text-center">Precio</th>
           <th scope="col" class="px-6 py-3">Estado</th>
           <th scope="col" class="px-6 py-3">Acciones</th>
@@ -33,7 +34,8 @@
             {{ art.codigo }}
           </td>
           <td class="px-6 py-4">{{ art.nombre }}</td>
-          <td class="px-6 py-4 uppercase text-xs">{{ art.categoria }}</td>
+          <td class="px-6 py-4 uppercase text-xs">{{ art.fullNameTipo }}</td>
+          <td class="px-6 py-4 uppercase text-xs">{{ art.unidadmedidaNombre }}</td>
           <td class="px-6 py-4 text-center font-bold">
             {{ art.precio | currency:'$' }}
           </td>

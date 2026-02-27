@@ -1,5 +1,5 @@
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
-import { FacturaVenta, ItemFactura } from './../../../../interfaces/documento-venta-interface';
+import { FacturaVenta, ItemFactura, TipoFactura } from './../../../../interfaces/documento-venta-interface';
 import { AfterContentInit, Component, effect, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HeaderInput, HeaderTitlePageComponent } from "@dashboard/components/header-title-page/header-title-page.component";
@@ -177,8 +177,9 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
 
         this.formVentas.patchValue({
           cliente: invoice.clientId,
+          tipoFactura: invoice.tipoFactura || '',
           tipoDocumento: invoice.client.tipoDocumento,
-          identificacion: invoice.client.tipoDocumento_nom + ' - ' + invoice.client.numeroDocumento,
+          identificacion: invoice.client.tipoDocumentoRel.abreviatura + ' - ' + invoice.client.numeroDocumento,
           clienteSearch: invoice.client.nombre + ' ' + invoice.client.apellido,
           contacto: invoice.client.email,
           vendedor: invoice.vendedor,
@@ -210,6 +211,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     metodoPago: [''], // Added field
     fecha: ['', Validators.required],
     canal: [''],
+    tipoFactura: [TipoFactura.ELECTRONICA, Validators.required],
     productos: [[]]
   })
 
@@ -323,7 +325,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       clienteSearch: cliente.nombre,
       tipoDocumento: cliente.tipoDocumento,
       contacto: cliente.email,
-      identificacion: cliente.tipoDocumento + ' - ' + cliente.numeroDocumento
+      identificacion: cliente.tipoDocumento_nom + ' - ' + cliente.numeroDocumento
     })
   }
 
@@ -382,6 +384,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       fecha: valueFormFactura.fecha!,
       formapago: valueFormFactura.formaPago!,
       metodoPago: valueFormFactura.metodoPago!,
+      tipoFactura: valueFormFactura.tipoFactura!,
       items: productos.map((item) => ({
         articuloId: item.articuloId!,
         description: item.description,

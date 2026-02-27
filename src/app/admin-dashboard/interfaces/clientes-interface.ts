@@ -1,4 +1,6 @@
 
+import { DocumentType } from "./catalogs-interface";
+
 export interface ClientesResponse {
     count: number;
     pages: number;
@@ -13,6 +15,7 @@ export interface ClientesInterfaceResponse {
     tipoPersona: string;
     tipoPersona_nom: string;
     razonSocial: string;
+    tipoDocumentoRel: DocumentType
     tipoDocumento: string;
     tipoDocumento_nom: string;
     numeroDocumento: string;

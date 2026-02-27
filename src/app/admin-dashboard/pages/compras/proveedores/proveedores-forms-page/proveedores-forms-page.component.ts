@@ -112,7 +112,7 @@ export class ProveedoresFormsPageComponent implements OnInit {
     try {
       const formValue = {
         ...this.formProveedor.value,
-        isActive: this.formProveedor.get("estado")?.value === 'Activo' ? true : false,
+        isActive: this.formProveedor.get("estado")?.value === 'A' ? true : false,
         telefono: this.formProveedor.get("telefono")?.value?.toString()
       }
 

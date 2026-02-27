@@ -57,7 +57,7 @@ export class ProveedoresService {
     }
 
     updateProveedor(id: string, proveedor: Partial<ProveedoresInterface>) {
-        return this.http.put(`${baseUrl}/proveedores/${id}`, proveedor).pipe(
+        return this.http.patch(`${baseUrl}/proveedores/${id}`, proveedor).pipe(
             map((proveedor): ResponseResult => ({ success: true, data: proveedor })),
             catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
         );

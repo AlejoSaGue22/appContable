@@ -44,6 +44,7 @@ export interface FacturaVenta {
   vendedor: string;
   canalventa: string;
   fecha: string;
+  tipoFactura: TipoFactura;
   formapago: string;
   metodoPago?: string;
   items: ItemFactura[];
@@ -71,7 +72,7 @@ interface CreatedBy {
 
 export enum TipoFactura {
   ELECTRONICA = 'ELECTRONICA',
-  STANDARD = 'STANDARD',
+  STANDARD = 'ESTANDAR',
 }
 
 export enum FormaPago {

@@ -29,6 +29,10 @@ export class TableInvoices {
   // Output events
   filterChange = output<InvoiceFilters>();
   pageChange = output<number>();
+  emitir = output<string>();
+  anular = output<string>();
+  downloadPDF = output<string>();
+  downloadXML = output<string>();
 
   // Filter signals
   clientName = signal<string>('');
@@ -135,6 +139,22 @@ export class TableInvoices {
       month: 'short',
       day: 'numeric'
     });
+  }
+
+  onEmitir(id: string): void {
+    this.emitir.emit(id);
+  }
+
+  onAnular(id: string): void {
+    this.anular.emit(id);
+  }
+
+  onDownloadPDF(id: string): void {
+    this.downloadPDF.emit(id);
+  }
+
+  onDownloadXML(id: string): void {
+    this.downloadXML.emit(id);
   }
 
 }

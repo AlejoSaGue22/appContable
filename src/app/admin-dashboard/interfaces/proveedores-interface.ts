@@ -9,7 +9,7 @@ export interface ProveedoresInterface {
     id: string;
     tipoDocumento: string;
     identificacion: string;
-    tipoDocumento_nombre?: string;
+    tipoDocumento_nom?: string;
     nombre: string;
     email: string;
     telefono: string;

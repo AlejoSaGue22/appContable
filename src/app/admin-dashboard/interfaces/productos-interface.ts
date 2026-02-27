@@ -23,9 +23,11 @@ export interface ArticulosInterface {
 export interface GetProductosDetalle {
     id: string;
     categoria: string;
+    fullNameTipo: string;
+    unidadmedidaNombre: string;
+    unidadmedida: string;
     nombre: string;
     codigo: string;
-    unidadmedida: string;
     impuesto: string;
     retencion: string;
     precio: number;

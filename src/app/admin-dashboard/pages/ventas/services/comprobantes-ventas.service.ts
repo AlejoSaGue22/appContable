@@ -56,6 +56,33 @@ export class ComprobantesVentasService {
     return this.http.get<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}`)
   }
 
+  emitirInvoice(id: string) {
+    return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/emitir`, {}).pipe(
+      map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+    );
+  }
 
+  anularInvoice(id: string, motivo: string) {
+    return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/anular`, { motivo }).pipe(
+      map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+    );
+  }
+
+  registrarPago(id: string, pagoData: any) {
+    return this.http.patch<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/pago`, pagoData).pipe(
+      map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+    );
+  }
+
+  downloadPDF(id: string): Observable<Blob> {
+    return this.http.get(`${baseUrl}/facturas-ventas/${id}/pdf`, { responseType: 'blob' });
+  }
+
+  downloadXML(id: string): Observable<Blob> {
+    return this.http.get(`${baseUrl}/facturas-ventas/${id}/xml`, { responseType: 'blob' });
+  }
 
 }
