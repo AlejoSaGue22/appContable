@@ -96,6 +96,7 @@ export class ProductosServiciosFormsComponent {
 
     const formValue = {
       ...this.formProductos.value,
+      unidadmedida: String(this.formProductos.value.unidadmedida),
       impuesto: typeof this.formProductos.value.impuesto == 'string' ?
         parseInt(this.formProductos.value.impuesto) : this.formProductos.value.impuesto,
       precio: this.formProductos.value.precioventa?.precio1,

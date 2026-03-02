@@ -42,12 +42,17 @@ export class ComprobantesVentasService {
   }
 
   createInvoice(invoice: Partial<FacturaVenta>) {
-
     return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas`, invoice).pipe(
       map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
       catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
     );
+  }
 
+  updateInvoice(id: string, invoice: Partial<FacturaVenta>) {
+    return this.http.patch<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}`, invoice).pipe(
+      map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+    );
   }
 
   getInvoiceById(id: string) {

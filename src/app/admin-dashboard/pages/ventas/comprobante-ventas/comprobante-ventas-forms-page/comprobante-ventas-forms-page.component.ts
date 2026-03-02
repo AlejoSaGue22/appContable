@@ -1,5 +1,5 @@
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
-import { FacturaVenta, FormaPago, ItemFactura, TipoFactura } from './../../../../interfaces/documento-venta-interface';
+import { FacturaVenta, FormaPago, ItemFactura, TipoFactura, InvoiceStatus } from './../../../../interfaces/documento-venta-interface';
 import { AfterContentInit, Component, effect, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HeaderInput, HeaderTitlePageComponent } from "@dashboard/components/header-title-page/header-title-page.component";
@@ -190,6 +190,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
           fechaVencimiento: invoice.fechaVencimiento
         });
 
+        this.factura.set(invoice as any);
         this.productSeleccionados.set(invoice.items)
         this.calcularTotal()
         this.loaderservice.hide();
@@ -223,34 +224,34 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     { initialValue: this.formVentas.get('tipoFactura')?.value as TipoFactura }
   );
 
-  paymentLogic = effect(() => {
-    const formaPago = this.formVentas.get('formaPago')?.value;
-    const metodoPagoControl = this.formVentas.get('metodoPago');
-    const fechaVencimientoControl = this.formVentas.get('fechaVencimiento');
+    paymentLogic = effect(() => {
+      const formaPago = this.formVentas.get('formaPago')?.value;
+      const metodoPagoControl = this.formVentas.get('metodoPago');
+      const fechaVencimientoControl = this.formVentas.get('fechaVencimiento');
 
-    if (formaPago === FormaPago.CONTADO) { // Contado
-      metodoPagoControl?.setValidators([Validators.required]);
-      fechaVencimientoControl?.clearValidators();
-    } else {
-      metodoPagoControl?.clearValidators();
-      metodoPagoControl?.setValue('');
-      fechaVencimientoControl?.setValidators([Validators.required]);
-    }
-    metodoPagoControl?.updateValueAndValidity();
-    fechaVencimientoControl?.updateValueAndValidity();
-  });
+      if (formaPago === FormaPago.CONTADO) { // Contado
+        metodoPagoControl?.setValidators([Validators.required]);
+        fechaVencimientoControl?.clearValidators();
+      } else {
+        metodoPagoControl?.clearValidators();
+        metodoPagoControl?.setValue('');
+        fechaVencimientoControl?.setValidators([Validators.required]);
+      }
+      metodoPagoControl?.updateValueAndValidity();
+      fechaVencimientoControl?.updateValueAndValidity();
+    });
 
-  ivaLogic = effect(() => {
-    const tipoFactura = this.tipoFacturaSignal();
-    const ivaControl = this.productosItemsForm.get('iva');
+    ivaLogic = effect(() => {
+        const tipoFactura = this.tipoFacturaSignal();
+        const ivaControl = this.productosItemsForm.get('iva');
 
-    if (tipoFactura === TipoFactura.STANDARD) {
-      ivaControl?.setValue(0);
-      ivaControl?.disable();
-    } else {
-      ivaControl?.enable();
-    }
-  });
+        if (tipoFactura === TipoFactura.STANDARD) {
+          ivaControl?.setValue(0);
+          ivaControl?.disable();
+        } else {
+          ivaControl?.enable();
+        }
+    });
 
   productosItemsForm = this.fb.group({
     articulo: ['', Validators.required],
@@ -378,10 +379,22 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     const validFactura = this.formVentas.valid;
     const validProduct = this.productosItemsForm.valid;
     this.formVentas.markAllAsTouched();
+    console.log("Formulario: ", this.formVentas.value);
+    console.log("Productos: ", this.productSeleccionados());
 
     if (!validFactura) {
+      // Identificar campos no válidos para depuración
+      const invalidFields = [];
+      const controls = this.formVentas.controls;
+      for (const name in controls) {
+        if (controls[name as keyof typeof controls].invalid) {
+          invalidFields.push(name);
+        }
+      }
+      console.error("Campos no válidos:", invalidFields);
+
       this.notificacionService.error(
-        'Por favor, completa los campos requeridos.',
+        `Por favor, completa los campos requeridos: ${invalidFields.join(', ')}`,
         'Campos no validos',
         5000
       );
@@ -451,7 +464,39 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       })
 
     } else {
+      // Verificar si la factura está en borrador antes de actualizar
+      const currentInvoice = this.factura();
+      if (currentInvoice && currentInvoice.status !== InvoiceStatus.DRAFT) {
+        this.loading.set(false);
+        this.notificacionService.error(
+          'Solo se pueden editar facturas en estado borrador.',
+          'Acción denegada',
+          5000
+        );
+        return;
+      }
 
+      this.ventaServices.updateInvoice(this.invoiceID(), invoiceData).subscribe((response) => {
+        this.loading.set(false);
+        if (response.success == false) {
+          this.notificacionService.error(
+            `Ocurrio un problema al actualizar la factura ${HelpersUtils.getMessageError(response.message)}`,
+            'Error',
+            5000
+          );
+          return;
+        }
+
+        this.notificacionService.success(
+          'Factura actualizada con exito',
+          'Accion Completada',
+          5000
+        );
+
+        setTimeout(() => {
+          this.router.navigateByUrl('/panel/ventas/comprobantes')
+        }, 1500);
+      });
     }
 
   }
