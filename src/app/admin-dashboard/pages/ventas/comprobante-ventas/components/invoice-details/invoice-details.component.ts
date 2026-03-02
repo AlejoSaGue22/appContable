@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { FacturaVenta, InvoiceStatus } from '@dashboard/interfaces/documento-venta-interface';
+import { DianStatus, GetFacturaRequest, InvoiceStatus, TipoFactura } from '@dashboard/interfaces/documento-venta-interface';
 import { ComprobantesVentasService } from '@dashboard/pages/ventas/services/comprobantes-ventas.service';
 
 @Component({
@@ -10,7 +10,7 @@ import { ComprobantesVentasService } from '@dashboard/pages/ventas/services/comp
   templateUrl: './invoice-details.component.html',
 })
 export class InvoiceDetailsComponent {
-  factura = signal<FacturaVenta | null>(null);
+  factura = signal<GetFacturaRequest | null>(null);
   loading = signal(true);
   error = signal<string | null>(null);
 
@@ -66,6 +66,38 @@ export class InvoiceDetailsComponent {
       [InvoiceStatus.ERROR_ASIENTO]: 'Error Asiento'
     };
     return labels[status];
+  }
+
+  getDianStatusClass(status: DianStatus): string {
+    const classes: Record<DianStatus, string> = {
+      [DianStatus.PENDING]: 'bg-yellow-100 text-yellow-800 border-yellow-300',
+      [DianStatus.SENT]: 'bg-blue-50 text-blue-700 border-blue-200',
+      [DianStatus.PROCESSING]: 'bg-blue-100 text-blue-800 border-blue-300 animate-pulse',
+      [DianStatus.ACCEPTED]: 'bg-green-100 text-green-800 border-green-300',
+      [DianStatus.REJECTED]: 'bg-red-100 text-red-800 border-red-300',
+      [DianStatus.CANCELLED]: 'bg-gray-100 text-gray-800 border-gray-300'
+    };
+    return classes[status] || 'bg-gray-100 text-gray-800';
+  }
+
+  getDianStatusLabel(status: DianStatus): string {
+    const labels: Record<DianStatus, string> = {
+      [DianStatus.PENDING]: 'Pendiente envío',
+      [DianStatus.SENT]: 'Enviada',
+      [DianStatus.PROCESSING]: 'Procesando',
+      [DianStatus.ACCEPTED]: 'Aceptada por DIAN',
+      [DianStatus.REJECTED]: 'Rechazada por DIAN',
+      [DianStatus.CANCELLED]: 'Anulada'
+    };
+    return labels[status] || status;
+  }
+
+  getTipoFacturaLabel(tipo: TipoFactura): string {
+    const labels: Record<TipoFactura, string> = {
+      [TipoFactura.ELECTRONICA]: 'Factura Electrónica',
+      [TipoFactura.STANDARD]: 'Factura de Venta',
+    };
+    return labels[tipo] || tipo;
   }
 
   formatCurrency(value: number): string {

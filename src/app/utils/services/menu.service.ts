@@ -21,8 +21,6 @@ export class MenuService {
 
   constructor() {
     this.authService.authEvents$.subscribe(event => {
-      console.log('event en AuthService',event);
-      
       if (event === 'login') {
         // Only fetch menu on actual login
         this.fetchMenu().subscribe();
@@ -37,7 +35,7 @@ export class MenuService {
     });
   }
   
-//   private apiUrl = `${environment.apiUrl}/menu`;
+  //private apiUrl = `${environment.apiUrl}/menu`;
   
   // Signals para estado reactivo
   private menuItemsSignal = signal<MenuItem[]>([]);

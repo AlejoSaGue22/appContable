@@ -1,5 +1,5 @@
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
-import { FacturaVenta, ItemFactura, TipoFactura } from './../../../../interfaces/documento-venta-interface';
+import { FacturaVenta, FormaPago, ItemFactura, TipoFactura } from './../../../../interfaces/documento-venta-interface';
 import { AfterContentInit, Component, effect, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HeaderInput, HeaderTitlePageComponent } from "@dashboard/components/header-title-page/header-title-page.component";
@@ -183,9 +183,9 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
           clienteSearch: invoice.client.nombre + ' ' + invoice.client.apellido,
           contacto: invoice.client.email,
           vendedor: invoice.vendedor,
-          canal: invoice.canalventa,
+          canal: invoice.canalVenta,
           fecha: invoice.fecha,
-          formaPago: invoice.formapago,
+          formaPago: invoice.formaPago,
           metodoPago: invoice.metodoPago,
           fechaVencimiento: invoice.fechaVencimiento
         });
@@ -208,21 +208,27 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     identificacion: ['', Validators.required],
     contacto: [''],
     vendedor: [''],
-    formaPago: ['', Validators.required],
+    formaPago: [FormaPago.CONTADO, Validators.required],
     metodoPago: [''], // Added field
     fechaVencimiento: [''],
     fecha: ['', Validators.required],
-    canal: [''],
+    canal: ['', Validators.required],
     tipoFactura: [TipoFactura.ELECTRONICA, Validators.required],
     productos: [[]]
   })
+
+  // Signal to track the selected invoice type for UI logic
+  tipoFacturaSignal = toSignal(
+    this.formVentas.get('tipoFactura')!.valueChanges,
+    { initialValue: this.formVentas.get('tipoFactura')?.value as TipoFactura }
+  );
 
   paymentLogic = effect(() => {
     const formaPago = this.formVentas.get('formaPago')?.value;
     const metodoPagoControl = this.formVentas.get('metodoPago');
     const fechaVencimientoControl = this.formVentas.get('fechaVencimiento');
 
-    if (formaPago === '1') { // Contado
+    if (formaPago === FormaPago.CONTADO) { // Contado
       metodoPagoControl?.setValidators([Validators.required]);
       fechaVencimientoControl?.clearValidators();
     } else {
@@ -232,6 +238,18 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     }
     metodoPagoControl?.updateValueAndValidity();
     fechaVencimientoControl?.updateValueAndValidity();
+  });
+
+  ivaLogic = effect(() => {
+    const tipoFactura = this.tipoFacturaSignal();
+    const ivaControl = this.productosItemsForm.get('iva');
+
+    if (tipoFactura === TipoFactura.STANDARD) {
+      ivaControl?.setValue(0);
+      ivaControl?.disable();
+    } else {
+      ivaControl?.enable();
+    }
   });
 
   productosItemsForm = this.fb.group({
@@ -257,10 +275,14 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     if (!this.productosItemsForm.valid) return;
 
     const valores = this.productosItemsForm.value as ItemFactura;
-    console.log(valores);
+    console.log("Valores: ", valores);
     const valorItemTotal = this.calcularItemTotal();
     const valorItemImporte = this.calcularDescuentoImporte();
-    const impuestoIva = this.productosItemsForm.value.iva ?? 0;
+    let impuestoIva = this.productosItemsForm.value.iva ?? 0;
+
+    if (typeof impuestoIva === 'string') {
+      impuestoIva = parseInt(impuestoIva);
+    }
     const nuevoItemConId = {
       ...valores,
       id: crypto.randomUUID(),
@@ -324,7 +346,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   onClienteSeleccionado(cliente: Partial<ClientesInterfaceResponse>) {
     this.formVentas.patchValue({
       cliente: cliente.id,
-      clienteSearch: cliente.nombre,
+      clienteSearch: cliente.nombre + ' ' + cliente.apellido,
       tipoDocumento: cliente.tipoDocumento,
       contacto: cliente.email,
       identificacion: cliente.tipoDocumentoRel?.abreviatura + ' - ' + cliente.numeroDocumento
@@ -375,16 +397,16 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       return;
     }
 
-    this.loading.set(true)
+    this.loading.set(true);
     const valueFormFactura = this.formVentas.value;
     const productos = this.productSeleccionados();
 
     const invoiceData: Partial<FacturaVenta> = {
       clientId: valueFormFactura.cliente!,
       vendedor: valueFormFactura.vendedor!,
-      canalventa: valueFormFactura.canal!,
+      canalVenta: valueFormFactura.canal!,
       fecha: valueFormFactura.fecha!,
-      formapago: valueFormFactura.formaPago!,
+      formaPago: valueFormFactura.formaPago!,
       metodoPago: valueFormFactura.metodoPago!,
       fechaVencimiento: valueFormFactura.fechaVencimiento!,
       tipoFactura: valueFormFactura.tipoFactura!,

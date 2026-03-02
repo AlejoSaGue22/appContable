@@ -1,5 +1,5 @@
 import { Component, input, output, signal } from '@angular/core';
-import { FacturaVenta, InvoiceStatus } from '@dashboard/interfaces/documento-venta-interface';
+import { FacturaVenta, GetFacturaRequest, InvoiceStatus } from '@dashboard/interfaces/documento-venta-interface';
 import { RouterLink } from "@angular/router";
 import { FormsModule } from '@angular/forms';
 
@@ -18,7 +18,7 @@ export interface InvoiceFilters {
 })
 export class TableInvoices {
 
-  invoiceData = input.required<FacturaVenta[]>();
+  invoiceData = input.required<GetFacturaRequest[]>();
 
   // Pagination inputs
   currentPage = input<number>(1);
@@ -40,7 +40,7 @@ export class TableInvoices {
   startDate = signal<string>('');
   endDate = signal<string>('');
 
-  get invoiceDataArray(): FacturaVenta[] {
+  get invoiceDataArray(): GetFacturaRequest[] {
     const data = this.invoiceData();
 
     return Array.isArray(data) ? data : [data];

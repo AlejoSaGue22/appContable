@@ -111,15 +111,15 @@
                                 <select class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded 
                                                 pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm
                                                 focus:shadow-md cursor-pointer" formControlName="formaPago">
-                                    <option value="1">Contado</option>
-                                    <option value="2">Crédito</option>
+                                    <option value="CONTADO">Contado</option>
+                                    <option value="CREDITO">Crédito</option>
                                 </select>
                             </div>
 
                             <form-error-label [errorType]="formVentas.get('formaPago')!" />
                         </div>
 
-                        @if (formVentas.get('formaPago')?.value === '1') {
+                        @if (formVentas.get('formaPago')?.value === 'CONTADO') {
                         <div>
                             <label class="block mb-2 text-sm text-slate-600">
                                 Metodo de Pago <span class="text-red-500">*</span>
@@ -130,7 +130,7 @@
                                                     focus:shadow-md cursor-pointer" formControlName="metodoPago">
                                     <option value="">Selecciona un método de pago</option>
                                     @for (method of catalogsStore.paymentMethods(); track method.id) {
-                                        <option [value]="method.id">{{ method.nombre }}</option>
+                                        <option [value]="method.codigo">{{ method.nombre }}</option>
                                     }
                                 </select>
                             </div>
@@ -139,7 +139,7 @@
                         </div>
                         }
 
-                        @if (formVentas.get('formaPago')?.value === '2') {
+                        @if (formVentas.get('formaPago')?.value === 'CREDITO') {
                             <div>
                                 <label class="block mb-2 text-sm text-slate-600">
                                     Fecha Vencimiento <span class="text-red-500">*</span>
@@ -183,10 +183,10 @@
 
                     </div>
                 </div>
-            </div>
 
         </div>
-        <div class="mt-4 self-end w-full">
+    </div>
+    <div class="mt-4 self-end w-full">
             <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
                 <h3 class="text-lg font-medium text-slate-700 border-b border-gray-300 pb-2 mb-4 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" width="24" height="24"
@@ -228,203 +228,135 @@
 
                     Productos
                 </h3>
-                <table class="w-full text-left table-auto shadow-md rounded-xl">
-                    <thead>
-                        <tr class="text-center">
-                            <th class="p-4 border-r border-gray-300 bg-gray-200" colspan="2">
-                                <p
-                                    class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-95">
-                                    Producto
-                                </p>
-                            </th>
-                            <th class="p-4 border-r border-gray-300 bg-gray-200">
-                                <p
-                                    class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-95">
-                                    Descripcion
-                                </p>
-                            </th>
-                            <th class="p-4 border-r border-gray-300 bg-gray-200">
-                                <p
-                                    class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-95">
-                                    Cant.
-                                </p>
-                            </th>
-                            <th class="p-4 border-r border-gray-300 bg-gray-200">
-                                <p
-                                    class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-95">
-                                    Valor Unitario
-                                </p>
-                            </th>
-                            <th class="p-4 border-r border-gray-300 bg-gray-200">
-                                <p
-                                    class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-95">
-                                    % Desc.
-                                </p>
-                            </th>
-                            <th class="p-4 border-r border-gray-300 bg-gray-200">
-                                <p
-                                    class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-95">
-                                    Importe
-                                </p>
-                            </th>
-                            <th class="p-4 border-r border-gray-300 bg-gray-200">
-                                <p
-                                    class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-95">
-                                    IVA
-                                </p>
-                            </th>
-                            <th class="p-4 border-r border-gray-300 bg-gray-200" colspan="2">
-                                <p
-                                    class="block font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-95">
-                                    Valor Total
-                                </p>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody [formGroup]="productosItemsForm">
-                        <tr class="text-center">
-                            <td></td>
-                            <td class="w-[295px]">
-                                <div class="m-4">
-                                    <app-list-group-dropdown title="" [dataList]="getAllProductos()"
-                                        (objectSelect)="onProductoSeleccionado($event)"
-                                        (createOption)="openProductModal()" formControlName="articulo" />
-                                </div>
-                            </td>
-                            <td>
-                                <div class="m-4">
-                                    <textarea class="min-h-[40px] text-sm border rounded-md px-3 py-2 transition
-                                                     duration-300 ease shadow-sm focus:shadow"
-                                        formControlName="description">
-                                            </textarea>
-                                </div>
-                            </td>
-                            <td>
-                                <input class="w-4/5 bg-transparent text-slate-700 text-sm border 
-                                            rounded-md px-3 py-2 transition duration-300 ease 
-                                            shadow-sm focus:shadow" placeholder="0.00" formControlName="quantity"
-                                    type="number" min="1" />
-                            </td>
-                            <td>
-                                <input class="w-4/5 bg-transparent text-slate-700 text-sm border 
-                                            rounded-md px-3 py-2 transition duration-300 ease 
-                                            shadow-sm focus:shadow" placeholder="0.00" formControlName="unitPrice"
-                                    type="number" min="1" />
-                            </td>
-                            <td>
-                                <input class="w-4/5 bg-transparent text-slate-700 text-sm border 
-                                            rounded-md px-3 py-2 transition duration-300 ease shadow-sm focus:shadow"
-                                    placeholder="0.00" type="number" formControlName="discount" min="0" />
-                            </td>
-                            <td>
-                                <span class="text-sm p-2 text-center text-gray-500">
-                                    {{ calcularDescuentoImporte() | number : "1.2-2" }}
-                                </span>
-                            </td>
-                            <td>
-                                <select class="bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 
-                                            rounded pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm
-                                            cursor-pointer m-2" formControlName="iva">
-                                    <option value="19">IVA 19%</option>
-                                    <option value="16">IVA 16%</option>
-                                    <option value="6">IVA 6%</option>
-                                    <option value="0">No aplica</option>
+                <div class="mb-6 p-4 rounded-lg bg-blue-50/50 border border-blue-100" [formGroup]="productosItemsForm">
+                    <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-4 items-end">
+                        <div class="col-span-1 md:col-span-2">
+                            <label class="block mb-1 text-xs font-semibold text-slate-500 uppercase tracking-wider">Producto/Servicio</label>
+                            <app-list-group-dropdown title="" [dataList]="getAllProductos()"
+                                (objectSelect)="onProductoSeleccionado($event)"
+                                (createOption)="openProductModal()" formControlName="articulo" />
+                        </div>
+                        <div class="col-span-1 md:col-span-2 lg:col-span-1">
+                            <label class="block mb-1 text-xs font-semibold text-slate-500 uppercase tracking-wider">Cant.</label>
+                            <input class="w-full bg-white text-slate-700 text-sm border rounded-md px-3 py-2 transition duration-300 ease shadow-sm focus:border-blue-400 focus:outline-none" 
+                                placeholder="0" formControlName="quantity" type="number" min="1" />
+                        </div>
+                        <div class="col-span-1 md:col-span-2 lg:col-span-1">
+                            <label class="block mb-1 text-xs font-semibold text-slate-500 uppercase tracking-wider">Precio Unit.</label>
+                            <input class="w-full bg-white text-slate-700 text-sm border rounded-md px-3 py-2 transition duration-300 ease shadow-sm focus:border-blue-400 focus:outline-none" 
+                                placeholder="0.00" formControlName="unitPrice" type="number" min="0" />
+                        </div>
+                        @if (tipoFacturaSignal() !== 'ESTANDAR') {
+                            <div class="col-span-1 md:col-span-1">
+                                <label class="block mb-1 text-xs font-semibold text-slate-500 uppercase tracking-wider">IVA (%)</label>
+                                <select class="w-full bg-white text-slate-700 text-sm border border-slate-200 rounded px-3 py-2 transition duration-300 ease focus:border-blue-400 focus:outline-none cursor-pointer disabled:bg-slate-100 disabled:text-slate-400" 
+                                    formControlName="iva">
+                                    <option value="19">19%</option>
+                                    <option value="16">16%</option>
+                                    <option value="6">6%</option>
+                                    <option value="0">0%</option>
                                 </select>
-                            </td>
-                            <td class="w-[100px] text-center">
-                                <span class="text-sm p-2 text-center text-slate-700">
-                                    {{ calcularItemTotal() | currency }}
-                                </span>
-                            </td>
-                            <td class="cursor-pointer pr-2" (click)="setProductos()">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                    class="text-blue-200 hover:text-blue-500">
-                                    <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                        stroke-width="2">
-                                        <path stroke-dasharray="64" stroke-dashoffset="64"
-                                            d="M4 12v-7c0 -0.55 0.45 -1 1 -1h14c0.55 0 1 0.45 1 1v14c0 0.55 -0.45 1 -1 1h-14c-0.55 0 -1 -0.45 -1 -1Z">
-                                            <animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s"
-                                                values="64;0" />
-                                        </path>
-                                        <path stroke-dasharray="12" stroke-dashoffset="12" d="M7 12h10">
-                                            <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s"
-                                                dur="0.2s" values="12;0" />
-                                        </path>
-                                        <path stroke-dasharray="12" stroke-dashoffset="12" d="M12 7v10">
-                                            <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.8s"
-                                                dur="0.2s" values="12;0" />
-                                        </path>
-                                    </g>
-                                </svg>
-                            </td>
-                        </tr>
-
-                        @for (item of productSeleccionados(); track $index) {
-                        <tr class="text-center">
-                            <td class="border-t border-gray-200" (click)="deleteProducto(item.id!)">
-                                <div class="pl-3 cursor-pointer">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                        class="text-red-300 hover:text-red-500">
-                                        <g fill="none" stroke="currentColor" stroke-linecap="round"
-                                            stroke-linejoin="round" stroke-width="2">
-                                            <path stroke-dasharray="64" stroke-dashoffset="64"
-                                                d="M12 3c4.97 0 9 4.03 9 9c0 4.97 -4.03 9 -9 9c-4.97 0 -9 -4.03 -9 -9c0 -4.97 4.03 -9 9 -9Z">
-                                                <animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s"
-                                                    values="64;0" />
-                                            </path>
-                                            <path stroke-dasharray="8" stroke-dashoffset="8"
-                                                d="M12 12l4 4M12 12l-4 -4M12 12l-4 4M12 12l4 -4">
-                                                <animate fill="freeze" attributeName="stroke-dashoffset" begin="0.6s"
-                                                    dur="0.2s" values="8;0" />
-                                            </path>
-                                        </g>
-                                    </svg>
-                                </div>
-                            </td>
-                            <td class="p-4 border-t border-gray-200 border-r">
-                                <p class="block font-sans text-sm antialiased leading-normal text-gray-700">
-                                    {{ item.articulo?.nombre ?? item.articulo }}
-                                </p>
-                            </td>
-                            <td class="p-4 border-t border-r border-gray-200">
-                                <p class="block font-sans text-sm antialiased leading-normal text-gray-700">
-                                    {{ item.description }}
-                                </p>
-                            </td>
-                            <td class="p-4 border-t border-gray-200 border-r">
-                                <p class="block font-sans text-sm antialiased leading-normal text-gray-700">
-                                    {{ item.quantity }}
-                                </p>
-                            </td>
-                            <td class="p-4 border-t border-gray-200 border-r">
-                                <a class="block font-sans text-sm antialiased text-gray-700">
-                                    {{ item.unitPrice | currency }}
-                                </a>
-                            </td>
-                            <td class="p-4 border-t border-gray-200 border-r">
-                                <a class="block font-sans text-sm antialiased text-gray-700">
-                                    {{ item.discount }} %
-                                </a>
-                            </td>
-                            <td class="p-4 border-t border-gray-200 border-r">
-                                <a class="block font-sans text-sm antialiased text-gray-500">
-                                    {{ item.importe | number : "1.2-2" }}
-                                </a>
-                            </td>
-                            <td class="p-4 border-t border-gray-200 border-r">
-                                <a class="block font-sans text-sm antialiased text-gray-700">
-                                    {{ item.iva }} %
-                                </a>
-                            </td>
-                            <td colspan="2" class="p-4 border-t border-gray-200 border-r">
-                                <a class="block font-sans text-sm antialiased text-gray-700">
-                                    {{ item.total | currency }}
-                                </a>
-                            </td>
-                        </tr>
+                            </div>
                         }
-                    </tbody>
-                </table>
+                        <div [class]="tipoFacturaSignal() === 'ESTANDAR' ? 'col-span-1 md:col-span-2' : 'col-span-1 md:col-span-1'">
+                            <label class="block mb-1 text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Item</label>
+                            <div class="h-[38px] flex items-center px-3 bg-slate-100 rounded-md border border-slate-200">
+                                <span class="text-sm font-bold text-slate-700">{{ calcularItemTotal() | currency }}</span>
+                            </div>
+                        </div>
+                        <div class="col-span-1 lg:col-span-6 flex justify-between items-center bg-white/50 p-2 rounded border border-dashed border-blue-200 mt-2">
+                             <div class="flex-1 mr-4">
+                                <label class="block mb-1 text-xs font-semibold text-slate-500 uppercase tracking-wider">Descripción adicional (Opcional)</label>
+                                <textarea class="w-full min-h-[38px] text-sm border rounded-md px-3 py-1 transition duration-300 ease focus:border-blue-400 focus:outline-none resize-none"
+                                    formControlName="description" rows="1"></textarea>
+                            </div>
+                            <div class="w-24">
+                                <label class="block mb-1 text-xs font-semibold text-slate-500 uppercase tracking-wider">% Desc.</label>
+                                <input class="w-full bg-white text-slate-700 text-sm border rounded-md px-3 py-2 transition duration-300 ease focus:border-blue-400 focus:outline-none"
+                                    placeholder="0" type="number" formControlName="discount" min="0" />
+                            </div>
+                            <button type="button" class="ml-4 h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-md transition-all shadow-md flex items-center justify-center gap-2"
+                                (click)="setProductos()">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                Agregar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left table-auto shadow-sm rounded-xl">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-gray-200">
+                                <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider">Producto</th>
+                                <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider text-center">Cant.</th>
+                                <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider text-right">Precio Unit.</th>
+                                @if (tipoFacturaSignal() !== 'ESTANDAR') {
+                                    <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider text-center">% IVA</th>
+                                }
+                                <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider text-center">% Desc.</th>
+                                <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider text-right">Total</th>
+                                <th class="p-4 w-16"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @for (item of productSeleccionados(); track item.id) {
+                                <tr class="hover:bg-slate-50/80 transition-colors group">
+                                    <td class="p-4">
+                                        <div class="flex flex-col">
+                                            <span class="text-sm font-semibold text-slate-800">{{ item.articulo?.nombre ?? item.articulo }}</span>
+                                            @if (item.description) {
+                                                <span class="text-xs text-slate-500 italic mt-0.5 line-clamp-1 truncate max-w-[200px]" [title]="item.description">
+                                                    {{ item.description }}
+                                                </span>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td class="p-4 text-center">
+                                        <span class="inline-flex items-center px-2 py-1 rounded bg-slate-100 text-xs font-medium text-slate-600">
+                                            {{ item.quantity }}
+                                        </span>
+                                    </td>
+                                    <td class="p-4 text-right text-sm text-slate-600">
+                                        {{ item.unitPrice | currency }}
+                                    </td>
+                                    @if (tipoFacturaSignal() !== 'ESTANDAR') {
+                                        <td class="p-4 text-center">
+                                            <span class="text-xs font-semibold" [class.text-blue-600]="item.iva > 0" [class.text-slate-400]="item.iva === 0">
+                                                {{ item.iva }}%
+                                            </span>
+                                        </td>
+                                    }
+                                    <td class="p-4 text-center">
+                                        <span class="text-xs font-semibold" [class.text-red-600]="item.discount > 0" [class.text-slate-400]="item.discount === 0">
+                                            {{ item.discount }}%
+                                        </span>
+                                    </td>
+                                    <td class="p-4 text-right text-sm font-bold text-slate-800">
+                                        {{ item.total | currency }}
+                                    </td>
+                                    <td class="p-4 text-right">
+                                        <button type="button" (click)="deleteProducto(item.id!)" 
+                                            class="p-1.5 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                            @if (productSeleccionados().length === 0) {
+                                <tr>
+                                    <td [attr.colspan]="tipoFacturaSignal() === 'ESTANDAR' ? 6 : 7" class="p-12 text-center">
+                                        <div class="flex flex-col items-center justify-center text-slate-400">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2 opacity-20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg>
+                                            <p class="text-sm font-medium">No hay productos agregados</p>
+                                            <p class="text-xs mt-1">Usa el formulario de arriba para añadir items.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </form>
@@ -440,11 +372,13 @@
                         currency}}</span>
                 </div>
 
-                <div class="flex justify-between">
-                    <span class="text-sm text-gray-600 dark:text-gray-400">IVA:</span>
-                    <span class="text-sm font-medium text-gray-900 dark:text-white">{{ totales.totalIVA | currency
-                        }}</span>
-                </div>
+                @if (tipoFacturaSignal() !== 'ESTANDAR') {
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-600 dark:text-gray-400">IVA:</span>
+                        <span class="text-sm font-medium text-gray-900 dark:text-white">{{ totales.totalIVA | currency
+                            }}</span>
+                    </div>
+                }
 
                 @if (0 == 0) {
                 <div class="flex justify-between">

@@ -106,7 +106,7 @@
             {{ invoice.fecha }}
           </td>
           <td class="px-6 py-4">
-            <span [class]="'inline-flex rounded-full px-2 py-1 text-xs font-semibold' + getStatusClass(invoice.status)">
+            <span [class]="'inline-flex rounded-full px-2 py-1 text-xs font-semibold ' + getStatusClass(invoice.status)">
               {{ getStatusLabel(invoice.status) }}
             </span>
           </td>

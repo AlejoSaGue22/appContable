@@ -31,7 +31,7 @@
                             class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors bg-gray-50 text-sm">
                             <option value="">Selecciona un documento</option>
                             @for (doc of catalogsStore.documentTypes(); track doc.id) {
-                                <option [value]="doc.codigo">{{ doc.nombre }}</option>
+                                <option [value]="doc.id">{{ doc.nombre }}</option>
                             }
                         </select>
                         <form-error-label [errorType]="formProveedor.get('tipoDocumento')!"></form-error-label>

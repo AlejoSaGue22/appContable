@@ -6,7 +6,7 @@
                     <th scope="col" class="px-6 py-3">Codigo</th>
                     <th scope="col" class="px-6 py-3">Nombre</th>
                     <th scope="col" class="px-6 py-3">Categoria</th>
-                    <th scope="col" class="px-6 py-3">Precio</th>
+                    <th scope="col" class="px-6 py-3">Precio Referencial</th>
                     <th scope="col" class="px-6 py-3">Iva</th>
                     <!-- <th scope="col" class="px-6 py-3">Retencion</th> -->
                     <th scope="col" class="px-6 py-3">Medida</th>
@@ -42,7 +42,7 @@
                     <td class="px-6 py-4">{{ producto.fullNameTipo | titlecase }}</td>
                     <td class="px-6 py-4">{{ producto.precio | currency : '$'}}</td>
                     <td class="px-6 py-4">{{ producto.iva_percent }}</td>
-                    <td class="px-6 py-4">{{ producto.unidadmedidaNombre | titlecase }}</td>
+                    <td class="px-6 py-4">{{ producto.unidadmedidaRel.nombre | titlecase }}</td>
                     <td class="px-6 py-4">
                         <span [class]="producto.isActive === true 
                             ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' 

@@ -19,13 +19,31 @@ export interface ArticulosInterface {
     observacion: string,
 }
 
+export interface UnidadMedidaRel {
+    id: number;
+    codigo: string;
+    nombre: string;
+    state: boolean;
+}
+
+export interface CuentasContablesRel {
+    id: string;
+    codigo: string;
+    nombre: string;
+}
+
+export interface CuentasIvaRel {
+    id: string;
+    codigo: string;
+    nombre: string;
+}
 
 export interface GetProductosDetalle {
     id: string;
     categoria: string;
     fullNameTipo: string;
-    unidadmedidaNombre: string;
-    unidadmedida: string;
+    unidadmedida: number;
+    unidadmedidaRel: UnidadMedidaRel;
     nombre: string;
     codigo: string;
     impuesto: string;
@@ -40,5 +58,9 @@ export interface GetProductosDetalle {
     estado: string;
     tipo: string;
     tipoCodigo: string;
+    cuentaContable: CuentasContablesRel;
+    cuentaContableId: string;
+    cuentaIva: CuentasIvaRel;
+    cuentaIvaId: string;
     ind: string;
 }

@@ -1,15 +1,16 @@
 import { ClientesInterfaceResponse } from "./clientes-interface";
+import { CreatedBy } from "./factura-compra-interface";
 import { ArticulosInterface } from "./productos-interface";
 
-export interface ComprobanteVentaResponseTemp {
-  count: number;
-  pages: number;
-  comprobantes: FacturaVenta[];
-}
+// export interface ComprobanteVentaResponseTemp {
+//   count: number;
+//   pages: number;
+//   comprobantes: FacturaVenta[];
+// }
 
 export interface ComprobanteVentaResponse {
   success: boolean;
-  data: FacturaVenta[];
+  data: GetFacturaRequest[];
   message?: string;
   meta?: {
     page: number;
@@ -27,7 +28,7 @@ export interface ItemFactura {
   unitPrice: number;
   iva: number;
   valor_iva?: number;
-  discount?: number;
+  discount: number;
   valor_discount?: number;
   quantity: number;
   subtotal?: number;
@@ -42,10 +43,10 @@ export interface FacturaVenta {
   comprobante_completo: string;
   status: InvoiceStatus;
   vendedor: string;
-  canalventa: string;
+  canalVenta: string;
   fecha: string;
   tipoFactura: TipoFactura;
-  formapago: string;
+  formaPago: FormaPago;
   metodoPago?: string;
   fechaVencimiento?: string;
   items: ItemFactura[];
@@ -62,13 +63,67 @@ export interface FacturaVenta {
   createdAt: Date;
 }
 
-interface CreatedBy {
-  id: "e5f05bfc-97c1-4397-8ee9-6489c73ce829",
-  email: "tejodeveloper@gmail.com",
-  fullName: "Tejo Dev",
-  isActive: true,
-  role: "viewer",
-  deleteAt: null
+export interface GetFacturaRequest {
+  id: string;
+  tipoFactura: TipoFactura;
+  prefijo: string;
+  comprobante: string;
+  comprobante_completo: string;
+  status: InvoiceStatus;
+  dianStatus: DianStatus;
+  vendedor: string | null;
+  canalVenta: string;
+  formaPago: FormaPago;
+  metodoPago: string | null;
+  metodoPagoRel: {
+    id: number;
+    codigo: string;
+    nombre: string;
+    state: boolean;
+  };
+  fecha: string; // ISO date (YYYY-MM-DD)
+  fechaVencimiento: string | null;
+  asientoError: string | null;
+  fechaAsientoError: string | null;
+  items: GetFacturaItemRequest[];
+  iva: number;
+  descuento: number;
+  client: ClientesInterfaceResponse;
+  clientId: string;
+  subtotal: number;
+  total: number;
+  cufe: string | null;
+  xmlUrl: string | null;
+  pdfUrl: string | null;
+  qrCode: string | null;
+  proveedorResponse: string | null;
+  dianResponse: string | null;
+  mensajeError: string | null;
+  fechaEnvioDIAN: string | null;
+  fechaAceptacionDIAN: string | null;
+  intentosEnvio: number;
+  observaciones: string | null;
+  createdBy: CreatedBy;
+  createdById: string;
+  createdAt: string; // ISO datetime
+}
+
+interface GetFacturaItemRequest {
+  id: string;
+  articulo: ArticulosInterface;
+  articuloId: string;
+  description: string;
+  unitPrice: number;
+  iva: number;
+  valor_iva: number;
+  discount: number;
+  valor_discount: number;
+  quantity: number;
+  subtotal: number;
+  importe: number;
+  total: number;
+  facturaId: string;
+  createdAt: string; // ISO datetime
 }
 
 export enum TipoFactura {

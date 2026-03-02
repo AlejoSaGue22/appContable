@@ -89,7 +89,7 @@
                                 rounded pl-3 pr-8 py-2 transition duration-300 ease hover:border-slate-400 shadow-sm cursor-pointer" formControlName="unidadmedida">
                                 <option value="">Selecciona una unidad</option>
                                 @for (unit of catalogsStore.unitsMeasure(); track unit.id) {
-                                    <option [value]="unit.codigo">{{ unit.nombre }}</option>
+                                    <option [value]="unit.id">{{ unit.nombre }}</option>
                                 }
                             </select>
                         </div>

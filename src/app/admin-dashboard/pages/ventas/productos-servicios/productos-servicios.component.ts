@@ -52,7 +52,7 @@ export class ProductosServiciosComponent {
             tap((p) => {
                this.totalProducto.set(p.count);
                this.cardValor.set([
-                  { title: 'Total Productos', valor: this.totalProducto().toString(), percent: '100' },
+                  { title: 'Total Productos y Servicios', valor: this.totalProducto().toString(), percent: '100' },
                   { title: 'Nuevos este Mes', valor: '0', percent: '20' },
                   { title: 'Total Servicios', valor: '0', percent: '20' }
                ]);

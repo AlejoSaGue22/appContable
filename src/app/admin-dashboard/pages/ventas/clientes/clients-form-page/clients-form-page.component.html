@@ -108,7 +108,7 @@
                                                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm cursor-pointer" formControlName="tipoDocumento">
                                 <option value="">Selecciona un documento</option>
                                 @for (doc of catalogsStore.documentTypes(); track doc.id) {
-                                    <option [value]="doc.codigo">{{ doc.nombre }}</option>
+                                    <option [value]="doc.id">{{ doc.nombre }}</option>
                                 }
                             </select>
 

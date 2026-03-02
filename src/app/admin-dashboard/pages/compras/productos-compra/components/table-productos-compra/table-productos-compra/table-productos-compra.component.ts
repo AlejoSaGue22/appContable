@@ -2,6 +2,7 @@ import { Component, EventEmitter, input, Output } from '@angular/core';
 import { modalOpen } from '@shared/interfaces/services.interfaces';
 import { RouterLink } from '@angular/router';
 import { CurrencyPipe, TitleCasePipe } from '@angular/common';
+import { GetProductosDetalle } from '@dashboard/interfaces/productos-interface';
 
 @Component({
   selector: 'app-table-productos-compra',
@@ -10,7 +11,7 @@ import { CurrencyPipe, TitleCasePipe } from '@angular/common';
 })
 export class TableProductosCompra {
 
-  productoData = input<any[]>([]);
+  productoData = input<GetProductosDetalle[]>([]);
   @Output() delete = new EventEmitter<modalOpen>();
 
   onDeleteProducto(id: string) {

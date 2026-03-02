@@ -34,8 +34,8 @@
             {{ art.codigo }}
           </td>
           <td class="px-6 py-4">{{ art.nombre }}</td>
-          <td class="px-6 py-4 uppercase text-xs">{{ art.fullNameTipo }}</td>
-          <td class="px-6 py-4 uppercase text-xs">{{ art.unidadmedidaNombre }}</td>
+          <td class="px-6 py-4 uppercase text-xs">{{ art.fullNameTipo | titlecase }}</td>
+          <td class="px-6 py-4 uppercase text-xs">{{ art.unidadmedidaRel.nombre | titlecase }}</td>
           <td class="px-6 py-4 text-center font-bold">
             {{ art.precio | currency:'$' }}
           </td>

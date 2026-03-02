@@ -1,7 +1,7 @@
 
-<div class="min-h-screen bg-gray-50 p-6 font-sans">
-    <div class="h-screen w-64 fixed left-0 top-0 bg-[#0f172a] shadow-md">
-
+<div class="min-h-screen bg-gray-50 p-6 font-sans print:p-0">
+    <div class="h-screen w-64 fixed left-0 top-0 bg-[#0f172a] shadow-md print:hidden">
+        
         <app-menu-perfil/>
 
         <!-- Navigation -->
@@ -20,7 +20,7 @@
         </nav>
     </div>
 
-    <div class="ml-64 mx-auto mt-0">
+    <div class="ml-64 mx-auto mt-0 print:ml-0 print:p-0">
        <router-outlet/>
     </div>
 </div>
