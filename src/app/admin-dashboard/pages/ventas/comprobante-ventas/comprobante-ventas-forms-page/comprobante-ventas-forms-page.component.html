@@ -234,7 +234,8 @@
                             <label class="block mb-1 text-xs font-semibold text-slate-500 uppercase tracking-wider">Producto/Servicio</label>
                             <app-list-group-dropdown title="" [dataList]="getAllProductos()"
                                 (objectSelect)="onProductoSeleccionado($event)"
-                                (createOption)="openProductModal()" formControlName="articulo" />
+                                (createOption)="openProductModal()" formControlName="articulo" 
+                                [valueInput]="productosItemsForm.get('articulo')?.value || ''" />
                         </div>
                         <div class="col-span-1 md:col-span-2 lg:col-span-1">
                             <label class="block mb-1 text-xs font-semibold text-slate-500 uppercase tracking-wider">Cant.</label>

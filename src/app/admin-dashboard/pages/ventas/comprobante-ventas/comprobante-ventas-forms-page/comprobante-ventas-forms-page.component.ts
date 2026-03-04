@@ -59,15 +59,15 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   clienteServicios = inject(ClientesService);
   productoServicios = inject(ProductosService);
   ventaServices = inject(ComprobantesVentasService);
-  factura = signal<FacturaVenta | null>(null);
   notificacionService = inject(NotificationService);
-  productSeleccionados = signal<ItemFactura[]>([]);
-  getAllProductos = signal<GetProductosDetalle[]>([]);
-  getAllClientes = signal<ClientesInterfaceResponse[]>([]);
   activateRoute = inject(ActivatedRoute);
   loaderservice = inject(LoaderService);
   router = inject(Router);
   catalogsStore = inject(CatalogsStore);
+  factura = signal<FacturaVenta | null>(null);
+  productSeleccionados = signal<ItemFactura[]>([]);
+  getAllProductos = signal<GetProductosDetalle[]>([]);
+  getAllClientes = signal<ClientesInterfaceResponse[]>([]);
   loading = signal<boolean>(false);
 
   invoiceID = toSignal(
@@ -78,11 +78,9 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
 
   // ***** SECCION MODALES *****
 
-  // Modal State
   isClientModalVisible = signal<boolean>(false);
   isProductModalVisible = signal<boolean>(false);
 
-  // --- Client Modal Methods ---
   openClientModal() {
     this.isClientModalVisible.set(true);
   }
@@ -99,7 +97,6 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
 
     // Select it
     this.onClienteSeleccionado(newClient);
-
     this.closeClientModal();
     this.notificacionService.success('Cliente creado y seleccionado', 'Éxito');
   }
@@ -224,34 +221,39 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     { initialValue: this.formVentas.get('tipoFactura')?.value as TipoFactura }
   );
 
-    paymentLogic = effect(() => {
-      const formaPago = this.formVentas.get('formaPago')?.value;
-      const metodoPagoControl = this.formVentas.get('metodoPago');
-      const fechaVencimientoControl = this.formVentas.get('fechaVencimiento');
+  formaPagoSignal = toSignal(
+    this.formVentas.get('formaPago')!.valueChanges,
+    { initialValue: this.formVentas.get('formaPago')?.value as FormaPago }
+  );
 
-      if (formaPago === FormaPago.CONTADO) { // Contado
-        metodoPagoControl?.setValidators([Validators.required]);
-        fechaVencimientoControl?.clearValidators();
+  paymentLogic = effect(() => {
+    const formaPago = this.formaPagoSignal(); // Trigger effect on change
+    const metodoPagoControl = this.formVentas.get('metodoPago');
+    const fechaVencimientoControl = this.formVentas.get('fechaVencimiento');
+
+    if (formaPago === FormaPago.CONTADO) { // Contado
+      metodoPagoControl?.setValidators([Validators.required]);
+      fechaVencimientoControl?.clearValidators();
+    } else {
+      metodoPagoControl?.clearValidators();
+      metodoPagoControl?.setValue('');
+      fechaVencimientoControl?.setValidators([Validators.required]);
+    }
+    metodoPagoControl?.updateValueAndValidity();
+    fechaVencimientoControl?.updateValueAndValidity();
+  });
+
+  ivaLogic = effect(() => {
+      const tipoFactura = this.tipoFacturaSignal();
+      const ivaControl = this.productosItemsForm.get('iva');
+
+      if (tipoFactura === TipoFactura.STANDARD) {
+        ivaControl?.setValue(0);
+        ivaControl?.disable();
       } else {
-        metodoPagoControl?.clearValidators();
-        metodoPagoControl?.setValue('');
-        fechaVencimientoControl?.setValidators([Validators.required]);
+        ivaControl?.enable();
       }
-      metodoPagoControl?.updateValueAndValidity();
-      fechaVencimientoControl?.updateValueAndValidity();
-    });
-
-    ivaLogic = effect(() => {
-        const tipoFactura = this.tipoFacturaSignal();
-        const ivaControl = this.productosItemsForm.get('iva');
-
-        if (tipoFactura === TipoFactura.STANDARD) {
-          ivaControl?.setValue(0);
-          ivaControl?.disable();
-        } else {
-          ivaControl?.enable();
-        }
-    });
+  });
 
   productosItemsForm = this.fb.group({
     articulo: ['', Validators.required],
@@ -276,7 +278,6 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     if (!this.productosItemsForm.valid) return;
 
     const valores = this.productosItemsForm.value as ItemFactura;
-    console.log("Valores: ", valores);
     const valorItemTotal = this.calcularItemTotal();
     const valorItemImporte = this.calcularDescuentoImporte();
     let impuestoIva = this.productosItemsForm.value.iva ?? 0;
@@ -336,6 +337,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   reiniciarProducto() {
     this.productosItemsForm.reset({
       articulo: '',
+      articuloId: '',
       description: '',
       quantity: 0,
       unitPrice: 0,
@@ -417,7 +419,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     const invoiceData: Partial<FacturaVenta> = {
       clientId: valueFormFactura.cliente!,
       vendedor: valueFormFactura.vendedor!,
-      canalVenta: valueFormFactura.canal!,
+      canalVenta: valueFormFactura.canal!.toString(),
       fecha: valueFormFactura.fecha!,
       formaPago: valueFormFactura.formaPago!,
       metodoPago: valueFormFactura.metodoPago!,

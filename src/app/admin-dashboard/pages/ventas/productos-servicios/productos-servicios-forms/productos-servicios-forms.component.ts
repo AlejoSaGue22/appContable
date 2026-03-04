@@ -10,6 +10,7 @@ import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { LoaderComponent } from "src/app/utils/components/loader/loader.component";
 import { NotificationService } from '@shared/services/notification.service';
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
+import { HelpersUtils } from '@utils/helpers.utils';
 
 @Component({
   selector: 'app-productos-servicios-forms',
@@ -96,9 +97,8 @@ export class ProductosServiciosFormsComponent {
 
     const formValue = {
       ...this.formProductos.value,
-      unidadmedida: String(this.formProductos.value.unidadmedida),
-      impuesto: typeof this.formProductos.value.impuesto == 'string' ?
-        parseInt(this.formProductos.value.impuesto) : this.formProductos.value.impuesto,
+      impuesto: typeof this.formProductos.value.impuesto == 'string' ? 
+                parseInt(this.formProductos.value.impuesto) : this.formProductos.value.impuesto,
       precio: this.formProductos.value.precioventa?.precio1,
       precioventa2: this.formProductos.value.precioventa?.precio2
     };
@@ -112,7 +112,7 @@ export class ProductosServiciosFormsComponent {
 
         if (product.success == false) {
           this.notificacionService.error(
-            `Hubo un error al guardar el producto ${product.error.message}`,
+            `Hubo un error al guardar el producto ${HelpersUtils.getMessageError(product.message)}`,
             'Error',
             5000
           );
@@ -137,9 +137,8 @@ export class ProductosServiciosFormsComponent {
         );
 
         if (product.success == false) {
-          console.log(product.error);
           this.notificacionService.error(
-            `Hubo un error al guardar este item ${product.error.message}`,
+            `Hubo un error al guardar este item ${HelpersUtils.getMessageError(product.message)}`,
             'Error',
             5000
           );
@@ -156,7 +155,11 @@ export class ProductosServiciosFormsComponent {
       }
 
     } catch (error: any) {
-      alert(error.message)
+      this.notificacionService.error(
+        `Hubo un error al realizar la operacion ${HelpersUtils.getMessageError(error.message)}`,
+        'Error',
+        5000
+      );
     }
   }
 
