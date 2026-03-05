@@ -93,7 +93,7 @@
           <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
             {{ compra.numero }}
           </td>
-          <td class="px-6 py-4">{{ compra.proveedor.nombre }} - {{ compra.proveedor.identificacion }}</td>
+          <td class="px-6 py-4">{{ compra.proveedor.razonSocial || (compra.proveedor.nombre) }}</td>
           <td class="px-6 py-4">{{ compra.total | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
           <td class="px-6 py-4">{{ compra.iva | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
           <td class="px-6 py-4">

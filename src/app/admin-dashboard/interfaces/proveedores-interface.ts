@@ -11,7 +11,11 @@ export interface ProveedoresInterface {
     id: string;
     tipoDocumento: string;
     identificacion: string;
+    tipoPersona: string;
+    razonSocial: string;
     nombre: string;
+    apellido: string;
+    dv?: string;
     email: string;
     telefono: string;
     direccion: string;
@@ -31,11 +35,15 @@ export interface ProveedoresRequest {
     deletedAt: string;
     direccion: string;
     email: string;
-    estado: string;
+    // estado: string;
     id: string;
     ind: string;
     isActive: boolean;
     nombre: string;
+    apellido: string;
+    tipoPersona: string;
+    razonSocial: string;
+    dv: string;
     identificacion: string;
     observaciones: string;
     telefono: string;

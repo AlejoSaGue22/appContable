@@ -19,9 +19,15 @@ export interface DocumentType {
     nombre: string;
     abreviatura: string;
 }
+export interface SalesChannel {
+    id: number;
+    nombre: string;
+    descripcion: string;
+    codigo: string;
+    state: boolean;
+}
 
 export interface PaymentMethod extends CatalogItem {}
-export interface SalesChannel extends CatalogItem {}
 export interface UnitMeasure extends CatalogItem {}
 export interface Municipality {
     id: string;

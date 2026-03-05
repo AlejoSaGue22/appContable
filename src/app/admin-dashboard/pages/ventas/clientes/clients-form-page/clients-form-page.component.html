@@ -184,7 +184,8 @@
 
                         <div>
                             <label class="block mb-2 text-sm font-medium text-slate-600">
-                                Teléfono <span class="text-red-500">*</span>
+                                Teléfono 
+                                <!-- <span class="text-red-500">*</span> -->
                             </label>
                             <input [class.border-red-500]="clientsForm.get('telefono')?.errors ?? false"
                                 class="w-full bg-white text-slate-700 text-sm border rounded-lg px-4 py-3 transition duration-300 ease focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
@@ -195,7 +196,8 @@
 
                         <div>
                             <label class="block mb-2 text-sm font-medium text-slate-600">
-                                Email <span class="text-red-500">*</span>
+                                Email 
+                                <!-- <span class="text-red-500">*</span> -->
                             </label>
                             <input [class.border-red-500]="clientsForm.get('email')?.errors ?? false"
                                 class="w-full bg-white text-slate-700 text-sm border rounded-lg px-4 py-3 transition duration-300 ease focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
@@ -283,7 +285,9 @@
                     </button>
                     <button type="submit" class="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg shadow-sm
                                             hover:bg-blue-700 transition-colors duration-300 cursor-pointer">
-                        Guardar Cliente
+                        {{ loading() ? 'Guardando...' : 
+                            (clienteID() && clienteID() !== 'new-Item' ? 'Actualizar Cliente' :
+                            'Guardar Cliente') }}   
                     </button>
                 </div>
             </div>

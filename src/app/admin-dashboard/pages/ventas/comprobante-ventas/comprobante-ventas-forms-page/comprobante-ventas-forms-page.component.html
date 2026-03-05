@@ -173,7 +173,7 @@
                                                 focus:shadow-md cursor-pointer" formControlName="canal">
                                     <option value="">Selecciona un canal</option>
                                     @for (canal of catalogsStore.salesChannels(); track canal.id) {
-                                        <option [value]="canal.id">{{ canal.nombre }}</option>
+                                        <option [ngValue]="canal.id">{{ canal.nombre }}</option>
                                     }
                                 </select>
                             </div>

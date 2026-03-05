@@ -210,7 +210,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     metodoPago: [''], // Added field
     fechaVencimiento: [''],
     fecha: ['', Validators.required],
-    canal: ['', Validators.required],
+    canal: [0, Validators.required],
     tipoFactura: [TipoFactura.ELECTRONICA, Validators.required],
     productos: [[]]
   })
@@ -419,7 +419,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     const invoiceData: Partial<FacturaVenta> = {
       clientId: valueFormFactura.cliente!,
       vendedor: valueFormFactura.vendedor!,
-      canalVenta: valueFormFactura.canal!.toString(),
+      canalVenta: valueFormFactura.canal!,
       fecha: valueFormFactura.fecha!,
       formaPago: valueFormFactura.formaPago!,
       metodoPago: valueFormFactura.metodoPago!,

@@ -43,7 +43,7 @@ export interface FacturaVenta {
   comprobante_completo: string;
   status: InvoiceStatus;
   vendedor: string;
-  canalVenta: string;
+  canalVenta: number;
   fecha: string;
   tipoFactura: TipoFactura;
   formaPago: FormaPago;
@@ -72,7 +72,7 @@ export interface GetFacturaRequest {
   status: InvoiceStatus;
   dianStatus: DianStatus;
   vendedor: string | null;
-  canalVenta: string;
+  canalVenta: number;
   formaPago: FormaPago;
   metodoPago: string | null;
   metodoPagoRel: {

@@ -49,9 +49,13 @@ export class ProveedoresFormsPageComponent implements OnInit {
   );
 
   formProveedor = this.fb.group({
-    tipoDocumento: ['NIT', Validators.required],
+    tipoDocumento: ['', Validators.required],
     identificacion: ['', Validators.required],
+    tipoPersona: ['', Validators.required],
     nombre: ['', Validators.required],
+    apellido: ['', Validators.required],
+    razonSocial: ['', Validators.required],
+    dv: [''],
     email: ['', [Validators.required, Validators.email]],
     telefono: ['', Validators.required],
     direccion: [''],
@@ -59,7 +63,7 @@ export class ProveedoresFormsPageComponent implements OnInit {
     nombreContacto: [''],
     telefonoContacto: [''],
     observaciones: [''],
-    estado: ['A']
+    // estado: ['A']
   });
 
   ngOnInit(): void {
@@ -72,6 +76,83 @@ export class ProveedoresFormsPageComponent implements OnInit {
 
     if (this.isModal()) {
       this.formProveedor.reset();
+    }
+
+    this.formProveedor.get('tipoPersona')?.valueChanges.subscribe(value => {
+      if (!value) return;
+      this.toggleValidations(value);
+    });
+
+    this.formProveedor.get('tipoDocumento')?.valueChanges.subscribe(value => {
+      this.handleTipoDocumentoChange(value);
+    });
+
+    this.formProveedor.get('identificacion')?.valueChanges.subscribe(value => {
+      if (this.formProveedor.get('tipoDocumento')?.value === '6') {
+        this.updateDV(value);
+      }
+    });
+  }
+
+  toggleValidations(tipo: string) {
+    const nombreControl = this.formProveedor.get('nombre');
+    const apellidoControl = this.formProveedor.get('apellido');
+    const razonSocialControl = this.formProveedor.get('razonSocial');
+
+    if (tipo === 'PN') {
+      nombreControl?.setValidators([Validators.required]);
+      apellidoControl?.setValidators([Validators.required]);
+      razonSocialControl?.clearValidators();
+
+    } else if (tipo === 'PJ') {
+      razonSocialControl?.setValidators([Validators.required]);
+      nombreControl?.clearValidators();
+      apellidoControl?.clearValidators();
+    }
+
+    nombreControl?.updateValueAndValidity();
+    apellidoControl?.updateValueAndValidity();
+    razonSocialControl?.updateValueAndValidity();
+  }
+
+  private handleTipoDocumentoChange(tipo: string | null | undefined) {
+    const dvControl = this.formProveedor.get('dv');
+    if (tipo === '6') { // NIT
+      dvControl?.setValidators([Validators.required]);
+      this.updateDV(this.formProveedor.get('identificacion')?.value);
+    } else {
+      dvControl?.clearValidators();
+      dvControl?.setValue('');
+    }
+    dvControl?.updateValueAndValidity();
+  }
+
+  private updateDV(nit: string | null | undefined) {
+    if (!nit) {
+      this.formProveedor.get('dv')?.setValue('');
+      return;
+    }
+    const dv = this.calculateDV(nit);
+    this.formProveedor.get('dv')?.setValue(dv);
+  }
+
+  private calculateDV(nit: string): string {
+    const cleanNit = nit.replace(/\D/g, ''); // Solo números
+    const vpri = [3, 7, 13, 17, 19, 23, 29, 37, 41, 43, 47, 53, 59, 67, 71];
+    const z = cleanNit.length;
+    let x = 0;
+    let y = 0;
+
+    for (let i = 0; i < z; i++) {
+      y = parseInt(cleanNit.substr(i, 1));
+      x += y * vpri[z - 1 - i];
+    }
+
+    y = x % 11;
+    if (y > 1) {
+      return (11 - y).toString();
+    } else {
+      return y.toString();
     }
   }
 
@@ -95,7 +176,7 @@ export class ProveedoresFormsPageComponent implements OnInit {
   loadProveedor(proveedor: ProveedoresInterface) {
     this.loaderService.show();
     this.formProveedor.patchValue(proveedor);
-    this.formProveedor.get("estado")?.setValue(proveedor.isActive ? 'A' : 'I');
+    // this.formProveedor.get("estado")?.setValue(proveedor.isActive ? 'A' : 'I');
     this.loaderService.hide();
   }
 
@@ -108,15 +189,16 @@ export class ProveedoresFormsPageComponent implements OnInit {
     }
 
     this.loaderService.show();
+    this.loading.set(true); 
 
     try {
       const formValue = {
         ...this.formProveedor.value,
-        isActive: this.formProveedor.get("estado")?.value === 'A' ? true : false,
+        // isActive: this.formProveedor.get("estado")?.value === 'A' ? true : false,
         telefono: this.formProveedor.get("telefono")?.value?.toString()
       }
 
-      delete formValue.estado;
+      // delete formValue.estado;
 
       if (this.proveedorId() == 'new-Item' || this.isModal()) {
         const client = await firstValueFrom(this.proveedoresService.createProveedor(formValue as Partial<ProveedoresInterface>));
@@ -151,6 +233,9 @@ export class ProveedoresFormsPageComponent implements OnInit {
 
     } catch (error: any) {
       this.notificationService.error(error.message, 'Error');
+    } finally {
+      this.loaderService.hide();
+      this.loading.set(false);
     }
 
   }

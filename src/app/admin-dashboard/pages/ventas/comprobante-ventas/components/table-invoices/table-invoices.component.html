@@ -166,7 +166,7 @@
               }
 
               <!-- Botón Anular (Si no está ya cancelada) -->
-              @if (invoice.status !== 'cancelled') {
+              @if (invoice.status !== 'cancelled' && invoice.tipoFactura === 'ESTANDAR') {
                 <button (click)="onAnular(invoice.id)"
                   class="inline-flex items-center rounded-lg p-2 text-sm text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 cursor-pointer"
                   title="Anular Factura">

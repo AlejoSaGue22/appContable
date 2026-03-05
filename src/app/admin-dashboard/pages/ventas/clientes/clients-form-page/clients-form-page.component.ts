@@ -33,6 +33,7 @@ export class ClientsFormPageComponent implements OnInit {
     activateRoute = inject(ActivatedRoute);
     catalogsStore = inject(CatalogsStore);
     headTitleCliente: HeaderInput = { title: 'Crear Cliente', slog: 'Registra un nuevo cliente al sistema' };
+    loading = signal<boolean>(false);
 
     clientsForm = this.fb.group({
         nombre: ['', Validators.required],
@@ -43,8 +44,8 @@ export class ClientsFormPageComponent implements OnInit {
         razonSocial: ['', Validators.required],
         direccion: ['', Validators.required],
         ciudad: ['', Validators.required],
-        telefono: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(10)]],
-        email: ['', Validators.required],
+        telefono: [''],
+        email: [''],
         observacion: [''],
         tributo: ['', Validators.required],
         responsableFiscal: ['', Validators.required],
@@ -127,6 +128,8 @@ export class ClientsFormPageComponent implements OnInit {
             return;
         }
 
+        this.loading.set(true);
+
         try {
 
             const formValue = {
@@ -167,6 +170,8 @@ export class ClientsFormPageComponent implements OnInit {
 
         } catch (error: any) {
             this.notificationService.error(error.message, 'Error');
+        } finally {
+            this.loading.set(false);
         }
 
     }
