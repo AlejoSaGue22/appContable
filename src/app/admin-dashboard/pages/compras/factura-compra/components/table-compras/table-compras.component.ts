@@ -1,4 +1,4 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, computed, input, output, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -6,6 +6,9 @@ import { FormsModule } from '@angular/forms';
 export interface PurchaseInvoiceFilters {
   status?: string;
   type?: string;
+  tipoFactura?: string;
+  numeroFactura?: string;
+  dianStatus?: string;
   providerName?: string;
   startDate?: string;
   endDate?: string;
@@ -33,8 +36,29 @@ export class TableComprasComponent {
   // Filter signals
   providerName = signal<string>('');
   status = signal<string>('');
+  tipoFactura = signal<string>('');
+  numeroFactura = signal<string>('');
+  dianStatus = signal<string>('');
   startDate = signal<string>('');
   endDate = signal<string>('');
+
+  activeFiltersCount = computed(() => {
+    let count = 0;
+    if (this.providerName()) count++;
+    if (this.status()) count++;
+    if (this.tipoFactura()) count++;
+    if (this.numeroFactura()) count++;
+    if (this.dianStatus()) count++;
+    if (this.startDate()) count++;
+    if (this.endDate()) count++;
+    return count;
+  });
+
+  showFilters = signal<boolean>(false);
+
+  toggleFilters(): void {
+    this.showFilters.update(v => !v);
+  }
 
   readonly statuses = [
     { value: '', label: 'Todos los estados' },
@@ -44,11 +68,30 @@ export class TableComprasComponent {
     { value: 'anulado', label: 'Anulado' }
   ];
 
+  readonly tiposFactura = [
+    { value: '', label: 'Todos los tipos' },
+    { value: 'ELECTRONICA', label: 'Electrónica' },
+    { value: 'ESTANDAR', label: 'Estándar' }
+  ];
+
+  readonly dianStatuses = [
+    { value: '', label: 'Todos los estados DIAN' },
+    { value: 'pending', label: 'Pendiente' },
+    { value: 'sent', label: 'Enviada' },
+    { value: 'processing', label: 'Procesando' },
+    { value: 'accepted', label: 'Aceptada' },
+    { value: 'rejected', label: 'Rechazada' },
+    { value: 'cancelled', label: 'Anulada' }
+  ];
+
   applyFilters(): void {
     const filters: PurchaseInvoiceFilters = {};
 
     if (this.providerName()) filters.providerName = this.providerName();
     if (this.status()) filters.status = this.status();
+    if (this.tipoFactura()) filters.tipoFactura = this.tipoFactura();
+    if (this.numeroFactura()) filters.numeroFactura = this.numeroFactura();
+    if (this.dianStatus()) filters.dianStatus = this.dianStatus();
     if (this.startDate()) filters.startDate = this.startDate();
     if (this.endDate()) filters.endDate = this.endDate();
 
@@ -58,6 +101,9 @@ export class TableComprasComponent {
   clearFilters(): void {
     this.providerName.set('');
     this.status.set('');
+    this.tipoFactura.set('');
+    this.numeroFactura.set('');
+    this.dianStatus.set('');
     this.startDate.set('');
     this.endDate.set('');
 
