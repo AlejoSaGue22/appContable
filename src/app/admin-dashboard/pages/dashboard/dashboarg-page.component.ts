@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { HeaderInput, HeaderTitlePageComponent } from '@dashboard/components/header-title-page/header-title-page.component';
 import { CardsTotales, NumCardsTotalesComponent } from '@shared/components/num-cards-totales/num-cards-totales.component';
@@ -40,6 +40,21 @@ export class DashboargPageComponent implements OnInit {
    cardsValor = signal<CardsTotales[]>([]);
    recentTransactions = signal<RecentTransaction[]>([]);
    history = signal<DashboardHistory[]>([]);
+
+   chartData = computed(() => {
+      const data = this.history();
+      if (!data.length) return [];
+
+      const maxVal = Math.max(...data.map(item => Math.max(item.ingresos, item.egresos)));
+      
+      const scaleBase = maxVal > 0 ? maxVal * 1.1 : 1;
+
+      return data.map(item => ({
+         ...item,
+         ingresosHeight: Math.min((item.ingresos / scaleBase) * 100, 100),
+         egresosHeight: Math.min((item.egresos / scaleBase) * 100, 100)
+      }));
+   });
 
    ngOnInit(): void {
       this.loadDashboardData();

@@ -63,6 +63,13 @@ export interface FacturaVenta {
   createdAt: Date;
 }
 
+export interface CatalogsItems {
+  id: number;
+  codigo: string;
+  nombre: string;
+  state: boolean;
+}
+
 export interface GetFacturaRequest {
   id: string;
   tipoFactura: TipoFactura;
@@ -73,14 +80,10 @@ export interface GetFacturaRequest {
   dianStatus: DianStatus;
   vendedor: string | null;
   canalVenta: number;
+  canalVentaRel: CatalogsItems;
   formaPago: FormaPago;
   metodoPago: string | null;
-  metodoPagoRel: {
-    id: number;
-    codigo: string;
-    nombre: string;
-    state: boolean;
-  };
+  metodoPagoRel: CatalogsItems;
   fecha: string; // ISO date (YYYY-MM-DD)
   fechaVencimiento: string | null;
   asientoError: string | null;

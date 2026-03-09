@@ -134,29 +134,29 @@
     <!-- Información del Cliente -->
     <div class="mb-8 grid gap-6 md:grid-cols-2">
       <div>
-        <h3 class="mb-3 text-sm font-semibold uppercase text-gray-500 dark:text-gray-400">Cliente</h3>
+        <h3 class="mb-3 text-lg font-semibold uppercase text-gray-900 dark:text-gray-400">Cliente</h3>
         <div class="space-y-1">
-          <p class="text-lg font-semibold text-gray-900 dark:text-white">
-            {{ factura()!.client.nombre }} {{ factura()!.client.apellido }}
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            <span class="font-medium text-gray-700">Cliente:</span> {{ factura()!.client.nombre }} {{ factura()!.client.apellido }}
           </p>
           <p class="text-sm text-gray-600 dark:text-gray-400">
-            <span class="font-medium">Documento:</span> {{ factura()!.client.tipoDocumentoRel.abreviatura }} - {{ factura()!.client.numeroDocumento }}
+            <span class="font-medium text-gray-700">Documento:</span> {{ factura()!.client.tipoDocumentoRel.abreviatura }} - {{ factura()!.client.numeroDocumento }}
           </p>
           @if (factura()!.client.email) {
           <p class="text-sm text-gray-600 dark:text-gray-400">
-            <span class="font-medium">Email:</span> {{ factura()!.client.email }}
+            <span class="font-medium text-gray-700">Email:</span> {{ factura()!.client.email }}
           </p>
           }
           @if (factura()!.client.telefono) {
           <p class="text-sm text-gray-600 dark:text-gray-400">
-            <span class="font-medium">Teléfono:</span> {{ factura()!.client.telefono }}
+            <span class="font-medium text-gray-700">Teléfono:</span> {{ factura()!.client.telefono }}
           </p>
           }
         </div>
       </div>
 
       <div>
-        <h3 class="mb-3 text-sm font-semibold uppercase text-gray-500 dark:text-gray-400">Información de Venta</h3>
+        <h3 class="mb-3 text-lg font-semibold uppercase text-gray-900 dark:text-gray-400">Información de Venta</h3>
         <div class="grid grid-cols-2 gap-x-4 gap-y-1">
           <p class="text-sm text-gray-600 dark:text-gray-400 font-medium">Tipo:</p>
           <p class="text-sm text-gray-900 dark:text-gray-100">{{ getTipoFacturaLabel(factura()!.tipoFactura) }}</p>
@@ -165,7 +165,7 @@
           <p class="text-sm text-gray-900 dark:text-gray-100">{{ factura()!.vendedor || 'N/A' }}</p>
 
           <p class="text-sm text-gray-600 dark:text-gray-400 font-medium">Canal:</p>
-          <p class="text-sm text-gray-900 dark:text-gray-100">{{ factura()!.canalVenta }}</p>
+          <p class="text-sm text-gray-900 dark:text-gray-100">{{ factura()!.canalVentaRel.nombre }}</p>
 
           <p class="text-sm text-gray-600 dark:text-gray-400 font-medium">Forma de Pago:</p>
           <p class="text-sm text-gray-900 dark:text-gray-100">{{ factura()!.formaPago }}</p>
@@ -173,12 +173,6 @@
           @if (factura()!.metodoPago) {
           <p class="text-sm text-gray-600 dark:text-gray-400 font-medium">Método:</p>
           <p class="text-sm text-gray-900 dark:text-gray-100">{{ factura()!.metodoPago }}</p>
-          }
-
-          @if (factura()!.cufe) {
-          <p class="col-span-2 mt-2 text-xs text-gray-500 dark:text-gray-400">
-            <span class="font-medium">CUFE:</span> {{ factura()!.cufe }}
-          </p>
           }
         </div>
       </div>
@@ -265,12 +259,18 @@
 
     <!-- Footer Info -->
     <div class="mt-8 border-t border-gray-200 pt-6 dark:border-gray-700">
-      <div class="grid gap-4 text-xs text-gray-500 dark:text-gray-400 md:grid-cols-2">
+      <div class="grid gap-4 text-xs text-gray-500 dark:text-gray-400 md:grid-cols-3">
         <div>
           <p class="font-medium">Creado por:</p>
           <p>{{ factura()?.createdBy?.email || 'Sistema' }}</p>
           <p>{{ formatDate(factura()!.createdAt) }}</p>
         </div>
+
+        @if (factura()!.cufe) {
+          <p class="col-span-2 mt-2 text-xs text-gray-500 dark:text-gray-400">
+            <span class="font-medium">CUFE:</span> {{ factura()!.cufe }}
+          </p>
+        }
 
         @if (factura()!.dianStatus ) {
         <div class="text-right">
