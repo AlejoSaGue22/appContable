@@ -22,7 +22,7 @@ export interface ComprobanteCompraResponse {
 export interface FacturaCompra {
     id: string;
     comprobante: string;
-    status: InvoiceStatus;
+    status: InvoiceCompraStatus;
     fecha: string;
     fechaVencimiento?: string;
     formapago: string;
@@ -71,11 +71,12 @@ export interface ItemFacturaResponse {
     createdAt: Date;
 }
 
-export enum InvoiceStatus {
-    DRAFT = 'draft',
-    REGISTERED = 'registered',
-    PAID = 'paid',
-    CANCELLED = 'cancelled'
+export enum InvoiceCompraStatus {
+    BORRADOR = 'borrador',
+    ERROR_ASIENTO = 'error_asiento',
+    REGISTRADO = 'registrado',
+    PAGADO = 'pagado',
+    ANULADO = 'anulado'
 }
 
 

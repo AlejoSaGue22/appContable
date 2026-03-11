@@ -57,19 +57,6 @@
           class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400" />
       </div>
 
-      <!-- Filtro Tipo de Factura -->
-      <div>
-        <label for="tipoFactura" class="mb-2 block text-xs font-medium text-gray-900 dark:text-gray-300">
-          Tipo de Factura
-        </label>
-        <select id="tipoFactura" [(ngModel)]="tipoFactura"
-          class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
-          @for (tipo of tiposFactura; track tipo.value) {
-          <option [value]="tipo.value">{{ tipo.label }}</option>
-          }
-        </select>
-      </div>
-
       <!-- Filtro por estado -->
       <div>
         <label for="status" class="mb-2 block text-xs font-medium text-gray-900 dark:text-gray-300">
@@ -83,21 +70,8 @@
         </select>
       </div>
 
-      <!-- Filtro Estado DIAN -->
-      <div>
-        <label for="dianStatus" class="mb-2 block text-xs font-medium text-gray-900 dark:text-gray-300">
-          Estado DIAN
-        </label>
-        <select id="dianStatus" [(ngModel)]="dianStatus"
-          class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
-          @for (ds of dianStatuses; track ds.value) {
-          <option [value]="ds.value">{{ ds.label }}</option>
-          }
-        </select>
-      </div>
-
       <!-- Fechas -->
-      <div class="sm:col-span-2 lg:col-span-1 grid grid-cols-2 gap-2">
+      <div class="sm:col-span-2 lg:col-span-2 grid grid-cols-2 gap-2">
         <div>
           <label for="startDate" class="mb-2 block text-xs font-medium text-gray-900 dark:text-gray-300">
             Desde

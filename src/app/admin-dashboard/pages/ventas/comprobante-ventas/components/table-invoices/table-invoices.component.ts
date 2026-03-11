@@ -2,6 +2,7 @@ import { Component, computed, input, output, signal } from '@angular/core';
 import { FacturaVenta, GetFacturaRequest, InvoiceStatus } from '@dashboard/interfaces/documento-venta-interface';
 import { RouterLink } from "@angular/router";
 import { FormsModule } from '@angular/forms';
+import { TitleCasePipe } from '@angular/common';
 
 export interface InvoiceFilters {
   status?: string;
@@ -16,7 +17,7 @@ export interface InvoiceFilters {
 
 @Component({
   selector: 'app-table-invoices',
-  imports: [RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, TitleCasePipe],
   templateUrl: './table-invoices.component.html',
 })
 export class TableInvoices {
@@ -34,6 +35,8 @@ export class TableInvoices {
   pageChange = output<number>();
   emitir = output<string>();
   anular = output<string>();
+  retry = output<string>();
+  delete = output<string>();
   downloadPDF = output<string>();
   downloadXML = output<string>();
 
@@ -191,8 +194,16 @@ export class TableInvoices {
     this.emitir.emit(id);
   }
 
+  onRetry(id: string): void {
+    this.retry.emit(id);
+  }
+
   onAnular(id: string): void {
     this.anular.emit(id);
+  }
+
+  onDelete(id: string): void {
+    this.delete.emit(id);
   }
 
   onDownloadPDF(id: string): void {
