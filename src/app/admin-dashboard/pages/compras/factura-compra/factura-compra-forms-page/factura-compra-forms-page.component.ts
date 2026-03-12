@@ -322,8 +322,8 @@ export class FacturaCompraFormsPageComponent implements OnInit {
 
 
     onSubmit() {
+        this.formCompra.markAllAsTouched();
         if (this.formCompra.invalid) {
-            this.formCompra.markAllAsTouched();
             this.notificationService.error(
                 'Por favor, completa los campos requeridos.',
                 'Campos no validos',
@@ -345,14 +345,14 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         const factura = this.formCompra.value;
         const items = this.formCompra.controls.items.value;
 
-        const invoiceData = {
-            proveedorId: factura.proveedor,
-            fecha: factura.fechaEmision,
-            numero: factura.referencia,
-            observaciones: factura.observaciones,
-            fechaVencimiento: factura.fechaVencimiento,
-            formaPago: factura.formaPago,
-            metodoPago: factura.metodoPago,
+        const invoiceData: Partial<FacturaCompra> = {
+            proveedorId: factura.proveedor!,
+            fecha: factura.fechaEmision!,
+            numero: factura.referencia || '',
+            observaciones: factura.observaciones || '',
+            fechaVencimiento: factura.fechaVencimiento || '',
+            formaPago: factura.formaPago!,
+            metodoPago: factura.metodoPago || '',
             items: items.map((item: any) => ({
                 articuloId: item.productoId,
                 quantity: item.cantidad,
@@ -369,9 +369,8 @@ export class FacturaCompraFormsPageComponent implements OnInit {
 
         console.log(invoiceData);
         if (this.facturaId() == 'new-Item') {
-            this.facturaService.createFacturaCompra(invoiceData as Partial<FacturaCompra>).subscribe((response) => {
+            this.facturaService.createFacturaCompra(invoiceData).subscribe((response) => {
                 this.loading.set(false);
-                console.log(response);
                 if (response.success == false) {
                     this.notificationService.error(
                         `Ocurrio un problema al crear la factura ${HelpersUtils.getMessageError(response.message)}`,
@@ -394,9 +393,34 @@ export class FacturaCompraFormsPageComponent implements OnInit {
             });
 
         } else {
-            // this.updateFactura(this.facturaId(), invoiceData);
+            this.updateFactura(this.facturaId(), invoiceData);
         }
 
+    }
+
+    updateFactura(id: string, data: Partial<FacturaCompra>) {
+        this.facturaService.updateFacturaCompra(id, data).subscribe((response) => {
+            this.loading.set(false);
+            if (response.success == false) {
+                this.notificationService.error(
+                    `Ocurrio un problema al actualizar la factura ${HelpersUtils.getMessageError(response.message)}`,
+                    'Error',
+                    5000
+                );
+                return;
+            }
+
+            console.log('✅ Respuesta del backend:', response);
+            this.notificationService.success(
+                'Factura actualizada con exito',
+                'Accion Completada',
+                5000
+            );
+
+            setTimeout(() => {
+                this.router.navigateByUrl('/panel/compras/purchases')
+            }, 1500);
+        });
     }
 
     // --- Modal Handling ---
@@ -408,7 +432,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         this.isProviderModalVisible.set(false);
     }
 
-    onProviderSaved(newProvider: any) { // Replace any with proper type
+    onProviderSaved(newProvider: any) {
         // Add new provider to list
         this.proveedoresList.update(list => [...list, newProvider]);
 
@@ -417,9 +441,9 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         // Select the new provider in the form
         this.formCompra.patchValue({
             proveedor: newProvider.id,
-            proveedorSearch: newProvider.nombre,
-            numeroIdentificacion: newProvider.tipoDocumento + ' - ' + newProvider.identificacion,
-            tipoIdentificacion: newProvider.tipoDocumento,
+            proveedorSearch: newProvider.nombre || newProvider.razonSocial,
+            numeroIdentificacion: newProvider.tipoDocumentoRel.abreviatura + ' - ' + newProvider.identificacion,
+            tipoIdentificacion: newProvider.tipoDocumentoRel.abreviatura,
             telefono: newProvider.telefono,
             email: newProvider.email,
         });
@@ -437,7 +461,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         this.isProductModalVisible.set(false);
     }
 
-    onProductSaved(newProduct: any) { // Replace any with proper type
+    onProductSaved(newProduct: any) { 
         // Add new product to list
         this.productosList.update(list => [...list, newProduct]);
 

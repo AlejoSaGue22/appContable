@@ -33,8 +33,9 @@ export class ComprobanteVentasComponent {
    totalPages = signal(1);
    totalItems = signal(0);
    pageSize = signal(10);
-   isModalAnular = signal<boolean>(false);
-   idAnular = signal<string>('');
+   isModalItem = signal<boolean>(false);
+   idItem = signal<string>('');
+   action = signal<string>('');
    totalComprobantes = signal<number>(0);
    cardsTotales = signal<CardsTotales[]>([]);
    filters = signal<InvoiceFilters>({});
@@ -104,9 +105,23 @@ export class ComprobanteVentasComponent {
       ]
    }
 
-   openModalAnular(id: string): void {
-      this.isModalAnular.set(true);
-      this.idAnular.set(id);
+   openModalItem(id: string, action: string): void {
+      this.isModalItem.set(true);
+      this.idItem.set(id);
+      this.action.set(action);
+   }
+
+   onAction(): void {
+      switch (this.action()) {
+         case 'anular':
+            this.onAnular();
+            break;
+         case 'delete':
+            this.onDelete();
+            break;
+         default:
+            break;
+      }
    }
 
    onEmitir(id: string): void {
@@ -124,13 +139,39 @@ export class ComprobanteVentasComponent {
    onAnular(): void {
       // Simplificado: En un caso real podrías abrir un modal para pedir el motivo
       const motivo = 'Anulación solicitada por el usuario';
-      this.comprobantesVentasService.anularInvoice(this.idAnular(), motivo).subscribe((res: ResponseResult) => {
+      this.comprobantesVentasService.anularInvoice(this.idItem(), motivo).subscribe((res: ResponseResult) => {
          if (res.success) {
+            this.isModalItem.set(false);
             this.notificacionService.success('Factura anulada con éxito', 'Éxito');
             this.comprobanteVentasResource.reload();
          } else {
             const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
             this.notificacionService.error('Error al anular factura', message || 'Error desconocido');
+         }
+      });
+   }
+
+   onRetry(id: string): void {
+      this.comprobantesVentasService.retryInvoice(id).subscribe((res: ResponseResult) => {
+         if (res.success) {
+            this.notificacionService.success('Factura reintentada con éxito', 'Éxito');
+            this.comprobanteVentasResource.reload();
+         } else {
+            const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
+            this.notificacionService.error('Error al reintentar factura', message || 'Error desconocido');
+         }
+      });
+   }
+
+   onDelete(): void {
+      this.comprobantesVentasService.deleteInvoice(this.idItem()).subscribe((res: ResponseResult) => {
+         if (res.success) {
+            this.isModalItem.set(false);
+            this.notificacionService.success('Factura eliminada con éxito', 'Éxito');
+            this.comprobanteVentasResource.reload();
+         } else {
+            const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
+            this.notificacionService.error('Error al eliminar factura', message || 'Error desconocido');
          }
       });
    }

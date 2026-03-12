@@ -21,16 +21,17 @@ export interface ComprobanteCompraResponse {
 
 export interface FacturaCompra {
     id: string;
-    comprobante: string;
-    status: InvoiceStatus;
+    proveedorId: string;
+    numero: string;
+    status: InvoiceCompraStatus;
     fecha: string;
     fechaVencimiento?: string;
-    formapago: string;
+    formaPago: string;
     metodoPago?: string;
+    observaciones?: string;
     items: ItemFactura[];
     iva: number;
     descuento: number;
-    proveedorId: string;
     proveedor?: ProveedoresInterface;
     subtotal: number;
     total: number;
@@ -71,11 +72,12 @@ export interface ItemFacturaResponse {
     createdAt: Date;
 }
 
-export enum InvoiceStatus {
-    DRAFT = 'draft',
-    REGISTERED = 'registered',
-    PAID = 'paid',
-    CANCELLED = 'cancelled'
+export enum InvoiceCompraStatus {
+    BORRADOR = 'borrador',
+    ERROR_ASIENTO = 'error_asiento',
+    REGISTRADO = 'registrado',
+    PAGADO = 'pagado',
+    ANULADO = 'anulado'
 }
 
 

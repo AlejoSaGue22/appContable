@@ -36,7 +36,7 @@ export class AuthService {
 
     return this.http.post<LoginResponse>(`${baseURL}/auth/login`, { email, password })
       .pipe(
-        delay(3000),
+        // delay(3000),
         map((auth: LoginResponse): ResponseResult => {
           this.handleAuthSuccess(auth, true) // true = initial login
           return { success: true }

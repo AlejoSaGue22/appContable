@@ -28,6 +28,7 @@ export class TableComprasComponent {
   totalPages = input<number>(1);
   totalItems = input<number>(0);
   pageSize = input<number>(10);
+  anular = output<string>();
 
   // Output events
   filterChange = output<PurchaseInvoiceFilters>();
@@ -96,6 +97,10 @@ export class TableComprasComponent {
     if (this.endDate()) filters.endDate = this.endDate();
 
     this.filterChange.emit(filters);
+  }
+
+  onAnular(id: string): void {
+    this.anular.emit(id);
   }
 
   clearFilters(): void {

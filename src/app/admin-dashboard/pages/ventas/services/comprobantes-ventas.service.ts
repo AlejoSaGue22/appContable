@@ -57,7 +57,6 @@ export class ComprobantesVentasService {
     );
   }
 
-
   getInvoiceById(id: string) {
     return this.http.get<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}`)
   }
@@ -71,6 +70,20 @@ export class ComprobantesVentasService {
 
   anularInvoice(id: string, motivo: string) {
     return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/anular`, { motivo }).pipe(
+      map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+    );
+  }
+
+  retryInvoice(id: string) {
+    return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/reintentar`, {}).pipe(
+      map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+    );
+  }
+
+  deleteInvoice(id: string) {
+    return this.http.delete<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}`).pipe(
       map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
       catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
     );
