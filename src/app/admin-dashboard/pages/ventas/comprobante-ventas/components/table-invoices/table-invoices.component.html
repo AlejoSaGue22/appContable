@@ -237,6 +237,7 @@
                       </button>
                   } 
 
+
                   <!-- Botones Descarga (Solo si está aceptada o emitida) -->
                   @if (invoice.tipoFactura === 'ELECTRONICA' && (invoice.status === 'accepted' || invoice.status === 'paid')) {
                       <button (click)="onDownloadPDF(invoice.id)"
