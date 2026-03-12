@@ -21,16 +21,17 @@ export interface ComprobanteCompraResponse {
 
 export interface FacturaCompra {
     id: string;
-    comprobante: string;
+    proveedorId: string;
+    numero: string;
     status: InvoiceCompraStatus;
     fecha: string;
     fechaVencimiento?: string;
-    formapago: string;
+    formaPago: string;
     metodoPago?: string;
+    observaciones?: string;
     items: ItemFactura[];
     iva: number;
     descuento: number;
-    proveedorId: string;
     proveedor?: ProveedoresInterface;
     subtotal: number;
     total: number;

@@ -51,7 +51,7 @@ export class FacturaCompraService {
     }
 
     updateFacturaCompra(id: string, factura: Partial<FacturaCompra>): Observable<ResponseResult> {
-        return this.http.put<ComprobanteCompraResponse>(`${baseUrl}/facturas-compras/${id}`, factura).pipe(
+        return this.http.patch<ComprobanteCompraResponse>(`${baseUrl}/facturas-compras/${id}`, factura).pipe(
             map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
             catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
         )
