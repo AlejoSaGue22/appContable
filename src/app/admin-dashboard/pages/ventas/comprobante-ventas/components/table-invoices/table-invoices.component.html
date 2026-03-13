@@ -91,7 +91,7 @@
         <select id="dianStatus" [(ngModel)]="dianStatus"
           class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
           @for (ds of dianStatuses; track ds.value) {
-          <option [value]="ds.value">{{ ds.label }}</option>
+            <option [value]="ds.value">{{ ds.label }}</option>
           }
         </select>
       </div>
