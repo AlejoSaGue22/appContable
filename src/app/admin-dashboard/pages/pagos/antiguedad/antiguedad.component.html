@@ -1,0 +1,204 @@
+<header-title-page [titleHead]="headTitle()" />
+
+<div class="w-full space-y-6">
+
+  <!-- Selector de vista (Cobrar / Pagar) -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <div class="flex border-b border-gray-200">
+      <button type="button"
+              (click)="vistaActiva.set('cobrar')"
+              class="flex-1 py-3.5 text-sm font-semibold flex items-center justify-center gap-2 transition-colors"
+              [ngClass]="vistaActiva() === 'cobrar'
+                ? 'bg-green-50 text-green-700 border-b-2 border-green-500'
+                : 'text-slate-500 hover:bg-slate-50'">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline>
+        </svg>
+        Cartera por Cobrar
+        @if (agingCobrar()?.totales?.total) {
+          <span class="px-2 py-0.5 rounded-full text-xs bg-green-100 text-green-700">
+            {{ agingCobrar()!.totales.total | currency:'COP':'symbol-narrow':'1.0-0' }}
+          </span>
+        }
+      </button>
+      <button type="button"
+              (click)="vistaActiva.set('pagar')"
+              class="flex-1 py-3.5 text-sm font-semibold flex items-center justify-center gap-2 transition-colors"
+              [ngClass]="vistaActiva() === 'pagar'
+                ? 'bg-orange-50 text-orange-700 border-b-2 border-orange-500'
+                : 'text-slate-500 hover:bg-slate-50'">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline>
+        </svg>
+        Deuda por Pagar
+        @if (agingPagar()?.totales?.total) {
+          <span class="px-2 py-0.5 rounded-full text-xs bg-orange-100 text-orange-700">
+            {{ agingPagar()!.totales.total | currency:'COP':'symbol-narrow':'1.0-0' }}
+          </span>
+        }
+      </button>
+    </div>
+
+    <!-- Contenido activo -->
+    <div class="p-6">
+      @if ((vistaActiva() === 'cobrar' && loadingCobrar()) || (vistaActiva() === 'pagar' && loadingPagar())) {
+        <div class="w-full h-1 bg-blue-100 rounded-full mb-6 overflow-hidden">
+          <div class="h-full bg-blue-500 rounded-full animate-pulse w-3/4"></div>
+        </div>
+      }
+
+      @let reporte = vistaActiva() === 'cobrar' ? agingCobrar() : agingPagar();
+      @let labelContraparte = vistaActiva() === 'cobrar' ? 'Cliente' : 'Proveedor';
+
+      @if (reporte) {
+
+        <!-- Barras de distribución -->
+        <div class="mb-8">
+          <h3 class="text-sm font-semibold text-slate-600 uppercase tracking-wider mb-4">
+            Distribución por Antigüedad
+          </h3>
+          <div class="space-y-3">
+            @for (b of buckets; track b.key) {
+              <div class="flex items-center gap-3">
+                <span class="w-20 text-right text-xs text-slate-500 flex-shrink-0">{{ b.label }}</span>
+                <div class="flex-1 h-6 bg-slate-100 rounded-full overflow-hidden">
+                  <div class="h-full rounded-full transition-all duration-500 flex items-center pl-2"
+                       [style.width.%]="pct(reporte!.totales[b.key], reporte!.totales.total)"
+                       [ngClass]="b.bgClass">
+                    @if (pct(reporte!.totales[b.key], reporte!.totales.total) > 10) {
+                      <span class="text-xs font-semibold text-white">
+                        {{ pct(reporte!.totales[b.key], reporte!.totales.total) }}%
+                      </span>
+                    }
+                  </div>
+                </div>
+                <span class="w-36 text-right text-xs font-semibold flex-shrink-0"
+                      [ngClass]="b.textClass">
+                  {{ reporte!.totales[b.key] | currency:'COP':'symbol-narrow':'1.0-0' }}
+                </span>
+              </div>
+            }
+          </div>
+          <div class="mt-4 flex justify-end border-t border-gray-100 pt-3">
+            <span class="text-sm text-slate-500 mr-3">Total:</span>
+            <span class="text-sm font-bold text-slate-800">
+              {{ reporte!.totales.total | currency:'COP':'symbol-narrow':'1.0-0' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Tabla de totales por contraparte -->
+        <h3 class="text-sm font-semibold text-slate-600 uppercase tracking-wider mb-4">
+          Detalle por {{ labelContraparte }}
+        </h3>
+        <div class="overflow-x-auto mb-8">
+          <table class="w-full text-left table-auto shadow-sm rounded-xl text-sm">
+            <thead>
+              <tr class="bg-slate-50 border-b border-gray-200">
+                <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider">{{ labelContraparte }}</th>
+                @for (b of buckets; track b.key) {
+                  <th class="p-3 font-sans text-xs font-bold uppercase tracking-wider text-right"
+                      [ngClass]="b.textClass">{{ b.label }}</th>
+                }
+                <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider text-right">Total</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              @for (grupo of reporte!.grupos; track grupo.contraparteId) {
+                <tr class="hover:bg-slate-50/80 transition-colors cursor-pointer"
+                    (click)="toggleGrupo(grupo.contraparteId)">
+                  <td class="p-3">
+                    <div class="flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-slate-400 transition-transform"
+                           [class.rotate-90]="gruposAbiertos().has(grupo.contraparteId)"
+                           viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                      </svg>
+                      <span class="font-medium text-slate-800">{{ grupo.contraparteNombre }}</span>
+                      <span class="text-xs bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">
+                        {{ grupo.facturas.length }} fact.
+                      </span>
+                    </div>
+                  </td>
+                  @for (b of buckets; track b.key) {
+                    <td class="p-3 text-right">
+                      @if (grupo[b.key] > 0) {
+                        <span class="text-xs font-semibold" [ngClass]="b.textClass">
+                          {{ grupo[b.key] | currency:'COP':'symbol-narrow':'1.0-0' }}
+                        </span>
+                      } @else {
+                        <span class="text-slate-300 text-xs">—</span>
+                      }
+                    </td>
+                  }
+                  <td class="p-3 text-right font-bold text-slate-800">
+                    {{ grupo.total | currency:'COP':'symbol-narrow':'1.0-0' }}
+                  </td>
+                </tr>
+
+                <!-- Filas de detalle expandibles -->
+                @if (gruposAbiertos().has(grupo.contraparteId)) {
+                  @for (f of grupo.facturas; track f.id) {
+                    <tr class="bg-slate-50/60 border-l-2 border-blue-200">
+                      <td class="p-3 pl-10">
+                        <span class="font-mono text-xs font-semibold text-blue-600">{{ f.numero }}</span>
+                        <span class="text-xs text-slate-400 ml-2">{{ f.emision | date:'dd/MM/yyyy' }}</span>
+                      </td>
+                      @for (b of buckets; track b.key) {
+                        <td class="p-3 text-right">
+                          @if (f.bucket === b.key) {
+                            <span class="text-xs font-semibold" [ngClass]="b.textClass">
+                              {{ f.saldo | currency:'COP':'symbol-narrow':'1.0-0' }}
+                            </span>
+                          } @else {
+                            <span class="text-slate-200 text-xs">—</span>
+                          }
+                        </td>
+                      }
+                      <td class="p-3 text-right">
+                        <div class="flex items-center justify-end gap-2">
+                          <span class="text-xs font-bold text-slate-700">
+                            {{ f.saldo | currency:'COP':'symbol-narrow':'1.0-0' }}
+                          </span>
+                          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium"
+                                [ngClass]="{
+                                  'bg-blue-100 text-blue-600':   f.paymentStatus === 'pending',
+                                  'bg-amber-100 text-amber-600': f.paymentStatus === 'partial',
+                                  'bg-red-100 text-red-600':     f.paymentStatus === 'overdue'
+                                }">
+                            @if (f.diasVencida > 0) { +{{ f.diasVencida }}d }
+                            @else { {{ f.diasVencida * -1 }}d }
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                }
+              }
+
+              <!-- Fila de totales -->
+              <tr class="bg-slate-100 border-t-2 border-slate-300 font-bold">
+                <td class="p-3 text-xs uppercase tracking-wider text-slate-500">TOTAL</td>
+                @for (b of buckets; track b.key) {
+                  <td class="p-3 text-right">
+                    <span class="text-xs font-bold" [ngClass]="b.textClass">
+                      {{ reporte!.totales[b.key] | currency:'COP':'symbol-narrow':'1.0-0' }}
+                    </span>
+                  </td>
+                }
+                <td class="p-3 text-right text-slate-800">
+                  {{ reporte!.totales.total | currency:'COP':'symbol-narrow':'1.0-0' }}
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+      }
+    </div>
+  </div>
+
+</div>

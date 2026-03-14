@@ -28,6 +28,10 @@ export const routes: Routes = [
                 loadChildren: () => import('./administracion/administracion.routes')
             },
             {
+                path: 'pagos',
+                loadChildren: () => import('./pagos/pagos.routes')
+            },
+            {
                 path: '**',
                 redirectTo: 'dashboard'
             }

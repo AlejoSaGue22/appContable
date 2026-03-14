@@ -1,0 +1,260 @@
+
+<!-- cxc.component.html -->
+<header-title-page [titleHead]="headTitle()" />
+
+<div class="w-full space-y-6">
+
+  <!-- Tarjetas resumen -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 flex items-center gap-4">
+      <div class="p-3 rounded-full bg-blue-50 flex-shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+          <line x1="8" y1="21" x2="16" y2="21"></line>
+          <line x1="12" y1="17" x2="12" y2="21"></line>
+        </svg>
+      </div>
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Cartera</p>
+        <p class="text-xl font-bold text-slate-800 mt-0.5">
+          {{ resumen.totalCartera | currency:'COP':'symbol-narrow':'1.0-0' }}
+        </p>
+        <p class="text-xs text-slate-400 mt-0.5">
+          {{ resumen.cantidadPorVencer + resumen.cantidadVencida }} facturas
+        </p>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-l-4 border-amber-400 p-5 flex items-center gap-4">
+      <div class="p-3 rounded-full bg-amber-50 flex-shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-500" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+      </div>
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Por Vencer</p>
+        <p class="text-xl font-bold text-amber-600 mt-0.5">
+          {{ resumen.porVencer | currency:'COP':'symbol-narrow':'1.0-0' }}
+        </p>
+        <p class="text-xs text-slate-400 mt-0.5">{{ resumen.cantidadPorVencer }} facturas</p>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-l-4 border-red-400 p-5 flex items-center gap-4">
+      <div class="p-3 rounded-full bg-red-50 flex-shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+      </div>
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Cartera Vencida</p>
+        <p class="text-xl font-bold text-red-600 mt-0.5">
+          {{ resumen.vencida | currency:'COP':'symbol-narrow':'1.0-0' }}
+        </p>
+        <p class="text-xs text-slate-400 mt-0.5">{{ resumen.cantidadVencida }} facturas</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Tabla principal -->
+  <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+    <div class="p-6">
+
+      <!-- Header tabla -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <h3 class="text-lg font-medium text-slate-700 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line>
+            <line x1="8" y1="18" x2="21" y2="18"></line>
+            <line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line>
+            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+          </svg>
+          Facturas por Cobrar
+        </h3>
+
+        <!-- Filtros -->
+        <div class="flex flex-col sm:flex-row gap-3">
+          <div class="relative">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400"
+                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input
+              [formControl]="filtroTexto"
+              class="pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-md focus:outline-none
+                     focus:border-slate-400 hover:border-slate-300 shadow-sm w-full sm:w-52"
+              placeholder="Buscar cliente o factura..." />
+          </div>
+
+          <select
+            [formControl]="filtroEstado"
+            class="text-sm border border-slate-200 rounded-md px-3 py-2 focus:outline-none
+                   focus:border-slate-400 hover:border-slate-400 shadow-sm cursor-pointer bg-transparent">
+            <option value="">Todos los estados</option>
+            <option value="pending">Pendiente</option>
+            <option value="partial">Parcial</option>
+            <option value="overdue">Vencida</option>
+          </select>
+
+          <button (click)="cargar()" [disabled]="loading"
+                  class="flex items-center gap-1.5 px-4 py-2 text-sm border border-slate-200 rounded-md
+                         hover:bg-slate-50 transition-colors shadow-sm disabled:opacity-50">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" [class.animate-spin]="loading"
+                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+            </svg>
+            Actualizar
+          </button>
+        </div>
+      </div>
+
+      <!-- Progress bar -->
+      @if (loading) {
+        <div class="w-full h-1 bg-blue-100 rounded-full mb-4 overflow-hidden">
+          <div class="h-full bg-blue-500 rounded-full animate-pulse w-3/4"></div>
+        </div>
+      }
+
+      <!-- Tabla -->
+      <div class="overflow-x-auto">
+        <table class="w-full text-left table-auto shadow-sm rounded-xl">
+          <thead>
+            <tr class="bg-slate-50 border-b border-gray-200">
+              <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider">Factura</th>
+              <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider">Cliente</th>
+              <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider text-center">Vencimiento</th>
+              <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider text-center">Días</th>
+              <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider text-right">Total</th>
+              <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider text-right">Pagado</th>
+              <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider text-right">Saldo</th>
+              <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider text-center">Estado</th>
+              <th class="p-4 w-20"></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+
+            @for (item of itemsFiltrados; track item.facturaId) {
+              <tr class="hover:bg-slate-50/80 transition-colors group"
+                  [class.bg-red-50]="item.paymentStatus === 'overdue'">
+
+                <td class="p-4">
+                  <span class="font-mono text-sm font-semibold text-blue-600">
+                    {{ item.numeroFactura }}
+                  </span>
+                </td>
+
+                <td class="p-4">
+                  <span class="text-sm text-slate-700">{{ item.clienteNombre }}</span>
+                </td>
+
+                <td class="p-4 text-center">
+                  <span class="text-sm text-slate-600">
+                    {{ item.fechaVencimiento ? (item.fechaVencimiento | date:'dd/MM/yyyy') : '—' }}
+                  </span>
+                </td>
+
+                <td class="p-4 text-center">
+                  @if (item.diasVencida > 0) {
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700">
+                      +{{ item.diasVencida }}d
+                    </span>
+                  } @else if (item.diasVencida < 0) {
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                      {{ item.diasVencida * -1 }}d
+                    </span>
+                  } @else {
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
+                      Hoy
+                    </span>
+                  }
+                </td>
+
+                <td class="p-4 text-right text-sm text-slate-600">
+                  {{ item.total | currency:'COP':'symbol-narrow':'1.0-0' }}
+                </td>
+
+                <td class="p-4 text-right text-sm text-slate-400">
+                  {{ item.totalPagado | currency:'COP':'symbol-narrow':'1.0-0' }}
+                </td>
+
+                <td class="p-4 text-right">
+                  <span class="text-sm font-bold text-slate-800">
+                    {{ item.saldoPendiente | currency:'COP':'symbol-narrow':'1.0-0' }}
+                  </span>
+                </td>
+
+                <td class="p-4 text-center">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                        [ngClass]="{
+                          'bg-blue-100 text-blue-700':   item.paymentStatus === 'pending',
+                          'bg-amber-100 text-amber-700': item.paymentStatus === 'partial',
+                          'bg-red-100 text-red-700':     item.paymentStatus === 'overdue',
+                          'bg-green-100 text-green-700': item.paymentStatus === 'paid'
+                        }">
+                    {{ etiquetaEstado(item.paymentStatus) }}
+                  </span>
+                </td>
+
+                <td class="p-4 text-right">
+                  <button
+                    type="button"
+                    (click)="abrirCobro(item)"
+                    class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold
+                           rounded-md transition-all shadow-sm hover:shadow flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2.5">
+                      <line x1="12" y1="5" x2="12" y2="19"></line>
+                      <polyline points="19 12 12 19 5 12"></polyline>
+                    </svg>
+                    Cobrar
+                  </button>
+                </td>
+              </tr>
+            }
+
+            @if (itemsFiltrados.length === 0 && !loading) {
+              <tr>
+                <td colspan="9" class="p-12 text-center">
+                  <div class="flex flex-col items-center justify-center text-slate-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2 opacity-20"
+                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <path d="M12 8v4"></path><path d="M12 16h.01"></path>
+                    </svg>
+                    <p class="text-sm font-medium">No hay facturas por cobrar</p>
+                    <p class="text-xs mt-1">No se encontraron resultados con los filtros aplicados.</p>
+                  </div>
+                </td>
+              </tr>
+            }
+
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal cobro usando el app-modal del proyecto -->
+<app-modal [(visible)]="modalVisible"
+           [title]="'Registrar Cobro'"
+           width="max-w-lg">
+  @if (modalData) {
+    <app-registrar-pago-modal
+      [data]="modalData"
+      (success)="onCobroExitoso($event)"
+      (cancel)="modalVisible = false" />
+  }
+</app-modal>
