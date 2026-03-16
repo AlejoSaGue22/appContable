@@ -1,301 +1,505 @@
-<!-- src/app/features/facturas/pages/invoice-detail/invoice-detail.component.html -->
+<!-- invoice-detail.component.html -->
 
 <div class="p-4 sm:p-6 lg:p-8 print:p-0">
-  <!-- Loading State -->
+
+  <!-- Loading -->
   @if (loading()) {
-  <div class="flex items-center justify-center py-12">
-    <div role="status">
-      <svg class="h-12 w-12 animate-spin text-blue-600" fill="none" viewBox="0 0 24 24">
+    <div class="flex items-center justify-center py-16">
+      <svg class="h-10 w-10 animate-spin text-blue-600" fill="none" viewBox="0 0 24 24">
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor"
-          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-        </path>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
       </svg>
     </div>
-  </div>
   }
 
-  <!-- Error State -->
+  <!-- Error -->
   @if (error()) {
-  <div class="rounded-lg bg-red-50 p-4 dark:bg-gray-800">
-    <div class="flex">
-      <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd"
-          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-          clip-rule="evenodd" />
-      </svg>
-      <p class="ml-3 text-sm text-red-800 dark:text-red-400">{{ error() }}</p>
+    <div class="rounded-lg bg-red-50 border border-red-200 p-4">
+      <div class="flex gap-3">
+        <svg class="h-5 w-5 text-red-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+        </svg>
+        <p class="text-sm text-red-800">{{ error() }}</p>
+      </div>
     </div>
-  </div>
   }
 
-  <!-- Factura Content -->
   @if (!loading() && !error() && factura()) {
-  <!-- Header con acciones (no imprimible) -->
-  <div class="mb-6 space-y-4 print:hidden">
-    <!-- Título y botones básicos -->
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-          Factura {{ factura()!.comprobante_completo }}
-        </h1>
-        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          Detalle completo de la factura
-        </p>
-      </div>
 
-      <div class="flex flex-wrap gap-2">
-        <button (click)="print()"
-          class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100">
-          <svg class="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd"
-              d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z"
-              clip-rule="evenodd" />
-          </svg>
-          Imprimir
-        </button>
+    <!-- ── Barra de acciones (no imprime) ────────────────────────────── -->
+    <div class="mb-6 print:hidden">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 
-        <button (click)="exportPDF()"
-          class="inline-flex items-center rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800">
-          <svg class="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd"
-              d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-              clip-rule="evenodd" />
-          </svg>
-          Descargar PDF
-        </button>
-
-        <a routerLink="/panel/ventas/comprobantes"
-          class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100">
-          <svg class="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd"
-              d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
-              clip-rule="evenodd" />
-          </svg>
-          Volver
-        </a>
-      </div>
-    </div>
-
-    <!-- 🔑 BOTONES DE ACCIÓN SEGÚN ESTADO -->
-    <!-- <app-invoice-actions
-        [factura]="factura"
-        (emitir)="onEmitir()"
-        (registrarPago)="onRegistrarPago()"
-        (cancelar)="onCancelar()"
-        (verHistorial)="onVerHistorial()"
-      /> -->
-
-    <!-- 🔑 MODALES -->
-    <!-- <app-payment-modal
-        [isOpen]="showPaymentModal"
-        [totalFactura]="factura()?.total || 0"
-        (close)="showPaymentModal.set(false)"
-        (confirm)="confirmPayment($event)"
-      /> -->
-
-    <!-- <app-cancel-modal
-        [isOpen]="showCancelModal"
-        (close)="showCancelModal.set(false)"
-        (confirm)="confirmCancel($event)"
-      /> -->
-  </div>
-
-  <!-- Documento de Factura -->
-  <div
-    class="mx-auto max-w-4xl rounded-lg border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-800 print:border-0 print:shadow-none">
-    <!-- Header de la Factura -->
-    <div class="mb-8 flex items-start justify-between border-b border-gray-200 pb-6 dark:border-gray-700">
-      <div>
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">FACTURA DE VENTA {{ factura()!.tipoFactura }}</h2>
-        <p class="mt-2 text-lg text-gray-600 dark:text-gray-400">
-        <div class="mt-2 flex flex-wrap gap-2">
-          <span
-            [class]="'inline-flex rounded-full border px-3 py-1 text-xs font-semibold ' + getStatusClass(factura()!.status)">
-            {{ getStatusLabel(factura()!.status) }}
-          </span>
-          @if (factura()!.dianStatus && factura()!.tipoFactura === 'ELECTRONICA') {
-          <span
-            [class]="'inline-flex rounded-full border px-3 py-1 text-xs font-semibold ' + getDianStatusClass(factura()!.dianStatus)">
-            DIAN: {{ getDianStatusLabel(factura()!.dianStatus) }}
-          </span>
-          }
-        </div>
-      </div>
-
-      <div class="text-right">
-        <p class="text-sm text-gray-600 dark:text-gray-400">Fecha</p>
-        <p class="text-lg font-semibold text-gray-900 dark:text-white">
-          {{ formatDate(factura()!.fecha) }}
-        </p>
-      </div>
-    </div>
-
-    <!-- Información del Cliente -->
-    <div class="mb-8 grid gap-6 md:grid-cols-2">
-      <div>
-        <h3 class="mb-3 text-lg font-semibold uppercase text-gray-900 dark:text-gray-400">Cliente</h3>
-        <div class="space-y-1">
-          <p class="text-sm text-gray-600 dark:text-gray-400">
-            <span class="font-medium text-gray-700">Cliente:</span> {{ factura()!.client.nombre }} {{ factura()!.client.apellido }}
-          </p>
-          <p class="text-sm text-gray-600 dark:text-gray-400">
-            <span class="font-medium text-gray-700">Documento:</span> {{ factura()!.client.tipoDocumentoRel.abreviatura }} - {{ factura()!.client.numeroDocumento }}
-          </p>
-          @if (factura()!.client.email) {
-          <p class="text-sm text-gray-600 dark:text-gray-400">
-            <span class="font-medium text-gray-700">Email:</span> {{ factura()!.client.email }}
-          </p>
-          }
-          @if (factura()!.client.telefono) {
-          <p class="text-sm text-gray-600 dark:text-gray-400">
-            <span class="font-medium text-gray-700">Teléfono:</span> {{ factura()!.client.telefono }}
-          </p>
-          }
-        </div>
-      </div>
-
-      <div>
-        <h3 class="mb-3 text-lg font-semibold uppercase text-gray-900 dark:text-gray-400">Información de Venta</h3>
-        <div class="grid grid-cols-2 gap-x-4 gap-y-1">
-          <p class="text-sm text-gray-600 dark:text-gray-400 font-medium">Tipo:</p>
-          <p class="text-sm text-gray-900 dark:text-gray-100">{{ getTipoFacturaLabel(factura()!.tipoFactura) }}</p>
-
-          <p class="text-sm text-gray-600 dark:text-gray-400 font-medium">Vendedor:</p>
-          <p class="text-sm text-gray-900 dark:text-gray-100">{{ factura()!.vendedor || 'N/A' }}</p>
-
-          <p class="text-sm text-gray-600 dark:text-gray-400 font-medium">Canal:</p>
-          <p class="text-sm text-gray-900 dark:text-gray-100">{{ factura()!.canalVentaRel.nombre }}</p>
-
-          <p class="text-sm text-gray-600 dark:text-gray-400 font-medium">Forma de Pago:</p>
-          <p class="text-sm text-gray-900 dark:text-gray-100">{{ factura()!.formaPago }}</p>
-
-          @if (factura()!.metodoPago) {
-          <p class="text-sm text-gray-600 dark:text-gray-400 font-medium">Método:</p>
-          <p class="text-sm text-gray-900 dark:text-gray-100">{{ factura()!.metodoPago }}</p>
-          }
-        </div>
-      </div>
-    </div>
-
-    <!-- Items de la Factura -->
-    <div class="mb-8">
-      <h3 class="mb-4 text-sm font-semibold uppercase text-gray-500 dark:text-gray-400">Detalle de Productos</h3>
-
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm">
-          <thead
-            class="border-b-2 border-gray-300 bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-              <th scope="col" class="px-4 py-3">Descripción</th>
-              <th scope="col" class="px-4 py-3 text-center">Cant.</th>
-              <th scope="col" class="px-4 py-3 text-right">Precio Unit.</th>
-              <th scope="col" class="px-4 py-3 text-center">IVA</th>
-              <th scope="col" class="px-4 py-3 text-right">Total</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-            @for (item of factura()!.items; track item.id) {
-            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
-              <td class="px-4 py-3">
-                <div>
-                  <p class="font-medium text-gray-900 dark:text-white">{{ item.description }}</p>
-                  @if (item.articulo) {
-                  <p class="text-xs text-gray-500 dark:text-gray-400">{{ item.articulo.nombre }} ({{ item.articulo.codigo }})</p>
-                  }
-                </div>
-              </td>
-              <td class="px-4 py-3 text-center text-gray-900 dark:text-white">
-                {{ item.quantity }}
-              </td>
-              <td class="px-4 py-3 text-right text-gray-900 dark:text-white">
-                {{ formatCurrency(item.unitPrice) }}
-              </td>
-              <td class="px-4 py-3 text-center text-gray-900 dark:text-white">
-                <div>
-                  {{ item.iva }}%
-                  <p class="text-[10px] text-gray-500">{{ formatCurrency(item.valor_iva) }}</p>
-                </div>
-              </td>
-              <td class="px-4 py-3 text-right font-semibold text-gray-900 dark:text-white">
-                {{ formatCurrency(item.total) }}
-              </td>
-            </tr>
+        <!-- Título + estado -->
+        <div>
+          <div class="flex items-center gap-3 flex-wrap">
+            <h1 class="text-xl font-bold text-gray-900">{{ factura()!.comprobante_completo }}</h1>
+            <span [class]="'inline-flex rounded-full px-3 py-1 text-xs font-semibold border ' + getStatusClass(factura()!.status)">
+              {{ getStatusLabel(factura()!.status) }}
+            </span>
+            @if (factura()!.tipoFactura === 'ELECTRONICA' && factura()!.dianStatus) {
+              <span [class]="'inline-flex rounded-full px-3 py-1 text-xs font-semibold border ' + getDianStatusClass(factura()!.dianStatus)">
+                DIAN: {{ getDianStatusLabel(factura()!.dianStatus) }}
+              </span>
             }
-          </tbody>
-        </table>
+          </div>
+          <p class="mt-1 text-sm text-gray-500">Factura de Venta — {{ getTipoFacturaLabel(factura()!.tipoFactura) }}</p>
+        </div>
+
+        <!-- Botones -->
+        <div class="flex flex-wrap gap-2">
+          <button type="button" (click)="print()"
+            class="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+            <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd"/>
+            </svg>
+            Imprimir
+          </button>
+
+          <a routerLink="/panel/ventas/comprobantes"
+            class="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+            <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
+            </svg>
+            Volver
+          </a>
+        </div>
       </div>
     </div>
 
-    <!-- Totales -->
-    <div class="flex justify-end">
-      <div class="w-full max-w-xs space-y-2">
-        <div class="flex justify-between text-sm">
-          <span class="text-gray-600 dark:text-gray-400">Subtotal:</span>
-          <span class="font-medium text-gray-900 dark:text-white">{{ formatCurrency(factura()!.subtotal) }}</span>
-        </div>
+    <!-- ── DOCUMENTO FACTURA ──────────────────────────────────────────── -->
+    <div class="mx-auto max-w-4xl space-y-4">
 
-        <div class="flex justify-between text-sm">
-          <span class="text-gray-600 dark:text-gray-400">IVA:</span>
-          <span class="font-medium text-gray-900 dark:text-white">{{ formatCurrency(factura()!.iva) }}</span>
-        </div>
+      <!-- Documento principal -->
+      <div class="rounded-xl border border-gray-200 bg-white shadow-sm print:border-0 print:shadow-none overflow-hidden">
 
-        @if (factura()!.descuento > 0) {
-        <div class="flex justify-between text-sm">
-          <span class="text-gray-600 dark:text-gray-400">Descuento:</span>
-          <span class="font-medium text-red-600">-{{ formatCurrency(factura()!.descuento) }}</span>
-        </div>
-        }
-
-        <div class="border-t-2 border-gray-300 pt-2 dark:border-gray-600">
-          <div class="flex justify-between">
-            <span class="text-lg font-semibold text-gray-900 dark:text-white">Total:</span>
-            <span class="text-xl font-bold text-blue-600 dark:text-blue-400">{{ formatCurrency(factura()!.total)
-              }}</span>
+        <!-- Cabecera verde con número -->
+        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-5 print:bg-blue-600">
+          <div class="flex items-start justify-between">
+            <div class="text-white">
+              <p class="text-xs font-semibold uppercase tracking-widest text-blue-200 mb-1">
+                {{ factura()!.tipoFactura === 'ELECTRONICA' ? 'Factura Electrónica de Venta' : 'Factura de Venta' }}
+              </p>
+              <p class="text-2xl font-bold">{{ factura()!.comprobante_completo }}</p>
+            </div>
+            <div class="text-right text-white">
+              <p class="text-xs text-blue-200">Fecha</p>
+              <p class="text-lg font-bold">{{ formatDate(factura()!.fecha) }}</p>
+              @if (factura()!.fechaVencimiento) {
+                <p class="text-xs text-blue-200 mt-1">Vence: {{ formatDate(factura()!.fechaVencimiento || '') }}</p>
+              }
+            </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Footer Info -->
-    <div class="mt-8 border-t border-gray-200 pt-6 dark:border-gray-700">
-      <div class="grid gap-4 text-xs text-gray-500 dark:text-gray-400 md:grid-cols-3">
-        <div>
-          <p class="font-medium">Creado por:</p>
-          <p>{{ factura()?.createdBy?.email || 'Sistema' }}</p>
-          <p>{{ formatDate(factura()!.createdAt) }}</p>
+        <div class="p-8">
+
+          <!-- Info cliente + venta -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+
+            <!-- Cliente -->
+            <div class="bg-gray-50 rounded-lg border border-gray-100 p-4">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 flex items-center gap-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                Cliente
+              </h3>
+              <p class="text-base font-bold text-gray-900">{{ factura()!.client.nombre }} {{ factura()!.client.apellido }}</p>
+              <p class="text-sm text-gray-600 mt-1">
+                <span class="font-medium">{{ factura()!.client.tipoDocumentoRel?.abreviatura }}:</span>
+                {{ factura()!.client.numeroDocumento }}
+              </p>
+              @if (factura()!.client.email) {
+                <p class="text-sm text-gray-500 mt-0.5">{{ factura()!.client.email }}</p>
+              }
+              @if (factura()!.client.telefono) {
+                <p class="text-sm text-gray-500 mt-0.5">{{ factura()!.client.telefono }}</p>
+              }
+            </div>
+
+            <!-- Info venta -->
+            <div class="space-y-2">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">Información de Venta</h3>
+              <div class="grid grid-cols-2 gap-x-3 gap-y-1.5 text-sm">
+                <span class="text-gray-500">Tipo:</span>
+                <span class="font-medium text-gray-800">{{ getTipoFacturaLabel(factura()!.tipoFactura) }}</span>
+
+                <span class="text-gray-500">Forma de pago:</span>
+                <span class="font-medium text-gray-800">{{ factura()!.formaPago }}</span>
+
+                @if (factura()!.metodoPago) {
+                  <span class="text-gray-500">Método:</span>
+                  <span class="font-medium text-gray-800">{{ factura()!.metodoPagoRel?.nombre || factura()!.metodoPago }}</span>
+                }
+
+                @if (factura()!.vendedor) {
+                  <span class="text-gray-500">Vendedor:</span>
+                  <span class="font-medium text-gray-800">{{ factura()!.vendedor }}</span>
+                }
+
+                <span class="text-gray-500">Canal:</span>
+                <span class="font-medium text-gray-800">{{ factura()!.canalVentaRel?.nombre || '—' }}</span>
+
+                @if (factura()!.formaPago === 'CREDITO') {
+                  <span class="text-gray-500">Estado pago:</span>
+                  <span class="font-semibold"
+                        [ngClass]="{
+                          'text-blue-700':   factura()!.paymentStatus === 'pendiente',
+                          'text-amber-700':  factura()!.paymentStatus === 'parcial',
+                          'text-green-700':  factura()!.paymentStatus === 'pagado',
+                          'text-red-700':    factura()!.paymentStatus === 'vencido'
+                        }">
+                    {{ getPaymentStatusLabel(factura()!.paymentStatus) }}
+                  </span>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabla de items -->
+          <div class="mb-8">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">Detalle de Productos / Servicios</h3>
+            <div class="overflow-x-auto rounded-lg border border-gray-200">
+              <table class="w-full text-sm">
+                <thead class="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th class="px-4 py-3 text-left text-xs font-bold uppercase text-gray-500 tracking-wider">#</th>
+                    <th class="px-4 py-3 text-left text-xs font-bold uppercase text-gray-500 tracking-wider">Descripción</th>
+                    <th class="px-4 py-3 text-center text-xs font-bold uppercase text-gray-500 tracking-wider">Cant.</th>
+                    <th class="px-4 py-3 text-right text-xs font-bold uppercase text-gray-500 tracking-wider">Val. Unit.</th>
+                    <th class="px-4 py-3 text-center text-xs font-bold uppercase text-gray-500 tracking-wider">IVA</th>
+                    <th class="px-4 py-3 text-center text-xs font-bold uppercase text-gray-500 tracking-wider">Desc.</th>
+                    <th class="px-4 py-3 text-right text-xs font-bold uppercase text-gray-500 tracking-wider">Val. Item</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                  @for (item of factura()!.items; track item.id; let i = $index) {
+                    <tr class="hover:bg-gray-50/60 transition-colors">
+                      <td class="px-4 py-3 text-gray-400 text-xs">{{ i + 1 }}</td>
+                      <td class="px-4 py-3">
+                        <p class="font-medium text-gray-900">{{ item.description || item.articulo?.nombre }}</p>
+                        @if (item.articulo) {
+                          <p class="text-xs text-gray-400 font-mono mt-0.5">{{ item.articulo.codigo || item.articulo.nombre }}</p>
+                        }
+                      </td>
+                      <td class="px-4 py-3 text-center text-gray-700">{{ item.quantity }}</td>
+                      <td class="px-4 py-3 text-right text-gray-700">{{ formatCurrency(item.unitPrice) }}</td>
+                      <td class="px-4 py-3 text-center">
+                        @if (item.iva > 0) {
+                          <div class="text-center">
+                            <span class="text-xs font-semibold text-blue-700">{{ item.iva }}%</span>
+                            <p class="text-xs text-gray-400">{{ formatCurrency(item.valor_iva) }}</p>
+                          </div>
+                        } @else {
+                          <span class="text-xs text-gray-300">0%</span>
+                        }
+                      </td>
+                      <td class="px-4 py-3 text-center">
+                        @if (item.discount > 0) {
+                          <span class="text-xs font-semibold text-red-600">{{ item.discount }}%</span>
+                        } @else {
+                          <span class="text-xs text-gray-300">0%</span>
+                        }
+                      </td>
+                      <td class="px-4 py-3 text-right font-bold text-gray-900">{{ formatCurrency(item.total) }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Totales + observaciones -->
+          <div class="flex flex-col md:flex-row md:justify-between gap-6">
+            <!-- Observaciones -->
+            <div class="flex-1">
+              @if (factura()!.observaciones) {
+                <div>
+                  <p class="text-xs font-bold uppercase text-gray-500 mb-1">Observaciones</p>
+                  <p class="text-sm text-gray-600">{{ factura()!.observaciones }}</p>
+                </div>
+              }
+              @if (factura()!.cufe) {
+                <div class="mt-3">
+                  <p class="text-xs font-bold uppercase text-gray-500 mb-1">CUFE</p>
+                  <p class="text-xs text-gray-400 font-mono break-all">{{ factura()!.cufe }}</p>
+                </div>
+              }
+              <!-- Tipo de operación -->
+              <div class="mt-4 flex gap-8">
+                <div>
+                  <p class="text-xs font-bold text-gray-500">Tipo de operación</p>
+                  <p class="text-sm font-medium text-gray-700">{{ getTipoFacturaLabel(factura()!.tipoFactura) }}</p>
+                </div>
+                <div>
+                  <p class="text-xs font-bold text-gray-500">Forma de pago</p>
+                  <p class="text-sm font-medium text-gray-700">{{ factura()!.formaPago === 'CONTADO' ? 'Pago de contado' : 'Pago a crédito' }}</p>
+                  @if (factura()!.metodoPago) {
+                    <p class="text-xs font-bold text-gray-500 mt-1">Medio de pago</p>
+                    <p class="text-sm font-medium text-gray-700">{{ factura()!.metodoPagoRel?.nombre || factura()!.metodoPago }}</p>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- Resumen de totales -->
+            <div class="w-full md:w-72">
+              <div class="rounded-lg border border-gray-200 overflow-hidden">
+                <div class="bg-gray-50 px-4 py-2 border-b border-gray-200">
+                  <p class="text-xs font-bold uppercase tracking-wider text-gray-500">Resumen</p>
+                </div>
+                <div class="divide-y divide-gray-100">
+                  <div class="flex justify-between px-4 py-2 text-sm">
+                    <span class="text-gray-600">Valor Bruto</span>
+                    <span class="font-medium text-gray-900">{{ formatCurrency(factura()!.subtotal) }}</span>
+                  </div>
+                  <div class="flex justify-between px-4 py-2 text-sm">
+                    <span class="text-gray-600">Base Imponible</span>
+                    <span class="font-medium text-gray-900">{{ formatCurrency(factura()!.subtotal) }}</span>
+                  </div>
+                  @if (factura()!.iva > 0) {
+                    <div class="flex justify-between px-4 py-2 text-sm">
+                      <span class="text-gray-600">IVA</span>
+                      <span class="font-medium text-gray-900">{{ formatCurrency(factura()!.iva) }}</span>
+                    </div>
+                  }
+                  @if (factura()!.descuento > 0) {
+                    <div class="flex justify-between px-4 py-2 text-sm">
+                      <span class="text-gray-600">Descuento global(-)</span>
+                      <span class="font-medium text-red-600">-{{ formatCurrency(factura()!.descuento) }}</span>
+                    </div>
+                  }
+                  <div class="flex justify-between px-4 py-3 bg-blue-600">
+                    <span class="text-sm font-bold text-white">Total Factura</span>
+                    <span class="text-base font-bold text-white">{{ formatCurrency(factura()!.total) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- QR Code (solo DIAN) -->
+          @if (factura()!.qrCode) {
+            <div class="mt-6 flex justify-end print:block">
+              <div class="text-center">
+                <img [src]="factura()!.qrCode" class="h-24 w-24 mx-auto" alt="QR DIAN" />
+                <p class="text-xs text-gray-400 mt-1">Validación DIAN</p>
+              </div>
+            </div>
+          }
+
         </div>
+      </div>
 
-        @if (factura()!.cufe) {
-          <p class="col-span-2 mt-2 text-xs text-gray-500 dark:text-gray-400">
-            <span class="font-medium">CUFE:</span> {{ factura()!.cufe }}
-          </p>
+      <!-- ── SECCIÓN CONTABLE (no imprime) ──────────────────────────── -->
+      <div class="print:hidden space-y-4">
+
+        <!-- Estado de cartera (solo crédito) -->
+        @if (factura()!.formaPago === 'CREDITO') {
+          <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+            <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-gray-50/50">
+              <h3 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                  <line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
+                Estado de Cartera (CxC)
+              </h3>
+              <span class="text-xs font-semibold px-2.5 py-1 rounded-full"
+                    [ngClass]="{
+                      'bg-blue-100 text-blue-700':   factura()!.paymentStatus === 'pendiente',
+                      'bg-amber-100 text-amber-700': factura()!.paymentStatus === 'parcial',
+                      'bg-green-100 text-green-700': factura()!.paymentStatus === 'pagado',
+                      'bg-red-100 text-red-700':     factura()!.paymentStatus === 'vencido'
+                    }">
+                {{ getPaymentStatusLabel(factura()!.paymentStatus) }}
+              </span>
+            </div>
+            <div class="p-5">
+              <div class="grid grid-cols-3 gap-4 mb-4">
+                <div class="text-center">
+                  <p class="text-xs text-gray-500 mb-1">Total Factura</p>
+                  <p class="text-base font-bold text-gray-900">{{ formatCurrency(factura()!.total) }}</p>
+                </div>
+                <div class="text-center">
+                  <p class="text-xs text-gray-500 mb-1">Total Pagado</p>
+                  <p class="text-base font-bold text-green-700">{{ formatCurrency(factura()!.totalPagado || 0) }}</p>
+                </div>
+                <div class="text-center">
+                  <p class="text-xs text-gray-500 mb-1">Saldo Pendiente</p>
+                  <p class="text-base font-bold" [ngClass]="(factura()!.saldoPendiente || 0) > 0 ? 'text-red-700' : 'text-green-700'">
+                    {{ formatCurrency(factura()!.saldoPendiente || 0) }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Historial de cobros -->
+              @if (cobros && cobros.length > 0) {
+                <div class="overflow-x-auto">
+                  <table class="w-full text-sm">
+                    <thead>
+                      <tr class="bg-slate-50 border-b border-gray-200">
+                        <th class="px-3 py-2 text-left text-xs font-bold uppercase text-slate-500 tracking-wider">Fecha</th>
+                        <th class="px-3 py-2 text-left text-xs font-bold uppercase text-slate-500 tracking-wider">Medio</th>
+                        <th class="px-3 py-2 text-left text-xs font-bold uppercase text-slate-500 tracking-wider">Referencia</th>
+                        <th class="px-3 py-2 text-right text-xs font-bold uppercase text-slate-500 tracking-wider">Monto</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                      @for (cobro of cobros; track cobro.id) {
+                        <tr class="hover:bg-slate-50/60">
+                          <td class="px-3 py-2 text-gray-700 text-xs">{{ cobro.fecha | date:'dd/MM/yyyy' }}</td>
+                          <td class="px-3 py-2 text-gray-600 text-xs capitalize">{{ cobro.medioPago }}</td>
+                          <td class="px-3 py-2 text-gray-500 text-xs">{{ cobro.referencia || '—' }}</td>
+                          <td class="px-3 py-2 text-right font-semibold text-green-700">{{ formatCurrency(cobro.monto) }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              } @else if (factura()!.paymentStatus !== 'pagado') {
+                <p class="text-xs text-gray-400 text-center py-3">Sin cobros registrados aún</p>
+              }
+            </div>
+          </div>
         }
 
-        @if (factura()!.dianStatus ) {
-        <div class="text-right">
-          <p class="font-medium">Estado DIAN:</p>
-          <p [class]="factura()!.dianStatus === 'accepted' ? 'text-green-600' : 'text-gray-600'">
-            {{ factura()!.dianStatus }}
-          </p>
+        <!-- Asientos contables -->
+        <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+          <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-gray-50/50">
+            <h3 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+              Asientos Contables Generados
+            </h3>
+            @if (loadingAsientos) {
+              <svg class="h-4 w-4 animate-spin text-blue-500" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            }
+          </div>
+
+          <div class="p-5">
+            @if (asientos && asientos.length > 0) {
+              <div class="space-y-4">
+                @for (asiento of asientos; track asiento.id) {
+                  <div class="border border-gray-100 rounded-lg overflow-hidden">
+                    <!-- Cabecera del asiento -->
+                    <div class="flex items-center justify-between bg-slate-50 px-4 py-2.5 border-b border-gray-100">
+                      <div class="flex items-center gap-3">
+                        <span class="font-mono text-xs font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">
+                          #{{ asiento.numero }}
+                        </span>
+                        <span class="text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                          <!-- {{ getTipoAsientoLabel(asiento.tipo) }} -->
+                        </span>
+                      </div>
+                      <div class="text-right">
+                        <span class="text-xs text-gray-500">{{ asiento.fecha | date:'dd/MM/yyyy' }}</span>
+                      </div>
+                    </div>
+                    <!-- Detalles del asiento -->
+                    <table class="w-full text-xs">
+                      <thead class="bg-gray-50/50">
+                        <tr>
+                          <th class="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Cuenta</th>
+                          <th class="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Descripción</th>
+                          <th class="px-4 py-2 text-right text-xs font-semibold text-green-700 uppercase tracking-wider">Débito</th>
+                          <th class="px-4 py-2 text-right text-xs font-semibold text-red-700 uppercase tracking-wider">Crédito</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-gray-50">
+                        @for (detalle of asiento.detalles; track $index) {
+                          <tr class="hover:bg-slate-50/40">
+                            <td class="px-4 py-2">
+                              <span class="font-mono font-semibold text-blue-700">{{ detalle.cuenta?.codigo }}</span>
+                              <span class="text-gray-600 ml-1.5">{{ detalle.cuenta?.nombre }}</span>
+                            </td>
+                            <td class="px-4 py-2 text-gray-500">{{ detalle.descripcion }}</td>
+                            <td class="px-4 py-2 text-right font-semibold" [ngClass]="detalle.debito > 0 ? 'text-green-700' : 'text-gray-300'">
+                              {{ detalle.debito > 0 ? formatCurrency(detalle.debito) : '—' }}
+                            </td>
+                            <td class="px-4 py-2 text-right font-semibold" [ngClass]="detalle.credito > 0 ? 'text-red-700' : 'text-gray-300'">
+                              {{ detalle.credito > 0 ? formatCurrency(detalle.credito) : '—' }}
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                      <tfoot class="border-t-2 border-gray-200 bg-gray-50">
+                        <tr>
+                          <td colspan="2" class="px-4 py-2 text-xs font-bold uppercase text-gray-500">Total</td>
+                          <td class="px-4 py-2 text-right text-xs font-bold text-green-700">{{ formatCurrency(asiento.totalDebito) }}</td>
+                          <td class="px-4 py-2 text-right text-xs font-bold text-red-700">{{ formatCurrency(asiento.totalCredito) }}</td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                }
+              </div>
+            } @else if (!loadingAsientos) {
+              <div class="py-8 text-center">
+                @if (factura()!.status === 'error_asiento') {
+                  <div class="text-amber-500 mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path>
+                      <line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                  </div>
+                  <p class="text-sm font-medium text-amber-700">Error al generar el asiento contable</p>
+                  <p class="text-xs text-gray-400 mt-1">{{ factura()!.asientoError }}</p>
+                  <button type="button" (click)="reintentarAsiento()"
+                    class="mt-3 px-4 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-medium rounded-lg transition-colors">
+                    Reintentar generación
+                  </button>
+                } @else if (factura()!.status === 'draft') {
+                  <p class="text-sm text-gray-400">El asiento se generará al emitir la factura</p>
+                } @else {
+                  <p class="text-sm text-gray-400">Sin asientos contables registrados</p>
+                }
+              </div>
+            }
+          </div>
         </div>
-        }
-      </div>
-    </div>
-  </div>
-  }
+
+        <!-- Metadatos -->
+        <div class="rounded-xl border border-gray-100 bg-white shadow-sm px-5 py-4">
+          <div class="flex flex-wrap gap-6 text-xs text-gray-500">
+            <div>
+              <span class="font-semibold text-gray-600">Creado por:</span>
+              {{ factura()!.createdBy?.email || 'Sistema' }}
+            </div>
+            <div>
+              <span class="font-semibold text-gray-600">Fecha creación:</span>
+              {{ formatDate(factura()!.createdAt) }}
+            </div>
+            @if (factura()!.fechaEnvioDIAN) {
+              <div>
+                <span class="font-semibold text-gray-600">Envío DIAN:</span>
+                {{ formatDate(factura()!.fechaEnvioDIAN || '') }}
+              </div>
+            }
+            @if (factura()!.fechaAceptacionDIAN) {
+              <div>
+                <span class="font-semibold text-gray-600">Aceptación DIAN:</span>
+                {{ formatDate(factura()!.fechaAceptacionDIAN || '') }}
+              </div>
+            }
+          </div>
+        </div>
+
+      </div><!-- /sección contable -->
+    </div><!-- /max-w-4xl -->
+  }<!-- /factura() -->
 </div>
 
-<!-- Print Styles -->
 <style>
   @media print {
-    @page {
-      margin: 1cm;
-    }
-
-    body {
-      print-color-adjust: exact;
-      -webkit-print-color-adjust: exact;
-    }
+    @page { margin: 1cm; }
+    body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   }
 </style>

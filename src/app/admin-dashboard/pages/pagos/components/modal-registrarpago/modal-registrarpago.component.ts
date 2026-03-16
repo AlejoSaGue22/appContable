@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CuentaBancaria, MedioPago } from '@dashboard/interfaces/pagos-interface';
 import { PagosHttpService } from '../../services/pagos.service';
+import { NotificationService } from '@shared/services/notification.service';
 
 
 export interface RegistrarPagoModalData {
@@ -47,8 +48,9 @@ export class RegistrarPagoModalComponent implements OnInit {
   }
 
   constructor(
-    private fb:  FormBuilder,
-    private svc: PagosHttpService,
+    private fb:   FormBuilder,
+    private svc:  PagosHttpService,
+    private notif: NotificationService,
   ) {}
 
   ngOnInit(): void {
@@ -111,8 +113,17 @@ export class RegistrarPagoModalComponent implements OnInit {
       : this.svc.registrarPago(this.data.documentoId, dto);
 
     obs$.subscribe({
-      next:  result => { this.loading = false; this.success.emit(result); },
-      error: ()     => { this.loading = false; },
+      next: result => {
+        this.loading = false;
+        const msg = result.message ?? (this.data.tipo === 'cobro' ? 'Cobro registrado correctamente.' : 'Pago registrado correctamente.');
+        this.notif.success(msg);
+        this.success.emit(result);
+      },
+      error: (err) => {
+        this.loading = false;
+        const msg = err?.error?.message ?? 'Ocurrió un error al procesar la operación.';
+        this.notif.error(msg);
+      },
     });
   }
 

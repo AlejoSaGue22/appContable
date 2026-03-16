@@ -1,10 +1,10 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import { Component, computed, input, output, signal, effect } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 export interface PurchaseInvoiceFilters {
-  status?: string;
+  estado?: string;
   type?: string;
   tipoFactura?: string;
   numeroFactura?: string;
@@ -22,6 +22,9 @@ export interface PurchaseInvoiceFilters {
 })
 export class TableComprasComponent {
   compraData = input<any[]>([]);
+
+  // Input for active filters to restore state if component is recreated
+  activeFilters = input<PurchaseInvoiceFilters>({});
 
   // Pagination inputs
   currentPage = input<number>(1);
@@ -57,6 +60,31 @@ export class TableComprasComponent {
 
   showFilters = signal<boolean>(false);
 
+  constructor() {
+    effect(() => {
+      const filters = this.activeFilters();
+      this.providerName.set(filters.providerName ?? '');
+      this.status.set(filters.estado ?? '');
+      this.tipoFactura.set(filters.tipoFactura ?? '');
+      this.numeroFactura.set(filters.numeroFactura ?? '');
+      this.dianStatus.set(filters.dianStatus ?? '');
+      this.startDate.set(filters.startDate ?? '');
+      this.endDate.set(filters.endDate ?? '');
+
+      // Reshow the filters panel if any extended filter is active
+      if (
+        filters.estado ||
+        filters.tipoFactura ||
+        filters.numeroFactura ||
+        filters.dianStatus ||
+        filters.startDate ||
+        filters.endDate
+      ) {
+        this.showFilters.set(true);
+      }
+    }, { allowSignalWrites: true });
+  }
+
   toggleFilters(): void {
     this.showFilters.update(v => !v);
   }
@@ -64,7 +92,6 @@ export class TableComprasComponent {
   readonly statuses = [
     { value: '', label: 'Todos los estados' },
     { value: 'registrado', label: 'Registrado' },
-    { value: 'pagado', label: 'Pagado' },
     { value: 'error_contable', label: 'Error Contable' },
     { value: 'anulado', label: 'Anulado' }
   ];
@@ -89,7 +116,7 @@ export class TableComprasComponent {
     const filters: PurchaseInvoiceFilters = {};
 
     if (this.providerName()) filters.providerName = this.providerName();
-    if (this.status()) filters.status = this.status();
+    if (this.status()) filters.estado = this.status();
     if (this.tipoFactura()) filters.tipoFactura = this.tipoFactura();
     if (this.numeroFactura()) filters.numeroFactura = this.numeroFactura();
     if (this.dianStatus()) filters.dianStatus = this.dianStatus();

@@ -12,20 +12,20 @@ export class FacturaCompraService {
     private http = inject(HttpClient);
 
     getFacturasCompras(options: Options & {
-        status?: string;
+        estado?: string;
         type?: string;
         providerName?: string;
         startDate?: string;
         endDate?: string;
     }): Observable<ComprobanteCompraResponse> {
-        const { limit = 10, page = 1, status, type, providerName, startDate, endDate } = options;
+        const { limit = 10, page = 1, estado, type, providerName, startDate, endDate } = options;
 
         const params: any = {
             limit,
             page
         };
 
-        if (status) params.status = status;
+        if (estado) params.estado = estado;
         if (type) params.type = type;
         if (providerName) params.providerName = providerName;
         if (startDate) params.startDate = startDate;
@@ -55,6 +55,13 @@ export class FacturaCompraService {
             map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
             catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
         )
+    }
+
+    anularFacturaCompra(id: string): Observable<ResponseResult> {
+        return this.http.patch<ComprobanteCompraResponse>(`${baseUrl}/facturas-compras/${id}/anular`, {}).pipe(
+            map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+            catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+        )   
     }
 
     deleteFacturaCompra(id: string): Observable<ResponseResult> {

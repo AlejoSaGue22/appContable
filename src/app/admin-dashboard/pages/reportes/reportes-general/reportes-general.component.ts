@@ -5,11 +5,11 @@ import { FormsModule } from '@angular/forms';
 import { HeaderInput, HeaderTitlePageComponent } from '@dashboard/components/header-title-page/header-title-page.component';
 
 @Component({
-  selector: 'app-estado-resultado',
+  selector: 'app-reportes-general',
   imports: [CurrencyPipe, DecimalPipe, FormsModule, DatePipe, HeaderTitlePageComponent],
-  templateUrl: './estado-resultado.component.html',
+  templateUrl: './reportes-general.component.html',
 })
-export class EstadoResultadoComponent implements OnInit {
+export class ReportesGeneralComponent implements OnInit {
   reporte?: EstadoResultados;
   loading = false;
 
@@ -17,7 +17,7 @@ export class EstadoResultadoComponent implements OnInit {
   fechaFin: string;
 
   headTitle: HeaderInput = {
-    title: 'Estado de Resultados (P&L)',
+    title: 'Reportes Generales',
     slog: 'Análisis de rentabilidad del período'
   };
 

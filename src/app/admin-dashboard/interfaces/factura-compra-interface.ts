@@ -1,3 +1,4 @@
+import { PaymentStatus } from "./pagos-interface";
 import { ArticulosInterface } from "./productos-interface";
 import { ProveedoresInterface } from "./proveedores-interface";
 
@@ -29,6 +30,9 @@ export interface FacturaCompra {
     formaPago: string;
     metodoPago?: string;
     observaciones?: string;
+    totalPagado: number;
+    saldoPendiente: number;
+    paymentStatus: PaymentStatus;
     items: ItemFactura[];
     iva: number;
     descuento: number;

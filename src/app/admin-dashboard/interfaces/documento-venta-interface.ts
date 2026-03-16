@@ -1,5 +1,6 @@
 import { ClientesInterfaceResponse } from "./clientes-interface";
 import { CreatedBy } from "./factura-compra-interface";
+import { PaymentStatus } from "./pagos-interface";
 import { ArticulosInterface } from "./productos-interface";
 
 // export interface ComprobanteVentaResponseTemp {
@@ -95,6 +96,9 @@ export interface GetFacturaRequest {
   clientId: string;
   subtotal: number;
   total: number;
+  totalPagado: number;
+  saldoPendiente: number;
+  paymentStatus: PaymentStatus;
   cufe: string | null;
   xmlUrl: string | null;
   pdfUrl: string | null;

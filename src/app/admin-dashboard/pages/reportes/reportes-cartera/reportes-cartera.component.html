@@ -1,0 +1,458 @@
+<!-- reporte-cartera.component.html -->
+<header-title-page [titleHead]="headTitle" />
+
+<div class="w-full px-4 sm:px-6 lg:px-8 py-6">
+  <div class="max-w-7xl mx-auto space-y-6">
+
+    <!-- ── Tabs de navegación ─────────────────────────────────────────── -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div class="flex border-b border-gray-200 overflow-x-auto">
+
+        @for (tab of [
+          { id: 'resumen',      label: 'Resumen',          icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
+          { id: 'aging-cobrar', label: 'Antigüedad por Cobrar',     icon: 'M12 19l-7-7 7-7m7 14l-7-7 7-7' },
+          { id: 'aging-pagar',  label: 'Antigüedad por Pagar',      icon: 'M12 5l7 7-7 7M5 19l7-7-7-7' },
+          { id: 'historial',    label: 'Historial Pagos',  icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' }
+        ]; track tab.id) {
+          <button type="button"
+                  (click)="cambiarVista(tab.id)"
+                  class="flex items-center gap-2 px-5 py-3.5 text-sm font-medium whitespace-nowrap 
+                  transition-colors flex-shrink-0 cursor-pointer"
+                  [ngClass]="vistaActiva === tab.id
+                    ? 'text-blue-600 border-b-2 border-blue-500 bg-blue-50/40'
+                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="tab.icon" />
+            </svg>
+            {{ tab.label }}
+          </button>
+        }
+      </div>
+
+      <!-- Loading bar -->
+      @if (loadingActual) {
+        <div class="w-full h-1 bg-blue-100 overflow-hidden">
+          <div class="h-full bg-blue-500 animate-pulse w-2/3"></div>
+        </div>
+      }
+
+      <div class="p-6">
+
+        <!-- ══ VISTA: RESUMEN ══════════════════════════════════════════ -->
+        @if (vistaActiva === 'resumen') {
+          @if (resumen) {
+            <div class="space-y-6">
+
+              <!-- Cards CxC / CxP -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <!-- CxC -->
+                <div class="rounded-xl border border-green-200 bg-green-50 overflow-hidden">
+                  <div class="flex items-center justify-between px-5 py-4 bg-gradient-to-r from-green-500 to-emerald-500">
+                    <div class="flex items-center gap-2 text-white">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24"
+                           fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <polyline points="19 12 12 19 5 12"></polyline>
+                      </svg>
+                      <span class="text-base font-semibold">Cuentas por Cobrar</span>
+                    </div>
+                    <span class="text-xl font-bold text-white">
+                      {{ resumen.cxc.total | currency:'COP':'symbol-narrow':'1.0-0' }}
+                    </span>
+                  </div>
+                  <div class="divide-y divide-green-100">
+                    <div class="flex justify-between px-5 py-3">
+                      <span class="text-sm text-green-800">Por vencer</span>
+                      <span class="text-sm font-semibold text-green-900">{{ resumen.cxc.porVencer | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+                    </div>
+                    <div class="flex justify-between px-5 py-3">
+                      <span class="text-sm text-red-700 font-medium">Vencida</span>
+                      <span class="text-sm font-bold text-red-700">{{ resumen.cxc.vencida | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+                    </div>
+                    <div class="flex justify-between px-5 py-3">
+                      <span class="text-sm text-green-700">Total facturas</span>
+                      <span class="text-sm font-semibold text-green-900">{{ resumen.cxc.cantidadFacturas }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- CxP -->
+                <div class="rounded-xl border border-orange-200 bg-orange-50 overflow-hidden">
+                  <div class="flex items-center justify-between px-5 py-4 bg-gradient-to-r from-orange-500 to-amber-500">
+                    <div class="flex items-center gap-2 text-white">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24"
+                           fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="19" x2="12" y2="5"></line>
+                        <polyline points="5 12 12 5 19 12"></polyline>
+                      </svg>
+                      <span class="text-base font-semibold">Cuentas por Pagar</span>
+                    </div>
+                    <span class="text-xl font-bold text-white">
+                      {{ resumen.cxp.total | currency:'COP':'symbol-narrow':'1.0-0' }}
+                    </span>
+                  </div>
+                  <div class="divide-y divide-orange-100">
+                    <div class="flex justify-between px-5 py-3">
+                      <span class="text-sm text-orange-800">Por vencer</span>
+                      <span class="text-sm font-semibold text-orange-900">{{ resumen.cxp.porVencer | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+                    </div>
+                    <div class="flex justify-between px-5 py-3">
+                      <span class="text-sm text-red-700 font-medium">Vencida</span>
+                      <span class="text-sm font-bold text-red-700">{{ resumen.cxp.vencida | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+                    </div>
+                    <div class="flex justify-between px-5 py-3">
+                      <span class="text-sm text-orange-700">Total facturas</span>
+                      <span class="text-sm font-semibold text-orange-900">{{ resumen.cxp.cantidadFacturas }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Indicador neto -->
+              <div class="rounded-xl border-2 px-6 py-5 flex items-center justify-between"
+                   [ngClass]="(resumen.cxc.total - resumen.cxp.total) >= 0
+                     ? 'border-green-400 bg-green-50'
+                     : 'border-red-400 bg-red-50'">
+                <div>
+                  <p class="text-sm font-medium text-slate-600">Posición neta de cartera</p>
+                  <p class="text-xs text-slate-400 mt-0.5">CxC (te deben) − CxP (debes tú)</p>
+                </div>
+                <div class="text-right">
+                  <p class="text-2xl font-bold"
+                     [ngClass]="(resumen.cxc.total - resumen.cxp.total) >= 0 ? 'text-green-700' : 'text-red-700'">
+                    {{ (resumen.cxc.total - resumen.cxp.total) | currency:'COP':'symbol-narrow':'1.0-0' }}
+                  </p>
+                  <p class="text-xs text-slate-400 mt-0.5">
+                    {{ (resumen.cxc.total - resumen.cxp.total) >= 0 ? 'Posición favorable' : 'Posición desfavorable' }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Accesos rápidos -->
+              <div class="grid grid-cols-2 gap-3">
+                <button type="button" (click)="cambiarVista('aging-cobrar')"
+                  class="flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-green-300
+                         text-green-700 bg-white hover:bg-green-50 text-sm font-medium transition-colors">
+                  Ver Aging CxC →
+                </button>
+                <button type="button" (click)="cambiarVista('aging-pagar')"
+                  class="flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-orange-300
+                         text-orange-700 bg-white hover:bg-orange-50 text-sm font-medium transition-colors">
+                  Ver Aging CxP →
+                </button>
+              </div>
+
+            </div>
+          } @else if (!loadingResumen) {
+            <div class="py-12 text-center text-slate-400">
+              <p class="text-sm">No hay datos disponibles</p>
+            </div>
+          }
+        }
+
+        <!-- ══ VISTA: AGING (reutilizable para cobrar/pagar) ══════════ -->
+        @if (vistaActiva === 'aging-cobrar' || vistaActiva === 'aging-pagar') {
+          @let reporte = vistaActiva === 'aging-cobrar' ? agingCobrar : agingPagar;
+          @let labelContraparte = vistaActiva === 'aging-cobrar' ? 'Cliente' : 'Proveedor';
+          @let colorHeader = vistaActiva === 'aging-cobrar' ? 'from-green-500 to-emerald-500' : 'from-orange-500 to-amber-500';
+
+          @if (reporte) {
+            <div class="space-y-6">
+
+              <!-- Barras de distribución -->
+              <div>
+                <h3 class="text-sm font-semibold text-slate-600 uppercase tracking-wider mb-4 flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" viewBox="0 0 24 24"
+                       fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="9" y1="9" x2="15" y2="9"></line>
+                    <line x1="9" y1="12" x2="15" y2="12"></line>
+                    <line x1="9" y1="15" x2="12" y2="15"></line>
+                  </svg>
+                  Distribución por Antigüedad
+                </h3>
+                <div class="space-y-2.5">
+                  @for (b of buckets; track b.key) {
+                    <div class="flex items-center gap-3">
+                      <span class="w-20 text-right text-xs text-slate-500 flex-shrink-0">{{ b.label }}</span>
+                      <div class="flex-1 h-7 bg-slate-100 rounded-full overflow-hidden relative">
+                        <div class="h-full rounded-full transition-all duration-500 flex items-center pl-3"
+                             [style.width.%]="pct(reporte!.totales[b.key], reporte!.totales.total)"
+                             [ngClass]="b.bgClass">
+                          @if (pct(reporte!.totales[b.key], reporte!.totales.total) > 12) {
+                            <span class="text-xs font-semibold text-white">
+                              {{ pct(reporte!.totales[b.key], reporte!.totales.total) }}%
+                            </span>
+                          }
+                        </div>
+                      </div>
+                      <span class="w-36 text-right text-xs font-semibold flex-shrink-0" [ngClass]="b.textClass">
+                        {{ reporte!.totales[b.key] | currency:'COP':'symbol-narrow':'1.0-0' }}
+                      </span>
+                    </div>
+                  }
+                </div>
+                <div class="mt-3 flex justify-end gap-3 border-t border-gray-100 pt-3 text-sm">
+                  <span class="text-slate-500">Total:</span>
+                  <strong class="text-slate-800">{{ reporte!.totales.total | currency:'COP':'symbol-narrow':'1.0-0' }}</strong>
+                </div>
+              </div>
+
+              <!-- Tabla aging -->
+              <div>
+                <h3 class="text-sm font-semibold text-slate-600 uppercase tracking-wider mb-3">
+                  Detalle por {{ labelContraparte }}
+                </h3>
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left table-auto text-sm">
+                    <thead>
+                      <tr class="bg-slate-50 border-b border-gray-200">
+                        <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider">{{ labelContraparte }}</th>
+                        @for (b of buckets; track b.key) {
+                          <th class="p-3 font-sans text-xs font-bold uppercase tracking-wider text-right" [ngClass]="b.textClass">
+                            {{ b.label }}
+                          </th>
+                        }
+                        <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider text-right">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+
+                      @for (grupo of reporte!.grupos; track grupo.contraparteId) {
+                        <!-- Fila grupo (clickable) -->
+                        <tr class="hover:bg-slate-50 transition-colors cursor-pointer"
+                            (click)="toggleGrupo(grupo.contraparteId)">
+                          <td class="p-3">
+                            <div class="flex items-center gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-slate-400 flex-shrink-0 transition-transform"
+                                   [class.rotate-90]="gruposAbiertos.has(grupo.contraparteId)"
+                                   viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                              </svg>
+                              <span class="font-medium text-slate-800">{{ grupo.contraparteNombre }}</span>
+                              <span class="text-xs bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">
+                                {{ grupo.facturas.length }}
+                              </span>
+                            </div>
+                          </td>
+                          @for (b of buckets; track b.key) {
+                            <td class="p-3 text-right">
+                              @if (grupo[b.key] > 0) {
+                                <span class="text-xs font-semibold" [ngClass]="b.textClass">
+                                  {{ grupo[b.key] | currency:'COP':'symbol-narrow':'1.0-0' }}
+                                </span>
+                              } @else {
+                                <span class="text-slate-300 text-xs">—</span>
+                              }
+                            </td>
+                          }
+                          <td class="p-3 text-right font-bold text-slate-800">
+                            {{ grupo.total | currency:'COP':'symbol-narrow':'1.0-0' }}
+                          </td>
+                        </tr>
+
+                        <!-- Filas detalle (expandibles) -->
+                        @if (gruposAbiertos.has(grupo.contraparteId)) {
+                          @for (f of grupo.facturas; track f.id) {
+                            <tr class="bg-slate-50/60 border-l-2 border-blue-200">
+                              <td class="p-2.5 pl-10">
+                                <div class="flex items-center gap-2">
+                                  <span class="font-mono text-xs font-semibold text-blue-600">{{ f.numero }}</span>
+                                  <span class="text-xs text-slate-400">{{ f.emision | date:'dd/MM/yyyy' }}</span>
+                                  @if (f.vencimiento) {
+                                    <span class="text-xs text-slate-400">→ {{ f.vencimiento | date:'dd/MM/yyyy' }}</span>
+                                  }
+                                </div>
+                              </td>
+                              @for (b of buckets; track b.key) {
+                                <td class="p-2.5 text-right">
+                                  @if (f.bucket === b.key) {
+                                    <span class="text-xs font-semibold" [ngClass]="b.textClass">
+                                      {{ f.saldo | currency:'COP':'symbol-narrow':'1.0-0' }}
+                                    </span>
+                                  } @else {
+                                    <span class="text-slate-200 text-xs">—</span>
+                                  }
+                                </td>
+                              }
+                              <td class="p-2.5 text-right">
+                                <span class="text-xs font-bold text-slate-700">
+                                  {{ f.saldo | currency:'COP':'symbol-narrow':'1.0-0' }}
+                                </span>
+                              </td>
+                            </tr>
+                          }
+                        }
+                      }
+
+                      <!-- Fila totales -->
+                      <tr class="bg-slate-100 border-t-2 border-slate-300">
+                        <td class="p-3 text-xs uppercase tracking-wider font-bold text-slate-500">TOTAL</td>
+                        @for (b of buckets; track b.key) {
+                          <td class="p-3 text-right">
+                            <span class="text-xs font-bold" [ngClass]="b.textClass">
+                              {{ reporte!.totales[b.key] | currency:'COP':'symbol-narrow':'1.0-0' }}
+                            </span>
+                          </td>
+                        }
+                        <td class="p-3 text-right font-bold text-slate-900">
+                          {{ reporte!.totales.total | currency:'COP':'symbol-narrow':'1.0-0' }}
+                        </td>
+                      </tr>
+
+                    </tbody>
+                  </table>
+                </div>
+
+                <p class="text-xs text-slate-400 mt-3 text-right">
+                  Generado: {{ reporte!.generadoEn | date:'dd/MM/yyyy HH:mm' }}
+                </p>
+              </div>
+
+            </div>
+          } @else if (!loadingCobrar && !loadingPagar) {
+            <div class="py-12 text-center text-slate-400">
+              <div class="text-5xl mb-3">📋</div>
+              <p class="text-sm">No hay datos de cartera disponibles</p>
+            </div>
+          }
+        }
+
+        <!-- ══ VISTA: HISTORIAL DE PAGOS ═══════════════════════════════ -->
+        @if (vistaActiva === 'historial') {
+          <div class="space-y-5">
+
+            <!-- Filtro de período -->
+            <div class="bg-gray-50/50 border border-gray-100 rounded-lg px-5 py-4">
+              <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-500" fill="none"
+                     viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Seleccionar Período
+              </h3>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Fecha Inicio</label>
+                  <input type="date" [(ngModel)]="fechaInicio"
+                    class="w-full text-sm border border-slate-200 rounded-md px-3 py-2 focus:outline-none
+                           focus:border-slate-400 hover:border-slate-300 shadow-sm">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Fecha Fin</label>
+                  <input type="date" [(ngModel)]="fechaFin"
+                    class="w-full text-sm border border-slate-200 rounded-md px-3 py-2 focus:outline-none
+                           focus:border-slate-400 hover:border-slate-300 shadow-sm">
+                </div>
+                <button type="button" (click)="generarHistorial()"
+                  class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5
+                         text-sm font-medium text-white shadow-sm hover:bg-blue-700 transition-all cursor-pointer">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                       stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                  Generar
+                </button>
+              </div>
+            </div>
+
+            @if (historial) {
+              <!-- Resumen totales -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-green-50 border border-green-200 rounded-lg px-5 py-4 text-center">
+                  <p class="text-xs font-semibold uppercase tracking-wider text-green-700 mb-1">Total Cobrado</p>
+                  <p class="text-xl font-bold text-green-800">
+                    {{ historial.totalCobros | currency:'COP':'symbol-narrow':'1.0-0' }}
+                  </p>
+                </div>
+                <div class="bg-orange-50 border border-orange-200 rounded-lg px-5 py-4 text-center">
+                  <p class="text-xs font-semibold uppercase tracking-wider text-orange-700 mb-1">Total Pagado</p>
+                  <p class="text-xl font-bold text-orange-800">
+                    {{ historial.totalPagos | currency:'COP':'symbol-narrow':'1.0-0' }}
+                  </p>
+                </div>
+                <div class="rounded-lg px-5 py-4 text-center border-2"
+                     [ngClass]="historial.neto >= 0
+                       ? 'bg-blue-50 border-blue-300'
+                       : 'bg-red-50 border-red-300'">
+                  <p class="text-xs font-semibold uppercase tracking-wider mb-1"
+                     [ngClass]="historial.neto >= 0 ? 'text-blue-700' : 'text-red-700'">Neto</p>
+                  <p class="text-xl font-bold"
+                     [ngClass]="historial.neto >= 0 ? 'text-blue-800' : 'text-red-800'">
+                    {{ historial.neto | currency:'COP':'symbol-narrow':'1.0-0' }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Tabla movimientos -->
+              <div class="overflow-x-auto">
+                <table class="w-full text-left table-auto text-sm shadow-sm rounded-xl">
+                  <thead>
+                    <tr class="bg-slate-50 border-b border-gray-200">
+                      <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider">Fecha</th>
+                      <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider">Tipo</th>
+                      <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider">Documento</th>
+                      <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider">Contraparte</th>
+                      <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider">Medio</th>
+                      <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider">Referencia</th>
+                      <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider text-right">Monto</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-100">
+                    @for (pago of historial.pagos; track pago.id) {
+                      <tr class="hover:bg-slate-50/80 transition-colors">
+                        <td class="p-3 text-slate-600 text-xs">{{ pago.fecha | date:'dd/MM/yyyy' }}</td>
+                        <td class="p-3">
+                          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
+                                [ngClass]="pago.tipo === 'cobro'
+                                  ? 'bg-green-100 text-green-700'
+                                  : 'bg-orange-100 text-orange-700'">
+                            @if (pago.tipo === 'cobro') {
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+                            } @else {
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+                            }
+                            {{ pago.tipo === 'cobro' ? 'Cobro' : 'Pago' }}
+                          </span>
+                        </td>
+                        <td class="p-3">
+                          <span class="font-mono text-xs font-semibold text-blue-600">{{ pago.numeroDocumento }}</span>
+                        </td>
+                        <td class="p-3 text-slate-700 text-xs">{{ pago.contraparte }}</td>
+                        <td class="p-3 text-slate-500 text-xs capitalize">{{ pago.medioPago }}</td>
+                        <td class="p-3 text-slate-400 text-xs">{{ pago.referencia || '—' }}</td>
+                        <td class="p-3 text-right font-semibold"
+                            [ngClass]="pago.tipo === 'cobro' ? 'text-green-700' : 'text-orange-700'">
+                          {{ pago.monto | currency:'COP':'symbol-narrow':'1.0-0' }}
+                        </td>
+                      </tr>
+                    }
+                    @if (historial.pagos.length === 0) {
+                      <tr>
+                        <td colspan="7" class="p-10 text-center text-slate-400 text-sm">
+                          No hay movimientos en este período
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            } @else if (!loadingHistorial) {
+              <div class="py-12 text-center">
+                <div class="text-5xl mb-3">📂</div>
+                <p class="text-sm text-slate-400">Seleccione un período y haga clic en "Generar"</p>
+              </div>
+            }
+
+          </div>
+        }
+
+      </div>
+    </div>
+
+  </div>
+</div>

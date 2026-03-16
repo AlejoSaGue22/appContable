@@ -1,15 +1,20 @@
 import { Routes } from "@angular/router";
-import { EstadoResultadoComponent } from "./estado-resultado/estado-resultado.component";
+import { ReportesGeneralComponent } from "./reportes-general/reportes-general.component";
+import { ReportesCarteraComponent } from "./reportes-cartera/reportes-cartera.component";
 
 export const routes: Routes = [
     {
-        path: '',
-        component: EstadoResultadoComponent
+        path: 'reports-general',
+        component: ReportesGeneralComponent
+    },
+    {
+        path: 'reports-cartera',
+        component: ReportesCarteraComponent
     },
     {
         path: '**',
-        redirectTo: ''
+        redirectTo: 'reports-general'
     }
-]
+];
 
 export default routes;

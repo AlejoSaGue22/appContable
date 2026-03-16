@@ -164,9 +164,10 @@
                           </span>
                           <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium"
                                 [ngClass]="{
-                                  'bg-blue-100 text-blue-600':   f.paymentStatus === 'pending',
-                                  'bg-amber-100 text-amber-600': f.paymentStatus === 'partial',
-                                  'bg-red-100 text-red-600':     f.paymentStatus === 'overdue'
+                                  'bg-blue-100 text-blue-600':   f.paymentStatus === 'pendiente',
+                                  'bg-amber-100 text-amber-600': f.paymentStatus === 'parcial',
+                                  'bg-red-100 text-red-600':     f.paymentStatus === 'vencido',
+                                  'bg-green-100 text-green-600': f.paymentStatus === 'pagado'
                                 }">
                             @if (f.diasVencida > 0) { +{{ f.diasVencida }}d }
                             @else { {{ f.diasVencida * -1 }}d }

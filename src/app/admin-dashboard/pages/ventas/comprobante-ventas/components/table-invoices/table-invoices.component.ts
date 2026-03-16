@@ -1,4 +1,4 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import { Component, computed, input, output, signal, effect } from '@angular/core';
 import { FacturaVenta, GetFacturaRequest, InvoiceStatus } from '@dashboard/interfaces/documento-venta-interface';
 import { RouterLink } from "@angular/router";
 import { FormsModule } from '@angular/forms';
@@ -23,6 +23,9 @@ export interface InvoiceFilters {
 export class TableInvoices {
 
   invoiceData = input.required<GetFacturaRequest[]>();
+
+  // Input for active filters to restore state if component is recreated
+  activeFilters = input<InvoiceFilters>({});
 
   // Pagination inputs
   currentPage = input<number>(1);
@@ -62,6 +65,31 @@ export class TableInvoices {
   });
 
   showFilters = signal<boolean>(false);
+
+  constructor() {
+    effect(() => {
+      const filters = this.activeFilters();
+      this.clientName.set(filters.clientName ?? '');
+      this.status.set(filters.status ?? '');
+      this.tipoFactura.set(filters.tipoFactura ?? '');
+      this.numeroFactura.set(filters.numeroFactura ?? '');
+      this.dianStatus.set(filters.dianStatus ?? '');
+      this.startDate.set(filters.startDate ?? '');
+      this.endDate.set(filters.endDate ?? '');
+
+      // Show filters panel if any extended filter is active
+      if (
+        filters.status ||
+        filters.tipoFactura ||
+        filters.numeroFactura ||
+        filters.dianStatus ||
+        filters.startDate ||
+        filters.endDate
+      ) {
+        this.showFilters.set(true);
+      }
+    }, { allowSignalWrites: true });
+  }
 
   toggleFilters(): void {
     this.showFilters.update(v => !v);

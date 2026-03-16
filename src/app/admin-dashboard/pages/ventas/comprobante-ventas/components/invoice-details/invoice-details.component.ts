@@ -1,8 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { DianStatus, GetFacturaRequest, InvoiceStatus, TipoFactura } from '@dashboard/interfaces/documento-venta-interface';
+import { DianStatus, FormaPago, GetFacturaRequest, InvoiceStatus, TipoFactura } from '@dashboard/interfaces/documento-venta-interface';
+import { PagoHistorial, PaymentStatus } from '@dashboard/interfaces/pagos-interface';
+import { RegistrarPagoModalData } from '@dashboard/pages/pagos/components/modal-registrarpago/modal-registrarpago.component';
+import { PagosHttpService } from '@dashboard/pages/pagos/services/pagos.service';
 import { ComprobantesVentasService } from '@dashboard/pages/ventas/services/comprobantes-ventas.service';
+import { AsientosHttpService } from '@dashboard/services/asientos-http.service';
 
 @Component({
   selector: 'app-invoice-details',
@@ -13,16 +17,90 @@ export class InvoiceDetailsComponent {
   factura = signal<GetFacturaRequest | null>(null);
   loading = signal(true);
   error = signal<string | null>(null);
+  asientos: any[] = [];
+  cobros: PagoHistorial[] = [];
+  loadingAsientos = false;
+  modalCobroVisible = false;
+  modalCobroData: RegistrarPagoModalData | null = null;
 
   constructor(
     private facturasService: ComprobantesVentasService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private pagosService: PagosHttpService,
+    private asientosService: AsientosHttpService,
   ) { }
 
   ngOnInit(): void {
     const id = this.route.snapshot.params['id'];
     this.loadInvoice(id);
   }
+  
+  cargarDatosContables(): void {
+    const id = this.factura()!.id;
+  
+    // Cargar asientos de esta factura
+    this.loadingAsientos = true;
+    this.asientosService.getByReferencia(this.factura()!.comprobante_completo).subscribe({
+      next:  a  => { this.asientos = a; this.loadingAsientos = false; },
+      error: () => { this.loadingAsientos = false; },
+    });
+  
+    // Cargar historial de cobros (solo si es crédito)
+    if (this.factura()!.formaPago === FormaPago.CREDITO) {
+      this.pagosService.getHistorialCobros(id).subscribe({
+        next: c => { this.cobros = c; },
+      });
+    }
+  }
+  
+  // ── Modal de cobro ────────────────────────────────────────────────────
+  abrirCobro(): void {
+    const f = this.factura()!;
+    this.modalCobroData = {
+      tipo:            'cobro',
+      documentoId:     f.id,
+      numeroDocumento: f.comprobante_completo,
+      contraparte:     `${f.client.nombre} ${f.client.apellido}`,
+      total:           f.total,
+      saldoPendiente:  f.saldoPendiente ?? f.total,
+    };
+    this.modalCobroVisible = true;
+  }
+  
+  onCobroExitoso(_result: any): void {
+    this.modalCobroVisible = false;
+    // this.cargarFactura(); // recarga la factura para actualizar saldos
+  }
+  
+  // ── Reintentar asiento ────────────────────────────────────────────────
+  reintentarAsiento(): void {
+    // Llama al endpoint que regener el asiento
+    // this.asientosService.reintentarAsientoFactura(this.factura()!.id).subscribe({
+    //   next: () => { this.cargarFactura(); },
+    // });
+  }
+  
+  // ── Helpers labels ────────────────────────────────────────────────────
+  getPaymentStatusLabel(status: PaymentStatus | null | undefined): string {
+    const map: Record<string, string> = {
+      pendiente: 'Pendiente de cobro',
+      parcial: 'Pago parcial',
+      pagado:    'Pagado',
+      vencida: 'Vencida',
+    };
+    return status ? (map[status] ?? status) : '—';
+  }
+  
+  getTipoAsientoLabel(tipo: string): string {
+    const map: Record<string, string> = {
+      FACTURA_VENTA:           'Venta',
+      COBRO:                   'Cobro CxC',
+      ANULACION_FACTURA_VENTA: 'Anulación',
+      PAGO_FACTURA_VENTA:      'Cobro',
+    };
+    return map[tipo] ?? tipo;
+  }
+
 
   loadInvoice(id: string): void {
     this.loading.set(true);
@@ -32,6 +110,7 @@ export class InvoiceDetailsComponent {
       next: (response) => {
         this.factura.set(response.data[0]);
         this.loading.set(false);
+        this.cargarDatosContables();
       },
       error: (err) => {
         this.error.set('Error al cargar la factura');

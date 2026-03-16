@@ -1,8 +1,24 @@
 // src/app/pagos/models/pagos.models.ts
 
-export type PaymentStatus = 'pending' | 'partial' | 'paid' | 'overdue';
+export type PaymentStatus = 'pendiente' | 'parcial' | 'pagado' | 'vencido';
 export type MedioPago     = 'caja' | 'banco' | 'transferencia' | 'cheque';
 export type TipoPago      = 'cobro' | 'pago';
+
+// ── Envelope genérico del backend ──────────────────────────────────────────
+
+export interface PagoMetaDto {
+  total?:   number;
+  page?:    number;
+  limit?:   number;
+  [key: string]: unknown;
+}
+
+export interface PagoResponseDto<T> {
+  success:  boolean;
+  data:     T;
+  message?: string;
+  meta?:    PagoMetaDto;
+}
 
 // ── CxC ────────────────────────────────────────────────────────────────────
 

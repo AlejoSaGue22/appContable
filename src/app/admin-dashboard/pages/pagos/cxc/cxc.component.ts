@@ -93,8 +93,8 @@ export class CxcComponent implements OnInit {
 
   etiquetaEstado(status: PaymentStatus): string {
     const map: Record<PaymentStatus, string> = {
-      pending: 'Pendiente', partial: 'Parcial',
-      paid: 'Pagado', overdue: 'Vencida',
+      pendiente: 'Pendiente', parcial: 'Parcial',
+      pagado: 'Pagado', vencido: 'Vencido',
     };
     return map[status] ?? status;
   }

@@ -75,6 +75,6 @@ export class CxpComponent implements OnInit {
   }
 
   etiquetaEstado(status: PaymentStatus): string {
-    return ({ pending: 'Pendiente', partial: 'Parcial', paid: 'Pagado', overdue: 'Vencida' })[status] ?? status;
+    return ({ pendiente: 'Pendiente', parcial: 'Parcial', pagado: 'Pagado', vencido: 'Vencido' })[status] ?? status;
   }
 }
