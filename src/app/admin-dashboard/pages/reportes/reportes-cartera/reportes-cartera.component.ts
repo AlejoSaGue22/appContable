@@ -71,7 +71,7 @@ export class ReportesCarteraComponent implements OnInit {
   cargarResumen(): void {
     this.loadingResumen = true;
     this.svc.getResumenCartera().subscribe({
-      next:  d  => { this.resumen = d; this.loadingResumen = false; },
+      next:  d  => { console.log('Resumen: ', d); this.resumen = d; this.loadingResumen = false; },
       error: () => { this.loadingResumen = false; },
     });
   }

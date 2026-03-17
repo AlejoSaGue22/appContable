@@ -2,8 +2,8 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
-import { MenuService } from '../../../services/menu.service';
-import { MenuItem } from '../../../interfaces/menu.interface';
+import { MenuService } from '../../../../services/menu.service';
+import { MenuItem } from '../../../../interfaces/menu.interface';
 import { MenuFormComponent } from '../menu-form/menu-form.component';
 
 @Component({
@@ -15,10 +15,11 @@ import { MenuFormComponent } from '../menu-form/menu-form.component';
 export class MenuListComponent implements OnInit {
   private menuService = inject(MenuService);
 
-  menuItems        = signal<MenuItem[]>([]);
-  isLoading        = signal(false);
-  isModalOpen      = signal(false);
+  menuItems           = signal<MenuItem[]>([]);
+  isLoading           = signal(false);
+  isModalOpen         = signal(false);
   selectedItemForEdit = signal<MenuItem | null>(null);
+  expandedItems       = signal<Set<string>>(new Set());
 
   ngOnInit(): void {
     this.loadMenu();
@@ -30,7 +31,8 @@ export class MenuListComponent implements OnInit {
       next: res => {
         if (res.success) {
           // flattenTree para la vista de lista (el árbol ya viene del backend)
-          this.menuItems.set(this.flattenTree(res.data || []));
+          // this.menuItems.set(this.flattenTree(res.data || []));
+          this.menuItems.set(res.data || []);
         }
         this.isLoading.set(false);
       },
@@ -55,6 +57,20 @@ export class MenuListComponent implements OnInit {
       }
     }
     return result;
+  }
+
+  toggleExpand(itemId: string): void {
+    const next = new Set(this.expandedItems());
+    if (next.has(itemId)) {
+      next.delete(itemId);
+    } else {
+      next.add(itemId);
+    }
+    this.expandedItems.set(next);
+  }
+
+  isExpanded(itemId: string): boolean {
+    return this.expandedItems().has(itemId);
   }
 
   // ── Modal ─────────────────────────────────────────────────────────
@@ -117,10 +133,25 @@ export class MenuListComponent implements OnInit {
     moveItemInArray(currentItems, event.previousIndex, event.currentIndex);
     this.menuItems.set(currentItems);
 
-    this.menuService.reorderMenu({ orderedIds: currentItems.map(i => i.id) }).subscribe({
+    this.updateReorder(currentItems);
+  }
+
+  dropChild(event: CdkDragDrop<MenuItem[]>, parent: MenuItem): void {
+    const children = [...(parent.children || [])];
+    moveItemInArray(children, event.previousIndex, event.currentIndex);
+    
+    // Actualización optimista en el árbol
+    parent.children = children;
+    this.menuItems.set([...this.menuItems()]);
+
+    this.updateReorder(children);
+  }
+
+  private updateReorder(items: MenuItem[]): void {
+    this.menuService.reorderMenu({ orderedIds: items.map(i => i.id) }).subscribe({
       error: () => {
         console.error('Error al reordenar');
-        this.loadMenu(); // rollback
+        this.loadMenu(); // rollback si falla
       },
     });
   }

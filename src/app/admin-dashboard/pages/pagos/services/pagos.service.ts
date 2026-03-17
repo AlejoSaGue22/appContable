@@ -18,8 +18,8 @@ export class PagosHttpService {
   // ── Resumen (dashboard) ────────────────────────────────────────────────
   getResumenCartera(): Observable<ResumenCartera> {
     return this.http
-      .get<PagoResponseDto<ResumenCartera>>(`${this.base}/reportes/cartera/resumen`)
-      .pipe(map(r => r.data));
+      .get<ResumenCartera>(`${this.base}/reportes/cartera/resumen`)
+      .pipe(map(r => r));
   }
 
   // ── CxC ───────────────────────────────────────────────────────────────
@@ -56,8 +56,7 @@ export class PagosHttpService {
 
   getHistorialPagos(facturaCompraId: string): Observable<PagoHistorial[]> {
     return this.http
-      .get<PagoResponseDto<PagoHistorial[]>>(`${this.base}/pagos/cxp/${facturaCompraId}/historial`)
-      .pipe(map(r => r.data));
+      .get<PagoHistorial[]>(`${this.base}/pagos/cxp/${facturaCompraId}/historial`);
   }
 
   registrarPago(facturaCompraId: string, dto: RegistrarPagoDto): Observable<PagoResponseDto<unknown>> {
@@ -67,14 +66,12 @@ export class PagosHttpService {
   // ── Aging ─────────────────────────────────────────────────────────────
   getAgingCobrar(): Observable<AgingReporte> {
     return this.http
-      .get<PagoResponseDto<AgingReporte>>(`${this.base}/pagos/reportes/cartera/aging-cobrar`)
-      .pipe(map(r => r.data));
+      .get<AgingReporte>(`${this.base}/reportes/cartera/aging-cobrar`);
   }
 
   getAgingPagar(): Observable<AgingReporte> {
     return this.http
-      .get<PagoResponseDto<AgingReporte>>(`${this.base}/pagos/reportes/cartera/aging-pagar`)
-      .pipe(map(r => r.data));
+      .get<AgingReporte>(`${this.base}/reportes/cartera/aging-pagar`);
   }
 
   // ── Historial global ──────────────────────────────────────────────────
@@ -83,11 +80,11 @@ export class PagosHttpService {
       .set('fechaInicio', fechaInicio)
       .set('fechaFin',    fechaFin);
     return this.http
-      .get<PagoResponseDto<HistorialPagosResponse>>(
-        `${this.base}/pagos/reportes/cartera/historial-pagos`,
+      .get<HistorialPagosResponse>(
+        `${this.base}/reportes/cartera/historial-pagos`,
         { params },
       )
-      .pipe(map(r => r.data));
+      .pipe(map(r => r));
   }
 
   // ── Cuentas bancarias ─────────────────────────────────────────────────

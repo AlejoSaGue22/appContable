@@ -5,8 +5,8 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MenuItem, CreateMenuDto, UpdateMenuDto } from '../../../interfaces/menu.interface';
-import { MenuService } from '../../../services/menu.service';
+import { MenuItem, CreateMenuDto, UpdateMenuDto } from '../../../../interfaces/menu.interface';
+import { MenuService } from '../../../../services/menu.service';
 
 @Component({
   selector: 'app-menu-form',

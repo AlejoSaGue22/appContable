@@ -1,0 +1,135 @@
+<div class="p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Gestión de Menú</h1>
+    <button (click)="openCreateModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md flex items-center gap-2 transition-colors">
+      <i class="fa-solid fa-plus"></i> Nuevo Ítem
+    </button>
+  </div>
+
+  <div *ngIf="isLoading()" class="text-center py-10">
+    <span class="loading loading-spinner text-primary loading-lg"></span>
+  </div>
+
+  <div *ngIf="!isLoading()" class="bg-white rounded-lg shadow-sm border border-gray-200">
+    <div class="p-4 border-b border-gray-200 font-semibold grid grid-cols-12 gap-4 text-gray-700 bg-gray-50 rounded-t-lg">
+      <div class="col-span-1 text-center">Orden</div>
+      <div class="col-span-3">Título</div>
+      <div class="col-span-2 text-center">Ruta / URL</div>
+      <div class="col-span-2 text-center">Permiso</div>
+      <div class="col-span-2 text-center">Estado</div>
+      <div class="col-span-2 text-center">Acciones</div>
+    </div>
+
+    <div cdkDropList (cdkDropListDropped)="drop($event)">
+      <div *ngFor="let item of menuItems()" cdkDrag class="mb-2">
+        <!-- Parent Item Row -->
+        <div class="p-4 border-b border-gray-100 hover:bg-gray-50 grid grid-cols-12 gap-4 items-center bg-white cursor-move rounded-lg shadow-sm border border-gray-100">
+          <div class="col-span-1 flex items-center justify-center gap-2">
+            <i class="fa-solid fa-grip-vertical text-gray-300"></i>
+            <button *ngIf="item.children?.length" (click)="$event.stopPropagation(); toggleExpand(item.id)" 
+                    class="text-gray-400 hover:text-blue-600 transition-colors w-6 h-6 flex items-center justify-center rounded-full hover:bg-gray-100">
+              <i [class]="isExpanded(item.id) ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right'"></i>
+            </button>
+            <div *ngIf="!item.children?.length" class="w-6"></div>
+          </div>
+          <div class="col-span-3 flex items-center gap-3">
+            <span class="text-blue-600 w-8 h-8 flex items-center justify-center bg-blue-50 rounded-lg">
+              <span [innerHTML]="renderIcon(item.icon)"></span>
+            </span>
+            <div class="flex flex-col">
+              <span class="font-bold text-gray-800">{{ item.title }}</span>
+              <span *ngIf="item.children?.length" class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">
+                {{item.children!.length}} sub-ítems
+              </span>
+            </div>
+          </div>
+          <div class="col-span-2 text-center text-sm text-gray-500 truncate" [title]="item.route || item.externalUrl">
+            {{ item.route || item.externalUrl || '-' }}
+          </div>
+          <div class="col-span-2 text-center text-xs">
+            <span *ngIf="item.requiredPermission" class="bg-indigo-50 text-indigo-700 px-2 py-1 rounded border border-indigo-100 font-medium">{{ item.requiredPermission }}</span>
+            <span *ngIf="!item.requiredPermission" class="text-gray-300">-</span>
+          </div>
+          <div class="col-span-2 text-center flex flex-col gap-1 items-center justify-center">
+            <button (click)="toggleActive(item)" [class]="item.isActive ? 'text-green-600' : 'text-red-400'" class="text-[10px] font-bold hover:opacity-75 uppercase tracking-tighter" title="Cambiar Activo">
+              <i class="fa-solid fa-circle text-[8px] mr-1"></i> {{ item.isActive ? 'Activo' : 'Inactivo'}}
+            </button>
+            <button (click)="toggleVisible(item)" [class]="item.isVisible ? 'text-blue-600' : 'text-gray-300'" class="text-[10px] hover:opacity-75 font-semibold uppercase tracking-tighter" title="Cambiar Visibilidad">
+              <i [class]="item.isVisible ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash'" class="mr-1"></i> {{ item.isVisible ? 'Visible' : 'Oculto'}}
+            </button>
+          </div>
+          <div class="col-span-2 text-center flex justify-center gap-1">
+            <button (click)="openEditModal(item)" class="text-blue-500 hover:text-blue-700 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-blue-50 transition-colors" title="Editar">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+            <button (click)="deleteItem(item)" [disabled]="item.children && item.children.length > 0" 
+                    class="text-red-400 hover:text-red-600 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-50 transition-colors disabled:opacity-20" title="Eliminar">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Children Container (Collapsible) -->
+        <div *ngIf="isExpanded(item.id) && item.children?.length" 
+             cdkDropList 
+             (cdkDropListDropped)="dropChild($event, item)"
+             class="mt-1 ml-10 pl-4 border-l-2 border-dashed border-gray-200 space-y-1 py-1">
+          
+          <div *ngFor="let child of item.children" cdkDrag 
+               class="p-3 bg-gray-50 border border-gray-100 rounded-lg hover:bg-white hover:shadow-sm grid grid-cols-11 gap-3 items-center cursor-move transition-all group">
+            
+            <div class="col-span-1 flex justify-center">
+              <i class="fa-solid fa-grip-vertical text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+            </div>
+
+            <div class="col-span-3 flex items-center gap-2">
+              <span class="text-gray-400 text-sm">
+                <span [innerHTML]="renderIcon(child.icon)"></span>
+              </span>
+              <span class="text-sm font-medium text-gray-700">{{ child.title }}</span>
+            </div>
+
+            <div class="col-span-2 text-xs text-gray-400 truncate text-center">
+              {{ child.route || child.externalUrl || '-' }}
+            </div>
+
+            <div class="col-span-1 text-center">
+              <span *ngIf="child.requiredPermission" class="text-[10px] bg-white text-indigo-500 px-1.5 py-0.5 rounded border border-indigo-100">{{ child.requiredPermission }}</span>
+              <span *ngIf="!child.requiredPermission" class="text-gray-300 text-[10px]">-</span>
+            </div>
+
+            <div class="col-span-2 flex flex-col items-center justify-center gap-0.5">
+              <button (click)="toggleActive(child)" [class]="child.isActive ? 'text-green-500' : 'text-red-300'" class="text-[9px] font-bold hover:opacity-75 uppercase" title="Cambiar Activo">
+                {{ child.isActive ? 'Activo' : 'Inactivo'}}
+              </button>
+              <button (click)="toggleVisible(child)" [class]="child.isVisible ? 'text-blue-500' : 'text-gray-300'" class="text-[9px] hover:opacity-75 font-semibold uppercase" title="Cambiar Visibilidad">
+                {{ child.isVisible ? 'Ver' : 'Ocultar'}}
+              </button>
+            </div>
+
+            <div class="col-span-2 flex justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button (click)="openEditModal(child)" class="text-blue-400 hover:text-blue-600 p-1 rounded-md hover:bg-white transition-colors">
+                <i class="fa-solid fa-pen-to-square text-xs"></i>
+              </button>
+              <button (click)="deleteItem(child)" class="text-red-300 hover:text-red-500 p-1 rounded-md hover:bg-white transition-colors">
+                <i class="fa-solid fa-trash-can text-xs"></i>
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <div *ngIf="menuItems().length === 0" class="p-8 text-center text-gray-500 bg-white rounded-b-lg">
+        No hay ítems de menú creados.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal componente -->
+<app-menu-form 
+  *ngIf="isModalOpen()" 
+  [itemToEdit]="selectedItemForEdit()" 
+  [allMenuItems]="menuItems()"
+  (close)="closeModal($event)">
+</app-menu-form>
