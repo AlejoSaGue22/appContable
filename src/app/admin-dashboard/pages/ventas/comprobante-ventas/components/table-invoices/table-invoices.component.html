@@ -141,13 +141,15 @@
           <th scope="col" class="px-6 py-3">Forma Pago</th>
           <th scope="col" class="px-6 py-3">Estado</th>
           <th scope="col" class="px-6 py-3 text-right">Total</th>
+          <th scope="col" class="px-6 py-3 text-right">Pagado</th>
+          <th scope="col" class="px-6 py-3 text-right">Saldo</th>
           <th scope="col" class="px-6 py-3 text-center">Acciones</th>
         </tr>
       </thead>
       <tbody>
         @if (invoiceDataArray.length == 0) {
             <tr>
-              <td colspan="6" class="px-6 py-12 text-center">
+              <td colspan="10" class="px-6 py-12 text-center">
                 <div class="flex flex-col items-center justify-center">
                   <svg class="mb-3 h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -188,6 +190,22 @@
               </td>
               <td class="px-6 py-4 text-right font-semibold">
                 {{ formatCurrency(invoice.total) }}
+              </td>
+              <td class="px-6 py-4 text-right">
+                @if (invoice.formaPago === 'CREDITO') {
+                  <span class="text-sm text-slate-500">{{ formatCurrency(invoice.totalPagado) }}</span>
+                } @else {
+                  <span class="text-xs text-slate-400">—</span>
+                }
+              </td>
+              <td class="px-6 py-4 text-right">
+                @if (invoice.formaPago === 'CREDITO') {
+                  <span class="text-sm font-semibold" [class.text-red-600]="invoice.saldoPendiente > 0" [class.text-green-600]="invoice.saldoPendiente === 0">
+                    {{ formatCurrency(invoice.saldoPendiente) }}
+                  </span>
+                } @else {
+                  <span class="text-xs text-slate-400">—</span>
+                }
               </td>
               <td class="px-6 py-4">
                 <div class="flex items-center gap-2">
@@ -237,22 +255,21 @@
                       </button>
                   } 
 
-
                   <!-- Botones Descarga (Solo si está aceptada o emitida) -->
                   @if (invoice.tipoFactura === 'ELECTRONICA' && (invoice.status === 'accepted' || invoice.status === 'paid')) {
                       <button (click)="onDownloadPDF(invoice.id)"
-                        class="inline-flex items-center rounded-lg p-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-500 dark:hover:bg-gray-700 cursor-pointer"
-                        title="Descargar PDF">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                        </svg>
+                          class="inline-flex items-center rounded-lg p-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-500 dark:hover:bg-gray-700 cursor-pointer"
+                          title="Descargar PDF">
+                          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                          </svg>
                       </button>
                       <button (click)="onDownloadXML(invoice.id)"
-                        class="inline-flex items-center rounded-lg p-2 text-sm text-orange-600 hover:bg-orange-50 dark:text-orange-500 dark:hover:bg-gray-700 cursor-pointer"
-                        title="Descargar XML">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                        </svg>
+                          class="inline-flex items-center rounded-lg p-2 text-sm text-orange-600 hover:bg-orange-50 dark:text-orange-500 dark:hover:bg-gray-700 cursor-pointer"
+                          title="Descargar XML">
+                          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                          </svg>
                       </button>
                   }
 

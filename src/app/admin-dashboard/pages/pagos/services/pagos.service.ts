@@ -4,18 +4,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/app/environments/environment';
-import {
-  AgingReporte,
-  CuentaBancaria,
-  CxcResponse,
-  CxpResponse,
-  HistorialPagosResponse,
-  PagoHistorial,
-  PagoResponseDto,
-  PaymentStatus,
-  RegistrarCobroDto,
-  RegistrarPagoDto,
-  ResumenCartera,
+import { AgingReporte, CuentaBancaria, CxcResponse, CxpResponse, HistorialPagosResponse, PagoHistorial, 
+         PagoResponseDto, PaymentStatus, RegistrarCobroDto, RegistrarPagoDto, ResumenCartera
 } from '@dashboard/interfaces/pagos-interface';
 
 

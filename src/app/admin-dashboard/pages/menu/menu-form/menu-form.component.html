@@ -1,0 +1,204 @@
+<!-- menu-form.component.html -->
+<!-- Se muestra como overlay. Usa el mismo patrón que otros modales del proyecto. -->
+
+<div class="fixed inset-0 bg-black/50 flex justify-center items-center z-[100] p-4">
+  <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+
+    <!-- Cabecera -->
+    <div class="flex justify-between items-center px-6 py-4 border-b border-gray-100 bg-gray-50 rounded-t-xl">
+      <div>
+        <h3 class="font-bold text-lg text-gray-800">
+          {{ isEditMode() ? 'Editar Ítem de Menú' : 'Nuevo Ítem de Menú' }}
+        </h3>
+        <p class="text-xs text-gray-500 mt-0.5">
+          {{ isEditMode() ? 'Modifica los datos del ítem seleccionado' : 'Completa los campos para agregar un nuevo ítem al menú' }}
+        </p>
+      </div>
+      <button type="button" (click)="onClose()"
+        class="text-gray-400 hover:text-gray-600 hover:bg-gray-200 p-2 rounded-full transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Formulario -->
+    <form [formGroup]="menuForm" (ngSubmit)="onSubmit()" class="p-6 space-y-5">
+
+      <!-- Fila 1: Título + Ícono -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+        <!-- Título -->
+        <div>
+          <label class="block mb-1 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            Título <span class="text-red-500">*</span>
+          </label>
+          <input type="text"
+                 formControlName="title"
+                 placeholder="Ej. Panel de Control"
+                 class="w-full bg-transparent text-slate-700 text-sm border rounded-md px-3 py-2
+                        transition duration-300 ease focus:outline-none focus:border-slate-400
+                        hover:border-slate-300 shadow-sm focus:shadow"
+                 [class.border-red-400]="menuForm.get('title')?.invalid && menuForm.get('title')?.touched" />
+            @if (menuForm.get('title')?.invalid && menuForm.get('title')?.touched) {
+              <p class="mt-1 text-xs text-red-500">El título es requerido.</p>
+            }
+        </div>
+
+        <!-- Ícono con preview -->
+        <div>
+          <label class="block mb-1 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            Ícono
+          </label>
+          <div class="flex gap-2">
+            <input type="text"
+                   formControlName="icon"
+                   placeholder="fa-solid fa-home  o  home"
+                   class="flex-1 bg-transparent text-slate-700 text-sm border rounded-md px-3 py-2
+                          transition duration-300 ease focus:outline-none focus:border-slate-400
+                          hover:border-slate-300 shadow-sm focus:shadow" />
+            <!-- Preview del ícono -->
+            <div class="w-10 h-10 flex-shrink-0 rounded-md border border-slate-200 bg-slate-50
+                        flex items-center justify-center text-blue-600 text-sm"
+                 [innerHTML]="iconPreview()">
+            </div>
+          </div>
+          @if (menuForm.get('icon')?.invalid && menuForm.get('icon')?.touched) {
+            <p class="mt-1 text-xs text-red-500">El ícono es requerido.</p>
+          } @else {
+            <p class="mt-1 text-xs text-slate-400">
+              Acepta: clase FA (<code>fa-solid fa-home</code>), Material Icon (<code>home</code>) o HTML.
+            </p>
+          }
+        </div>
+      </div>
+
+      <!-- Fila 2: Ruta + URL externa -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+        <div>
+          <label class="block mb-1 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            Ruta Interna (Angular)
+          </label>
+          <input type="text"
+                 formControlName="route"
+                 placeholder="/panel/dashboard"
+                 class="w-full bg-transparent text-slate-700 text-sm border rounded-md px-3 py-2
+                        transition duration-300 ease focus:outline-none focus:border-slate-400
+                        hover:border-slate-300 shadow-sm focus:shadow" />
+          <p class="mt-1 text-xs text-slate-400">Navegación interna dentro de Angular.</p>
+        </div>
+
+        <div>
+          <label class="block mb-1 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            URL Externa
+          </label>
+          <input type="url"
+                 formControlName="externalUrl"
+                 placeholder="https://sitio.com"
+                 class="w-full bg-transparent text-slate-700 text-sm border rounded-md px-3 py-2
+                        transition duration-300 ease focus:outline-none focus:border-slate-400
+                        hover:border-slate-300 shadow-sm focus:shadow" />
+          <p class="mt-1 text-xs text-slate-400">Abre otro sitio web en nueva pestaña.</p>
+        </div>
+      </div>
+
+      <!-- Fila 3: Permiso + Padre -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+        <div>
+          <label class="block mb-1 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            Permiso Requerido
+          </label>
+          <input type="text"
+                 formControlName="requiredPermission"
+                 placeholder="Ej. REPORT_READ"
+                 class="w-full bg-transparent text-slate-700 text-sm border rounded-md px-3 py-2
+                        transition duration-300 ease focus:outline-none focus:border-slate-400
+                        hover:border-slate-300 shadow-sm focus:shadow" />
+          <p class="mt-1 text-xs text-slate-400">Vacío = visible para todos los autenticados.</p>
+        </div>
+
+        <div>
+          <label class="block mb-1 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            Menú Padre
+          </label>
+          <select formControlName="parentId"
+                  class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border
+                         border-slate-200 rounded pl-3 pr-8 py-2 transition duration-300 ease
+                         focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm
+                         focus:shadow-md cursor-pointer">
+            <option value="">— Nodo raíz (sin padre) —</option>
+            @for (option of parentOptions(); track option.id) {
+              <option [value]="option.id">{{ option.title }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- Toggles: Activo + Visible -->
+      <div class="bg-slate-50 rounded-lg border border-slate-200 p-4">
+        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Estado del ítem</p>
+        <div class="flex flex-col sm:flex-row gap-4">
+
+          <!-- Toggle Activo -->
+          <label class="flex items-center gap-3 cursor-pointer flex-1">
+            <div class="relative">
+              <input type="checkbox" formControlName="isActive" class="sr-only peer" />
+              <div class="w-10 h-5 rounded-full border-2 border-slate-300 bg-white
+                          peer-checked:border-green-500 peer-checked:bg-green-500 transition-all"></div>
+              <div class="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-slate-300
+                          peer-checked:translate-x-5 peer-checked:bg-white transition-all"></div>
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-slate-700">Activo</p>
+              <p class="text-xs text-slate-400">Si está inactivo no aparece en ningún rol.</p>
+            </div>
+          </label>
+
+          <!-- Toggle Visible -->
+          <label class="flex items-center gap-3 cursor-pointer flex-1">
+            <div class="relative">
+              <input type="checkbox" formControlName="isVisible" class="sr-only peer" />
+              <div class="w-10 h-5 rounded-full border-2 border-slate-300 bg-white
+                          peer-checked:border-blue-500 peer-checked:bg-blue-500 transition-all"></div>
+              <div class="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-slate-300
+                          peer-checked:translate-x-5 peer-checked:bg-white transition-all"></div>
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-slate-700">Visible</p>
+              <p class="text-xs text-slate-400">Puede estar activo pero oculto temporalmente.</p>
+            </div>
+          </label>
+
+        </div>
+      </div>
+
+      <!-- Acciones -->
+      <div class="flex justify-end gap-3 pt-2 border-t border-gray-100">
+        <button type="button"
+                (click)="onClose()"
+                [disabled]="isSubmitting()"
+                class="px-4 py-2 rounded-md bg-white border border-gray-300 text-sm font-medium
+                       text-slate-700 hover:bg-gray-50 transition-colors disabled:opacity-50">
+          Cancelar
+        </button>
+        <button type="submit"
+                [disabled]="isSubmitting() || menuForm.invalid"
+                class="px-5 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-sm
+                       font-medium transition-colors shadow-sm disabled:opacity-50
+                       flex items-center gap-2">
+          @if (isSubmitting()) {
+            <svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          }
+          {{ isEditMode() ? 'Actualizar' : 'Crear' }} Ítem
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

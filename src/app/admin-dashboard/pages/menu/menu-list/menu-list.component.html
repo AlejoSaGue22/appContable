@@ -1,0 +1,74 @@
+<div class="p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Gestión de Menú</h1>
+    <button (click)="openCreateModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md flex items-center gap-2 transition-colors">
+      <i class="fa-solid fa-plus"></i> Nuevo Ítem
+    </button>
+  </div>
+
+  <div *ngIf="isLoading()" class="text-center py-10">
+    <span class="loading loading-spinner text-primary loading-lg"></span>
+  </div>
+
+  <div *ngIf="!isLoading()" class="bg-white rounded-lg shadow-sm border border-gray-200">
+    <div class="p-4 border-b border-gray-200 font-semibold grid grid-cols-12 gap-4 text-gray-700 bg-gray-50 rounded-t-lg">
+      <div class="col-span-1 text-center">Orden</div>
+      <div class="col-span-3">Título</div>
+      <div class="col-span-2 text-center">Ruta / URL</div>
+      <div class="col-span-2 text-center">Permiso</div>
+      <div class="col-span-2 text-center">Estado</div>
+      <div class="col-span-2 text-center">Acciones</div>
+    </div>
+
+    <div cdkDropList (cdkDropListDropped)="drop($event)">
+      <div *ngFor="let item of menuItems()" cdkDrag class="p-4 border-b border-gray-100 hover:bg-gray-50 grid grid-cols-12 gap-4 items-center bg-white cursor-move">
+        <div class="col-span-1 text-center text-gray-400">
+          <i class="fa-solid fa-grip-vertical"></i>
+        </div>
+        <div class="col-span-3 flex items-center gap-3">
+          <span class="text-gray-500 w-6 text-center">
+            <i *ngIf="!item.icon.includes('<i')" class="material-icons text-sm">{{item.icon}}</i>
+            <span *ngIf="item.icon.includes('<i')" [innerHTML]="item.icon"></span>
+          </span>
+          <span class="font-medium text-gray-800">{{ item.title }}</span>
+          <span *ngIf="item.children?.length" class="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full" title="Tiene submenús">{{item.children!.length}} hijos</span>
+        </div>
+        <div class="col-span-2 text-center text-sm text-gray-600 truncate" [title]="item.route || item.externalUrl">
+          {{ item.route || item.externalUrl || '-' }}
+        </div>
+        <div class="col-span-2 text-center text-xs">
+          <span *ngIf="item.requiredPermission" class="bg-indigo-50 text-indigo-700 px-2 py-1 rounded border border-indigo-100">{{ item.requiredPermission }}</span>
+          <span *ngIf="!item.requiredPermission" class="text-gray-400">-</span>
+        </div>
+        <div class="col-span-2 text-center flex flex-col gap-1 items-center justify-center">
+          <button (click)="toggleActive(item)" [class]="item.isActive ? 'text-green-600' : 'text-red-500'" class="text-xs font-semibold hover:opacity-75" title="Cambiar Activo">
+            <i class="fa-solid fa-circle text-[10px] mr-1"></i> {{ item.isActive ? 'Activo' : 'Inactivo'}}
+          </button>
+          <button (click)="toggleVisible(item)" [class]="item.isVisible ? 'text-blue-600' : 'text-gray-400'" class="text-xs hover:opacity-75" title="Cambiar Visibilidad">
+            <i [class]="item.isVisible ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash'" class="mr-1"></i> {{ item.isVisible ? 'Visible' : 'Oculto'}}
+          </button>
+        </div>
+        <div class="col-span-2 text-center flex justify-center gap-2">
+          <button (click)="openEditModal(item)" class="text-blue-600 hover:text-blue-800 p-1.5 rounded hover:bg-blue-50 transition-colors" title="Editar">
+            <i class="fa-solid fa-pen-to-square"></i>
+          </button>
+          <button (click)="deleteItem(item)" [disabled]="item.children && item.children.length > 0" 
+                  class="text-red-500 hover:text-red-700 p-1.5 rounded hover:bg-red-50 transition-colors disabled:opacity-30 disabled:hover:bg-transparent" title="Eliminar">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </div>
+      </div>
+      <div *ngIf="menuItems().length === 0" class="p-8 text-center text-gray-500 bg-white rounded-b-lg">
+        No hay ítems de menú creados.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal componente -->
+<app-menu-form 
+  *ngIf="isModalOpen()" 
+  [itemToEdit]="selectedItemForEdit()" 
+  [allMenuItems]="menuItems()"
+  (close)="closeModal($event)">
+</app-menu-form>

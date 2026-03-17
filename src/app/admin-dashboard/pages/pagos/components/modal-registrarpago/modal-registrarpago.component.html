@@ -126,12 +126,12 @@
           [class.border-red-400]="form.get('cuentaBancariaId')?.invalid && form.get('cuentaBancariaId')?.touched"
           formControlName="cuentaBancariaId">
           <option [value]="null">Seleccione una cuenta</option>
-          @if (loadingCuentas) {
-            <option disabled>Cargando...</option>
-          }
-          @for (c of cuentasBancarias; track c.id) {
-            <option [value]="c.id">{{ c.nombre }} — {{ c.banco }}</option>
-          }
+              @if (loadingCuentas) {
+                <option disabled>Cargando...</option>
+              }
+              @for (c of cuentasBancarias; track c.id) {
+                <option [value]="c.id">{{ c.nombre }} — {{ c.banco }}</option>
+              }
         </select>
         @if (form.get('cuentaBancariaId')?.hasError('required') && form.get('cuentaBancariaId')?.touched) {
           <p class="mt-1 text-xs text-red-500">Seleccione una cuenta bancaria</p>

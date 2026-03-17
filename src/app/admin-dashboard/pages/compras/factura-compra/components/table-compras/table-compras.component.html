@@ -110,27 +110,29 @@
           <th scope="col" class="px-6 py-3">Fecha</th>
           <th scope="col" class="px-6 py-3">Comprobante</th>
           <th scope="col" class="px-6 py-3">Proveedor</th>
-          <th scope="col" class="px-6 py-3">Total</th>
-          <th scope="col" class="px-6 py-3">Iva</th>
+          <th scope="col" class="px-6 py-3 text-right">Total</th>
+          <th scope="col" class="px-6 py-3 text-right">Pagado</th>
+          <th scope="col" class="px-6 py-3 text-right">Saldo</th>
           <th scope="col" class="px-6 py-3">Estado</th>
           <th scope="col" class="px-6 py-3">Acciones</th>
         </tr>
       </thead>
       <tbody>
         @if (compraData().length === 0) {
-        <tr>
-          <td colspan="7" class="px-6 py-12 text-center">
-            <div class="flex flex-col items-center justify-center">
-              <svg class="mb-4 h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              <p class="text-lg font-semibold text-gray-900 dark:text-white">No hay facturas de compra registradas</p>
-              <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Comienza agregando tu primera factura de compra
-              </p>
-            </div>
-          </td>
-        </tr>
+            <tr>
+              <td colspan="9" class="px-6 py-12 text-center">
+                <div class="flex flex-col items-center justify-center">
+                  <svg class="mb-4 h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <p class="text-lg font-semibold text-gray-900 dark:text-white">No hay facturas de compra registradas</p>
+                  <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    Comienza agregando tu primera factura de compra
+                  </p>
+                </div>
+              </td>
+            </tr>
         }
 
         @for (compra of compraData(); track compra.id) {
@@ -140,8 +142,23 @@
             {{ compra.numero }}
           </td>
           <td class="px-6 py-4">{{ compra.proveedor.razonSocial || (compra.proveedor.nombre) }}</td>
-          <td class="px-6 py-4">{{ compra.total | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
-          <td class="px-6 py-4">{{ compra.iva | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+          <td class="px-6 py-4 text-right">{{ compra.total | currency:'COP':'symbol-narrow':'1.0-0' }}</td>
+          <td class="px-6 py-4 text-right">
+            @if (compra.formaPago === 'credito') {
+              <span class="text-sm text-slate-500">{{ compra.totalPagado | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+            } @else {
+              <span class="text-xs text-slate-400">—</span>
+            }
+          </td>
+          <td class="px-6 py-4 text-right">
+            @if (compra.formaPago === 'credito') {
+              <span class="text-sm font-semibold" [class.text-red-600]="compra.saldoPendiente > 0" [class.text-green-600]="compra.saldoPendiente === 0">
+                {{ compra.saldoPendiente | currency:'COP':'symbol-narrow':'1.0-0' }}
+              </span>
+            } @else {
+              <span class="text-xs text-slate-400">—</span>
+            }
+          </td>
           <td class="px-6 py-4">
             <span [class]="getStatusClass(compra.estado)" class="rounded px-2.5 py-0.5 text-xs font-medium">
               {{ compra.estado | titlecase }}

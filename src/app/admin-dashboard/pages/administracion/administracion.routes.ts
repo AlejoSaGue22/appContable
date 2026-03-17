@@ -13,6 +13,10 @@ export const administracionRoutes: Routes = [
         component: UserFormsPageComponent
     },
     {
+        path: 'menu',
+        loadChildren: () => import('../menu/menu.routes')
+    },
+    {
         path: '**',
         component: ErrorPageComponent
     }

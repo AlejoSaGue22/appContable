@@ -4,15 +4,16 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { RegistrarPagoModalComponent, RegistrarPagoModalData } from '../components/modal-registrarpago/modal-registrarpago.component';
-import { CxpItem, CxpResumen, PaymentStatus } from '@dashboard/interfaces/pagos-interface';
+import { CxpItem, CxpResumen, PagoHistorial, PaymentStatus } from '@dashboard/interfaces/pagos-interface';
 import { PagosHttpService } from '../services/pagos.service';
 import { ModalComponent } from "@shared/components/modal/modal.component";
 import { HeaderTitlePageComponent, HeaderInput } from "@dashboard/components/header-title-page/header-title-page.component";
+import { ModalHistorialpagoComponent } from "../components/modal-historialpago/modal-historialpago..component";
 
 @Component({
   selector: 'app-cxp',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RegistrarPagoModalComponent, ModalComponent, HeaderTitlePageComponent],
+  imports: [CommonModule, ReactiveFormsModule, RegistrarPagoModalComponent, ModalComponent, HeaderTitlePageComponent, ModalHistorialpagoComponent],
   templateUrl: './cxp.component.html',
 })
 export class CxpComponent implements OnInit {
@@ -42,6 +43,12 @@ export class CxpComponent implements OnInit {
   modalVisible = false;
   modalData: RegistrarPagoModalData | null = null;
 
+  // Modal historial
+  historialVisible  = false;
+  historialLoading  = false;
+  historialItem: CxpItem | null = null;
+  historialPagos: PagoHistorial[] = [];
+
   constructor(private svc: PagosHttpService) {}
 
   ngOnInit(): void {
@@ -66,6 +73,17 @@ export class CxpComponent implements OnInit {
       total: item.total, saldoPendiente: item.saldoPendiente,
     };
     this.modalVisible = true;
+  }
+
+  abrirHistorial(item: CxpItem): void {
+    this.historialItem    = item;
+    this.historialPagos   = [];
+    this.historialVisible = true;
+    this.historialLoading = true;
+    this.svc.getHistorialPagos(item.facturaId).subscribe({
+      next: pagos => { this.historialPagos = pagos; this.historialLoading = false; },
+      error: ()   => { this.historialLoading = false; },
+    });
   }
 
   onPagoExitoso(_result: any): void {

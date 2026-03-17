@@ -129,7 +129,7 @@
               <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider text-right">Pagado</th>
               <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider text-right">Saldo</th>
               <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider text-center">Estado</th>
-              <th class="p-4 w-20"></th>
+              <th class="p-4 w-36 text-xs border-l border-gray-200 text-center text-slate-500">ACCIONES</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
@@ -177,15 +177,30 @@
                   </span>
                 </td>
                 <td class="p-4 text-right">
-                  <button type="button" (click)="abrirPago(item)"
-                    class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold cursor-pointer
-                           rounded-md transition-all shadow-sm hover:shadow flex items-center gap-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24"
-                         fill="none" stroke="currentColor" stroke-width="2.5">
-                      <line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline>
-                    </svg>
-                    Pagar
-                  </button>
+                  <div class="flex items-center justify-end gap-2">
+                    <!-- Botón Ver Historial -->
+                    <button type="button" (click)="abrirHistorial(item)"
+                      class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold cursor-pointer
+                             rounded-md transition-all shadow-sm hover:shadow flex items-center gap-1"
+                      title="Ver historial de pagos">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24"
+                           fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                      </svg>
+                      Historial
+                    </button>
+                    <!-- Botón Pagar -->
+                    <button type="button" (click)="abrirPago(item)"
+                      class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold cursor-pointer
+                             rounded-md transition-all shadow-sm hover:shadow flex items-center gap-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24"
+                           fill="none" stroke="currentColor" stroke-width="2.5">
+                        <line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline>
+                      </svg>
+                      Pagar
+                    </button>
+                  </div>
                 </td>
               </tr>
             }
@@ -220,4 +235,16 @@
       (success)="onPagoExitoso($event)"
       (cancel)="modalVisible = false" />
   }
+</app-modal>
+
+<!-- Modal Historial de Pagos -->
+<app-modal [(visible)]="historialVisible"
+           [title]="'Historial de Pagos — ' + (historialItem?.numeroFactura ?? '')"
+           width="max-w-2xl">
+  <app-modal-historialpago
+    [historialItem]="historialItem"
+    [historialPagos]="historialPagos"
+    [historialLoading]="historialLoading"
+    tipo="pago"
+  />
 </app-modal>
