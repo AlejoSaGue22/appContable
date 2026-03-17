@@ -68,6 +68,7 @@ export class RolesComponent {
       this.notificationService.warning('Los roles del sistema no pueden ser editados', 'Información');
       return;
     }
+
     this.isEditing.set(true);
     this.selectedRoleId.set(role.id);
     this.roleForm.patchValue({

@@ -10,6 +10,10 @@
     <app-header-title-productos-compra />
 
     <app-table-productos-compra [productoData]="productorxResource.value().articulos" (delete)="openModal($event)" />
+    
+    <div class="mt-4">
+        <app-pagination />
+    </div>
 </div>
 }
 

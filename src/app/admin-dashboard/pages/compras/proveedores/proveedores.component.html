@@ -10,6 +10,10 @@
     <app-header-title-proveedores (searchTerm)="onSearch($event)" />
 
     <app-table-proveedores [proveedorData]="proveedoresList()" (delete)="openModal($event)" />
+    
+    <div class="mt-4">
+        <app-pagination />
+    </div>
 </div>
 }
 

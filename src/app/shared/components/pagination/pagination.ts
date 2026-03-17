@@ -1,5 +1,6 @@
-import { Component, computed, input, linkedSignal } from '@angular/core';
+import { Component, computed, inject, input, linkedSignal } from '@angular/core';
 import { RouterLink } from "@angular/router";
+import { PaginationService } from './pagination.service';
 
 @Component({
   selector: 'app-pagination',
@@ -8,19 +9,16 @@ import { RouterLink } from "@angular/router";
 })
 export class Pagination { 
 
-  pages = input(0);
-  
-  currentPages = input<number>(1);
-  selectPage = linkedSignal(this.currentPages);
+  paginationService = inject(PaginationService);
 
+  pages = computed(() => {
+    return Math.ceil(this.paginationService.totalItems() / this.paginationService.pageSize());
+  });
+
+  selectPage = linkedSignal(this.paginationService.currentPage!);
+  
   getPagesList = computed(() => {
     return Array.from({ length: this.pages() }, (_, i) => i + 1);
   })
 
-  nextPage(){
-    // this.selectPage.set
-  }
-
 }
-
-

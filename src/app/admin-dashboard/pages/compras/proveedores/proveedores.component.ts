@@ -13,10 +13,11 @@ import { ProveedoresService } from '../services/proveedores.service';
 import { modalOpen } from '@shared/interfaces/services.interfaces';
 import { ModalComponents } from '@shared/components/modal.components/modal.components';
 import { ProveedoresRequest } from '@dashboard/interfaces/proveedores-interface';
+import { Pagination } from '@shared/components/pagination/pagination';
 
 @Component({
    selector: 'app-proveedores',
-   imports: [LoaderComponent, ErrorPages, HeaderTitleProveedoresComponent, TableProveedoresComponent, ModalComponents],
+   imports: [LoaderComponent, ErrorPages, HeaderTitleProveedoresComponent, TableProveedoresComponent, ModalComponents, Pagination],
    templateUrl: './proveedores.component.html',
    standalone: true
 })
@@ -43,14 +44,15 @@ export class ProveedoresComponent {
    cardsTotales = signal<CardsTotales[]>([]);
    proveedoresList = signal<ProveedoresRequest[]>([]);
 
-   // TODO: Reemplazar con el servicio real cuando esté disponible
    proveedoresResource = rxResource({
       request: () => ({ page: this.paginationService.currentPage() - 1, limit: 10 }),
-      loader: ({ request }) => this.proveedoresService.getProveedores(request).pipe(
+      loader: ({ request }) => this.proveedoresService.getProveedores({ offset: request.page * request.limit, limit: request.limit }).pipe(
          tap((response) => {
             this.proveedoresList.set(response.proveedores); // TODO: Agregar el tipo de dato correcto
             this.totalProveedores.set(response.count ?? 0);
-
+            
+            // Set pagination total
+            this.paginationService.totalItems.set(response.count ?? 0);
          })
       )
    })

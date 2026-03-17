@@ -54,7 +54,7 @@ export class UsersComponent {
     }),
     loader: ({ request }) => this.usersService.getUsers(request).pipe(
       tap((response) => {
-        // Podríamos manejar totales aquí si fuera necesario
+        this.paginationService.totalItems.set(response.meta?.total || 0);
       })
     )
   });

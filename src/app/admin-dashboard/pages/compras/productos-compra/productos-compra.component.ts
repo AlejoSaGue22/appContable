@@ -9,9 +9,10 @@ import { NotificationService } from '@shared/services/notification.service';
 import { ProductosService } from '@dashboard/pages/ventas/services/productos.service';
 import { HeaderTitleProductosCompraComponent } from "./components/header-title-productos-compra/header-title-productos-compra.component";
 import { TableProductosCompra } from "./components/table-productos-compra/table-productos-compra/table-productos-compra.component";
+import { Pagination } from '@shared/components/pagination/pagination';
 
 @Component({
-   imports: [LoaderComponent, ModalComponents, HeaderTitleProductosCompraComponent, TableProductosCompra],
+   imports: [LoaderComponent, ModalComponents, HeaderTitleProductosCompraComponent, TableProductosCompra, Pagination],
    templateUrl: './productos-compra.component.html',
 })
 export class ProductosCompraComponent {
@@ -26,9 +27,10 @@ export class ProductosCompraComponent {
    productorxResource = rxResource({
       request: () => ({ page: this.paginationService.currentPage() - 1, limit: 10 }),
       loader: ({ request }) => {
-         return this.productoServicio.getProductos({ offset: request.page * 9, limit: request.limit, venta_compra: 'compra' }).pipe(
+         return this.productoServicio.getProductos({ offset: request.page * request.limit, limit: request.limit, venta_compra: 'compra' }).pipe(
             tap((p) => {
                this.totalProducto.set(p.count);
+               this.paginationService.totalItems.set(p.count);
             })
          )
       }

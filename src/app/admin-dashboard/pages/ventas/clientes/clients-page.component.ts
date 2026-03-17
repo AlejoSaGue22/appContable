@@ -16,7 +16,7 @@ import { HelpersUtils } from '@utils/helpers.utils';
 
 @Component({
     selector: 'app-clients-page',
-    imports: [HeaderTitlePageComponent, NumCardsTotalesComponent, TableClientsComponent, ModalComponents, LoaderComponent, PaginationComponent, RouterLink],
+    imports: [HeaderTitlePageComponent, TableClientsComponent, ModalComponents, LoaderComponent, PaginationComponent, RouterLink],
     templateUrl: './clients-page.component.html',
     standalone: true
 })
@@ -50,6 +50,7 @@ export class ClientsPageComponent {
         }).pipe(
             tap((el) => {
                 this.totalCliente.set(el.count);
+                this.paginationService.totalItems.set(el.count);
                 this.cardsTotales.set([
                     { title: 'Total Clientes', valor: this.totalCliente().toString(), percent: '0' },
                     { title: 'Nuevos este Mes', valor: '0', percent: '0' },

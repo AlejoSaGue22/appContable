@@ -129,8 +129,7 @@
 
         <!-- Pagination -->
         @if (usersResource.value().meta?.totalPages) {
-        <app-pagination [pages]="usersResource.value().meta?.totalPages || 0"
-            [currentPages]="paginationService.currentPage()" />
+            <app-pagination />
         }
     </div>
     }

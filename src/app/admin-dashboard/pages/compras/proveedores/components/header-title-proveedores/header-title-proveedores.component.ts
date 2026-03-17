@@ -13,9 +13,9 @@ import { RouterLink } from '@angular/router';
       <nav>
         <ol class="flex items-center gap-2">
           <li>
-            <a class="font-medium" routerLink="/panel/dashboard">Dashboard /</a>
+            <a class="font-medium text-gray-500 dark:text-gray-400" routerLink="/panel/compras">Compras /</a>
           </li>
-          <li class="font-medium text-primary">Proveedores</li>
+          <li class="font-medium text-gray-500 dark:text-gray-400">Proveedores</li>
         </ol>
       </nav>
     </div>

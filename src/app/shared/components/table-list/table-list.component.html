@@ -116,18 +116,17 @@
           }
 
           @if (dataTableTemp().length == 0) {
-          <tr class="hover:bg-slate-50 border-b border-slate-200">
-            <td [colSpan]="columns().length + 1" class="p-4 py-5">
-              <p class="text-sm text-slate-500 text-center">No se encontraron registros</p>
-            </td>
-          </tr>
+              <tr class="hover:bg-slate-50 border-b border-slate-200">
+                <td [colSpan]="columns().length + 1" class="p-4 py-5">
+                  <p class="text-sm text-slate-500 text-center">No se encontraron registros</p>
+                </td>
+              </tr>
           }
         </tbody>
       </table>
 
       @if (dataTableTemp().length > 0) {
-      <app-pagination [pages]="pages()" [currentPages]="paginationServices.currentPage()" />
-
+      <app-pagination />
       }
     </div>
 

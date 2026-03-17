@@ -1,0 +1,125 @@
+<div class="p-4 sm:p-6 lg:p-8">
+  <!-- Header -->
+  <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+        Catálogo de Cuentas Contables
+      </h2>
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        Visualización jerárquica del plan único de cuentas (PUC)
+      </p>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+    @if (cuentasResource.isLoading()) {
+      <div class="flex justify-center items-center h-64">
+        <app-loader />
+      </div>
+    } @else if (cuentasResource.error()) {
+      <div class="p-6 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-100 dark:border-red-900/30 m-4">
+        <p class="text-red-700 dark:text-red-400">Error al cargar las cuentas contables. Por favor intente de nuevo.</p>
+        <button (click)="cuentasResource.reload()" class="mt-2 text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 underline focus:outline-none">
+          Reintentar conexión
+        </button>
+      </div>
+    }
+
+    @if (cuentasResource.hasValue()) {
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+          <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700/50 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+            <tr>
+              <th scope="col" class="px-6 py-4">Código</th>
+              <th scope="col" class="px-6 py-4">Nombre de la Cuenta</th>
+              <th scope="col" class="px-6 py-4">Naturaleza</th>
+              <th scope="col" class="px-6 py-4 text-right">Saldo</th>
+              <th scope="col" class="px-6 py-4 text-center">Estado</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+            @for (cuenta of cuentasOrdenadas(); track cuenta.id) {
+              <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors duration-150" 
+                  [class.bg-gray-50]="cuenta.nivel === 1" 
+                  [class.dark:bg-gray-800]="cuenta.nivel === 1"
+                  [class.font-semibold]="cuenta.nivel <= 3">
+                  
+                <!-- Código with Hierarchical Padding -->
+                <td class="px-6 py-3 text-gray-900 dark:text-white whitespace-nowrap">
+                  <div class="flex items-center gap-2" [style.padding-left.rem]="(cuenta.nivel - 1) * 1.5">
+                    @if (cuenta.aceptaMovimiento) {
+                      <!-- Detail Account Status Dot -->
+                      <div class="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_5px_rgba(59,130,246,0.5)]"></div>
+                    } @else {
+                      <!-- Group Account Status Dot -->
+                      <div class="w-1.5 h-1.5 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+                    }
+                    <span [class.text-blue-600]="cuenta.nivel === 1" [class.dark:text-blue-400]="cuenta.nivel === 1">
+                      {{ cuenta.codigo }}
+                    </span>
+                  </div>
+                </td>
+                
+                <!-- Nombre y Descripción -->
+                <td class="px-6 py-3 min-w-[200px]" [class.text-gray-900]="!cuenta.aceptaMovimiento" [class.dark:text-white]="!cuenta.aceptaMovimiento">
+                  <div class="flex flex-col">
+                    <span>{{ cuenta.nombre }}</span>
+                    @if (cuenta.descripcion) {
+                      <span class="text-xs text-gray-400 dark:text-gray-500 font-normal mt-0.5 truncate max-w-sm" [title]="cuenta.descripcion">
+                        {{ cuenta.descripcion }}
+                      </span>
+                    }
+                  </div>
+                </td>
+
+                <!-- Naturaleza -->
+                <td class="px-6 py-3 whitespace-nowrap">
+                  <span class="px-2.5 py-1 text-[11px] font-bold tracking-wider rounded-md uppercase"
+                        [class]="cuenta.naturaleza === 'DEBITORA' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'">
+                    {{ cuenta.naturaleza }}
+                  </span>
+                </td>
+
+                <!-- Saldo -->
+                <td class="px-6 py-3 text-right whitespace-nowrap font-medium" 
+                    [class.text-red-600]="cuenta.saldo < 0" [class.dark:text-red-400]="cuenta.saldo < 0"
+                    [class.text-gray-900]="cuenta.saldo >= 0" [class.dark:text-white]="cuenta.saldo >= 0">
+                  {{ cuenta.saldo | currency:'COP':'symbol-narrow':'1.0-0' }}
+                </td>
+
+                <!-- Estado -->
+                <td class="px-6 py-3 text-center">
+                  <div class="flex justify-center items-center">
+                    @if (cuenta.isActive) {
+                      <span class="flex w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.4)]" title="Activa"></span>
+                    } @else {
+                      <span class="flex w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_5px_rgba(239,68,68,0.4)]" title="Inactiva"></span>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+
+            <!-- Empty State -->
+            @if (cuentasOrdenadas().length === 0) {
+              <tr>
+                <td colspan="5" class="px-6 py-12 text-center">
+                  <div class="flex flex-col items-center justify-center space-y-3">
+                    <div class="w-16 h-16 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                      <svg class="w-8 h-8 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                      </svg>
+                    </div>
+                    <h3 class="text-sm font-medium text-gray-900 dark:text-white">No hay cuentas disponibles</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 max-w-sm">No se encontraron cuentas contables registradas en el sistema o hubo un problema al sincronizar.</p>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>
