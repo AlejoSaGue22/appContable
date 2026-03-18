@@ -1,18 +1,47 @@
 @if ( !isLoading() ) {
-<section class="bg-gray-50 dark:bg-gray-900">
-    <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-        <a href="#" class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-            <img class="w-8 h-8 mr-2" [src]="logoApp" alt="logo">
+<section class="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-slate-50">
+    <!-- Left Side: Visual/Branding (Hidden on mobile) -->
+    <div class="relative hidden lg:flex flex-col justify-center items-center p-12 text-white overflow-hidden">
+        <!-- Background Image -->
+        <div class="absolute inset-0 z-0">
+            <img class="w-full h-full object-cover" src="assets/images/auth_bg.png" alt="background">
+            <div class="absolute inset-0 bg-blue-900/40 backdrop-blur-[2px]"></div>
+        </div>
+        
+        <!-- Content -->
+        <div class="relative z-10 max-w-md text-center">
+            <div class="flex items-center justify-center mb-8 animate-fade-in-down">
+                <div class="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-2xl">
+                    <img class="w-16 h-16" [src]="logoApp" alt="logo">
+                </div>
+            </div>
+            <h1 class="text-5xl font-extrabold tracking-tight mb-4 drop-shadow-lg animate-fade-in">
                 {{ nameApp }}
-        </a>
-        <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-            <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-                <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-                    Inicia sesión en tu cuenta
-                </h1>
+            </h1>
+            <p class="text-xl text-blue-50/90 font-medium leading-relaxed drop-shadow-md animate-fade-in" style="animation-delay: 200ms;">
+                La solución inteligente para la gestión contable de tu negocio.
+            </p>
+        </div>
+    </div>
+
+    <!-- Right Side: Auth Form -->
+    <div class="flex flex-col items-center justify-center p-6 sm:p-12 lg:p-24 relative overflow-hidden">
+        <!-- Decoration for mobile -->
+        <div class="lg:hidden absolute top-0 left-0 w-full h-48 bg-gradient-to-br from-blue-700 to-indigo-900 z-0 rounded-b-[3rem] shadow-xl"></div>
+        
+        <div class="w-full max-w-md relative z-10">
+            <div class="bg-white rounded-[2rem] shadow-2xl lg:shadow-none p-8 sm:p-12 animate-slide-up">
+                <div class="mb-10 lg:mb-12">
+                    <div class="lg:hidden flex justify-center mb-6">
+                         <div class="p-2 bg-white rounded-xl shadow-lg">
+                            <img class="w-12 h-12" [src]="logoApp" alt="logo">
+                        </div>
+                    </div>
+                    <h2 class="text-3xl font-bold text-slate-800 tracking-tight">¡Bienvenido!</h2>
+                    <p class="text-slate-500 mt-2 font-medium">Ingresa tus credenciales para continuar</p>
+                </div>
 
                 <router-outlet></router-outlet>
-                
             </div>
         </div>
     </div>
@@ -20,8 +49,25 @@
 }
 
 @if ( isLoading() ) {
-    <div class="flex justify-center items-center h-screen">
-            <app-loader/>  
+    <div class="flex justify-center items-center h-screen bg-white/80 backdrop-blur-sm fixed inset-0 z-50">
+        <app-loader/>  
     </div>
-
 }
+
+<style>
+    @keyframes fade-in {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    @keyframes fade-in-down {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slide-up {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in { animation: fade-in 1s ease-out forwards; }
+    .animate-fade-in-down { animation: fade-in-down 0.8s ease-out forwards; }
+    .animate-slide-up { animation: slide-up 0.6s ease-out forwards; }
+</style>

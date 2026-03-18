@@ -9,6 +9,7 @@ import { PagosHttpService } from '../services/pagos.service';
 import { ModalComponent } from "@shared/components/modal/modal.component";
 import { HeaderInput, HeaderTitlePageComponent } from "@dashboard/components/header-title-page/header-title-page.component";
 import { ModalHistorialpagoComponent } from "../components/modal-historialpago/modal-historialpago..component";
+import { TarjetasResumenPagos } from "../components/tarjetas-resumen-pagos/tarjetas-resumen-pagos.component";
 
 @Component({
   selector: 'app-cxc',
@@ -19,7 +20,8 @@ import { ModalHistorialpagoComponent } from "../components/modal-historialpago/m
     RegistrarPagoModalComponent,
     ModalComponent,
     HeaderTitlePageComponent,
-    ModalHistorialpagoComponent
+    ModalHistorialpagoComponent,
+    TarjetasResumenPagos
 ],
   templateUrl: './cxc.component.html',
 })

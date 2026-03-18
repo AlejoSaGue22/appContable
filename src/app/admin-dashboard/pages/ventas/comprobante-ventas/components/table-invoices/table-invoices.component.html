@@ -138,11 +138,10 @@
           <th scope="col" class="px-6 py-3">Nº Factura</th>
           <th scope="col" class="px-6 py-3">Tipo Factura</th>
           <th scope="col" class="px-6 py-3">Cliente</th>
-          <th scope="col" class="px-6 py-3">Forma Pago</th>
           <th scope="col" class="px-6 py-3">Estado</th>
           <th scope="col" class="px-6 py-3 text-right">Total</th>
-          <th scope="col" class="px-6 py-3 text-right">Pagado</th>
-          <th scope="col" class="px-6 py-3 text-right">Saldo</th>
+          <!-- <th scope="col" class="px-6 py-3 text-right">Pagado</th> -->
+          <th scope="col" class="px-6 py-3 text-center">Saldo</th>
           <th scope="col" class="px-6 py-3 text-center">Acciones</th>
         </tr>
       </thead>
@@ -181,9 +180,6 @@
                 {{ invoice.client.nombre }} {{ invoice.client.apellido }}
               </td>
               <td class="px-6 py-4">
-                {{ invoice.formaPago | titlecase }}
-              </td>
-              <td class="px-6 py-4">
                 <span [class]="'inline-flex rounded-full px-2 py-1 text-xs font-semibold ' + getStatusClass(invoice.status)">
                   {{ getStatusLabel(invoice.status) }}
                 </span>
@@ -191,14 +187,18 @@
               <td class="px-6 py-4 text-right font-semibold">
                 {{ formatCurrency(invoice.total) }}
               </td>
-              <td class="px-6 py-4 text-right">
+              <td class="px-6 py-4 text-center">
                 @if (invoice.formaPago === 'CREDITO') {
-                  <span class="text-sm text-slate-500">{{ formatCurrency(invoice.totalPagado) }}</span>
+                  <p class="text-sm text-slate-500">{{ formatCurrency(invoice.totalPagado) }}</p>
+                  <p class="text-sm mt-2" [class.text-red-600]="invoice.saldoPendiente > 0"
+                        [class.text-green-600]="invoice.saldoPendiente === 0">
+                    {{ formatCurrency(invoice.saldoPendiente) }}
+                  </p>
                 } @else {
                   <span class="text-xs text-slate-400">—</span>
                 }
               </td>
-              <td class="px-6 py-4 text-right">
+              <!-- <td class="px-6 py-4 text-right">
                 @if (invoice.formaPago === 'CREDITO') {
                   <span class="text-sm font-semibold" [class.text-red-600]="invoice.saldoPendiente > 0" [class.text-green-600]="invoice.saldoPendiente === 0">
                     {{ formatCurrency(invoice.saldoPendiente) }}
@@ -206,7 +206,7 @@
                 } @else {
                   <span class="text-xs text-slate-400">—</span>
                 }
-              </td>
+              </td> -->
               <td class="px-6 py-4">
                 <div class="flex items-center gap-2">
                   @if(invoice.status === 'issued' || invoice.status === 'accepted' || invoice.status === 'paid') {

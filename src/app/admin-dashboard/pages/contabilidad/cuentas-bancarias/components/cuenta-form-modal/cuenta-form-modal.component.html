@@ -1,0 +1,114 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-md overflow-y-auto p-4 transition-all duration-300">
+  <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-white/20 dark:border-gray-700 w-full max-w-xl overflow-hidden transform transition-all animate-scale-in">
+    
+    <!-- Modal Header with Gradient -->
+    <div class="px-8 py-6 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
+      <div class="flex flex-col">
+        <h3 class="text-2xl font-black tracking-tight">
+          {{ account ? 'Refactorizar' : 'Apertura de' }} Cuenta
+        </h3>
+        <p class="text-[11px] font-bold uppercase tracking-widest text-blue-100/80 mt-1">
+          Módulo de Tesorería General
+        </p>
+      </div>
+      <button (click)="onClose()" class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all group">
+        <svg class="w-6 h-6 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Modal Form -->
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-8 space-y-6">
+      
+      <!-- Financial Entity & Product Type Group -->
+      <div class="bg-gray-50/50 dark:bg-gray-900/20 p-6 rounded-2xl border border-gray-100 dark:border-gray-700/50 space-y-4">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="w-1 h-4 bg-blue-500 rounded-full"></div>
+          <h4 class="text-xs font-black uppercase tracking-widest text-gray-400">Información Institucional</h4>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div class="form-control w-full">
+            <label class="label pb-1">
+              <span class="label-text font-bold text-gray-600 dark:text-gray-400 text-xs uppercase tracking-wider">Entidad Financiera</span>
+            </label>
+            <select formControlName="bancoId" class="select select-bordered w-full h-12 focus:select-primary transition-all bg-white dark:bg-gray-700 font-semibold border-2 rounded-xl">
+              <option value="" disabled>Seleccionar Banco...</option>
+              <option *ngFor="let banco of bancos()" [value]="banco.id">{{ banco.nombre }}</option>
+            </select>
+          </div>
+
+          <div class="form-control w-full">
+            <label class="label pb-1">
+              <span class="label-text font-bold text-gray-600 dark:text-gray-400 text-xs uppercase tracking-wider">Tipo de Producto</span>
+            </label>
+            <select formControlName="tipoCuenta" class="select select-bordered w-full h-12 focus:select-primary transition-all bg-white dark:bg-gray-700 font-semibold border-2 rounded-xl">
+              <option *ngFor="let tipo of tiposCuenta" [value]="tipo">{{ tipo | titlecase }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Account Details Group -->
+      <div class="space-y-4">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="w-1 h-4 bg-emerald-500 rounded-full"></div>
+          <h4 class="text-xs font-black uppercase tracking-widest text-gray-400">Detalles de Operación</h4>
+        </div>
+
+        <div class="form-control w-full">
+          <label class="label pb-1">
+            <span class="label-text font-bold text-gray-600 dark:text-gray-400 text-xs uppercase tracking-wider">Nombre de Referencia</span>
+          </label>
+          <input type="text" formControlName="nombre" placeholder="Ej: Nómina Principal - Principal" 
+                 class="input input-bordered w-full h-12 focus:input-primary transition-all bg-white dark:bg-gray-700 font-semibold border-2 rounded-xl shadow-sm" />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div class="form-control w-full">
+            <label class="label pb-1">
+              <span class="label-text font-bold text-gray-600 dark:text-gray-400 text-xs uppercase tracking-wider">Número Oficial</span>
+            </label>
+            <input type="text" formControlName="numeroCuenta" placeholder="000-000-000" 
+                   class="input input-bordered w-full h-12 focus:input-primary transition-all bg-white dark:bg-gray-700 font-mono font-bold border-2 rounded-xl" />
+          </div>
+
+          <div class="form-control w-full">
+            <label class="label pb-1">
+              <span class="label-text font-bold text-gray-600 dark:text-gray-400 text-xs uppercase tracking-wider">Saldo de Apertura</span>
+            </label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</span>
+              <input type="number" formControlName="saldoInicial" 
+                     class="input input-bordered w-full h-12 pl-8 focus:input-primary transition-all bg-white dark:bg-gray-700 font-bold border-2 rounded-xl" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-control w-full">
+          <label class="label pb-1">
+            <span class="label-text font-bold text-gray-600 dark:text-gray-400 text-xs uppercase tracking-wider">Notas y Observaciones</span>
+          </label>
+          <textarea formControlName="observaciones" rows="2" placeholder="Información adicional relevante..." 
+                    class="textarea textarea-bordered w-full focus:textarea-primary transition-all bg-white dark:bg-gray-700 font-medium border-2 rounded-xl"></textarea>
+        </div>
+      </div>
+
+      <!-- Actions Section -->
+      <div class="pt-6 flex flex-col sm:flex-row items-center justify-end gap-3 border-t border-gray-100 dark:border-gray-700 mt-8">
+        <button type="button" (click)="onClose()" 
+                class="btn btn-ghost w-full sm:w-auto h-12 px-8 uppercase font-bold text-xs tracking-widest hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl">
+          Cancelar
+        </button>
+        <button type="submit" [disabled]="form.invalid || isSubmitting()" 
+                class="btn btn-primary w-full sm:w-auto h-12 px-10 shadow-lg shadow-blue-500/20 uppercase font-black text-xs tracking-widest rounded-xl">
+          <span *ngIf="isSubmitting()" class="loading loading-spinner"></span>
+          {{ account ? 'Actualizar Registro' : 'Confirmar Apertura' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+

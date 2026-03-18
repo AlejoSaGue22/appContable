@@ -1,68 +1,78 @@
-// cxp.component.ts
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { RegistrarPagoModalComponent, RegistrarPagoModalData } from '../components/modal-registrarpago/modal-registrarpago.component';
 import { CxpItem, CxpResumen, PagoHistorial, PaymentStatus } from '@dashboard/interfaces/pagos-interface';
 import { PagosHttpService } from '../services/pagos.service';
 import { ModalComponent } from "@shared/components/modal/modal.component";
 import { HeaderTitlePageComponent, HeaderInput } from "@dashboard/components/header-title-page/header-title-page.component";
 import { ModalHistorialpagoComponent } from "../components/modal-historialpago/modal-historialpago..component";
+import { TarjetasResumenPagos } from "../components/tarjetas-resumen-pagos/tarjetas-resumen-pagos.component";
+import { map, startWith } from 'rxjs';
 
 @Component({
   selector: 'app-cxp',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RegistrarPagoModalComponent, ModalComponent, HeaderTitlePageComponent, ModalHistorialpagoComponent],
+  imports: [CommonModule, ReactiveFormsModule, RegistrarPagoModalComponent, ModalComponent, HeaderTitlePageComponent, ModalHistorialpagoComponent, TarjetasResumenPagos],
   templateUrl: './cxp.component.html',
 })
-export class CxpComponent implements OnInit {
+export class CxpComponent {
+  private svc = inject(PagosHttpService);
+
   headTitle = signal<HeaderInput> ({
     title: 'Cuentas por Pagar',
     slog: 'Facturas de compra a crédito pendientes de pago'
   });
 
-  private todosLosItems: CxpItem[] = [];
-  resumen: CxpResumen = { totalPorPagar: 0, porVencer: 0, vencida: 0, cantidadPorVencer: 0, cantidadVencida: 0 };
-  loading = false;
+  // State
+  private rawData = signal<{ items: CxpItem[], resumen: CxpResumen }>({ items: [], resumen: { totalPorPagar: 0, porVencer: 0, vencida: 0, cantidadPorVencer: 0, cantidadVencida: 0 } });
+  loading = signal(false);
 
-  filtroTexto  = new FormControl('');
+  // Filters using Signals
+  filtroTexto = new FormControl('');
   filtroEstado = new FormControl<PaymentStatus | ''>('');
+  
+  textoSignal = toSignal(this.filtroTexto.valueChanges.pipe(startWith(''), map(v => v?.toLowerCase().trim() ?? '')));
+  estadoSignal = toSignal(this.filtroEstado.valueChanges.pipe(startWith('')));
 
-  get itemsFiltrados(): CxpItem[] {
-    const texto  = (this.filtroTexto.value  ?? '').toLowerCase().trim();
-    const estado = this.filtroEstado.value ?? '';
-    
-    return this.todosLosItems.filter(item => {
-      const pasaTexto  = !texto  || item.proveedorNombre.toLowerCase().includes(texto) || item.numeroFactura.toLowerCase().includes(texto);
+  resumen = computed(() => this.rawData().resumen);
+
+  itemsFiltrados = computed(() => {
+    const texto = this.textoSignal();
+    const estado = this.estadoSignal();
+    const items = this.rawData().items;
+
+    if (!texto && !estado) return items;
+
+    return items.filter(item => {
+      const pasaTexto = !texto || item.proveedorNombre.toLowerCase().includes(texto) || item.numeroFactura.toLowerCase().includes(texto);
       const pasaEstado = !estado || item.paymentStatus === estado;
       return pasaTexto && pasaEstado;
     });
-  }
+  });
 
+  // Modal logic
   modalVisible = false;
   modalData: RegistrarPagoModalData | null = null;
-
-  // Modal historial
-  historialVisible  = false;
-  historialLoading  = false;
+  historialVisible = false;
+  historialLoading = false;
   historialItem: CxpItem | null = null;
   historialPagos: PagoHistorial[] = [];
 
-  constructor(private svc: PagosHttpService) {}
-
-  ngOnInit(): void {
+  constructor() {
     this.cargar();
-    this.filtroEstado.valueChanges.subscribe(() => {});
-    this.filtroTexto.valueChanges.pipe(debounceTime(250), distinctUntilChanged()).subscribe(() => {});
   }
 
   cargar(): void {
-    this.loading = true;
-    const estado = this.filtroEstado.value || undefined;
-    this.svc.getCxp({ paymentStatus: estado as PaymentStatus }).subscribe({
-      next: res => { this.todosLosItems = res.items; this.resumen = res.resumen; this.loading = false; },
-      error: () => { this.loading = false; },
+    this.loading.set(true);
+    const currentEstado = this.filtroEstado.value || undefined;
+    this.svc.getCxp({ paymentStatus: currentEstado as PaymentStatus }).subscribe({
+      next: res => { 
+        this.rawData.set({ items: res.items, resumen: res.resumen }); 
+        this.loading.set(false); 
+      },
+      error: () => this.loading.set(false),
     });
   }
 
@@ -76,13 +86,13 @@ export class CxpComponent implements OnInit {
   }
 
   abrirHistorial(item: CxpItem): void {
-    this.historialItem    = item;
-    this.historialPagos   = [];
+    this.historialItem = item;
+    this.historialPagos = [];
     this.historialVisible = true;
     this.historialLoading = true;
     this.svc.getHistorialPagos(item.facturaId).subscribe({
       next: pagos => { this.historialPagos = pagos; this.historialLoading = false; },
-      error: ()   => { this.historialLoading = false; },
+      error: () => this.historialLoading = false,
     });
   }
 
@@ -93,6 +103,12 @@ export class CxpComponent implements OnInit {
   }
 
   etiquetaEstado(status: PaymentStatus): string {
-    return ({ pendiente: 'Pendiente', parcial: 'Parcial', pagado: 'Pagado', vencido: 'Vencido' })[status] ?? status;
+    const labels: Record<string, string> = { 
+      pendiente: 'Pendiente', 
+      parcial: 'Parcial', 
+      pagado: 'Pagado', 
+      vencido: 'Vencido' 
+    };
+    return labels[status] ?? status;
   }
 }

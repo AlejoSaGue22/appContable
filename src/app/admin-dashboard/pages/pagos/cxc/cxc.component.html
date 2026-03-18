@@ -5,63 +5,7 @@
 <div class="w-full space-y-6">
 
     <!-- Tarjetas resumen -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 flex items-center gap-4">
-        <div class="p-3 rounded-full bg-blue-50 flex-shrink-0">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-            <line x1="8" y1="21" x2="16" y2="21"></line>
-            <line x1="12" y1="17" x2="12" y2="21"></line>
-          </svg>
-        </div>
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Cartera</p>
-          <p class="text-xl font-bold text-slate-800 mt-0.5">
-            {{ resumen.totalCartera | currency:'COP':'symbol-narrow':'1.0-0' }}
-          </p>
-          <p class="text-xs text-slate-400 mt-0.5">
-            {{ resumen.cantidadPorVencer + resumen.cantidadVencida }} facturas
-          </p>
-        </div>
-      </div>
-
-      <div class="bg-white rounded-xl shadow-sm border border-l-4 border-amber-400 p-5 flex items-center gap-4">
-        <div class="p-3 rounded-full bg-amber-50 flex-shrink-0">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-500" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <polyline points="12 6 12 12 16 14"></polyline>
-          </svg>
-        </div>
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Por Vencer</p>
-          <p class="text-xl font-bold text-amber-600 mt-0.5">
-            {{ resumen.porVencer | currency:'COP':'symbol-narrow':'1.0-0' }}
-          </p>
-          <p class="text-xs text-slate-400 mt-0.5">{{ resumen.cantidadPorVencer }} facturas</p>
-        </div>
-      </div>
-
-      <div class="bg-white rounded-xl shadow-sm border border-l-4 border-red-400 p-5 flex items-center gap-4">
-        <div class="p-3 rounded-full bg-red-50 flex-shrink-0">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-            <line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line>
-          </svg>
-        </div>
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Cartera Vencida</p>
-          <p class="text-xl font-bold text-red-600 mt-0.5">
-            {{ resumen.vencida | currency:'COP':'symbol-narrow':'1.0-0' }}
-          </p>
-          <p class="text-xs text-slate-400 mt-0.5">{{ resumen.cantidadVencida }} facturas</p>
-        </div>
-      </div>
-
-    </div>
+    <app-tarjetas-resumen-pagos [resumen]="resumen" />
 
     <!-- Tabla principal -->
     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
