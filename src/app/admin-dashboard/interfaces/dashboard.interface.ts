@@ -20,6 +20,8 @@ export interface DashboardHistory {
     month: string;
     ingresos: number;
     egresos: number;
+    ingresosHeight?: number;
+    egresosHeight?: number;
 }
 
 export interface DashboardResponse {

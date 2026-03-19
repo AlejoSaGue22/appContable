@@ -24,7 +24,7 @@ export class CuentaFormModalComponent implements OnInit {
     bancoId: ['', [Validators.required]],
     tipoCuenta: [TipoCuentaBancaria.AHORROS, [Validators.required]],
     numeroCuenta: ['', [Validators.maxLength(30)]],
-    saldoInicial: [0, [Validators.required, Validators.min(0)]],
+    // saldoInicial: [0, [Validators.required, Validators.min(0)]],
     observaciones: ['', [Validators.maxLength(500)]]
   });
 
@@ -40,17 +40,17 @@ export class CuentaFormModalComponent implements OnInit {
         bancoId: this.account.banco.id,
         tipoCuenta: this.account.tipoCuenta,
         numeroCuenta: this.account.numeroCuenta,
-        saldoInicial: this.account.saldoInicial,
+        // saldoInicial: this.account.saldoInicial,
         observaciones: this.account.observaciones
       });
       // Saldo inicial might be disabled if editing (depends on backend logic)
-      this.form.get('saldoInicial')?.disable();
+      // this.form.get('saldoInicial')?.disable();
     }
   }
 
   loadBancos() {
     this.cuentasService.getBancos().subscribe({
-      next: (data) => this.bancos.set(data),
+      next: (data) => this.bancos.set(data.data),
       error: (err) => console.error('Error loading banks', err)
     });
   }

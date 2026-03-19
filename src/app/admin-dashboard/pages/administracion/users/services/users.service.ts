@@ -56,4 +56,12 @@ export class UsersService {
             catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
         );
     }
+
+    // change password for user - CAMBIAR CONTRASEÑA DE USUARIO
+    updateUserPassword(id: string, password: string): Observable<ResponseResult> {
+        return this.http.patch(`${baseUrl}/users/${id}`, { password }).pipe(
+            map((resp): ResponseResult => ({ success: true, data: resp })),
+            catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+        );
+    }
 }

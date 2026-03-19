@@ -1,0 +1,48 @@
+<div
+      class="bg-white p-7 rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-gray-100 flex flex-col h-[400px]">
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h2 class="text-lg font-bold text-gray-800">Flujo de Caja</h2>
+          <p class="text-xs text-gray-400 font-medium">Análisis de ingresos vs egresos por mes</p>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+            <span class="text-[10px] font-bold text-gray-500 uppercase">Ingresos</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-red-400"></span>
+            <span class="text-[10px] font-bold text-gray-500 uppercase">Egresos</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex-1 flex items-end gap-3 px-2">
+        @for (item of chartData(); track $index) {
+            <div class="flex-1 flex flex-col justify-end h-full group/bar transition-all duration-300">
+                <div class="flex gap-1.5 items-end h-full mb-3">
+                    <div
+                    class="flex-1 bg-indigo-500/90 rounded-t-lg transition-all duration-700 ease-out hover:bg-indigo-600 cursor-pointer relative group/income"
+                    [style.height]="item.ingresosHeight + '%'">
+                    <div
+                        class="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover/income:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
+                        {{ item.ingresos | currency }}
+                    </div>
+                    </div>
+                    <div
+                    class="flex-1 bg-red-400/90 rounded-t-lg transition-all duration-700 ease-out hover:bg-red-500 cursor-pointer relative group/expense"
+                    [style.height]="item.egresosHeight + '%'">
+                    <div
+                        class="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover/expense:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
+                        {{ item.egresos | currency }}
+                    </div>
+                    </div>
+                </div>
+                <span
+                    class="text-[11px] font-bold text-gray-400 text-center uppercase tracking-tighter group-hover/bar:text-gray-600">
+                    {{ item.month }}
+                </span>
+            </div>
+        }
+      </div>
+    </div>

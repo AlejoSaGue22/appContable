@@ -3,6 +3,7 @@ import { CommonModule, CurrencyPipe, TitleCasePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { tap, firstValueFrom } from 'rxjs';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { UsersService } from '../services/users.service';
 import { PaginationService } from '@shared/components/pagination/pagination.service';
@@ -13,6 +14,7 @@ import { modalOpen } from '@shared/interfaces/services.interfaces';
 import { ModalComponents } from '@shared/components/modal.components/modal.components';
 import { Pagination } from '@shared/components/pagination/pagination';
 import { HelpersUtils } from '@utils/helpers.utils';
+import { AuthService } from 'src/app/auth/services/auth.service';
 
 @Component({
   selector: 'app-users',
@@ -22,19 +24,28 @@ import { HelpersUtils } from '@utils/helpers.utils';
     LoaderComponent,
     ErrorPages,
     ModalComponents,
-    Pagination
+    Pagination,
+    ReactiveFormsModule
   ],
   templateUrl: './users.component.html',
   standalone: true
 })
 export class UsersComponent {
   usersService = inject(UsersService);
+  authService = inject(AuthService);
   paginationService = inject(PaginationService);
   notificationService = inject(NotificationService);
 
   searchTerm = signal<string>('');
   isModalVisible = false;
+  isPasswordModalVisible = false;
   userIdToDelete = signal<string>('');
+  userIdForPassword = signal<string>('');
+
+  passwordForm = new FormGroup({
+    password: new FormControl('', [Validators.required, Validators.minLength(6)]),
+    confirmPassword: new FormControl('', [Validators.required])
+  });
 
   // Sincronizar búsqueda con delay (debounce)
   searchEffect = effect((onCleanup) => {
@@ -92,5 +103,36 @@ export class UsersComponent {
 
   onSearch(value: string) {
     this.searchTerm.set(value);
+  }
+
+  openPasswordModal(id: string) {
+    this.userIdForPassword.set(id);
+    this.passwordForm.reset();
+    this.isPasswordModalVisible = true;
+  }
+
+  async onChangePassword() {
+    if (this.passwordForm.invalid) return;
+    
+    const { password, confirmPassword } = this.passwordForm.value;
+    if (password !== confirmPassword) {
+      this.notificationService.error('Las contraseñas no coinciden', 'Error');
+      return;
+    }
+
+    const id = this.userIdForPassword();
+    const result = await firstValueFrom(this.authService.changePassword(id, password!));
+    this.isPasswordModalVisible = false;
+
+    if (!result.success) {
+      this.notificationService.error(
+        `Error al cambiar contraseña: ${HelpersUtils.getMessageError(result.message)}`,
+        'Error'
+      );
+      return;
+    }
+
+    this.notificationService.success(result.message || 'Contraseña actualizada correctamente', 'Completado');
+    this.usersResource.reload();
   }
 }

@@ -1,16 +1,17 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { HeaderInput, HeaderTitlePageComponent } from '@dashboard/components/header-title-page/header-title-page.component';
 import { CardsTotales, NumCardsTotalesComponent } from '@shared/components/num-cards-totales/num-cards-totales.component';
 import { DashboardService } from './services/dashboard.service';
 import { DashboardHistory, DashboardResponse, RecentTransaction } from '@dashboard/interfaces/dashboard.interface';
-import { CurrencyPipe, DatePipe, TitleCasePipe } from '@angular/common';
+import { QuickAccess } from "./components/quick-access/quick-access.component";
+import { TransaccionesRecientesCard } from "./components/transacciones-recientes-card/transacciones-recientes-card.component";
+import { FlujoCajaCard } from "./components/flujo-caja-card/flujo-caja-card.component";
 
 
 
 @Component({
    selector: 'app-dashboarg-page',
-   imports: [HeaderTitlePageComponent, RouterLink, NumCardsTotalesComponent, CurrencyPipe, DatePipe],
+   imports: [HeaderTitlePageComponent, NumCardsTotalesComponent, QuickAccess, TransaccionesRecientesCard, FlujoCajaCard],
    templateUrl: './dashboarg-page.component.html',
 })
 export class DashboargPageComponent implements OnInit {
@@ -28,12 +29,12 @@ export class DashboargPageComponent implements OnInit {
          ruta: '/panel/ventas/comprobantes'
       },
       {
-         title: 'Clientes',
-         ruta: '/panel/ventas/clients'
+         title: 'Facturas Compras',
+         ruta: '/panel/compras/purchases'
       },
       {
-         title: 'Servicios',
-         ruta: '/panel/ventas/products_services'
+         title: 'Pagos',
+         ruta: '/panel/contabilidad/pagos/cxp'
       }
    ]
 

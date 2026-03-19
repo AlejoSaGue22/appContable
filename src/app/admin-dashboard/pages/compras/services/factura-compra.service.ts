@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { ComprobanteCompraResponse, FacturaCompra } from '@dashboard/interfaces/factura-compra-interface';
 import { Options, ResponseResult } from '@shared/interfaces/services.interfaces';
 import { environment } from 'src/app/environments/environment';
-import { catchError, map, Observable, of } from 'rxjs';
+import { catchError, delay, map, Observable, of } from 'rxjs';
 
 const baseUrl = environment.baseUrl;
 
@@ -32,6 +32,7 @@ export class FacturaCompraService {
         if (endDate) params.endDate = endDate;
 
         return this.http.get<ComprobanteCompraResponse>(`${baseUrl}/facturas-compras`, { params }).pipe(
+            delay(800),
             map((response): ComprobanteCompraResponse => response)
         )
     }

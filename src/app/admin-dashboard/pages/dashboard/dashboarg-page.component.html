@@ -3,142 +3,14 @@
 
   <num-cards-totales [itemsValores]="cardsValor()" />
 
-  <!-- Gráficos y Tablas -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-
     <!-- Flujo de Caja Card -->
-    <div
-      class="bg-white p-7 rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-gray-100 flex flex-col h-[400px]">
-      <div class="flex items-center justify-between mb-8">
-        <div>
-          <h2 class="text-lg font-bold text-gray-800">Flujo de Caja</h2>
-          <p class="text-xs text-gray-400 font-medium">Análisis de ingresos vs egresos por mes</p>
-        </div>
-        <div class="flex items-center gap-4">
-          <div class="flex items-center gap-1.5">
-            <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
-            <span class="text-[10px] font-bold text-gray-500 uppercase">Ingresos</span>
-          </div>
-          <div class="flex items-center gap-1.5">
-            <span class="w-2.5 h-2.5 rounded-full bg-red-400"></span>
-            <span class="text-[10px] font-bold text-gray-500 uppercase">Egresos</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex-1 flex items-end gap-3 px-2">
-        @for (item of chartData(); track $index) {
-        <div class="flex-1 flex flex-col justify-end h-full group/bar transition-all duration-300">
-          <div class="flex gap-1.5 items-end h-full mb-3">
-            <div
-              class="flex-1 bg-indigo-500/90 rounded-t-lg transition-all duration-700 ease-out hover:bg-indigo-600 cursor-pointer relative group/income"
-              [style.height]="item.ingresosHeight + '%'">
-              <div
-                class="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover/income:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
-                {{ item.ingresos | currency }}
-              </div>
-            </div>
-            <div
-              class="flex-1 bg-red-400/90 rounded-t-lg transition-all duration-700 ease-out hover:bg-red-500 cursor-pointer relative group/expense"
-              [style.height]="item.egresosHeight + '%'">
-              <div
-                class="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover/expense:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
-                {{ item.egresos | currency }}
-              </div>
-            </div>
-          </div>
-          <span
-            class="text-[11px] font-bold text-gray-400 text-center uppercase tracking-tighter group-hover/bar:text-gray-600">{{
-            item.month }}</span>
-        </div>
-        }
-      </div>
-    </div>
+    <app-flujo-caja-card [chartData]="chartData()" />
 
     <!-- Transacciones Recientes Card -->
-    <div
-      class="bg-white p-7 rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-gray-100 h-[400px] flex flex-col">
-      <div class="flex items-center justify-between mb-8">
-        <div>
-          <h2 class="text-lg font-bold text-gray-800">Transacciones Recientes</h2>
-          <p class="text-xs text-gray-400 font-medium">Últimos movimientos registrados</p>
-        </div>
-        <button
-          class="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 uppercase tracking-wider px-3 py-1.5 bg-indigo-50 rounded-lg transition-colors">Ver
-          todo</button>
-      </div>
-
-      <div class="flex-1 overflow-y-auto">
-        <table class="w-full text-sm text-left">
-          <tbody>
-            @for (tx of recentTransactions(); track tx.id) {
-            <tr class="group hover:bg-gray-50/80 transition-colors border-b border-gray-50 last:border-0">
-              <td class="py-4 pr-3">
-                <div class="flex flex-col">
-                  <span class="text-xs font-bold text-gray-700">{{ tx.entidad }}</span>
-                  <span class="text-[10px] font-medium text-gray-400 uppercase">{{ tx.fecha | date:'dd MMM, yyyy'
-                    }}</span>
-                </div>
-              </td>
-              <td class="py-4 px-3">
-                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide"
-                  [class.bg-emerald-50]="tx.type === 'venta'" [class.text-emerald-700]="tx.type === 'venta'"
-                  [class.bg-rose-50]="tx.type === 'compra'" [class.text-rose-700]="tx.type === 'compra'">
-                  {{ tx.type }}
-                </span>
-              </td>
-              <td class="py-4 pl-3 text-right">
-                <span class="text-sm font-bold tracking-tight" [class.text-emerald-600]="tx.type === 'venta'"
-                  [class.text-gray-800]="tx.type === 'compra'">
-                  {{ tx.type === 'venta' ? '+' : '-' }} {{ tx.total | currency }}
-                </span>
-              </td>
-            </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <app-transacciones-recientes-card [recentTransactions]="recentTransactions()" />
   </div>
 
   <!-- Accesos Rápidos -->
-  <div class="mb-8">
-    <div class="flex items-center gap-2 mb-6 ml-1">
-      <span class="w-1 h-5 bg-indigo-600 rounded-full"></span>
-      <h2 class="text-xl font-bold text-gray-800">Accesos Rápidos</h2>
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      @for (item of accesoRapido; track $index) {
-      <div
-        class="group relative bg-[#1e293b] p-6 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl shadow-indigo-500/20"
-        [routerLink]="item.ruta">
-
-        <div
-          class="absolute -right-6 -bottom-6 w-32 h-32 bg-white/5 rounded-full group-hover:scale-150 transition-transform duration-700">
-        </div>
-
-        <div class="relative z-10">
-          <h3 class="text-white text-lg font-bold mb-1">{{ item.title }}</h3>
-          <p class="text-gray-400 text-xs font-medium">Acceder al módulo directamente</p>
-        </div>
-
-        <div class="mt-8 flex justify-between items-center relative z-10">
-          <div
-            class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center group-hover:bg-indigo-500 transition-colors duration-300">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor" stroke-width="2.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-          </div>
-          <svg xmlns="http://www.w3.org/2000/svg"
-            class="w-6 h-6 text-white opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 transition-all duration-300"
-            fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-          </svg>
-        </div>
-      </div>
-      }
-    </div>
-  </div>
+  <app-quick-access [accesoRapido]="accesoRapido" />
 </div>

@@ -32,7 +32,7 @@
     </div>
 
     <!-- Actions section -->
-    <div class="flex items-center justify-between">
+    <!-- <div class="flex items-center justify-between">
         <label class="flex items-center cursor-pointer group">
             <div class="relative">
                 <input id="remember" type="checkbox" class="sr-only peer">
@@ -42,22 +42,26 @@
                     </svg>
                 </div>
             </div>
-            <span class="ml-2 text-sm font-medium text-slate-500 group-hover:text-slate-700 transition-colors">Recuérdame</span>
+            <span class="ml-2 text-sm font-medium text-slate-500 group-hover:text-slate-700 transition-colors">
+                Recuérdame
+            </span>
         </label>
-        <a href="#" class="text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors">¿Olvidaste tu contraseña?</a>
-    </div>
+        <a href="#" class="text-sm font-bold text-blue-600 cursor-pointer hover:text-blue-700 transition-colors">
+            ¿Olvidaste tu contraseña?
+        </a>
+    </div> -->
     
     <!-- Submit Button -->
     <button 
         type="submit" 
         (click)="onSubmit()"
-        class="w-full py-3.5 px-5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 transform transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:shadow-inner focus:ring-2 focus:ring-blue-500/40 outline-none">
+        class="w-full py-3.5 px-5 cursor-pointer bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 transform transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:shadow-inner focus:ring-2 focus:ring-blue-500/40 outline-none">
         Iniciar Sesión
     </button>
 
     <!-- Footer -->
-    <p class="text-center text-sm font-medium text-slate-500">
+    <!-- <p class="text-center text-sm font-medium text-slate-500">
         ¿Aún no tienes una cuenta? 
-        <a routerLink="/auth/register" class="text-blue-600 font-bold hover:underline decoration-2 underline-offset-4">Regístrate</a>
-    </p>
+        <a routerLink="/auth/register" class="text-blue-600 cursor-pointer font-bold hover:underline decoration-2 underline-offset-4">Regístrate</a>
+    </p> -->
 </form>

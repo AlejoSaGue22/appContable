@@ -24,7 +24,7 @@ export default class CuentasBancariasComponent {
     loader: () => this.cuentasService.getCuentas()
   });
 
-  cuentas = computed(() => this.cuentasResource.value() ?? []);
+  cuentas = computed(() => this.cuentasResource.value()?.data ?? []);
 
   openCreateModal() {
     this.selectedAccount.set(null);

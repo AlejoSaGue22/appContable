@@ -34,6 +34,16 @@ export interface CreateCuentaBancariaDto {
   saldoInicial?: number;
 }
 
+export interface ResponseCuentasBancarias {
+  data: CuentaBancaria[];
+  message: string;
+}
+
+export interface ResponseBancos {
+  data: Banco[];
+  message: string;
+}
+
 export interface UpdateCuentaBancariaDto extends Partial<CreateCuentaBancariaDto> {
   activa?: boolean;
 }

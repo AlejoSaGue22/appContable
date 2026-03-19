@@ -6,7 +6,9 @@ import {
   CuentaBancaria, 
   CreateCuentaBancariaDto, 
   UpdateCuentaBancariaDto, 
-  Banco 
+  Banco, 
+  ResponseCuentasBancarias,
+  ResponseBancos
 } from '../interfaces/cuenta-bancaria.interface';
 
 @Injectable({
@@ -17,12 +19,17 @@ export class CuentasBancariasService {
   private readonly base = `${environment.baseUrl}/cuentas-bancarias`;
   private readonly banksUrl = `${environment.baseUrl}/bancos`;
 
-  getCuentas(): Observable<CuentaBancaria[]> {
-    return this.http.get<CuentaBancaria[]>(this.base);
+  getCuentas(): Observable<ResponseCuentasBancarias> {
+    return this.http.get<ResponseCuentasBancarias>(this.base).pipe(
+      map((response) => {
+        response.data.sort((a, b) => a.banco.nombre.localeCompare(b.banco.nombre));
+        return response;
+      })
+    );
   }
 
-  getBancos(): Observable<Banco[]> {
-    return this.http.get<Banco[]>(this.banksUrl);
+  getBancos(): Observable<ResponseBancos> {
+    return this.http.get<ResponseBancos>(this.banksUrl);
   }
 
   createCuenta(dto: CreateCuentaBancariaDto): Observable<CuentaBancaria> {

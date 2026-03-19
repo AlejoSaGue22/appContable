@@ -139,16 +139,27 @@ export class AuthService {
   }
 
   getToken(): string | null {
-    return localStorage.getItem('token');
+    return sessionStorage.getItem('token');
   }
 
-  refreshToken(): Observable<any> {
-    return this.http.post(`${baseURL}/auth/refresh`, {}).pipe(
-      tap((response: any) => {
-        if (response.token) {
-          localStorage.setItem('token', response.token);
-        }
+  refreshToken(): Observable<boolean> {
+    const token = sessionStorage.getItem('token');
+    if (!token) return of(false);
+
+    return this.http.get<LoginResponse>(`${baseURL}/auth/check-status`).pipe(
+      map((resp) => {
+        return this.handleAuthSuccess(resp, false);
+      }),
+      catchError(() => {
+        this.logout();
+        return of(false);
       })
+    );
+  }
+
+  changePassword(id: string, password: string): Observable<ResponseResult> {
+    return this.http.patch<ResponseResult>(`${baseURL}/auth/change-password/${id}`, { password }).pipe(
+      catchError((error: any) => of({ success: false, error, message: error.error.message }))
     );
   }
 

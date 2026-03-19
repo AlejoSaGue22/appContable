@@ -1,33 +1,33 @@
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
   <!-- Total Cartera / Por Pagar -->
-  <div class="relative group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-1 overflow-hidden">
+  <div class="relative mb-3 group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 hover:-translate-y-1 overflow-hidden">
     <div class="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl group-hover:bg-blue-500/10 transition-all"></div>
     <div class="flex items-center gap-5 relative z-10">
-      <div class="p-4 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/40 text-blue-600 dark:text-blue-400 shadow-inner">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-          <line x1="8" y1="21" x2="16" y2="21"></line>
-          <line x1="12" y1="17" x2="12" y2="21"></line>
-        </svg>
-      </div>
-      <div>
-        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">{{ totalLabel() }}</p>
-        <p class="text-2xl font-black text-slate-800 dark:text-white mt-1 tracking-tight">
-          {{ totalValue() | currency:'COP':'symbol-narrow':'1.0-0' }}
-        </p>
-        <div class="flex items-center gap-1.5 mt-1.5">
-          <span class="flex w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-          <p class="text-xs font-bold text-slate-500 dark:text-slate-400">
-            {{ totalFacturas() }} Instrumentos vigentes
-          </p>
+        <div class="p-4 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/40 text-blue-600 dark:text-blue-400 shadow-inner">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
         </div>
-      </div>
+        <div>
+          <p class="text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">{{ totalLabel() }}</p>
+          <p class="text-2xl font-black text-slate-800 dark:text-white mt-1 tracking-tight">
+            {{ totalValue() | currency:'COP':'symbol-narrow':'1.0-0' }}
+          </p>
+          <div class="flex items-center gap-1.5 mt-1.5">
+            <span class="flex w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+            <p class="text-xs font-bold text-slate-500 dark:text-slate-400">
+              {{ totalFacturas() }} Instrumentos vigentes
+            </p>
+          </div>
+        </div>
     </div>
   </div>
 
   <!-- Por Vencer -->
-  <div class="relative group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-1 overflow-hidden border-l-4 border-l-amber-400">
+  <div class="relative mb-3 group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-1 overflow-hidden border-l-4 border-l-amber-400">
     <div class="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-amber-500/5 rounded-full blur-2xl group-hover:bg-amber-500/10 transition-all"></div>
     <div class="flex items-center gap-5 relative z-10">
       <div class="p-4 rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/40 dark:to-orange-900/40 text-amber-600 dark:text-amber-400 shadow-inner">
@@ -37,8 +37,8 @@
         </svg>
       </div>
       <div>
-        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Compromisos por Vencer</p>
-        <p class="text-2xl font-black text-amber-600 mt-1 tracking-tight">
+        <p class="text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">Compromisos por Vencer</p>
+        <p class="text-2xl font-bold text-amber-600 mt-1 tracking-tight">
           {{ resumen()?.porVencer | currency:'COP':'symbol-narrow':'1.0-0' }}
         </p>
         <div class="flex items-center gap-1.5 mt-1.5">
@@ -50,27 +50,27 @@
   </div>
 
   <!-- Vencida -->
-  <div class="relative group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:shadow-red-500/10 hover:-translate-y-1 overflow-hidden border-l-4 border-l-red-500">
+  <div class="relative mb-3 group bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 transition-all duration-300 hover:shadow-xl hover:shadow-red-500/10 hover:-translate-y-1 overflow-hidden border-l-4 border-l-red-500">
     <div class="absolute top-0 right-0 -mr-4 -mt-4 w-24 h-24 bg-red-500/5 rounded-full blur-2xl group-hover:bg-red-500/10 transition-all"></div>
-    <div class="flex items-center gap-5 relative z-10">
-      <div class="p-4 rounded-2xl bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/40 dark:to-rose-900/40 text-red-600 dark:text-red-400 shadow-inner">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-          <line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line>
-        </svg>
-      </div>
-      <div>
-        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">{{ vencidaLabel() }}</p>
-        <p class="text-2xl font-black text-red-600 mt-1 tracking-tight">
-          {{ resumen()?.vencida | currency:'COP':'symbol-narrow':'1.0-0' }}
-        </p>
-        <div class="flex items-center gap-1.5 mt-1.5">
-          <span class="flex w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
-          <p class="text-xs font-bold text-slate-500 dark:text-slate-400">{{ resumen()?.cantidadVencida || 0 }} Facturas críticas</p>
+        <div class="flex items-center gap-5 relative z-10">
+          <div class="p-4 rounded-2xl bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/40 dark:to-rose-900/40 text-red-600 dark:text-red-400 shadow-inner">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                  <line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+          </div>
+          <div>
+            <p class="text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">{{ vencidaLabel() }}</p>
+            <p class="text-2xl font-bold text-red-600 mt-1 tracking-tight">
+              {{ resumen()?.vencida | currency:'COP':'symbol-narrow':'1.0-0' }}
+            </p>
+            <div class="flex items-center gap-1.5 mt-1.5">
+              <span class="flex w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
+              <p class="text-xs font-bold text-slate-500 dark:text-slate-400">{{ resumen()?.cantidadVencida || 0 }} Facturas críticas</p>
+            </div>
+          </div>
         </div>
-      </div>
     </div>
-  </div>
 
 </div>
 

@@ -11,7 +11,7 @@
       </p>
     </div>
     <button (click)="openCreateModal()" 
-            class="btn btn-primary btn-md shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all duration-300 flex items-center gap-2 px-6">
+            class="btn btn-primary cursor-pointer btn-md shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 transition-all duration-300 flex items-center gap-2 px-6">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
       </svg>
@@ -52,7 +52,7 @@
               <th scope="col" class="px-6 py-5 font-bold text-gray-700 dark:text-gray-300 uppercase tracking-widest text-[10px]">Identificación Cuenta</th>
               <th scope="col" class="px-6 py-5 font-bold text-gray-700 dark:text-gray-300 uppercase tracking-widest text-[10px]">Tipo Producto</th>
               <th scope="col" class="px-6 py-5 font-bold text-gray-700 dark:text-gray-300 uppercase tracking-widest text-[10px]">Número de Cuenta</th>
-              <th scope="col" class="px-6 py-5 font-bold text-gray-700 dark:text-gray-300 uppercase tracking-widest text-[10px] text-right">Saldo Consolidado</th>
+              <th scope="col" class="px-6 py-5 font-bold text-gray-700 dark:text-gray-300 uppercase tracking-widest text-[10px] text-right">Saldo Actual</th>
               <th scope="col" class="px-6 py-5 font-bold text-gray-700 dark:text-gray-300 uppercase tracking-widest text-[10px] text-center">Estado</th>
               <th scope="col" class="px-6 py-5 font-bold text-gray-700 dark:text-gray-300 uppercase tracking-widest text-[10px] text-center">Acciones</th>
             </tr>
@@ -122,14 +122,14 @@
                 <td class="px-6 py-5">
                   <div class="flex justify-center items-center gap-1">
                     <button (click)="openEditModal(cuenta)" 
-                            class="p-2.5 rounded-xl text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:scale-110 active:scale-95 transition-all duration-200" 
+                            class="p-2.5 rounded-xl cursor-pointer text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:scale-110 active:scale-95 transition-all duration-200" 
                             title="Refactorizar Información">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                       </svg>
                     </button>
                     <button (click)="deleteCuenta(cuenta.id)" 
-                            class="p-2.5 rounded-xl text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:scale-110 active:scale-95 transition-all duration-200" 
+                            class="p-2.5 rounded-xl cursor-pointer text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:scale-110 active:scale-95 transition-all duration-200" 
                             title="Dar de Baja">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
