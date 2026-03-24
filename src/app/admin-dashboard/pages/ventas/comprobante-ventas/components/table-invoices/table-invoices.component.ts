@@ -2,7 +2,7 @@ import { Component, computed, input, output, signal, effect } from '@angular/cor
 import { FacturaVenta, GetFacturaRequest, InvoiceStatus } from '@dashboard/interfaces/documento-venta-interface';
 import { RouterLink } from "@angular/router";
 import { FormsModule } from '@angular/forms';
-import { TitleCasePipe } from '@angular/common';
+import { PaginationComponent } from '@shared/components/pagination/pagination';
 
 export interface InvoiceFilters {
   status?: string;
@@ -17,7 +17,7 @@ export interface InvoiceFilters {
 
 @Component({
   selector: 'app-table-invoices',
-  imports: [RouterLink, FormsModule, TitleCasePipe],
+  imports: [RouterLink, FormsModule, PaginationComponent],
   templateUrl: './table-invoices.component.html',
 })
 export class TableInvoices {

@@ -6,12 +6,13 @@ import { DashboardHistory, DashboardResponse, RecentTransaction } from '@dashboa
 import { QuickAccess } from "./components/quick-access/quick-access.component";
 import { TransaccionesRecientesCard } from "./components/transacciones-recientes-card/transacciones-recientes-card.component";
 import { FlujoCajaCard } from "./components/flujo-caja-card/flujo-caja-card.component";
-
+import { DashboardAvanzadoKPIs } from '../../interfaces/reportes-avanzados.interface';
+import { DecimalPipe, CurrencyPipe } from '@angular/common';
 
 
 @Component({
    selector: 'app-dashboarg-page',
-   imports: [HeaderTitlePageComponent, NumCardsTotalesComponent, QuickAccess, TransaccionesRecientesCard, FlujoCajaCard],
+   imports: [HeaderTitlePageComponent, NumCardsTotalesComponent, QuickAccess, TransaccionesRecientesCard, FlujoCajaCard, CurrencyPipe],
    templateUrl: './dashboarg-page.component.html',
 })
 export class DashboargPageComponent implements OnInit {
@@ -19,8 +20,8 @@ export class DashboargPageComponent implements OnInit {
    private dashboardService = inject(DashboardService);
 
    headTitle: HeaderInput = {
-      title: 'Dashboard',
-      slog: 'Resumen general de tu empresa'
+      title: 'Dashboard Avanzado',
+      slog: 'Vista estratégica y proyecciones de tu negocio'
    }
 
    accesoRapido = [
@@ -41,6 +42,9 @@ export class DashboargPageComponent implements OnInit {
    cardsValor = signal<CardsTotales[]>([]);
    recentTransactions = signal<RecentTransaction[]>([]);
    history = signal<DashboardHistory[]>([]);
+   
+   // New signals for advanced data
+   advancedData = signal<DashboardAvanzadoKPIs | null>(null);
 
    chartData = computed(() => {
       const data = this.history();
@@ -62,13 +66,21 @@ export class DashboargPageComponent implements OnInit {
    }
 
    loadDashboardData() {
+      // Load standard summary
       this.dashboardService.getSummary().subscribe({
          next: (data: DashboardResponse) => {
             this.mappingCards(data);
             this.recentTransactions.set(data.recentTransactions);
             this.history.set(data.history);
          }
-      })
+      });
+
+      // Load advanced dashboard data
+      this.dashboardService.getDashboardAvanzado().subscribe({
+         next: (data) => {
+            this.advancedData.set(data);
+         }
+      });
    }
 
    mappingCards(data: DashboardResponse) {

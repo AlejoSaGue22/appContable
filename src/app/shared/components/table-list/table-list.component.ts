@@ -1,6 +1,6 @@
 import { Component, effect, inject, input, OnInit, output, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { Pagination } from '../pagination/pagination';
+import { PaginationComponent } from '../pagination/pagination';
 import { modalOpen } from '@shared/interfaces/services.interfaces';
 import { PaginationService } from '../pagination/pagination.service';
 import { CurrencyPipe, TitleCasePipe } from '@angular/common';
@@ -13,7 +13,7 @@ export interface Column {
 
 @Component({
   selector: 'app-table-list',
-  imports: [RouterLink, Pagination, TitleCasePipe, CurrencyPipe],
+  imports: [RouterLink, PaginationComponent, TitleCasePipe, CurrencyPipe],
   templateUrl: './table-list.component.html',
 })
 

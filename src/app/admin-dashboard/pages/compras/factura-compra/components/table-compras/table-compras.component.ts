@@ -1,6 +1,7 @@
 import { Component, computed, input, output, signal, effect } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule, TitleCasePipe } from '@angular/common';
+import { PaginationComponent } from '@shared/components/pagination/pagination';
 import { FormsModule } from '@angular/forms';
 
 export interface PurchaseInvoiceFilters {
@@ -16,7 +17,7 @@ export interface PurchaseInvoiceFilters {
 
 @Component({
   selector: 'app-table-compras',
-  imports: [CommonModule, RouterLink, TitleCasePipe, FormsModule],
+  imports: [CommonModule, RouterLink, TitleCasePipe, FormsModule, PaginationComponent],
   templateUrl: './table-compras.component.html',
   standalone: true
 })

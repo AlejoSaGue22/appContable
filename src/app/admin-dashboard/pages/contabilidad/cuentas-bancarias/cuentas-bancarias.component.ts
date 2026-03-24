@@ -4,17 +4,25 @@ import { rxResource } from '@angular/core/rxjs-interop';
 
 import { CuentasBancariasService } from '../services/cuentas-bancarias.service';
 import { LoaderComponent } from '@utils/components/loader/loader.component';
+import { HeaderInput, HeaderTitlePageComponent } from '@dashboard/components/header-title-page/header-title-page.component';
 import { CuentaBancaria } from '../interfaces/cuenta-bancaria.interface';
+
 import { CuentaFormModalComponent } from './components/cuenta-form-modal/cuenta-form-modal.component';
 
 @Component({
   selector: 'app-cuentas-bancarias',
   standalone: true,
-  imports: [CommonModule, LoaderComponent, CurrencyPipe, CuentaFormModalComponent],
+  imports: [CommonModule, LoaderComponent, CurrencyPipe, CuentaFormModalComponent, HeaderTitlePageComponent],
   templateUrl: './cuentas-bancarias.component.html'
 })
 export default class CuentasBancariasComponent {
   private cuentasService = inject(CuentasBancariasService);
+
+  headTitle: HeaderInput = {
+    title: 'Cuentas Bancarias',
+    slog: 'Gestión centralizada de recursos financieros'
+  }
+
 
   // Modal control
   isModalOpen = signal(false);
@@ -49,16 +57,18 @@ export default class CuentasBancariasComponent {
   toggleStatus(id: string) {
     this.cuentasService.toggleStatus(id).subscribe({
       next: () => this.cuentasResource.reload(),
-      error: (err) => console.error('Error toggling status', err)
+      error: (err) => {}
     });
+
   }
 
   deleteCuenta(id: string) {
     if (confirm('¿Está seguro de que desea eliminar esta cuenta?')) {
       this.cuentasService.deleteCuenta(id).subscribe({
         next: () => this.cuentasResource.reload(),
-        error: (err) => console.error('Error deleting account', err)
+        error: (err) => {}
       });
+
     }
   }
 }

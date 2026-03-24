@@ -1,4 +1,4 @@
-import { CurrencyPipe, DecimalPipe } from '@angular/common';
+import { CurrencyPipe } from '@angular/common';
 import { FacturaVenta, FormaPago, ItemFactura, TipoFactura, InvoiceStatus } from './../../../../interfaces/documento-venta-interface';
 import { AfterContentInit, Component, effect, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -29,7 +29,7 @@ import { HelpersUtils } from '@utils/helpers.utils';
     ReactiveFormsModule,
     ListGroupDropdownComponent,
     CurrencyPipe,
-    DecimalPipe,
+
     FormErrorLabelComponent,
     RouterLink,
     ModalComponent,
@@ -155,7 +155,8 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
         this.getAllProductos.set(productos.articulos);
       },
       error: (error) => {
-        console.log("Error Comprobantes Ventas: ", error);
+        // Log removed
+
         this.loaderservice.hide();
       }
     });
@@ -357,7 +358,6 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   }
 
   onProductoSeleccionado(producto: Partial<GetProductosDetalle>) {
-    console.log("Producto seleccionado: ", producto);
     this.productosItemsForm.patchValue({
       unitPrice: producto.precio,
       iva: parseInt(producto.impuesto!),
@@ -373,7 +373,8 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     this.totales.totalIVA = this.productSeleccionados().reduce((accu, current) => accu + current.valor_iva!, 0);
     this.totales.descuentoTotal = this.productSeleccionados().reduce((accu, current) => accu + current.valor_discount!, 0);
 
-    console.log(this.totales);
+    // Log removed
+
   }
 
   async onSubmit() {
@@ -381,8 +382,9 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     const validFactura = this.formVentas.valid;
     const validProduct = this.productosItemsForm.valid;
     this.formVentas.markAllAsTouched();
-    console.log("Formulario: ", this.formVentas.value);
-    console.log("Productos: ", this.productSeleccionados());
+    // Log removed
+    // Log removed
+
 
     if (!validFactura) {
       // Identificar campos no válidos para depuración
@@ -393,7 +395,6 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
           invalidFields.push(name);
         }
       }
-      console.error("Campos no válidos:", invalidFields);
 
       this.notificacionService.error(
         `Por favor, completa los campos requeridos: ${invalidFields.join(', ')}`,
@@ -453,7 +454,8 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
           return;
         }
 
-        console.log('✅ Respuesta del backend:', response);
+        // Log removed
+
         this.notificacionService.success(
           'Factura creada con exito',
           'Accion Completada',

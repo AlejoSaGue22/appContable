@@ -1,272 +1,511 @@
 <header-title-page [titleHead]="headTitle" />
 
-<div class="w-full px-4 sm:px-6 lg:px-8 py-6">
-    <div class="max-w-7xl mx-auto">
+<div class="w-full px-4 sm:px-6 lg:px-8 py-6 animate-fade-in">
+    <div class="max-w-7xl mx-auto space-y-8">
 
-        <!-- Filtros de Período -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
-            <div class="border-b border-gray-100 bg-gray-50/50 px-6 py-4">
-                <h3 class="text-base font-semibold leading-6 text-gray-900 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    Seleccionar Período
-                </h3>
-            </div>
-
-            <div class="p-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Inicio</label>
+        <!-- Filtros de Período (Glassmorphism) -->
+        <div class="bg-white/70 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100/50 p-6 transition-all duration-300">
+            <div class="flex flex-col md:flex-row md:items-end gap-6">
+                <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1">Fecha Inicio</label>
                         <input type="date" [(ngModel)]="fechaInicio"
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors text-sm">
+                            class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all">
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha Fin</label>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1">Fecha Fin</label>
                         <input type="date" [(ngModel)]="fechaFin"
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors text-sm">
+                            class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all">
+                    </div>
+                </div>
+
+                <button (click)="generarReporte()"
+                    [disabled]="loading"
+                    class="h-[46px] px-8 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-100 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[160px]">
+                    @if (loading) {
+                        <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    } @else {
+                        <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                    }
+                    {{ loading ? 'Sincronizando...' : 'Actualizar' }}
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation (Premium Design) -->
+        <div class="flex items-center p-1 bg-gray-100/50 backdrop-blur-md rounded-2xl w-fit">
+            <button (click)="activeTab = 'facturacion'"
+                [class]="activeTab === 'facturacion' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
+                class="px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all duration-300">
+                Facturación
+            </button>
+            <button (click)="activeTab = 'dian'"
+                [class]="activeTab === 'dian' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
+                class="px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all duration-300">
+                Conciliación DIAN
+            </button>
+            <button (click)="activeTab = 'recaudos'"
+                [class]="activeTab === 'recaudos' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
+                class="px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all duration-300">
+                Recaudos
+            </button>
+            <button (click)="activeTab = 'impuestos'"
+                [class]="activeTab === 'impuestos' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
+                class="px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all duration-300">
+                Impuestos
+            </button>
+        </div>
+
+        <!-- Content Area -->
+        <div class="min-h-[400px]">
+            <!-- Loading Indicator -->
+            @if (loading) {
+                <div class="flex flex-col items-center justify-center py-32 bg-white/50 backdrop-blur-xl rounded-3xl border border-gray-100 shadow-sm">
+                    <div class="relative w-20 h-20">
+                        <div class="absolute inset-0 rounded-full border-4 border-blue-50"></div>
+                        <div class="absolute inset-0 rounded-full border-4 border-t-blue-600 animate-spin"></div>
+                    </div>
+                    <p class="mt-6 text-sm font-bold text-gray-900">Analizando registros contables...</p>
+                    <p class="text-xs text-gray-400 mt-1">Esto puede tomar unos segundos</p>
+                </div>
+            }
+
+            <!-- Empty State -->
+            @if (!loading && !facturacion) {
+                <div class="flex flex-col items-center justify-center py-32 bg-white/50 backdrop-blur-xl rounded-3xl border border-gray-100 shadow-sm">
+                    <div class="w-24 h-24 bg-gray-50 rounded-3xl flex items-center justify-center mb-6">
+                        <svg class="h-12 w-12 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900">Reporte Vacío</h3>
+                    <p class="text-sm text-gray-400 mt-2 max-w-xs text-center">Selecciona un período válido para generar las métricas de este módulo.</p>
+                </div>
+            }
+
+            <!-- Facturación Detallada Content -->
+            @if (!loading && facturacion && activeTab === 'facturacion') {
+                <div class="animate-slide-up space-y-8">
+                    <!-- Summary Cards (Premium) -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
+                            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Total Facturas</p>
+                            <h4 class="text-3xl font-semibold text-gray-900">{{ facturacion.resumen.totalFacturas }}</h4>
+                            <div class="mt-4 flex items-center justify-between p-2 bg-blue-50/50 rounded-xl">
+                                <span class="text-[10px] font-bold text-blue-600">{{ facturacion.resumen.totalElectronicas }} Elec.</span>
+                                <span class="text-[10px] font-bold text-gray-500">{{ facturacion.resumen.totalStandard }} Std.</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
+                            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Monto Total</p>
+                            <h4 class="text-3xl font-semibold text-gray-900">{{ facturacion.resumen.montoTotal | currency:'COP':'$':'1.0-0' }}</h4>
+                            <div class="mt-4 flex items-center gap-2">
+                                <span class="flex-1 h-1.5 rounded-full bg-emerald-100 overflow-hidden">
+                                    <span class="block h-full bg-emerald-500" [style.width.%]="(facturacion.resumen.montoElectronicas / facturacion.resumen.montoTotal) * 100"></span>
+                                </span>
+                                <span class="text-[10px] font-black text-emerald-600">IVA: {{ facturacion.resumen.ivaTotal | currency:'COP':'$':'1.0-0' }}</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
+                            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Efectividad DIAN</p>
+                            <h4 class="text-3xl font-semibold text-gray-900">{{ facturacion.electronicas.tasaAceptacion }}%</h4>
+                            <div class="mt-4 flex items-center justify-between text-[10px] font-bold">
+                                <span class="text-emerald-500">Aceptadas: {{ facturacion.electronicas.aceptadas }}</span>
+                                <span class="text-red-500">Rechazadas: {{ facturacion.electronicas.rechazadas }}</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
+                            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Ticket Promedio</p>
+                            <h4 class="text-3xl font-semibold text-gray-900">{{ (facturacion.resumen.montoTotal / (facturacion.resumen.totalFacturas || 1)) | currency:'COP':'$':'1.0-0' }}</h4>
+                            <p class="text-[10px] text-gray-400 mt-4 font-bold uppercase tracking-tighter">Valor Medio por Transacción</p>
+                        </div>
                     </div>
 
-                    <div class="flex gap-2">
-                        <button (click)="generarReporte()"
-                            class="inline-flex items-center justify-center cursor-pointer rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                            </svg>
-                            Generar Reporte
-                        </button>
+                    <!-- Comparison Section -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Electronic (DIAN) Details Card -->
+                        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden group">
+                            <div class="px-8 py-6 bg-blue-600 flex justify-between items-center">
+                                <div>
+                                    <h4 class="text-xs font-semibold text-blue-100 uppercase tracking-[0.2em]">Sincronización</h4>
+                                    <p class="text-xl font-semibold text-white mt-1">Electrónica (DIAN)</p>
+                                </div>
+                                <div class="w-12 h-12 bg-white/20 rounded-2xl backdrop-blur-md flex items-center justify-center">
+                                    <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V21a2 2 0 01-2 2H10a2 2 0 01-2-2v-7" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="p-8 space-y-6">
+                                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                    <span class="text-sm font-semibold text-gray-500">Facturas Emitidas</span>
+                                    <span class="text-lg font-semibold text-gray-900">{{ facturacion.electronicas.emitidas }}</span>
+                                </div>
+                                <div class="flex items-center justify-between p-4 bg-amber-50 rounded-2xl border border-amber-100">
+                                    <span class="text-sm font-semibold text-amber-700">Pendientes de Envío</span>
+                                    <span class="text-lg font-semibold text-amber-600">{{ facturacion.electronicas.pendientes }}</span>
+                                </div>
+                                <div class="flex items-center justify-between p-4 bg-blue-50 rounded-2xl border border-blue-100">
+                                    <span class="text-sm font-semibold text-blue-700">Ticket Medio Elec.</span>
+                                    <span class="text-lg font-semibold text-blue-600">{{ facturacion.electronicas.montoPromedio | currency:'COP':'$':'1.0-0' }}</span>
+                                </div>
+                            </div>
+                        </div>
 
-                        @if(reporte){
-                            <button (click)="exportarExcel()" title="Exportar a Excel"
-                                class="inline-flex items-center justify-center cursor-pointer rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 32 32">
-                                    <defs>
-                                        <linearGradient id="SVGxUjO6TbQ" x1="4.494" x2="13.832" y1="-2092.086"
-                                            y2="-2075.914" gradientTransform="translate(0 2100)"
-                                            gradientUnits="userSpaceOnUse">
-                                            <stop offset="0" stop-color="#18884f" />
-                                            <stop offset=".5" stop-color="#117e43" />
-                                            <stop offset="1" stop-color="#0b6631" />
-                                        </linearGradient>
-                                    </defs>
-                                    <path fill="#185c37"
-                                        d="M19.581 15.35L8.512 13.4v14.409A1.19 1.19 0 0 0 9.705 29h19.1A1.19 1.19 0 0 0 30 27.809V22.5Z" />
-                                    <path fill="#21a366"
-                                        d="M19.581 3H9.705a1.19 1.19 0 0 0-1.193 1.191V9.5L19.581 16l5.861 1.95L30 16V9.5Z" />
-                                    <path fill="#107c41" d="M8.512 9.5h11.069V16H8.512Z" />
-                                    <path
-                                        d="M16.434 8.2H8.512v16.25h7.922a1.2 1.2 0 0 0 1.194-1.191V9.391A1.2 1.2 0 0 0 16.434 8.2"
-                                        opacity="0.1" />
-                                    <path
-                                        d="M15.783 8.85H8.512V25.1h7.271a1.2 1.2 0 0 0 1.194-1.191V10.041a1.2 1.2 0 0 0-1.194-1.191"
-                                        opacity="0.2" />
-                                    <path
-                                        d="M15.783 8.85H8.512V23.8h7.271a1.2 1.2 0 0 0 1.194-1.191V10.041a1.2 1.2 0 0 0-1.194-1.191"
-                                        opacity="0.2" />
-                                    <path
-                                        d="M15.132 8.85h-6.62V23.8h6.62a1.2 1.2 0 0 0 1.194-1.191V10.041a1.2 1.2 0 0 0-1.194-1.191"
-                                        opacity="0.2" />
-                                    <path fill="url(#SVGxUjO6TbQ)"
-                                        d="M3.194 8.85h11.938a1.193 1.193 0 0 1 1.194 1.191v11.918a1.193 1.193 0 0 1-1.194 1.191H3.194A1.19 1.19 0 0 1 2 21.959V10.041A1.19 1.19 0 0 1 3.194 8.85" />
-                                    <path fill="#fff"
-                                        d="m5.7 19.873l2.511-3.884l-2.3-3.862h1.847L9.013 14.6c.116.234.2.408.238.524h.017q.123-.281.26-.546l1.342-2.447h1.7l-2.359 3.84l2.419 3.905h-1.809l-1.45-2.711A2.4 2.4 0 0 1 9.2 16.8h-.024a1.7 1.7 0 0 1-.168.351l-1.493 2.722Z" />
-                                    <path fill="#33c481" d="M28.806 3h-9.225v6.5H30V4.191A1.19 1.19 0 0 0 28.806 3" />
-                                    <path fill="#107c41" d="M19.581 16H30v6.5H19.581Z" />
-                                </svg>
-                            </button>
+                        <!-- Standard (Local) Details Card -->
+                        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                            <div class="px-8 py-6 bg-gray-900 flex justify-between items-center">
+                                <div>
+                                    <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-[0.2em]">Documentos</h4>
+                                    <p class="text-xl font-semibold text-white mt-1">Estándar (Local)</p>
+                                </div>
+                                <div class="w-12 h-12 bg-white/10 rounded-2xl backdrop-blur-md flex items-center justify-center">
+                                    <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="p-8 space-y-6">
+                                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                    <span class="text-sm font-semibold text-gray-500">Facturas Emitidas</span>
+                                    <span class="text-lg font-semibold text-gray-900">{{ facturacion.standard.emitidas }}</span>
+                                </div>
+                                <div class="flex items-center justify-between p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
+                                    <span class="text-sm font-semibold text-emerald-700">Total Liquidado</span>
+                                    <span class="text-lg font-semibold text-emerald-600">{{ facturacion.standard.totalPagado| currency:'COP':'$':'1.0-0' }}</span>
+                                </div>
+                                <div class="flex items-center justify-between p-4 bg-red-50 rounded-2xl border border-red-100">
+                                    <span class="text-sm font-semibold text-red-700">Saldo Cartera</span>
+                                    <span class="text-lg font-semibold text-red-600">{{ facturacion.standard.saldoPendiente | currency:'COP':'$':'1.0-0' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Clientes (Premium Table) -->
+                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/30">
+                            <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-[0.2em]">Ranking de Negocios</h4>
+                            <span class="px-3 py-1 bg-blue-100 text-blue-600 text-[10px] font-semibold uppercase rounded-lg">Top 5 Clientes</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-gray-50/50 text-[11px] uppercase tracking-[0.1em] text-gray-400 border-b border-gray-100">
+                                    <tr>
+                                        <th class="px-8 py-5">Nombre del Cliente</th>
+                                        <th class="px-8 py-5 text-center">Frecuencia (Doc)</th>
+                                        <th class="px-8 py-5 text-right">Monto Total Facturado</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-50">
+                                    @for (c of facturacion.topClientes; track c.clienteId) {
+                                        <tr class="hover:bg-blue-50/30 transition-all duration-200">
+                                            <td class="px-8 py-4">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-8 h-8 rounded-xl bg-blue-100 flex items-center justify-center text-[10px] font-semibold text-blue-600">
+                                                        {{ c.clienteNombre.substring(0, 2).toUpperCase() }}
+                                                    </div>
+                                                    <span class="font-semibold text-gray-900">{{ c.clienteNombre }}</span>
+                                                </div>
+                                            </td>
+                                            <td class="px-8 py-4 text-center">
+                                                <span class="px-2 py-1 bg-gray-100 rounded text-xs font-mono text-gray-600 font-semibold">{{ c.cantidadFacturas }}</span>
+                                            </td>
+                                            <td class="px-8 py-4 text-right">
+                                                <span class="text-sm font-semibold text-blue-600">{{ c.montoTotal | currency:'COP':'$':'1.0-0' }}</span>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Ventas Diarias (Timeline Style) -->
+                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="px-8 py-6 border-b border-gray-50 bg-gray-50/30">
+                            <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-[0.2em]">Desempeño Cronológico</h4>
+                        </div>
+                        <div class="p-8">
+                            <div class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                                @for (v of facturacion.ventasPorDia; track v.fecha) {
+                                    <div class="flex-none w-32 p-4 bg-gray-50/50 rounded-2xl border border-gray-100 text-center hover:bg-white hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                                        <p class="text-[10px] font-semibold text-gray-400 uppercase mb-2">{{ v.fecha | date:'dd MMM' }}</p>
+                                        <p class="text-sm font-semibold text-gray-900 mb-3">{{ v.montoTotal | currency:'COP':'$':'1.0-0' }}</p>
+                                        <div class="flex justify-center -space-x-1.5">
+                                            @for (i of [].constructor(v.cantidadElectronicas > 3 ? 3 : v.cantidadElectronicas); track $index) {
+                                                <span class="w-2.5 h-2.5 rounded-full bg-blue-500 border-2 border-white"></span>
+                                            }
+                                            @if (v.cantidadStandard > 0) {
+                                                <span class="w-2.5 h-2.5 rounded-full bg-gray-300 border-2 border-white"></span>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Conciliación DIAN Content -->
+            @if (!loading && conciliacionDIAN && activeTab === 'dian') {
+                <div class="animate-slide-up space-y-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-2 space-y-8">
+                            <!-- Comparison Grid -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-t-4 border-t-blue-500">
+                                    <p class="text-[10px] font-semibold uppercase tracking-widest text-gray-400 mb-1">Monto DIAN (Accepted)</p>
+                                    <h4 class="text-2xl font-semibold text-gray-900">{{ conciliacionDIAN.facturasElectronicas.montoAcceptedDIAN | currency:'COP':'$':'1.0-0' }}</h4>
+                                    <p class="text-[10px] text-blue-500 font-bold mt-4 flex items-center gap-1">
+                                        <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        Validado vía API DIAN
+                                    </p>
+                                </div>
+                                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-t-4 border-t-indigo-500">
+                                    <p class="text-[10px] font-semibold uppercase tracking-widest text-gray-400 mb-1">Débito en Libros</p>
+                                    <h4 class="text-2xl font-semibold text-gray-900">{{ conciliacionDIAN.facturasElectronicas.montoDebito | currency:'COP':'$':'1.0-0' }}</h4>
+                                    <p class="text-[10px] text-gray-400 font-bold mt-4 uppercase tracking-tighter">Cuentas por Cobrar</p>
+                                </div>
+                                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-t-4 border-t-purple-500">
+                                    <p class="text-[10px] font-semibold uppercase tracking-widest text-gray-400 mb-1">Saldo Cuentas 41XX</p>
+                                    <h4 class="text-2xl font-semibold text-gray-900">{{ conciliacionDIAN.contabilidad.saldoCuentasIngreso | currency:'COP':'$':'1.0-0' }}</h4>
+                                    <p class="text-[10px] text-gray-400 font-bold mt-4 uppercase tracking-tighter">Ingresos Operacionales</p>
+                                </div>
+                            </div>
+
+                            <!-- Detail Breakdown Table -->
+                            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                                <div class="px-8 py-6 border-b border-gray-50 bg-gray-50/30">
+                                    <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-[0.2em]">Desglose de Ingresos Operacionales</h4>
+                                </div>
+                                <div class="divide-y divide-gray-50">
+                                    @for (d of conciliacionDIAN.contabilidad.detallePorCuenta; track d.codigo) {
+                                        <div class="px-8 py-5 flex justify-between items-center hover:bg-gray-50 transition-all group">
+                                            <div class="flex items-center gap-4">
+                                                <div class="px-3 py-1.5 bg-gray-100 rounded-xl font-mono text-xs font-semibold text-gray-500">
+                                                    {{ d.codigo }}
+                                                </div>
+                                                <span class="text-sm font-semibold text-gray-900">{{ d.nombre }}</span>
+                                            </div>
+                                            <div class="flex items-center gap-6">
+                                                <span class="text-sm font-semibold text-gray-900">{{ d.saldo | currency:'COP':'$':'1.0-0' }}</span>
+                                                <div class="w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                                    <div class="h-full bg-blue-500/30 group-hover:bg-blue-500 transition-all" [style.width.%]="(d.saldo / (conciliacionDIAN.contabilidad.saldoCuentasIngreso || 1)) * 100"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Match Status Card -->
+                        <div class="space-y-8">
+                            <div [class]="conciliacionDIAN.cuadra ? 'bg-emerald-600 shadow-emerald-200' : 'bg-red-600 shadow-red-200'" 
+                                class="rounded-3xl p-10 text-white shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
+                                <div class="relative z-10">
+                                    <div class="w-20 h-20 bg-white/20 rounded-3xl backdrop-blur-md flex items-center justify-center text-4xl mb-6 mx-auto animate-bounce-slow">
+                                        {{ conciliacionDIAN.cuadra ? '✨' : '⚠️' }}
+                                    </div>
+                                    <h3 class="text-sm font-semibold uppercase tracking-[0.3em] opacity-80">Estado Global</h3>
+                                    <p class="text-xl font-semibold mt-2 uppercase tracking-widest">{{ conciliacionDIAN.cuadra ? 'Conciliado' : 'Requiere Ajuste' }}</p>
+                                    <div class="mt-8 py-4 px-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10">
+                                        <p class="text-4xl font-semibold">{{ (conciliacionDIAN.diferencia < 0 ? conciliacionDIAN.diferencia * -1 : conciliacionDIAN.diferencia) | currency:'COP':'$':'1.0-0' }}</p>
+                                        <p class="text-[10px] font-bold mt-1 opacity-60 uppercase tracking-widest">Diferencia Neta</p>
+                                    </div>
+                                </div>
+                                <div class="absolute -right-10 -bottom-10 w-44 h-44 bg-white/10 rounded-full blur-3xl"></div>
+                            </div>
+
+                            <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm relative group overflow-hidden">
+                                <div class="flex items-center gap-2 mb-4">
+                                    <span class="text-blue-500">📋</span>
+                                    <h4 class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Memorándum del Período</h4>
+                                </div>
+                                <p class="text-sm text-gray-700 leading-relaxed italic border-l-4 border-blue-500/30 pl-4">
+                                    {{ conciliacionDIAN.explicacion || 'No se han registrado discrepancias manuales o ajustes para esta conciliación. El sistema asume integridad basándose en los registros existentes.' }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Recaudos Content -->
+            @if (!loading && conciliacionRecaudos && activeTab === 'recaudos') {
+                <div class="animate-slide-up space-y-8">
+                    <div class="bg-gray-900 rounded-3xl p-12 text-white shadow-2xl relative overflow-hidden">
+                        <div class="relative z-10 flex flex-col md:flex-row items-center gap-12">
+                            <div class="text-center md:text-left flex-1">
+                                <p class="text-xs font-semibold text-gray-400 uppercase tracking-[0.3em] mb-4">Eficiencia en Recaudos</p>
+                                <div class="flex items-baseline gap-4">
+                                    <h3 class="text-5xl font-semibold">{{ (conciliacionRecaudos.totalPagosRegistrados / (conciliacionRecaudos.totalMovimientosBancos || 1) * 100).toFixed(1) }}%</h3>
+                                    <span class="text-xl font-semibold text-emerald-400">Tasa de Cruce</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-8">
+                                <div class="text-center">
+                                    <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Registros</p>
+                                    <p class="text-xl font-semibold">{{ conciliacionRecaudos.totalPagosRegistrados | currency:'COP':'$':'1.0-0' }}</p>
+                                </div>
+                                <div class="w-px h-12 bg-gray-800"></div>
+                                <div class="text-center">
+                                    <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Banco (1110)</p>
+                                    <p class="text-xl font-semibold text-blue-400">{{ conciliacionRecaudos.totalMovimientosBancos | currency:'COP':'$':'1.0-0' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="absolute -right-20 -top-20 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl"></div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        @for (m of conciliacionRecaudos.detallePorMedio; track m.medio) {
+                            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm group hover:border-blue-500/30 transition-all duration-300">
+                                <div class="flex items-center gap-4 mb-4">
+                                    <div class="w-12 h-12 rounded-2xl bg-gray-50 group-hover:bg-blue-50 transition-colors flex items-center justify-center text-2xl">
+                                        @if (m.medio === 'transferencia') { 💼 }
+                                        @else if (m.medio === 'banco') { 🏦 }
+                                        @else if (m.medio === 'caja') { 💵 }
+                                        @else { 🧾 }
+                                    </div>
+                                    <div class="flex-1 overflow-hidden">
+                                        <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest truncate">{{ m.medio }}</p>
+                                        <p class="text-lg font-semibold text-gray-900">{{ m.monto | currency:'COP':'$':'1.0-0' }}</p>
+                                    </div>
+                                </div>
+                                <div class="h-1 bg-gray-50 rounded-full overflow-hidden">
+                                    <div class="h-full bg-blue-500 transition-all" [style.width.%]="(m.monto / (conciliacionRecaudos.totalPagosRegistrados || 1)) * 100"></div>
+                                </div>
+                            </div>
                         }
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Loading -->
-        @if(loading){
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div class="flex flex-col items-center justify-center py-16">
-                    <svg class="animate-spin h-12 w-12 text-blue-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                        </path>
-                    </svg>
-                    <p class="text-gray-600 text-sm">Generando reporte...</p>
-                </div>
-            </div>
-        }
-
-        <!-- Reporte -->
-        @if (reporte && !loading) {
-        <div class="space-y-6">
-            <div class="bg-blue-50 border border-blue-200 rounded-lg px-6 py-4 text-center">
-                <p class="text-sm font-medium text-blue-900">
-                    <strong>Período:</strong> {{ reporte.periodo.inicio | date:'dd/MM/yyyy' }} - {{ reporte.periodo.fin
-                    | date:'dd/MM/yyyy' }}
-                </p>
-            </div>
-
-            <!-- INGRESOS -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div class="bg-gradient-to-r from-green-500 to-emerald-500 px-6 py-4 flex justify-between items-center">
-                    <h2 class="text-lg font-semibold text-white">INGRESOS</h2>
-                    <span class="text-2xl font-bold text-white">{{ reporte.ingresos.total |
-                        currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-                </div>
-
-                @if (reporte.ingresos.detalle.length > 0) {
-                <div class="divide-y divide-gray-100">
-                    @for (detalle of reporte.ingresos.detalle; track $index) {
-                    <div class="px-6 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors">
-                        <span class="text-sm text-gray-700">{{ detalle.cuenta }}</span>
-                        <span class="text-sm font-semibold text-gray-900">{{ detalle.valor |
-                            currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-                    </div>
-                    }
-                </div>
-                }
-                @else {
-                <div class="px-6 py-8 text-center">
-                    <p class="text-sm text-gray-500 italic">No hay ingresos en este período</p>
-                </div>
-                }
-            </div>
-
-            <!-- COSTOS -->
-            @if (reporte.costos.total > 0) {
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div class="bg-gradient-to-r from-yellow-500 to-orange-500 px-6 py-4 flex justify-between items-center">
-                    <h2 class="text-lg font-semibold text-white">(-) COSTOS DE VENTA</h2>
-                    <span class="text-2xl font-bold text-white">-{{ reporte.costos.total |
-                        currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-                </div>
-
-                <div class="divide-y divide-gray-100">
-                    @for (detalle of reporte.costos.detalle; track $index) {
-                    <div class="px-6 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors">
-                        <span class="text-sm text-gray-700">{{ detalle.cuenta }}</span>
-                        <span class="text-sm font-semibold text-gray-900">{{ detalle.valor |
-                            currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-                    </div>
-                    }
-                </div>
-            </div>
             }
 
-            <!-- UTILIDAD BRUTA -->
-            <div class="bg-green-50 border-2 border-green-500 rounded-xl px-6 py-4">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-lg font-bold text-green-900">UTILIDAD BRUTA</span>
-                    <span class="text-2xl font-bold" [class.text-green-700]="reporte.utilidadBruta >= 0"
-                        [class.text-red-600]="reporte.utilidadBruta < 0">
-                        {{ reporte.utilidadBruta | currency:'COP':'symbol-narrow':'1.0-0' }}
-                    </span>
-                </div>
-                <div class="text-right text-sm text-green-800">
-                    Margen: {{ getMargenBruto() | number:'1.2-2' }}%
-                </div>
-            </div>
+            <!-- Impuestos Content -->
+            @if (!loading && impuestos && activeTab === 'impuestos') {
+                <div class="animate-slide-up space-y-8">
+                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="grid grid-cols-1 lg:grid-cols-2">
+                            <div class="p-12 bg-indigo-950 text-white flex flex-col justify-center">
+                                <p class="text-xs font-semibold text-indigo-400 uppercase tracking-[0.3em] mb-4">Obligación Tributaria</p>
+                                <h3 class="text-5xl font-semibold mb-2">IVA Generado</h3>
+                                <p class="text-6xl font-semibold text-indigo-300">{{ impuestos.totalIVAGenerado | currency:'COP':'$':'1.0-0' }}</p>
+                                <p class="mt-8 text-sm text-indigo-400 leading-relaxed font-medium">IVA acumulado en el período seleccionado basado en facturación electrónica y estándar consolidada.</p>
+                            </div>
+                            <div class="p-12 space-y-10">
+                                <div class="space-y-4">
+                                    <div class="flex justify-between items-center text-xs font-semibold uppercase tracking-widest text-gray-400">
+                                        <span>Iva Fact. Electrónica</span>
+                                        <span class="text-gray-900">{{ impuestos.porTipoFactura.electronicas.iva | currency:'COP':'$':'1.0-0' }}</span>
+                                    </div>
+                                    <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                                        <div class="h-full bg-indigo-600 rounded-full" [style.width.%]="(impuestos.porTipoFactura.electronicas.iva / (impuestos.totalIVAGenerado || 1)) * 100"></div>
+                                    </div>
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">Base: {{ impuestos.porTipoFactura.electronicas.base | currency:'COP':'$':'1.0-0' }}</p>
+                                </div>
 
-            <!-- GASTOS -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div class="bg-gradient-to-r from-red-500 to-red-600 px-6 py-4 flex justify-between items-center">
-                    <h2 class="text-lg font-semibold text-white">(-) GASTOS OPERACIONALES</h2>
-                    <span class="text-2xl font-bold text-white">-{{ reporte.gastos.total |
-                        currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-                </div>
-
-                @if (reporte.gastos.detalle.length > 0) {
-                <div class="divide-y divide-gray-100">
-                    @for (detalle of reporte.gastos.detalle; track $index) {
-                    <div class="px-6 py-3 flex justify-between items-center hover:bg-gray-50 transition-colors">
-                        <span class="text-sm text-gray-700">{{ detalle.cuenta }}</span>
-                        <span class="text-sm font-semibold text-gray-900">{{ detalle.valor |
-                            currency:'COP':'symbol-narrow':'1.0-0' }}</span>
-                    </div>
-                    }
-                </div>
-                }
-                @else {
-                <div class="px-6 py-8 text-center">
-                    <p class="text-sm text-gray-500 italic">No hay gastos en este período</p>
-                </div>
-                }
-            </div>
-
-            <!-- UTILIDAD NETA -->
-            <div class="bg-gradient-to-r from-green-600 to-green-700 rounded-xl px-6 py-5 shadow-lg">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-xl font-bold text-white">UTILIDAD NETA</span>
-                    <span class="text-3xl font-bold text-white" [class.opacity-75]="reporte.utilidadNeta < 0">
-                        {{ reporte.utilidadNeta | currency:'COP':'symbol-narrow':'1.0-0' }}
-                    </span>
-                </div>
-                <div class="text-right text-sm text-green-100">
-                    Margen Neto: {{ getMargenNeto() | number:'1.2-2' }}%
-                </div>
-            </div>
-
-            <!-- Indicadores -->
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div class="border-b border-gray-100 bg-gray-50/50 px-6 py-4">
-                    <h3 class="text-base font-semibold leading-6 text-gray-900 flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                        </svg>
-                        Indicadores Clave
-                    </h3>
-                </div>
-
-                <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-200">
-                        <div class="text-xs font-medium text-gray-600 mb-2">Margen Bruto</div>
-                        <div class="text-2xl font-bold" [class.text-green-600]="getMargenBruto() > 30"
-                            [class.text-gray-900]="getMargenBruto() <= 30">
-                            {{ getMargenBruto() | number:'1.1-1' }}%
+                                <div class="space-y-4">
+                                    <div class="flex justify-between items-center text-xs font-semibold uppercase tracking-widest text-gray-400">
+                                        <span>Iva Fact. Estándar</span>
+                                        <span class="text-gray-900">{{ impuestos.porTipoFactura.standard.iva | currency:'COP':'$':'1.0-0' }}</span>
+                                    </div>
+                                    <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+                                        <div class="h-full bg-indigo-400 rounded-full" [style.width.%]="(impuestos.porTipoFactura.standard.iva / (impuestos.totalIVAGenerado || 1)) * 100"></div>
+                                    </div>
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">Base: {{ impuestos.porTipoFactura.standard.base | currency:'COP':'$':'1.0-0' }}</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-200">
-                        <div class="text-xs font-medium text-gray-600 mb-2">Margen Neto</div>
-                        <div class="text-2xl font-bold" [class.text-green-600]="getMargenNeto() > 10"
-                            [class.text-gray-900]="getMargenNeto() <= 10">
-                            {{ getMargenNeto() | number:'1.1-1' }}%
+                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="px-8 py-6 border-b border-gray-50 bg-gray-50/30">
+                            <h4 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Liquidación por Tarifas</h4>
                         </div>
-                    </div>
-
-                    <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-200">
-                        <div class="text-xs font-medium text-gray-600 mb-2">Total Ingresos</div>
-                        <div class="text-2xl font-bold text-gray-900">
-                            {{ reporte.ingresos.total | currency:'COP':'symbol-narrow':'1.0-0' }}
-                        </div>
-                    </div>
-
-                    <div class="bg-gray-50 rounded-lg p-4 text-center border border-gray-200">
-                        <div class="text-xs font-medium text-gray-600 mb-2">Total Gastos</div>
-                        <div class="text-2xl font-bold text-gray-900">
-                            {{ reporte.gastos.total | currency:'COP':'symbol-narrow':'1.0-0' }}
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-gray-50/50 text-[11px] uppercase tracking-[0.1em] text-gray-400 border-b border-gray-100">
+                                    <tr>
+                                        <th class="px-8 py-5">Tarifa Impositiva</th>
+                                        <th class="px-8 py-5 text-right">Base Imponible</th>
+                                        <th class="px-8 py-5 text-right">IVA Liquidado</th>
+                                        <th class="px-8 py-5 text-center">Registros</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-50">
+                                    @for (t of impuestos.desglosePorTarifa; track t.tarifa) {
+                                        <tr class="hover:bg-indigo-50/30 transition-all duration-200">
+                                            <td class="px-8 py-4">
+                                                <span class="px-3 py-1.5 bg-indigo-100 text-indigo-700 text-[10px] font-semibold uppercase rounded-lg">
+                                                    {{ t.tarifa }}% - IVA
+                                                </span>
+                                            </td>
+                                            <td class="px-8 py-4 text-right font-semibold text-gray-600">
+                                                {{ t.base | currency:'COP':'$':'1.0-0' }}
+                                            </td>
+                                            <td class="px-8 py-4 text-right font-semibold text-gray-900">
+                                                {{ t.iva | currency:'COP':'$':'1.0-0' }}
+                                            </td>
+                                            <td class="px-8 py-4 text-center">
+                                                <span class="text-[10px] font-semibold text-gray-400">{{ t.cantidadItems }} op.</span>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
-            </div>
+            }
         </div>
-        }
-
-        <!-- Estado vacío -->
-        @if (!reporte && !loading) {
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div class="flex flex-col items-center justify-center py-16 px-6">
-                <div class="text-6xl mb-4">📊</div>
-                <p class="text-gray-600 text-sm text-center">Seleccione un período y haga clic en "Generar Reporte"</p>
-            </div>
-        </div>
-        }
     </div>
 </div>
+
+<style>
+    .animate-fade-in {
+        animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    .animate-slide-up {
+        animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .animate-bounce-slow {
+        animation: bounce 3s infinite;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.98); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+</style>

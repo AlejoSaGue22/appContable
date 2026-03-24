@@ -1,17 +1,25 @@
 import { Component, OnInit } from '@angular/core';
 import { EstadoResultados, ReportesService } from '../services/reportes.service';
-import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
+import { CurrencyPipe, DatePipe, NgClass, NgFor, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HeaderInput, HeaderTitlePageComponent } from '@dashboard/components/header-title-page/header-title-page.component';
+import { ReporteConciliacionDIAN, ReporteConciliacionRecaudos, ReporteFacturacionAvanzada, ReporteImpuestos } from '../../../interfaces/reportes-avanzados.interface';
+import { NotificationService } from '@shared/services/notification.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-reportes-general',
-  imports: [CurrencyPipe, DecimalPipe, FormsModule, DatePipe, HeaderTitlePageComponent],
+  imports: [CurrencyPipe, DatePipe, FormsModule, HeaderTitlePageComponent],
   templateUrl: './reportes-general.component.html',
 })
 export class ReportesGeneralComponent implements OnInit {
-  reporte?: EstadoResultados;
+  facturacion?: ReporteFacturacionAvanzada;
+  conciliacionDIAN?: ReporteConciliacionDIAN;
+  conciliacionRecaudos?: ReporteConciliacionRecaudos;
+  impuestos?: ReporteImpuestos;
+  
   loading = false;
+  activeTab: 'facturacion' | 'dian' | 'recaudos' | 'impuestos' = 'facturacion';
 
   fechaInicio: string;
   fechaFin: string;
@@ -21,7 +29,10 @@ export class ReportesGeneralComponent implements OnInit {
     slog: 'Análisis de rentabilidad del período'
   };
 
-  constructor(private reportesService: ReportesService) {
+  constructor(
+    private reportesService: ReportesService,
+    private notificationService: NotificationService
+  ) {
     // Establecer mes actual por defecto
     const now = new Date();
     const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -38,38 +49,33 @@ export class ReportesGeneralComponent implements OnInit {
   generarReporte(): void {
     this.loading = true;
 
-    this.reportesService.estadoResultados(this.fechaInicio, this.fechaFin).subscribe({
-      next: (reporte) => {
-        this.reporte = reporte;
+    forkJoin({
+      facturacion: this.reportesService.getFacturacionDetallada(this.fechaInicio, this.fechaFin),
+      dian: this.reportesService.getConciliacionDIAN(this.fechaInicio, this.fechaFin),
+      recaudos: this.reportesService.getConciliacionRecaudos(this.fechaInicio, this.fechaFin),
+      impuestos: this.reportesService.getImpuestosDetallado(this.fechaInicio, this.fechaFin)
+    }).subscribe({
+      next: (res) => {
+        this.facturacion = res.facturacion;
+        this.conciliacionDIAN = res.dian;
+        this.conciliacionRecaudos = res.recaudos;
+        this.impuestos = res.impuestos;
         this.loading = false;
       },
       error: (error) => {
-        console.error('Error generando reporte:', error);
         this.loading = false;
-        alert('Error al generar el reporte');
+        this.notificationService.error('Error al generar los reportes avanzados', 'Error');
       }
     });
   }
 
   exportarPDF(): void {
     // Implementar exportación a PDF
-    alert('Función de exportar a PDF próximamente');
+    this.notificationService.info('Función de exportar a PDF próximamente', 'Próximamente');
   }
 
   exportarExcel(): void {
     // Implementar exportación a Excel
-    alert('Función de exportar a Excel próximamente');
-  }
-
-  getMargenBruto(): number {
-    if (!this.reporte) return 0;
-    if (this.reporte.ingresos.total === 0) return 0;
-    return (this.reporte.utilidadBruta / this.reporte.ingresos.total) * 100;
-  }
-
-  getMargenNeto(): number {
-    if (!this.reporte) return 0;
-    if (this.reporte.ingresos.total === 0) return 0;
-    return (this.reporte.utilidadNeta / this.reporte.ingresos.total) * 100;
+    this.notificationService.info('Función de exportar a Excel próximamente', 'Próximamente');
   }
 }

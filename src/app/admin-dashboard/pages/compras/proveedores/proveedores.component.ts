@@ -1,23 +1,24 @@
 import { Component, inject, signal } from '@angular/core';
-import { HeaderInput } from "@dashboard/components/header-title-page/header-title-page.component";
+import { HeaderInput, HeaderTitlePageComponent } from "@dashboard/components/header-title-page/header-title-page.component";
 import { CardsTotales } from "@shared/components/num-cards-totales/num-cards-totales.component";
+
 import { NotificationService } from '@shared/services/notification.service';
 import { PaginationService } from '@shared/components/pagination/pagination.service';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { tap, of, firstValueFrom } from 'rxjs';
 import { LoaderComponent } from "src/app/utils/components/loader/loader.component";
 import { ErrorPages } from "@shared/components/error-pages/error-pages.component";
-import { HeaderTitleProveedoresComponent } from "./components/header-title-proveedores/header-title-proveedores.component";
 import { TableProveedoresComponent } from "./components/table-proveedores/table-proveedores.component";
+
 import { ProveedoresService } from '../services/proveedores.service';
-import { modalOpen } from '@shared/interfaces/services.interfaces';
-import { ModalComponents } from '@shared/components/modal.components/modal.components';
+import { ModalComponent } from "@shared/components/modal/modal.component";
+
 import { ProveedoresRequest } from '@dashboard/interfaces/proveedores-interface';
-import { Pagination } from '@shared/components/pagination/pagination';
+import { PaginationComponent } from '@shared/components/pagination/pagination';
 
 @Component({
    selector: 'app-proveedores',
-   imports: [LoaderComponent, ErrorPages, HeaderTitleProveedoresComponent, TableProveedoresComponent, ModalComponents, Pagination],
+   imports: [LoaderComponent, HeaderTitlePageComponent, TableProveedoresComponent, ModalComponent, PaginationComponent],
    templateUrl: './proveedores.component.html',
    standalone: true
 })
@@ -34,7 +35,7 @@ export class ProveedoresComponent {
    totalItems = signal(0);
    pageSize = signal(10);
 
-   isModalEdit = false;
+   isModalEdit = signal<boolean>(false);
    idProveedorToModal = signal<string>('');
 
    paginationService = inject(PaginationService);
@@ -42,6 +43,7 @@ export class ProveedoresComponent {
    notificacionService = inject(NotificationService);
    totalProveedores = signal<number>(0);
    cardsTotales = signal<CardsTotales[]>([]);
+
    proveedoresList = signal<ProveedoresRequest[]>([]);
 
    proveedoresResource = rxResource({
@@ -86,8 +88,8 @@ export class ProveedoresComponent {
       }
    }
 
-   openModal(event: modalOpen) {
-      this.isModalEdit = event.open;
+   openModal(event: any) {
+      this.isModalEdit.set(event.open);
       this.idProveedorToModal.set(event.id);
    }
 
@@ -103,9 +105,9 @@ export class ProveedoresComponent {
       }
 
       const client = await firstValueFrom(this.proveedoresService.deleteProveedor(ID));
-      this.isModalEdit = false;
+      this.isModalEdit.set(false);
       if (client.success == false) {
-         this.isModalEdit = false;
+         this.isModalEdit.set(false);
          this.notificacionService.error(
             `Hubo un error al guardar el proveedor ${client.error.message}`,
             'Error',

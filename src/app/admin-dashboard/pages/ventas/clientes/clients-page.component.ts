@@ -10,7 +10,7 @@ import { modalOpen } from '@shared/interfaces/services.interfaces';
 import { PaginationService } from '@shared/components/pagination/pagination.service';
 import { NotificationService } from '@shared/services/notification.service';
 import { TableClientsComponent } from './components/table-clients/table-clients.component';
-import { Pagination as PaginationComponent } from '@shared/components/pagination/pagination';
+import { PaginationComponent } from '@shared/components/pagination/pagination';
 import { Router, RouterLink } from '@angular/router';
 import { HelpersUtils } from '@utils/helpers.utils';
 

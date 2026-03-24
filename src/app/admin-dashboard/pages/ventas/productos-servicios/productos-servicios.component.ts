@@ -10,7 +10,7 @@ import { ModalComponents } from "@shared/components/modal.components/modal.compo
 import { modalOpen } from '@shared/interfaces/services.interfaces';
 import { NotificationService } from '@shared/services/notification.service';
 import { TableProductosComponent } from './components/table-productos/table-productos.component';
-import { Pagination as PaginationComponent } from '@shared/components/pagination/pagination';
+import { PaginationComponent } from '@shared/components/pagination/pagination';
 import { Router, RouterLink } from '@angular/router';
 
 @Component({

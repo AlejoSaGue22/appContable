@@ -3,6 +3,7 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } fro
 import { MenuPerfilComponent } from "../../components/menu-perfil/menu-perfil.component";
 import { BarralateralMenuComponent } from "@dashboard/components/barralateral-menu/barralateral-menu.component";
 import { OptionBarralateral } from "@dashboard/components/option-barralateral/option-barralateral.component";
+import { NgClass, UpperCasePipe } from '@angular/common';
 import { filter, Subscription } from 'rxjs';
 import { Permission } from '@dashboard/interfaces/permission-interface';
 import { MenuService } from '@utils/services/menu.service';
@@ -29,7 +30,7 @@ export interface MenuOption {
 
 @Component({
   selector: 'app-admin-layouts',
-  imports: [RouterOutlet, MenuPerfilComponent, BarralateralMenuComponent, OptionBarralateral],
+  imports: [RouterOutlet, MenuPerfilComponent, BarralateralMenuComponent, OptionBarralateral, NgClass, UpperCasePipe],
   templateUrl: './admin-layouts.component.html',
 })
 export default class AdminLayoutsComponent implements OnInit, OnDestroy {
@@ -42,12 +43,13 @@ export default class AdminLayoutsComponent implements OnInit, OnDestroy {
   private routeSubscription: Subscription | null = null;
   menuItems = computed(() => this.menuService.menuItems());
   menuItemsOther = computed(() => this.menuService.menuItems().filter(item => item.other === 'SI').sort((a, b) => a.order! - b.order!));
-  isLoading = this.menuService.isLoading();
-  currentUser = this.authService.user();
+  isLoading = this.menuService.isLoading;
+  currentUser = this.authService.user;
 
   // Estado local
   expandedPanels = signal<Set<string>>(new Set());
   activeRoute = signal<string>('');
+  isMobileMenuOpen = signal<boolean>(false);
 
 
   ngOnInit(): void {
@@ -80,6 +82,10 @@ export default class AdminLayoutsComponent implements OnInit, OnDestroy {
     } else {
       this.activeMenu = menuId;
     }
+  }
+
+  toggleMobileMenu() {
+    this.isMobileMenuOpen.update(v => !v);
   }
 
   // menuLateral: Sidebar[] = [

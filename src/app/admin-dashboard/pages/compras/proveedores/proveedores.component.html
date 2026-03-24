@@ -1,46 +1,87 @@
-@if ( proveedoresResource.isLoading() ) {
-<div class="flex justify-center items-center h-screen">
-    <app-loader />
-</div>
-}
-
-<!-- Header -->
-@if (proveedoresResource.hasValue() ) {
-<div class="p-4 sm:p-6 lg:p-8">
-    <app-header-title-proveedores (searchTerm)="onSearch($event)" />
-
-    <app-table-proveedores [proveedorData]="proveedoresList()" (delete)="openModal($event)" />
-    
-    <div class="mt-4">
-        <app-pagination />
+<div class="space-y-6 animate-fade-in">
+  @if ( proveedoresResource.isLoading() ) {
+    <div class="flex flex-col justify-center items-center h-80 space-y-4">
+        <app-loader />
+        <p class="text-sm text-gray-400 animate-pulse">Cargando directorio de proveedores...</p>
     </div>
-</div>
-}
+  }
 
-@if (proveedoresResource.error()) {
-<app-error-pages />
-}
+  @if ( proveedoresResource.hasValue() ) {
+    <!-- Header -->
+    <header-title-page [titleHead]="headTitle" />
 
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <!-- Search Bar Modernized -->
+        <div class="relative flex-1 max-w-lg group">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <svg class="h-4 w-4 text-gray-400 group-hover:text-blue-500 transition-colors" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>
+            <input 
+                #txtSearch (input)="onSearch(txtSearch.value)"
+                type="text" 
+                placeholder="Buscar por nombre, NIT o email..."
+                class="block w-full pl-11 pr-4 py-2.5 bg-white border border-gray-100 rounded-2xl text-sm placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/50 transition-all shadow-sm"
+            >
+        </div>
 
-<app-modal [(visible)]="isModalEdit">
-    <div class="relative text-center">
-        <svg class="text-gray-400 dark:text-gray-500 w-11 h-11 mb-3.5 mx-auto" aria-hidden="true" fill="currentColor"
-            viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd"
-                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                clip-rule="evenodd"></path>
-        </svg>
-        <p class="mb-4 text-gray-500 dark:text-gray-300">Estas seguro de eliminar este Proveedor?</p>
+        <!-- Actions -->
+        <div class="flex items-center gap-3">
+            <a routerLink="/panel/compras/proveedores/new-Item"
+                class="inline-flex items-center justify-center px-6 py-2.5 bg-gray-900 hover:bg-black text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 group">
+                <svg class="mr-2 h-4 w-4 transition-transform group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
+                </svg>
+                Nuevo Proveedor
+            </a>
+        </div>
+    </div>
 
-        <div class="flex justify-center items-center space-x-4">
-            <button type="button" (click)="isModalEdit = false" class="py-2 px-3 text-sm font-medium text-gray-500 bg-white rounded-lg border border-gray-200
-                    hover:bg-gray-100 hover:text-gray-900 cursor-pointer">
-                No, cancelar
+    <!-- Table Section -->
+    <div class="space-y-4">
+        <app-table-proveedores [proveedorData]="proveedoresResource.value().proveedores" (delete)="openModal($event)" />
+
+        @if (proveedoresList().length > 0) {
+            <div class="flex items-center justify-between px-2 py-4">
+                <p class="text-xs text-gray-400 font-medium">Directorio de proveedores activo</p>
+                <app-pagination />
+            </div>
+        }
+    </div>
+  }
+
+  <!-- Delete Modal Modernized -->
+  <app-modal [(visible)]="isModalEdit">
+    <div class="p-6 text-center">
+        <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+        </div>
+        <h3 class="text-xl font-black text-gray-900 mb-2">¿Eliminar proveedor?</h3>
+        <p class="text-sm text-gray-500 mb-8 max-w-xs mx-auto">Esta acción eliminará permanentemente al proveedor y todos sus datos asociados. ¿Deseas continuar?</p>
+
+        <div class="flex flex-col sm:flex-row gap-3">
+            <button (click)="isModalEdit.set(false)" 
+                class="flex-1 px-6 py-3 border border-gray-100 text-sm font-bold text-gray-500 rounded-xl hover:bg-gray-50 transition-all">
+                Cancelar
             </button>
-            <button type="submit" (click)="onDelete()" class="py-2 px-3 text-sm font-medium text-center text-white bg-red-600 rounded-lg 
-                    hover:bg-red-700 cursor-pointer">
-                Si, Estoy seguro
+            <button (click)="onDelete()" 
+                class="flex-1 px-6 py-3 bg-red-600 text-white text-sm font-bold rounded-xl hover:bg-red-700 shadow-lg shadow-red-200 transition-all active:scale-95">
+                Confirmar
             </button>
         </div>
     </div>
-</app-modal>
+  </app-modal>
+</div>
+
+<style>
+  .animate-fade-in {
+    animation: fadeIn 0.4s ease-out;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>

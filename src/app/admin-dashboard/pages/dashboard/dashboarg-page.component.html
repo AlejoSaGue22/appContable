@@ -1,16 +1,122 @@
-<div class="space-y-8 p-1">
+<div class="space-y-5 bg-gray-50/50 min-h-screen">
   <header-title-page [titleHead]="headTitle" />
 
   <num-cards-totales [itemsValores]="cardsValor()" />
 
+  @if (advancedData(); as data) {
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-1 space-y-4">
+        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest px-1">Alertas del Sistema</h3>
+        
+        @if (data.alertas.saldosVencidos > 0) {
+          <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-xl flex gap-3">
+            <span class="text-xl">💳</span>
+            <div>
+              <p class="text-indigo-900 text-sm font-bold">Saldos Vencidos</p>
+              <p class="text-indigo-700 text-xs mt-0.5">Hay cobranzas por {{ data.alertas.saldosVencidos }} documentos que requieren gestión.</p>
+            </div>
+          </div>
+        }
+
+        @if (data.alertas.erroresAsiento > 0) {
+          <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl flex gap-3">
+            <span class="text-xl">⚠️</span>
+            <div>
+              <p class="text-amber-900 text-sm font-bold">Errores de Asiento</p>
+              <p class="text-amber-700 text-xs mt-0.5">Hay {{ data.alertas.erroresAsiento }} inconsistencias contables por revisar.</p>
+            </div>
+          </div>
+        }
+
+        @if (data.alertas.facturasRechazadas === 0 && data.alertas.erroresAsiento === 0 && data.alertas.saldosVencidos === 0) {
+          <div class="bg-green-50 border border-green-200 p-4 rounded-xl flex gap-3">
+            <span class="text-xl">✅</span>
+            <div>
+              <p class="text-green-900 text-sm font-bold">Todo en orden</p>
+              <p class="text-green-700 text-xs mt-0.5">No se detectaron anomalías críticas en la operación.</p>
+            </div>
+          </div>
+        }
+
+        <!-- Retention Card -->
+        <div class="bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl p-6 text-white shadow-lg mt-4">
+          <p class="text-[10px] font-bold uppercase tracking-widest opacity-70">Rendimiento Hoy</p>
+            <div class="flex justify-between items-end mt-2">
+              <h4 class="text-2xl font-black">{{ data.hoy.total | currency:'COP':'$':'1.0-0' }}</h4>
+              <span class="text-xs bg-white/20 px-2 py-0.5 rounded">{{ data.hoy.cantidad }} ops.</span>
+            </div>
+            <p class="text-[10px] mt-4 opacity-80 uppercase font-bold">Tasa de Rechazo</p>
+              <div class="mt-1 bg-white/10 rounded-full h-1.5 overflow-hidden">
+                <div class="bg-red-400 h-full" [style.width.%]="data.hoy.tasaRechazo"></div>
+              </div>
+            <p class="text-[10px] mt-1 text-right">{{ data.hoy.tasaRechazo }}% rechazado hoy</p>
+        </div>
+      </div>
+
+      <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between">
+          <div>
+            <div class="flex justify-between items-start">
+              <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Esta Semana</p>
+              <span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded">+{{ data.semana.crecimiento }}%</span>
+            </div>
+            <h4 class="text-3xl font-black text-gray-900 mt-2">{{ data.semana.total | currency:'COP':'$':'1.0-0' }}</h4>
+          </div>
+          <div class="mt-4 flex items-center gap-2">
+             <span class="p-1 bg-gray-100 rounded text-xs">📝 {{ data.semana.cantidad }} Facturas</span>
+          </div>
+        </div>
+
+        <!-- Mes KPI & Proyección -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-blue-100 flex flex-col justify-between relative overflow-hidden">
+          <div class="relative z-10">
+            <div class="flex justify-between items-start">
+              <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Este Mes</p>
+              <span class="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded">+{{ data.mes.crecimiento }}%</span>
+            </div>
+            <h4 class="text-3xl font-black text-gray-900 mt-2">{{ data.mes.total | currency:'COP':'$':'1.0-0' }}</h4>
+          </div>
+          <div class="mt-6 pt-4 border-t border-gray-100">
+            <p class="text-[10px] font-bold text-blue-600 uppercase tracking-widest">Proyección Cierre de Mes</p>
+            <p class="text-xl font-bold text-gray-800">{{ data.mes.proyeccionFinMes | currency:'COP':'$':'1.0-0' }}</p>
+          </div>
+          <!-- Background decoration -->
+          <div class="absolute -right-2 -bottom-2 text-blue-50/50 transform -rotate-12 translate-y-4">
+            <span class="text-6xl font-black">PROY</span>
+          </div>
+        </div>
+
+        <!-- Proyecciones Month Trend Chart Placeholder/Decoration -->
+        <div class="md:col-span-2 bg-gradient-to-r from-indigo-700 to-indigo-900 rounded-2xl p-6 text-white shadow-xl flex items-center justify-between">
+          <div class="space-y-1">
+            <h4 class="text-lg font-bold">Análisis de Tendencia</h4>
+            <p class="text-xs opacity-70">Basado en el comportamiento de facturación de los últimos 30 días.</p>
+          </div>
+          <div class="text-right">
+            <p class="text-[10px] font-bold opacity-60 uppercase">Crecimiento Est.</p>
+            <p class="text-3xl font-black">{{ data.mes.crecimiento }}%</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-    <!-- Flujo de Caja Card -->
     <app-flujo-caja-card [chartData]="chartData()" />
 
-    <!-- Transacciones Recientes Card -->
     <app-transacciones-recientes-card [recentTransactions]="recentTransactions()" />
   </div>
 
-  <!-- Accesos Rápidos -->
   <app-quick-access [accesoRapido]="accesoRapido" />
 </div>
+
+<style>
+  @keyframes pulseSubtle {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.005); }
+  }
+  .animate-pulse-subtle {
+    animation: pulseSubtle 3s ease-in-out infinite;
+  }
+</style>

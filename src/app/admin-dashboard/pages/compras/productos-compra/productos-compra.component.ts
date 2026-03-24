@@ -1,4 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { LoaderComponent } from "src/app/utils/components/loader/loader.component";
 import { PaginationService } from '@shared/components/pagination/pagination.service';
@@ -9,11 +10,12 @@ import { NotificationService } from '@shared/services/notification.service';
 import { ProductosService } from '@dashboard/pages/ventas/services/productos.service';
 import { HeaderTitleProductosCompraComponent } from "./components/header-title-productos-compra/header-title-productos-compra.component";
 import { TableProductosCompra } from "./components/table-productos-compra/table-productos-compra/table-productos-compra.component";
-import { Pagination } from '@shared/components/pagination/pagination';
+import { PaginationComponent } from '@shared/components/pagination/pagination';
 
 @Component({
-   imports: [LoaderComponent, ModalComponents, HeaderTitleProductosCompraComponent, TableProductosCompra, Pagination],
+   imports: [CommonModule, LoaderComponent, ModalComponents, HeaderTitleProductosCompraComponent, TableProductosCompra, PaginationComponent],
    templateUrl: './productos-compra.component.html',
+   standalone: true,
 })
 export class ProductosCompraComponent {
 

@@ -140,8 +140,8 @@ export class ClientsFormPageComponent implements OnInit {
             if (this.clienteID() == 'new-Item' || this.isModal()) {
                 const client = await firstValueFrom(this.clienteService.agregarCliente(formValue as Partial<ClientesFormInterface>));
 
-                console.log(client);
                 if (client.success == false) {
+
                     this.notificationService.error(`Hubo un error al guardar el cliente ${HelpersUtils.getMessageError(client.message)}`, 'Error');
                     return;
                 }

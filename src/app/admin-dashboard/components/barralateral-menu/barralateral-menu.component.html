@@ -1,49 +1,47 @@
 <div class="relative block w-full">
     <div role="button" (click)="toggleMenu()"
-        class="flex items-center w-full p-0 leading-tight mb-1 transition-all rounded-lg outline-none text-start">
+        class="flex items-center w-full p-0 leading-tight mb-1 transition-all rounded-xl outline-none text-start">
         <button 
             [routerLink]="children().length > 0 ? null : menuSection()?.route"
-            routerLinkActive="bg-gray-700"
+            routerLinkActive="!bg-blue-600 !text-white !shadow-lg !shadow-blue-500/30"
+            [routerLinkActiveOptions]="{ exact: true }"
             type="button"
-            class="flex items-center p-2 w-full text-base font-normal text-gray-300 rounded-lg transition duration-75 group 
-                    hover:bg-gray-700 cursor-pointer">
+            class="flex items-center p-3 w-full text-sm font-semibold text-gray-500 rounded-xl transition-all duration-300 group 
+                    hover:bg-white/5 hover:text-white cursor-pointer"
+            [class.bg-white]="isOpen">
 
-                <div class="flex-shrink-0 w-6 h-6 text-gray-200 transition duration-75
-                  dark:text-gray-400 dark:group-hover:text-white" [innerHTML]="menuSection()?.icon">
-                </div>
+            <div class="flex-shrink-0 w-5 h-5 transition-all duration-300 group-hover:scale-110" 
+                 [innerHTML]="menuSection()?.icon"
+                 [class.text-blue-500]="isOpen">
+            </div>
+            
             <span class="flex-1 ml-3 text-left whitespace-nowrap">
                 {{ menuSection()?.title }}
             </span>
 
             @if(children().length > 0){
-                <svg aria-hidden="true" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd">
-                    </path>
+                <svg [class.rotate-180]="isOpen" class="w-4 h-4 transition-transform duration-300 transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                 </svg>
             }
         </button>
     </div>
 
     @if(children().length > 0){
-   <div class="overflow-hidden">
-        <div class="block w-full py-1 font-sans text-sm antialiased font-light leading-normal" [ngClass]="{'max-h-96': isOpen, 'hidden': !isOpen }">
-            <nav class="flex min-w-[240px] flex-col gap-1 p-0 font-sans text-base">
+        <div class="overflow-hidden transition-all duration-300 ease-in-out" 
+             [style.max-height]="isOpen ? '500px' : '0'">
+            <nav class="flex flex-col gap-1 py-1 ml-4 border-l border-white/5 pl-2">
               @for (item of subItems(); track $index) {
-                  <div>
-                      <a [routerLink]="item.route" routerLinkActive="bg-gray-700"
-                          class="flex items-center p-2 pl-11 w-full text-base font-normal rounded-lg transition duration-75 group
-                               hover:bg-gray-700 text-white cursor-pointer">
-                          {{ item.title }}
-                      </a>
-                  </div>
+                <a [routerLink]="item.route" 
+                   routerLinkActive="!text-blue-400 !bg-blue-500/5"
+                   [routerLinkActiveOptions]="{ exact: false }"
+                   class="flex items-center p-2.5 w-full text-[13px] font-medium rounded-lg transition-all duration-200 group
+                        hover:bg-white/5 text-gray-500 hover:text-white cursor-pointer">
+                    <div class="w-1.5 h-1.5 rounded-full bg-current mr-3 opacity-20 group-hover:opacity-100"></div>
+                    {{ item.title }}
+                </a>
               }
             </nav>
-
         </div>
-    </div>
     }
 </div>
-
-
-
-

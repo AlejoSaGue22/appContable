@@ -56,8 +56,9 @@ export class ComprobanteVentasComponent {
             tap((el) => {
                this.totalComprobantes.set(el.meta?.total ?? 0);
                this.totalItems.set(el.meta?.total ?? 0);
-               this.totalPages.set(el.meta?.totalPages ?? 1);
-               this.cardsTotales.set([
+                this.totalPages.set(el.meta?.totalPages ?? 1);
+                this.paginationService.totalItems.set(el.meta?.total ?? 0);
+                this.cardsTotales.set([
                   { title: 'Total Facturas', valor: this.totalComprobantes().toString(), percent: '0' },
                   { title: 'Balance General', valor: '0', percent: '0' },
                ]);
@@ -72,7 +73,8 @@ export class ComprobanteVentasComponent {
    onPageChange(page: number): void {
       // Page changes are handled by PaginationService via query params
       // This would require navigation, which is typically handled by the pagination component
-      console.log('Page change requested:', page);
+// Removed log
+
    }
 
    formatCurrency(value: number): string {

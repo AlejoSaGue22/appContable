@@ -15,7 +15,7 @@ export class OptionBarralateral {
   router = inject(Router);
 
   menuItemsOther = input<MenuItem[]>();
-  user = this.authService.user();
+  user = this.authService.user;
 
   activeMenu: string | null = 'Dashboard';
 
@@ -24,9 +24,7 @@ export class OptionBarralateral {
     await this.router.navigateByUrl("/")
   }
 
-  constructor() {
-    console.log(this.user);
-  }
+  constructor() {}
 
   toggleActiveMenu(menuId: string) {
     if (this.activeMenu === menuId) {

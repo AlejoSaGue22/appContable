@@ -26,7 +26,7 @@
             </button>
           </div>
           <button
-            class="px-3 py-2 bg-blue-500 text-white text-sm font-medium rounded-md hover:bg-blue-600 flex items-center cursor-pointer"
+            class="px-3 py-2 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600 flex items-center cursor-pointer"
             [routerLink]="rutaLink() + `new-Item`">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd"
@@ -80,7 +80,7 @@
             <td class="text-center">
 
               <button type="button" [routerLink]="rutaLink() + item.id"
-                class="font-medium text-sm px-1 py-1 cursor-pointer">
+                class="text-sm px-1 py-1 cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" class="hover:text-gray-400" width="24" height="24"
                   viewBox="0 0 24 24">
                   <g fill="currentColor" fill-rule="evenodd" clip-rule="evenodd">
@@ -91,7 +91,7 @@
                   </g>
                 </svg>
               </button>
-              <button type="button" (click)="openModal(item.id)" class="font-medium text-sm px-1 py-2.5 cursor-pointer">
+              <button type="button" (click)="openModal(item.id)" class="text-sm px-1 py-2.5 cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" class="hover:text-red-400 text-red-500" width="24" height="24"
                   viewBox="0 0 24 24">
                   <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">

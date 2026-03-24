@@ -114,7 +114,6 @@ export class ProductosCompraFormsComponent {
         );
 
         if (product.success == false) {
-          console.log(product.error);
           this.notificacionService.error(
             `Hubo un error al guardar este item ${product.error.message}`,
             'Error',
@@ -122,6 +121,7 @@ export class ProductosCompraFormsComponent {
           );
           return;
         }
+
 
         this.notificacionService.success(
           'Producto actualizado correctamente',

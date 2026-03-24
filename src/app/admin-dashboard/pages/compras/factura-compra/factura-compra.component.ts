@@ -1,21 +1,23 @@
 import { Component, inject, signal } from '@angular/core';
-import { HeaderInput } from "@dashboard/components/header-title-page/header-title-page.component";
+import { CommonModule } from '@angular/common';
 import { CardsTotales } from "@shared/components/num-cards-totales/num-cards-totales.component";
 import { PaginationService } from '@shared/components/pagination/pagination.service';
+import { PaginationComponent } from '@shared/components/pagination/pagination';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { tap } from 'rxjs';
 import { LoaderComponent } from "src/app/utils/components/loader/loader.component";
-import { ErrorPages } from "@shared/components/error-pages/error-pages.component";
-import { HeaderTitleComprasComponent } from "./components/header-title-compras/header-title-compras.component";
+
 import { TableComprasComponent, PurchaseInvoiceFilters } from "./components/table-compras/table-compras.component";
 import { FacturaCompraService } from '../services/factura-compra.service';
 import { ModalComponent } from "@shared/components/modal/modal.component";
 import { ResponseResult } from '@shared/interfaces/services.interfaces';
 import { NotificationService } from '@shared/services/notification.service';
+import { HeaderInput, HeaderTitlePageComponent } from '@dashboard/components/header-title-page/header-title-page.component';
+import { ErrorPages } from "@shared/components/error-pages/error-pages.component";
 
 @Component({
    selector: 'app-factura-compra',
-   imports: [LoaderComponent, ErrorPages, HeaderTitleComprasComponent, TableComprasComponent, ModalComponent],
+   imports: [CommonModule, LoaderComponent, TableComprasComponent, ModalComponent, HeaderTitlePageComponent, ErrorPages],
    templateUrl: './factura-compra.component.html',
    standalone: true
 })
@@ -59,6 +61,7 @@ export class FacturaCompraComponent {
          tap((el) => {
             this.totalCompras.set(el.data.length);
             this.totalItems.set(el.meta?.total ?? 0);
+            this.paginationService.totalItems.set(el.meta?.total ?? 0);
             this.totalPages.set(el.meta?.totalPages ?? 1);
             this.cardsTotales.set([
                { title: 'Total Facturas Compra', valor: this.totalCompras().toString(), percent: '0' },
@@ -69,12 +72,11 @@ export class FacturaCompraComponent {
    })
 
    onFilterChange(filters: PurchaseInvoiceFilters): void {
-      console.log(filters);
       this.filters.set(filters);
    }
 
    onPageChange(page: number): void {
-      console.log('Page change requested:', page);
+      // Log removed
    }
 
    onAction(): void {

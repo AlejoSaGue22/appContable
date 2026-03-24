@@ -7,7 +7,7 @@ import { PaginationService } from './pagination.service';
   imports: [RouterLink],
   templateUrl: './pagination.html',
 })
-export class Pagination { 
+export class PaginationComponent { 
 
   paginationService = inject(PaginationService);
 

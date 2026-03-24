@@ -205,10 +205,10 @@ export class ProveedoresFormsPageComponent implements OnInit {
 
         this.loaderService.hide();
         if (client.success == false) {
-          console.log(client.error);
           this.notificationService.error(`Hubo un error al guardar el proveedor ${HelpersUtils.getMessageError(client.message)}`, 'Error');
           return;
         }
+
 
         this.notificationService.success("Proveedor guardado exitosamente", 'Éxito');
 
@@ -222,10 +222,10 @@ export class ProveedoresFormsPageComponent implements OnInit {
         const client = await firstValueFrom(this.proveedoresService.updateProveedor(this.proveedorId(), formValue as Partial<ProveedoresInterface>));
 
         if (client.success == false) {
-          console.log(client.error);
           this.notificationService.error(`Hubo un error al guardar el proveedor ${HelpersUtils.getMessageError(client.message)}`, 'Error');
           return;
         }
+
 
         this.notificationService.success("Proveedor actualizado exitosamente", 'Éxito');
         await this.router.navigateByUrl('/panel/compras/proveedores');

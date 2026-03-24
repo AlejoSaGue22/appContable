@@ -5,14 +5,21 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { CuentasContablesService } from '../services/cuentas-contables.service';
 import { LoaderComponent } from '@utils/components/loader/loader.component';
 
+import { HeaderInput, HeaderTitlePageComponent } from '@dashboard/components/header-title-page/header-title-page.component';
+
 @Component({
   selector: 'app-cuentas-contables',
   standalone: true,
-  imports: [CommonModule, LoaderComponent, CurrencyPipe],
+  imports: [CommonModule, LoaderComponent, CurrencyPipe, HeaderTitlePageComponent],
   templateUrl: './cuentas-contables.component.html'
 })
-export default class CuentasContablesComponent {
+export class CuentasContablesComponent {
   private cuentasService = inject(CuentasContablesService);
+
+  headTitle: HeaderInput = {
+    title: 'Catálogo de Cuentas Contables',
+    slog: 'Visualización jerárquica del plan único de cuentas (PUC)'
+  }
 
   cuentasResource = rxResource({
     loader: () => this.cuentasService.getCuentasContables()

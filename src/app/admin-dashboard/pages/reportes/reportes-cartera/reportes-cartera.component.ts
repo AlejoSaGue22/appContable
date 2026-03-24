@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule, CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
+import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HeaderTitlePageComponent, HeaderInput } from '@dashboard/components/header-title-page/header-title-page.component';
 import { AgingReporte, HistorialPagosResponse, ResumenCartera } from '@dashboard/interfaces/pagos-interface';
@@ -10,7 +10,7 @@ type VistaActiva = 'resumen' | 'aging-cobrar' | 'aging-pagar' | 'historial';
 @Component({
   selector: 'app-reporte-cartera',
   standalone: true,
-  imports: [CommonModule, FormsModule, CurrencyPipe, DatePipe, DecimalPipe, HeaderTitlePageComponent],
+  imports: [CommonModule, FormsModule, CurrencyPipe, DatePipe, HeaderTitlePageComponent],
   templateUrl: './reportes-cartera.component.html',
 })
 export class ReportesCarteraComponent implements OnInit {
@@ -71,9 +71,10 @@ export class ReportesCarteraComponent implements OnInit {
   cargarResumen(): void {
     this.loadingResumen = true;
     this.svc.getResumenCartera().subscribe({
-      next:  d  => { console.log('Resumen: ', d); this.resumen = d; this.loadingResumen = false; },
+      next:  d  => { this.resumen = d; this.loadingResumen = false; },
       error: () => { this.loadingResumen = false; },
     });
+
   }
 
   cargarAgingCobrar(): void {

@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { DashboardResponse } from '@dashboard/interfaces/dashboard.interface';
+import { DashboardHistory, DashboardResponse, RecentTransaction } from '@dashboard/interfaces/dashboard.interface';
 import { environment } from 'src/app/environments/environment';
+import { DashboardAvanzadoKPIs } from '../../../interfaces/reportes-avanzados.interface';
 
 const baseUrl = environment.baseUrl;
 
@@ -14,5 +15,9 @@ export class DashboardService {
 
     getSummary(): Observable<DashboardResponse> {
         return this.http.get<DashboardResponse>(`${baseUrl}/dashboard/summary`);
+    }
+
+    getDashboardAvanzado(): Observable<DashboardAvanzadoKPIs> {
+        return this.http.get<DashboardAvanzadoKPIs>(`${baseUrl}/reportes/dashboard-avanzado`);
     }
 }

@@ -201,6 +201,7 @@ export class InvoiceDetailsComponent {
 
   exportPDF(): void {
     // Implementar exportación a PDF
-    console.log('Exportar a PDF');
+    // Log removed
+
   }
 }

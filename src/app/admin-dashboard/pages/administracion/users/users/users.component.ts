@@ -12,7 +12,7 @@ import { LoaderComponent } from "src/app/utils/components/loader/loader.componen
 import { ErrorPages } from "@shared/components/error-pages/error-pages.component";
 import { modalOpen } from '@shared/interfaces/services.interfaces';
 import { ModalComponents } from '@shared/components/modal.components/modal.components';
-import { Pagination } from '@shared/components/pagination/pagination';
+import { PaginationComponent } from '@shared/components/pagination/pagination';
 import { HelpersUtils } from '@utils/helpers.utils';
 import { AuthService } from 'src/app/auth/services/auth.service';
 
@@ -24,7 +24,7 @@ import { AuthService } from 'src/app/auth/services/auth.service';
     LoaderComponent,
     ErrorPages,
     ModalComponents,
-    Pagination,
+    PaginationComponent,
     ReactiveFormsModule
   ],
   templateUrl: './users.component.html',

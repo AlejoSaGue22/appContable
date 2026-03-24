@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
-import CuentasContablesComponent from './cuentas-contables/cuentas-contables.component';
 import CuentasBancariasComponent from './cuentas-bancarias/cuentas-bancarias.component';
+import { CuentasContablesComponent } from './cuentas-contables/cuentas-contables.component';
 
 export default [
     {

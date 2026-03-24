@@ -168,7 +168,8 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                 this.loaderService.hide();
             },
             error: (error) => {
-                console.log("Error Comprobantes Compras: ", error);
+                // Log removed
+
                 this.loaderService.hide();
             }
         });
@@ -179,7 +180,8 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         this.facturaService.getFacturaCompraById(id).subscribe({
             next: (factura) => {
                 if (factura.success) {
-                    console.log("Factura Compra: ", factura);
+                    // Log removed
+
                     const invoice = factura.data.data[0]!;
 
                     while (this.items.length > 0) {
@@ -200,7 +202,8 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                         });
                     });
 
-                    console.log("Factura Compra 222: ", invoice)
+                    // Log removed
+
 
                     this.formCompra.patchValue({
                         proveedorSearch: invoice.proveedor?.nombre,
@@ -223,9 +226,9 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                 }
             },
             error: (error) => {
-                console.log("Error Comprobantes Compras: ", error);
                 this.loaderService.hide();
             }
+
         });
     }
 
@@ -248,7 +251,8 @@ export class FacturaCompraFormsPageComponent implements OnInit {
 
         const itemVal = this.productosItemsForm.value;
         const subtotal = (itemVal.quantity || 0) * (itemVal.unitPrice || 0);
-        console.log(itemVal);
+        // Log removed
+
         const newItem = this.fb.group({
             productoId: [itemVal.producto?.id],
             productoNombre: [itemVal.producto?.nombre],
@@ -295,8 +299,9 @@ export class FacturaCompraFormsPageComponent implements OnInit {
 
     // Computeds for Totals
     resumenTotales = computed(() => {
-        console.log('this.formCompra.controls.items.value', this.formCompra.controls.items.value);
-        console.log('Entro al computed');
+        // Log removed
+        // Log removed
+
         const items = this.formCompra.controls.items.value;
         let subtotal = 0;
         let impuestos = 0;
@@ -367,7 +372,8 @@ export class FacturaCompraFormsPageComponent implements OnInit {
             // retenciones: this.totales.retenciones,
         };
 
-        console.log(invoiceData);
+        // Log removed
+
         if (this.facturaId() == 'new-Item') {
             this.facturaService.createFacturaCompra(invoiceData).subscribe((response) => {
                 this.loading.set(false);
@@ -380,12 +386,12 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                     return;
                 }
 
-                console.log('✅ Respuesta del backend:', response);
                 this.notificationService.success(
                     'Factura creada con exito',
                     'Accion Completada',
                     5000
                 );
+
 
                 setTimeout(() => {
                     this.router.navigateByUrl('/panel/compras/purchases')
@@ -410,7 +416,8 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                 return;
             }
 
-            console.log('✅ Respuesta del backend:', response);
+            // Log removed
+
             this.notificationService.success(
                 'Factura actualizada con exito',
                 'Accion Completada',
@@ -436,7 +443,8 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         // Add new provider to list
         this.proveedoresList.update(list => [...list, newProvider]);
 
-        console.log(newProvider);
+        // Log removed
+
 
         // Select the new provider in the form
         this.formCompra.patchValue({
