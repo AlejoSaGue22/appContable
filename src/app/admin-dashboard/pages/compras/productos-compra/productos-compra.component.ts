@@ -13,7 +13,8 @@ import { TableProductosCompra } from "./components/table-productos-compra/table-
 import { PaginationComponent } from '@shared/components/pagination/pagination';
 
 @Component({
-   imports: [CommonModule, LoaderComponent, ModalComponents, HeaderTitleProductosCompraComponent, TableProductosCompra, PaginationComponent],
+   imports: [CommonModule, LoaderComponent, ModalComponents, HeaderTitleProductosCompraComponent, TableProductosCompra, 
+            PaginationComponent],
    templateUrl: './productos-compra.component.html',
    standalone: true,
 })

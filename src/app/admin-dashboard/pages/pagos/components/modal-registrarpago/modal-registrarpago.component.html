@@ -124,7 +124,7 @@
                 <option disabled>Cargando...</option>
               }
               @for (c of cuentasBancarias; track c.id) {
-                <option [value]="c.id">{{ c.nombre }} — {{ c.banco }}</option>
+                <option [value]="c.id">{{ c.nombre }} — {{ c.numeroCuenta }}</option>
               }
         </select>
         @if (form.get('cuentaBancariaId')?.hasError('required') && form.get('cuentaBancariaId')?.touched) {

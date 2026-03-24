@@ -1,6 +1,6 @@
 <div class="space-y-6 animate-fade-in">
   @if ( proveedoresResource.isLoading() ) {
-    <div class="flex flex-col justify-center items-center h-80 space-y-4">
+    <div class="flex flex-col gap-3 justify-center items-center h-screen">
         <app-loader />
         <p class="text-sm text-gray-400 animate-pulse">Cargando directorio de proveedores...</p>
     </div>
@@ -11,7 +11,6 @@
     <header-title-page [titleHead]="headTitle" />
 
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <!-- Search Bar Modernized -->
         <div class="relative flex-1 max-w-lg group">
             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                 <svg class="h-4 w-4 text-gray-400 group-hover:text-blue-500 transition-colors" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -26,7 +25,6 @@
             >
         </div>
 
-        <!-- Actions -->
         <div class="flex items-center gap-3">
             <a routerLink="/panel/compras/proveedores/new-Item"
                 class="inline-flex items-center justify-center px-6 py-2.5 bg-gray-900 hover:bg-black text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 group">

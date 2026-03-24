@@ -3,7 +3,6 @@
   
   <!-- Modernized Filters Panel -->
   <div class="bg-white/80 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100 p-6 overflow-hidden transition-all duration-300">
-    <!-- Header/Quick Search -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div class="relative flex-1 max-w-md group">
         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -23,7 +22,7 @@
 
       <div class="flex items-center gap-3">
         <button (click)="toggleFilters()" 
-          class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all border border-gray-100 hover:bg-gray-50 group"
+          class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm transition-all border cursor-pointer border-gray-100 hover:bg-gray-50 group"
           [class.bg-blue-50]="showFilters()"
           [class.text-blue-600]="showFilters()">
           <svg class="h-4 w-4 transition-transform group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -38,14 +37,14 @@
         </button>
 
         <button (click)="applyFilters()" 
-          class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-100 transition-all active:scale-95">
+          class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm cursor-pointer rounded-xl shadow-lg shadow-blue-100 transition-all active:scale-95">
           Consultar
         </button>
 
         @if (activeFiltersCount() > 0) {
           <button (click)="clearFilters()" 
-            class="p-2 text-gray-400 hover:text-red-500 transition-colors"
-            title="Limpiar filtros">
+            class="p-2 text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+            title="Limpiar filtros">  
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg>
@@ -57,52 +56,51 @@
     <!-- Advanced Filters Content -->
     @if (showFilters()) {
       <div class="mt-6 pt-6 border-t border-gray-50 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-slide-down">
-        <!-- Numero Factura -->
-        <div class="space-y-2">
-          <label class="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1">Nº Comprobante</label>
-          <input type="text" 
-            [ngModel]="numeroFactura()" 
-            (ngModelChange)="numeroFactura.set($event)"
-            placeholder="Ej: FAC-001"
-            class="block w-full px-4 py-2 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:border-blue-500/50 transition-all"
-          />
-        </div>
+          <!-- Numero Factura -->
+          <div class="space-y-2">
+            <label class="text-[10px] text-gray-400 ml-1">Nº Comprobante</label>
+            <input type="text" 
+              [ngModel]="numeroFactura()" 
+              (ngModelChange)="numeroFactura.set($event)"
+              placeholder="Ej: FAC-001"
+              class="block w-full px-4 py-2 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:border-blue-500/50 transition-all"
+            />
+          </div>
 
-        <!-- Estado -->
-        <div class="space-y-2">
-          <label class="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1">Estado Transacción</label>
-          <select [ngModel]="status()" (ngModelChange)="status.set($event)"
-            class="block w-full px-4 py-2 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:border-blue-500/50 transition-all appearance-none cursor-pointer">
-            @for (st of statuses; track st.value) {
-              <option [value]="st.value">{{ st.label }}</option>
-            }
-          </select>
-        </div>
+          <!-- Estado -->
+          <div class="space-y-2">
+            <label class="text-[10px] text-gray-400 ml-1">Estado Transacción</label>
+            <select [ngModel]="status()" (ngModelChange)="status.set($event)"
+              class="block w-full px-4 py-2 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:border-blue-500/50 transition-all appearance-none cursor-pointer">
+              @for (st of statuses; track st.value) {
+                <option [value]="st.value">{{ st.label }}</option>
+              }
+            </select>
+          </div>
 
-        <!-- Fecha Inicio -->
-        <div class="space-y-2">
-          <label class="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1">Desde</label>
-          <input type="date" [ngModel]="startDate()" (ngModelChange)="startDate.set($event)"
-            class="block w-full px-4 py-2 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:border-blue-500/50 transition-all"
-          />
-        </div>
+          <!-- Fecha Inicio -->
+          <div class="space-y-2">
+            <label class="text-[10px] text-gray-400 ml-1">Desde</label>
+            <input type="date" [ngModel]="startDate()" (ngModelChange)="startDate.set($event)"
+              class="block w-full px-4 py-2 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:border-blue-500/50 transition-all"
+            />
+          </div>
 
-        <!-- Fecha Fin -->
-        <div class="space-y-2">
-          <label class="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1">Hasta</label>
-          <input type="date" [ngModel]="endDate()" (ngModelChange)="endDate.set($event)"
-            class="block w-full px-4 py-2 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:border-blue-500/50 transition-all"
-          />
-        </div>
+          <!-- Fecha Fin -->
+          <div class="space-y-2">
+            <label class="text-[10px] text-gray-400 ml-1">Hasta</label>
+            <input type="date" [ngModel]="endDate()" (ngModelChange)="endDate.set($event)"
+              class="block w-full px-4 py-2 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:border-blue-500/50 transition-all"
+            />
+          </div>
       </div>
     }
   </div>
 
-  <!-- Modernized Table Card -->
   <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
     <div class="overflow-x-auto">
       <table class="w-full text-left text-sm">
-        <thead class="bg-gray-50/50 text-[11px] uppercase tracking-[0.1em] text-gray-400 border-b border-gray-100">
+        <thead class="bg-gray-50/50 text-[11px] text-gray-400 border-b border-gray-100">
           <tr>
             <th scope="col" class="px-8 py-5">Fecha Emisión</th>
             <th scope="col" class="px-8 py-5">N° Comprobante</th>

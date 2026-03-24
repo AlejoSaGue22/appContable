@@ -154,10 +154,23 @@ export interface ResumenCartera {
 // ── CuentaBancaria ─────────────────────────────────────────────────────────
 
 export interface CuentaBancaria {
-  id:         number;
-  nombre:     string;
-  banco:      string;
-  tipoCuenta: 'corriente' | 'ahorro';
+  activa: boolean;
+  banco: {
+    id: string;
+    nombre: string;
+    codigo: string | null;
+    nit: string;
+  };
+  codigoCuentaContable: string;
+  createdAt: string;
+  id: string;
+  nombre: string;
+  numeroCuenta: string;
+  observaciones: string | null;
+  saldoActual: number;
+  saldoInicial: number;
+  tipoCuenta: string;
+  updatedAt: string;
 }
 
 // ── DTOs de formulario ────────────────────────────────────────────────────

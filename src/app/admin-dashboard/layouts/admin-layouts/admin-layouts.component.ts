@@ -36,7 +36,7 @@ export interface MenuOption {
 export default class AdminLayoutsComponent implements OnInit, OnDestroy {
 
   private menuService = inject(MenuService);
-  private authService = inject(AuthService);
+  authService = inject(AuthService);
   private router = inject(Router);
 
   activeMenu: string | null = 'Dashboard';
@@ -50,7 +50,6 @@ export default class AdminLayoutsComponent implements OnInit, OnDestroy {
   expandedPanels = signal<Set<string>>(new Set());
   activeRoute = signal<string>('');
   isMobileMenuOpen = signal<boolean>(false);
-
 
   ngOnInit(): void {
     if (this.authService.authStatus() === 'authenticated' && this.menuItems().length === 0) {
@@ -66,7 +65,6 @@ export default class AdminLayoutsComponent implements OnInit, OnDestroy {
         // this.activeRoute.set(event.url);
         this.updateExpandedPanels(event.url);
       });
-
 
   }
 

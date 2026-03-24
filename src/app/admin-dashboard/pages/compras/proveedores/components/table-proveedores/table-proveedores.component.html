@@ -32,7 +32,7 @@
         @for (proveedor of proveedorData(); track proveedor.id) {
             <tr class="hover:bg-blue-50/30 transition-all duration-200 group">
               <td class="px-8 py-4 font-mono text-xs text-gray-900">
-                <span class="text-blue-600 font-medium">{{ proveedor.tipoDocumentoRel.abreviatura }}</span> {{ proveedor.identificacion }}
+                <span class="font-medium">{{ proveedor.tipoDocumentoRel.abreviatura }}</span> - {{ proveedor.identificacion }}
               </td>
               <td class="px-8 py-4">
                 <span class="text-gray-900">{{ proveedor.razonSocial || proveedor.nombre }}</span>

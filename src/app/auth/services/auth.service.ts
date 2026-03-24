@@ -146,7 +146,7 @@ export class AuthService {
     const token = sessionStorage.getItem('token');
     if (!token) return of(false);
 
-    return this.http.get<LoginResponse>(`${baseURL}/auth/check-status`).pipe(
+    return this.http.get<LoginResponse>(`${baseURL}/auth/refresh`).pipe(
       map((resp) => {
         return this.handleAuthSuccess(resp, false);
       }),

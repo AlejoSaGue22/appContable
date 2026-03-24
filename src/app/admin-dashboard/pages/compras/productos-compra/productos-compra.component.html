@@ -1,20 +1,21 @@
 @if ( productorxResource.isLoading() ) {
-<div class="flex justify-center items-center h-screen">
+<div class="flex flex-col gap-3 justify-center items-center h-screen">
     <app-loader />
+    <p class="text-sm text-gray-400 animate-pulse">Cargando directorio de productos...</p>
 </div>
 }
 
 
 @if ( productorxResource.hasValue() ) {
-<div class="p-4 sm:p-6 lg:p-8">
-    <app-header-title-productos-compra />
+    <div class="p-4 sm:p-6 lg:p-8">
+        <app-header-title-productos-compra />
 
-    <app-table-productos-compra [productoData]="productorxResource.value().articulos" (delete)="openModal($event)" />
-    
-    <div class="mt-4">
-        <app-pagination />
+        <app-table-productos-compra [productoData]="productorxResource.value().articulos" (delete)="openModal($event)" />
+        
+        <div class="mt-4">
+            <app-pagination />
+        </div>
     </div>
-</div>
 }
 
 <app-modal [(visible)]="isModalEdit">

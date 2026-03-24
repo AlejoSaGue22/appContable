@@ -24,7 +24,6 @@ export interface PurchaseInvoiceFilters {
 export class TableComprasComponent {
   compraData = input<any[]>([]);
 
-  // Input for active filters to restore state if component is recreated
   activeFilters = input<PurchaseInvoiceFilters>({});
 
   // Pagination inputs

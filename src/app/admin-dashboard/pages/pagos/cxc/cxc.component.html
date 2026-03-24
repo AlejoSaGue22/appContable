@@ -14,7 +14,7 @@
         <!-- Header tabla -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <h3 class="text-lg font-medium text-slate-700 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" viewBox="0 0 24 24"
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24"
                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line>
               <line x1="8" y1="18" x2="21" y2="18"></line>
@@ -92,7 +92,7 @@
                     [class.bg-red-50]="item.paymentStatus === 'vencido'">
 
                   <td class="p-4">
-                    <span class="font-mono text-sm font-semibold text-blue-600">
+                    <span class="font-mono text-sm font-semibold">
                       {{ item.numeroFactura }}
                     </span>
                   </td>

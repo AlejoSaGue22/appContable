@@ -13,4 +13,4 @@ export interface HeaderInput {
 export class HeaderTitlePageComponent {
 
     titleHead = input.required<HeaderInput>()
- }
+}

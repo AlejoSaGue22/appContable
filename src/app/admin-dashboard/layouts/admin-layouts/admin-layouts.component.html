@@ -26,7 +26,7 @@
             <app-menu-perfil />
 
             <nav class="px-4 mt-6 space-y-1">
-                <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-4 mb-4 opacity-50">Menú Principal</p>
+                <p class="text-[10px] font-bold text-gray-200 uppercase tracking-widest px-4 mb-4 opacity-50">Menú Principal</p>
                 
                 @for (option of menuItems(); track $index) {
                     <app-barralateral-menu [title]="option.title" 
@@ -52,11 +52,12 @@
                 <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white text-xs font-bold ring-2 ring-blue-500/20 shadow-lg capitalize">
                   {{ currentUser()?.fullName?.charAt(0) || 'U' }}
                 </div>
-                <div class="flex-1 min-w-0">
+                <div class="flex-1 min-w-0">    
                     <p class="text-xs font-bold text-white truncate">{{ currentUser()?.fullName }}</p>
                     <p class="text-[10px] text-gray-500 truncate">{{ currentUser()?.email }}</p>
                 </div>
-                <button class="opacity-0 group-hover:opacity-100 transition-opacity text-gray-500 hover:text-red-400">
+                <button class="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity text-gray-500 hover:text-red-400"
+                    (click)="authService.logout()">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                     </svg>

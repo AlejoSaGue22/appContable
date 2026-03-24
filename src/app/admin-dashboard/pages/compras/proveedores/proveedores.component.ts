@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { HeaderInput, HeaderTitlePageComponent } from "@dashboard/components/header-title-page/header-title-page.component";
+import { HeaderInput } from "@dashboard/components/header-title-page/header-title-page.component";
 import { CardsTotales } from "@shared/components/num-cards-totales/num-cards-totales.component";
 
 import { NotificationService } from '@shared/services/notification.service';
@@ -15,10 +15,13 @@ import { ModalComponent } from "@shared/components/modal/modal.component";
 
 import { ProveedoresRequest } from '@dashboard/interfaces/proveedores-interface';
 import { PaginationComponent } from '@shared/components/pagination/pagination';
+import { HeaderTitlePageComponent } from "@dashboard/components/header-title-page/header-title-page.component";
+import { HeaderTitleProveedoresComponent } from './components/header-title-proveedores/header-title-proveedores.component';
+import { RouterLink } from '@angular/router';
 
 @Component({
-   selector: 'app-proveedores',
-   imports: [LoaderComponent, HeaderTitlePageComponent, TableProveedoresComponent, ModalComponent, PaginationComponent],
+   imports: [LoaderComponent, RouterLink, ErrorPages, HeaderTitleProveedoresComponent, TableProveedoresComponent, ModalComponent, 
+            PaginationComponent, HeaderTitlePageComponent],
    templateUrl: './proveedores.component.html',
    standalone: true
 })
