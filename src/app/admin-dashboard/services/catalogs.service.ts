@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/app/environments/environment';
-import { CategoryArticle, DocumentType, PaymentMethod, SalesChannel, UnitMeasure } from '../interfaces/catalogs-interface';
+import { CategoryArticle, CategoryArticleResponse, DocumentType, PaymentMethod, SalesChannel, UnitMeasure } from '../interfaces/catalogs-interface';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +27,13 @@ export class CatalogsService {
     return this.http.get<UnitMeasure[]>(`${this.baseUrl}/catalogs/units-measure`);
   }
 
-  findAllCategoriesArticles(): Observable<CategoryArticle[]> {
-    return this.http.get<CategoryArticle[]>(`${this.baseUrl}/catalogs/categories-articles`);
+  findAllCategoriesArticles(limit: number = 10, offset: number = 0): Observable<CategoryArticleResponse> {
+    return this.http.get<CategoryArticleResponse>(`${this.baseUrl}/catalogs/categories-articles`, {
+      params: { limit, offset }
+    });
+  }
+
+  updateCategoryArticle(id: string, category: Partial<CategoryArticle>): Observable<any> {
+    return this.http.patch(`${this.baseUrl}/catalogs/categories-articles/${id}`, category);
   }
 }

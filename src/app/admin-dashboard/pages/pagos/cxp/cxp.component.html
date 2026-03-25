@@ -35,7 +35,7 @@
           </div>
 
           <select [formControl]="filtroEstado"
-            class="text-sm border border-slate-200 rounded-md py-2 px-3 focus:outline-none
+            class="text-sm border border-slate-200 rounded-md py-2 focus:outline-none
                    focus:border-slate-400 hover:border-slate-400 shadow-sm cursor-pointer bg-transparent">
             <option value="">Todos los estados</option>
             <option value="pendiente">Pendiente</option>
@@ -117,7 +117,7 @@
                     {{ item.totalPagado | currency:'COP':'symbol-narrow':'1.0-0' }}
                   </td>
                   <td class="p-4 text-right">
-                    <span class="text-sm font-bold text-slate-800">
+                    <span class="text-sm text-slate-800">
                       {{ item.saldoPendiente | currency:'COP':'symbol-narrow':'1.0-0' }}
                     </span>
                   </td>

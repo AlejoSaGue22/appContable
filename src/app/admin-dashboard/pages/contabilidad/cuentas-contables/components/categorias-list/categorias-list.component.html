@@ -1,0 +1,91 @@
+<div class="overflow-x-auto">
+    <table class="w-full text-sm text-left">
+        <thead class="text-[11px] text-gray-400 uppercase tracking-[0.15em] bg-gray-50/50 border-b border-gray-100 dark:bg-gray-700 dark:border-gray-600">
+            <tr>
+                <th scope="col" class="px-8 py-5">Información de Categoría</th>
+                <th scope="col" class="px-8 py-5">Configuración Contable (Principal / IVA)</th>
+                <th scope="col" class="px-8 py-5 text-center">Vínculos</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+            @for (category of categories(); track category.id) {
+                <tr class="hover:bg-blue-50/20 transition-all duration-200 group">
+                    <td class="px-8 py-6 align-top">
+                        <div class="flex flex-col gap-1.5">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-bold rounded uppercase tracking-tighter border border-blue-100">{{ category.codigo }}</span>
+                                <span class="px-2 py-0.5 bg-gray-50 text-gray-500 text-[10px] font-semibold rounded uppercase tracking-tighter border border-gray-100">{{ category.tipo }}</span>
+                            </div>
+                            <span class="font-bold text-gray-900 line-clamp-1">{{ category.nombre }}</span>
+                            @if (category.descripcion) {
+                                <p class="text-[11px] text-gray-400 line-clamp-2 max-w-xs">{{ category.descripcion }}</p>
+                            }
+                        </div>
+                    </td>
+                    <td class="px-8 py-6">
+                        <div class="flex flex-col gap-4 max-w-sm">
+                            <!-- Cuenta Principal -->
+                            <div class="space-y-1.5">
+                                <label class="text-[9px] text-gray-400 font-bold uppercase tracking-widest ps-1">Cuenta Principal</label>
+                                <div class="relative group/select">
+                                    <select class="w-full text-xs border border-gray-200 rounded-xl p-2.5 bg-gray-50/50 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all appearance-none pr-10 cursor-pointer group-hover/select:bg-white"
+                                            [ngModel]="category.cuentaContable?.id"
+                                            (ngModelChange)="updateCategoryAccount(category, $event, 'main')">
+                                        <option value="" disabled selected>— Vincular cuenta principal —</option>
+                                        @for (cuenta of cuentasAceptanMovimiento(); track cuenta.id) {
+                                            <option [value]="cuenta.id">{{ cuenta.codigo }} · {{ cuenta.nombre }}</option>
+                                        }
+                                    </select>
+                                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Cuenta IVA -->
+                            <div class="space-y-1.5">
+                                <label class="text-[9px] text-gray-400 font-bold uppercase tracking-widest ps-1">Impuesto (IVA)</label>
+                                <div class="relative group/select">
+                                    <select class="w-full text-xs border border-gray-200 rounded-xl p-2.5 bg-gray-50/50 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all appearance-none pr-10 cursor-pointer group-hover/select:bg-white"
+                                            [ngModel]="category.cuentaIva?.id"
+                                            (ngModelChange)="updateCategoryAccount(category, $event, 'iva')">
+                                        <option value="" disabled selected>— Vincular cuenta IVA —</option>
+                                        @for (cuenta of cuentasAceptanMovimiento(); track cuenta.id) {
+                                            <option [value]="cuenta.id">{{ cuenta.codigo }} · {{ cuenta.nombre }}</option>
+                                        }
+                                    </select>
+                                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-8 py-6 align-middle">
+                        <div class="flex flex-col items-center gap-2">
+                            @if (category.cuentaContable?.id && category.cuentaIva?.id) {
+                                <div class="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center text-green-600 border border-green-100 shadow-sm" title="Vínculos completos">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <span class="text-[9px] font-bold text-green-600 uppercase tracking-tighter">Completo</span>
+                            } @else {
+                                <div class="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center text-amber-500 border border-amber-100 shadow-sm" title="Pendiente de vinculación">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                </div>
+                                <span class="text-[9px] font-bold text-amber-500 uppercase tracking-tighter">Incompleto</span>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

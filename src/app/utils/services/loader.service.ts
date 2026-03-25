@@ -6,9 +6,13 @@ import { computed, Injectable, signal } from '@angular/core';
 export class LoaderService {
 
   private loadindState = signal<boolean>(false);
+  private message = signal<string>('Cargando...');
+  
   getLoading = computed(()=> this.loadindState());
+  getMessage = computed(() => this.message());
 
-  show(){
+  show(msg: string = 'Cargando...'){
+    this.message.set(msg);
     this.loadindState.set(true);
   }
 

@@ -74,6 +74,31 @@
     </main>
 </div>
 
+<!-- Glassmorphic Loader Overlay -->
+@if (loaderService.getLoading()) {
+    <div class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/10 backdrop-blur-[2px] animate-fade-in">
+        <div class="bg-white/80 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-2xl border border-white/40 flex flex-col items-center max-w-xs w-full mx-4 transform animate-scale-up">
+            <div class="relative mb-6">
+                <!-- Subtle Glow effect -->
+                <div class="absolute inset-0 bg-blue-400/20 blur-2xl rounded-full"></div>
+                <app-loader class="relative scale-110" />
+            </div>
+            
+            <h3 class="text-xl font-bold text-slate-800 mb-2">Procesando</h3>
+            <p class="text-slate-600 text-center text-sm font-medium leading-relaxed">
+                {{ loaderService.getMessage() }}
+            </p>
+            
+            <!-- Animated Dots -->
+            <div class="mt-8 flex gap-1.5">
+                <div class="w-1.5 h-1.5 rounded-full bg-blue-500/40 animate-pulse"></div>
+                <div class="w-1.5 h-1.5 rounded-full bg-blue-500/60 animate-pulse [animation-delay:200ms]"></div>
+                <div class="w-1.5 h-1.5 rounded-full bg-blue-500/80 animate-pulse [animation-delay:400ms]"></div>
+            </div>
+        </div>
+    </div>
+}
+
 <style>
     @keyframes fadeIn {
         from { opacity: 0; }
@@ -83,8 +108,13 @@
         from { opacity: 0; transform: translateY(10px); }
         to { opacity: 1; transform: translateY(0); }
     }
+    @keyframes scaleUp {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
     .animate-fade-in { animation: fadeIn 0.3s ease-out; }
     .animate-fade-up { animation: fadeUp 0.5s ease-out; }
+    .animate-scale-up { animation: scaleUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
     
     .scrollbar-hide::-webkit-scrollbar {
         display: none;

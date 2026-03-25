@@ -1,47 +1,45 @@
-<!-- Filtros -->
 <div class="mb-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-  <!-- Cabecera de Búsqueda Principal -->
   <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-    <!-- Buscador Principal -->
-    <div class="relative w-full sm:max-w-md flex-1">
-      <div class="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3">
-        <svg class="h-4 w-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-        </svg>
+      <!-- Buscador Principal -->
+      <div class="relative w-full sm:max-w-md flex-1">
+        <div class="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3">
+          <svg class="h-4 w-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+          </svg>
+        </div>
+        <input type="text" id="clientNameSearch" placeholder="Buscar por cliente..." [(ngModel)]="clientName" (keyup.enter)="applyFilters()"
+          class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 ps-10 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400" />
       </div>
-      <input type="text" id="clientNameSearch" placeholder="Buscar por cliente..." [(ngModel)]="clientName" (keyup.enter)="applyFilters()"
-        class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 ps-10 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400" />
-    </div>
 
-    <!-- Botones Principales -->
-    <div class="flex w-full sm:w-auto items-center gap-2">
-      <button (click)="toggleFilters()" 
-        class="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 cursor-pointer text-sm font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700">
-        <svg class="h-4 w-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M5.05 3C3.291 3 2.352 5.024 3.51 6.182l5.42 5.421a1.002 1.002 0 0 1 .253.535l1.09 5.45a1 1 0 0 0 1.954-.035l1.045-5.228a1.002 1.002 0 0 1 .28-.564l5.441-5.442C20.15 5.16 19.21 3 17.5 3H5.05Z"/>
-        </svg>
-        Filtros
+      <!-- Botones Principales -->
+      <div class="flex w-full sm:w-auto items-center gap-2">
+        <button (click)="toggleFilters()" 
+          class="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 cursor-pointer text-sm font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700">
+          <svg class="h-4 w-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M5.05 3C3.291 3 2.352 5.024 3.51 6.182l5.42 5.421a1.002 1.002 0 0 1 .253.535l1.09 5.45a1 1 0 0 0 1.954-.035l1.045-5.228a1.002 1.002 0 0 1 .28-.564l5.441-5.442C20.15 5.16 19.21 3 17.5 3H5.05Z"/>
+          </svg>
+          Filtros
+          @if (activeFiltersCount() > 0) {
+          <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+            {{ activeFiltersCount() }}
+          </span>
+          }
+        </button>
+
+        <button (click)="applyFilters()"
+          class="rounded-lg bg-blue-700 px-4 py-2 text-sm cursor-pointer font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+          Buscar
+        </button>
+        
         @if (activeFiltersCount() > 0) {
-        <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-          {{ activeFiltersCount() }}
-        </span>
+        <button (click)="clearFilters()" title="Limpiar todos los filtros"
+          class="rounded-lg p-2 text-gray-500 cursor-pointer hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+          <svg class="h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
         }
-      </button>
-
-      <button (click)="applyFilters()"
-        class="rounded-lg bg-blue-700 px-4 py-2 text-sm cursor-pointer font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-        Buscar
-      </button>
-      
-      @if (activeFiltersCount() > 0) {
-      <button (click)="clearFilters()" title="Limpiar todos los filtros"
-        class="rounded-lg p-2 text-gray-500 cursor-pointer hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
-        <svg class="h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
-      </button>
-      }
-    </div>
+      </div>
   </div>
 
   <!-- Filtros Extendidos Colapsables -->

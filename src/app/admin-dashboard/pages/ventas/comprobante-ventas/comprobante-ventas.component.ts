@@ -13,6 +13,7 @@ import { TableInvoices, InvoiceFilters } from "./components/table-invoices/table
 import { NotificationService } from '@shared/services/notification.service';
 import { ResponseResult } from '@shared/interfaces/services.interfaces';
 import { ModalComponent } from "@shared/components/modal/modal.component";
+import { LoaderService } from '@utils/services/loader.service';
 
 @Component({
    selector: 'app-comprobante-ventas',
@@ -28,6 +29,7 @@ export class ComprobanteVentasComponent {
    notificacionService = inject(NotificationService);
    comprobantesVentasService = inject(ComprobantesVentasService);
    paginationService = inject(PaginationService);
+   loaderService = inject(LoaderService);
 
    currentPage = signal(1);
    totalPages = signal(1);
@@ -127,7 +129,9 @@ export class ComprobanteVentasComponent {
    }
 
    onEmitir(id: string): void {
+      this.loaderService.show('Emitiendo factura a la DIAN...');
       this.comprobantesVentasService.emitirInvoice(id).subscribe((res: ResponseResult) => {
+         this.loaderService.hide();
          if (res.success) {
             this.notificacionService.success('Factura emitida con éxito', 'Éxito');
             this.comprobanteVentasResource.reload();
@@ -135,7 +139,7 @@ export class ComprobanteVentasComponent {
             const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
             this.notificacionService.error('Error al emitir factura', message || 'Error desconocido');
          }
-      });
+      }, () => this.loaderService.hide());
    }
 
    onAnular(): void {
@@ -179,6 +183,7 @@ export class ComprobanteVentasComponent {
    }
 
    onDownloadPDF(id: string): void {
+      this.loaderService.show('Preparando descarga de PDF...');
       this.comprobantesVentasService.downloadPDF(id).subscribe((blob) => {
          const url = window.URL.createObjectURL(blob);
          const a = document.createElement('a');
@@ -186,10 +191,12 @@ export class ComprobanteVentasComponent {
          a.download = `factura-${id}.pdf`;
          a.click();
          window.URL.revokeObjectURL(url);
-      });
+         this.loaderService.hide();
+      }, () => this.loaderService.hide());
    }
 
    onDownloadXML(id: string): void {
+      this.loaderService.show('Preparando descarga de XML...');
       this.comprobantesVentasService.downloadXML(id).subscribe((blob) => {
          const url = window.URL.createObjectURL(blob);
          const a = document.createElement('a');
@@ -197,7 +204,8 @@ export class ComprobanteVentasComponent {
          a.download = `factura-${id}.xml`;
          a.click();
          window.URL.revokeObjectURL(url);
-      });
+         this.loaderService.hide();
+      }, () => this.loaderService.hide());
    }
 
 }

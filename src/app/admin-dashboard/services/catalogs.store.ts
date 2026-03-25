@@ -60,7 +60,7 @@ export class CatalogsStore {
         }).pipe(
           tap(({ categoriesArticles, documentTypes, paymentMethods, salesChannels, unitsMeasure, municipalities }) => {
             this.state.set({
-              categoriesArticles,
+              categoriesArticles: categoriesArticles.categoriesArticles,
               documentTypes,
               paymentMethods,
               salesChannels,

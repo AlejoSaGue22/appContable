@@ -6,11 +6,23 @@ export interface CatalogItem {
 }
 
 export interface CategoryArticle {
-    id: string;
+    id: number | string;
     codigo: string;
     nombre: string;
     tipo: string;
     descripcion?: string;
+    cuentaContableId?: string;
+    cuentaContable?: Partial<GetCuentasContables>;
+    cuentaIvaId?: string;
+    cuentaIva?: Partial<GetCuentasContables>;
+    cuentaIvaCodigo?: string;
+    state?: boolean;
+}
+
+export interface CategoryArticleResponse {
+    count: number;
+    pages: number;
+    categoriesArticles: CategoryArticle[];
 }
 
 export interface DocumentType {
