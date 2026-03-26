@@ -16,12 +16,14 @@ import { CategoriasListComponent } from './components/categorias-list/categorias
 import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { CategoriaFormModalComponent } from './components/categoria-form-modal/categoria-form-modal.component';
+import { CategoryArticle } from '@dashboard/interfaces/catalogs-interface';
 
 @Component({
   selector: 'app-cuentas-contables',
   standalone: true,
   imports: [CommonModule, LoaderComponent, CurrencyPipe, HeaderTitlePageComponent, FormsModule, 
-          PaginationComponent, CategoriasListComponent],
+          PaginationComponent, CategoriasListComponent, CategoriaFormModalComponent],
   templateUrl: './cuentas-contables.component.html',
   providers: [PaginationService]
 })
@@ -34,6 +36,9 @@ export class CuentasContablesComponent {
 
   tabs = signal<'cuentas' | 'categorias'>('cuentas');
   isLoadingCatalogs = this.catalogsStore.loading;
+
+  isModalOpen = signal(false);
+  selectedCategory = signal<CategoryArticle | null>(null);
 
   constructor() {
     this.catalogsStore.initialize();
@@ -81,6 +86,25 @@ export class CuentasContablesComponent {
   cuentasAceptanMovimiento = computed(() => {
     return this.cuentasOrdenadas().filter(c => c.aceptaMovimiento);
   });
+
+  openCreateModal() {
+    this.selectedCategory.set(null);
+    this.isModalOpen.set(true);
+  }
+
+  openEditModal(category: CategoryArticle) {
+    this.selectedCategory.set(category);
+    this.isModalOpen.set(true);
+  }
+
+  closeModal() {
+    this.isModalOpen.set(false);
+    this.selectedCategory.set(null);
+  }
+
+  onFormSubmit() {
+    this.categoriesResource.reload();
+  }
 
   
 }

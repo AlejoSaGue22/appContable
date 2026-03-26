@@ -33,7 +33,15 @@ export class CatalogsService {
     });
   }
 
+  createCategoryArticle(category: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/catalogs/categories-articles`, category);
+  }
+
   updateCategoryArticle(id: string, category: Partial<CategoryArticle>): Observable<any> {
     return this.http.patch(`${this.baseUrl}/catalogs/categories-articles/${id}`, category);
+  }
+
+  removeCategoryArticle(id: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/catalogs/categories-articles/${id}`);
   }
 }

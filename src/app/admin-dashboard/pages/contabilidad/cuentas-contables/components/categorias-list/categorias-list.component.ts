@@ -20,6 +20,25 @@ export class CategoriasListComponent {
   categories = input<CategoryArticle[]>();
   cuentasAceptanMovimiento = input<GetCuentasContables[]>();
   categoryUpdated = output<void>();
+  editCategory = output<CategoryArticle>();
+
+  onEditCategory(category: CategoryArticle) {
+    this.editCategory.emit(category);
+  }
+
+  onDeleteCategory(id: string | number) {
+    if (confirm('¿Estás seguro de que deseas eliminar esta categoría?')) {
+      this.catalogsService.removeCategoryArticle(id.toString()).subscribe({
+        next: () => {
+          this.notificationService.success('Categoría eliminada correctamente', 'Éxito');
+          this.categoryUpdated.emit();
+        },
+        error: (err) => {
+          this.notificationService.error('Error al eliminar la categoría', err.error?.message || 'Error desconocido');
+        }
+      });
+    }
+  }
 
   updateCategoryAccount(category: CategoryArticle, cuentaId: string, type: 'main' | 'iva' = 'main') {
     if (!cuentaId) return;

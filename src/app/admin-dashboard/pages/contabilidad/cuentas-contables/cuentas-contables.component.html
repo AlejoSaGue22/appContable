@@ -1,6 +1,16 @@
 <div class="space-y-6 animate-fade-in">
   <!-- Header -->
-  <header-title-page [titleHead]="headTitle" />
+  <header-title-page [titleHead]="headTitle">
+    @if (tabs() === 'categorias') {
+      <button actions (click)="openCreateModal()" 
+              class="inline-flex items-center justify-center cursor-pointer px-6 py-2.5 bg-gray-900 hover:bg-black text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 group">
+        <svg class="mr-2 h-4 w-4 transition-transform group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
+        </svg>
+        Nueva Categoría
+      </button>
+    }
+  </header-title-page>
 
   <!-- Tabs Navigation -->
   <div class="flex border-b border-gray-200 dark:border-gray-700 overflow-x-auto scrollbar-hide">
@@ -141,7 +151,8 @@
             <app-categorias-list 
                 [categories]="categories()" 
                 [cuentasAceptanMovimiento]="cuentasAceptanMovimiento()"
-                (categoryUpdated)="categoriesResource.reload()" />
+                (categoryUpdated)="categoriesResource.reload()"
+                (editCategory)="openEditModal($event)" />
 
             <div class="p-6 border-t border-gray-100 bg-gray-50/50 dark:bg-gray-800/50">
                 <app-pagination />
@@ -151,6 +162,17 @@
 
   </div>
 </div>
+
+<!-- Modal -->
+@if (isModalOpen()) {
+  <app-categoria-form-modal 
+    [isOpen]="isModalOpen()"
+    [category]="selectedCategory()"
+    [cuentasList]="cuentasAceptanMovimiento()"
+    (close)="closeModal()"
+    (submitForm)="onFormSubmit()"
+  ></app-categoria-form-modal>
+}
 
 <style>
   .animate-fade-in {
