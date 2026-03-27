@@ -1,14 +1,11 @@
 @if (isOpen) {
     <!-- Backdrop -->
-    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity z-[60]" aria-hidden="true" (click)="onClose()"></div>
+    <div class="fixed inset-0 backdrop-blur-xs transition-opacity z-[60]" aria-hidden="true" (click)="onClose()"></div>
 
     <div class="fixed inset-0 z-[70] overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen p-4 text-center sm:p-0">
             
-            <!-- Modal Panel -->
             <div class="relative bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full animate-fade-up">
-                
-                <!-- Modal Header -->
                 <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                     <div>
                         <h3 class="text-base font-bold text-slate-800" id="modal-title">
@@ -25,13 +22,11 @@
                     </button>
                 </div>
 
-                <!-- Modal Content -->
                 <div class="px-6 py-6 space-y-5">
                     
                     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- Nombre -->
                             <div class="md:col-span-2">
                                 <label class="block mb-1 text-[10px] font-bold text-slate-500 uppercase tracking-wider ps-1">
                                     Nombre de Categoría <span class="text-red-500">*</span>
@@ -41,12 +36,14 @@
                                            transition duration-300 ease focus:outline-none focus:border-slate-400
                                            hover:border-slate-300 shadow-sm focus:shadow placeholder:text-slate-300"
                                     placeholder="Ej: Materiales de Oficina">
-                                <div *ngIf="form.get('nombre')?.touched && form.get('nombre')?.invalid" class="mt-1 text-[10px] text-red-500 font-bold px-1">
-                                    El nombre es obligatorio (Máx 100)
-                                </div>
+                               
+                                @if (form.get('nombre')?.touched && form.get('nombre')?.invalid) {
+                                    <div class="mt-1 text-[10px] text-red-500 font-bold px-1">
+                                        El nombre es obligatorio (Máx 100)
+                                    </div>
+                                }
                             </div>
 
-                            <!-- Tipo -->
                             <div>
                                 <label class="block mb-1 text-[10px] font-bold text-slate-500 uppercase tracking-wider ps-1">
                                     Tipo <span class="text-red-500">*</span>
@@ -55,15 +52,14 @@
                                         class="w-full bg-transparent text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2
                                                transition duration-300 ease focus:outline-none focus:border-slate-400
                                                hover:border-slate-400 shadow-sm focus:shadow-md cursor-pointer">
-                                    <option value="PRODUCTO">PRODUCTO</option>
-                                    <option value="SERVICIO">SERVICIO</option>
+                                    <option value="compra">Compra</option>
+                                    <option value="venta">Venta</option>
+                                    <option value="gasto">Gasto</option>
                                 </select>
                             </div>
                         </div>
 
-                        <!-- Cuentas Contables -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- Cuenta Principal -->
                             <div>
                                 <label class="block mb-1 text-[10px] font-bold text-slate-500 uppercase tracking-wider ps-1">
                                     Cuenta Principal <span class="text-red-500">*</span>
@@ -77,12 +73,13 @@
                                         <option [value]="cuenta.id">{{ cuenta.codigo }} · {{ cuenta.nombre }}</option>
                                     }
                                 </select>
-                                <div *ngIf="form.get('cuentaContableId')?.touched && form.get('cuentaContableId')?.invalid" class="mt-1 text-[10px] text-red-500 font-bold px-1">
-                                    Obligatorio
-                                </div>
+                                @if (form.get('cuentaContableId')?.touched && form.get('cuentaContableId')?.invalid) {
+                                    <div class="mt-1 text-[10px] text-red-500 font-bold px-1">
+                                        Obligatorio
+                                    </div>
+                                }
                             </div>
 
-                            <!-- Cuenta IVA -->
                             <div>
                                 <label class="block mb-1 text-[10px] font-bold text-slate-500 uppercase tracking-wider ps-1">
                                     Cuenta IVA <span class="text-red-500">*</span>
@@ -96,13 +93,14 @@
                                         <option [value]="cuenta.id">{{ cuenta.codigo }} · {{ cuenta.nombre }}</option>
                                     }
                                 </select>
-                                <div *ngIf="form.get('cuentaIvaId')?.touched && form.get('cuentaIvaId')?.invalid" class="mt-1 text-[10px] text-red-500 font-bold px-1">
-                                    Obligatorio
-                                </div>
+                                @if (form.get('cuentaIvaId')?.touched && form.get('cuentaIvaId')?.invalid) {
+                                    <div class="mt-1 text-[10px] text-red-500 font-bold px-1">
+                                        Obligatorio
+                                    </div>
+                                }
                             </div>
                         </div>
 
-                        <!-- Descripción -->
                         <div>
                             <label class="block mb-1 text-[10px] font-bold text-slate-500 uppercase tracking-wider ps-1">
                                 Descripción (Opcional)
@@ -115,13 +113,12 @@
                         </div>
                     </form>
 
-                    <!-- Modal Actions -->
                     <div class="flex gap-2 pt-4 border-t border-slate-100">
                         <button type="button" (click)="onClose()"
                                 [disabled]="isSubmitting()"
                                 class="flex-1 rounded-md bg-white border border-slate-200 py-2 px-4 text-center text-sm
                                        text-slate-600 transition-all shadow-sm hover:shadow hover:bg-slate-50 disabled:opacity-50 cursor-pointer font-bold">
-                            Cancelar
+                                Cancelar
                         </button>
                         <button type="button" (click)="onSubmit()"
                                 [disabled]="isSubmitting() || form.invalid"
