@@ -49,6 +49,22 @@
     </div>
   }
 
+  @if (proveedoresResource.error()) {
+
+        <div class="p-10 text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-50 text-red-500 mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900">Error al cargar proveedores</h3>
+            <p class="text-gray-500 max-w-xs mx-auto mt-2">
+                {{ $any(proveedoresResource.error())?.error?.message || 'No se pudo cargar la información. Inténtalo de nuevo más tarde.' }}
+            </p>
+          </div>
+          
+  }
+
   <!-- Delete Modal Modernized -->
   <app-modal [(visible)]="isModalEdit">
     <div class="p-6 text-center">
@@ -62,11 +78,11 @@
 
         <div class="flex flex-col sm:flex-row gap-3">
             <button (click)="isModalEdit.set(false)" 
-                class="flex-1 px-6 py-3 border border-gray-100 text-sm font-bold text-gray-500 rounded-xl hover:bg-gray-50 transition-all">
+                class="flex-1 px-6 py-3 border border-gray-100 text-sm font-bold text-gray-500 rounded-xl hover:bg-gray-50 transition-all cursor-pointer">
                 Cancelar
             </button>
             <button (click)="onDelete()" 
-                class="flex-1 px-6 py-3 bg-red-600 text-white text-sm font-bold rounded-xl hover:bg-red-700 shadow-lg shadow-red-200 transition-all active:scale-95">
+                class="flex-1 px-6 py-3 bg-red-600 text-white text-sm font-bold rounded-xl hover:bg-red-700 shadow-lg shadow-red-200 transition-all active:scale-95 cursor-pointer">
                 Confirmar
             </button>
         </div>

@@ -8,11 +8,12 @@ import { HeaderInput, HeaderTitlePageComponent } from '@dashboard/components/hea
 import { CuentaBancaria } from '../interfaces/cuenta-bancaria.interface';
 
 import { CuentaFormModalComponent } from './components/cuenta-form-modal/cuenta-form-modal.component';
+import { ModalComponent } from '@shared/components/modal/modal.component';
 
 @Component({
   selector: 'app-cuentas-bancarias',
   standalone: true,
-  imports: [CommonModule, LoaderComponent, CurrencyPipe, CuentaFormModalComponent, HeaderTitlePageComponent],
+  imports: [CommonModule, LoaderComponent, CurrencyPipe, CuentaFormModalComponent, HeaderTitlePageComponent, ModalComponent],
   templateUrl: './cuentas-bancarias.component.html'
 })
 export default class CuentasBancariasComponent {
@@ -27,6 +28,10 @@ export default class CuentasBancariasComponent {
   // Modal control
   isModalOpen = signal(false);
   selectedAccount = signal<CuentaBancaria | null>(null);
+
+  // Modal de eliminación
+  isDeleteModalVisible = signal(false);
+  idToDelete = signal<string | null>(null);
 
   cuentasResource = rxResource({
     loader: () => this.cuentasService.getCuentas()
@@ -63,12 +68,21 @@ export default class CuentasBancariasComponent {
   }
 
   deleteCuenta(id: string) {
-    if (confirm('¿Está seguro de que desea eliminar esta cuenta?')) {
-      this.cuentasService.deleteCuenta(id).subscribe({
-        next: () => this.cuentasResource.reload(),
-        error: (err) => {}
-      });
+    this.idToDelete.set(id);
+    this.isDeleteModalVisible.set(true);
+  }
 
-    }
+  confirmDelete() {
+    const id = this.idToDelete();
+    if (!id) return;
+
+    this.cuentasService.deleteCuenta(id).subscribe({
+      next: () => {
+        this.cuentasResource.reload();
+        this.isDeleteModalVisible.set(false);
+        this.idToDelete.set(null);
+      },
+      error: (err) => {}
+    });
   }
 }

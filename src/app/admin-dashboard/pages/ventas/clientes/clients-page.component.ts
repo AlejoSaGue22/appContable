@@ -13,10 +13,12 @@ import { TableClientsComponent } from './components/table-clients/table-clients.
 import { PaginationComponent } from '@shared/components/pagination/pagination';
 import { Router, RouterLink } from '@angular/router';
 import { HelpersUtils } from '@utils/helpers.utils';
+import { ClientDetailComponent } from './components/client-detail/client-detail.component';
+import { ClientesInterfaceResponse } from '@dashboard/interfaces/clientes-interface';
 
 @Component({
     selector: 'app-clients-page',
-    imports: [HeaderTitlePageComponent, TableClientsComponent, ModalComponents, LoaderComponent, PaginationComponent, RouterLink],
+    imports: [HeaderTitlePageComponent, TableClientsComponent, ModalComponents, LoaderComponent, PaginationComponent, RouterLink, ClientDetailComponent],
     templateUrl: './clients-page.component.html',
     standalone: true
 })
@@ -34,7 +36,9 @@ export class ClientsPageComponent {
     cardsTotales = signal<CardsTotales[]>([]);
     totalCliente = signal(0);
     idClienteToModal = signal<string>('');
+    selectedCliente = signal<ClientesInterfaceResponse | null>(null);
     isModalEdit = false;
+    isModalDetail = false;
     searchTerm = signal<string>('');
 
     clientesResource = rxResource({
@@ -68,6 +72,11 @@ export class ClientsPageComponent {
     openModal(event: modalOpen) {
         this.isModalEdit = event.open;
         this.idClienteToModal.set(event.id);
+    }
+
+    onViewDetail(cliente: ClientesInterfaceResponse) {
+        this.selectedCliente.set(cliente);
+        this.isModalDetail = true;
     }
 
     async deleteCliente() {

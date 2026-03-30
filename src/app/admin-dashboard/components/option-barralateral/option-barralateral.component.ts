@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuItem } from '@utils/menu.config';
 import { AuthService } from 'src/app/auth/services/auth.service';
@@ -15,23 +15,28 @@ export class OptionBarralateral {
   router = inject(Router);
 
   menuItemsOther = input<MenuItem[]>();
+  activeMenu = input<string | null>(null);
+  activeRoute = input<string>('');
+  menuToggled = output<string>();
   user = this.authService.user;
-
-  activeMenu: string | null = 'Dashboard';
 
   async cerrarSesion() {
     this.authService.logout()
     await this.router.navigateByUrl("/")
   }
 
-  constructor() {}
+  isItemActive(item: MenuItem): boolean {
+    if (item.children) {
+      return item.children.some(child =>
+        this.activeRoute() === child.route ||
+        this.activeRoute().startsWith(child.route + '/')
+      );
+    }
+    return this.activeRoute() === item.route;
+  }
 
   toggleActiveMenu(menuId: string) {
-    if (this.activeMenu === menuId) {
-      this.activeMenu = null;
-    } else {
-      this.activeMenu = menuId;
-    }
+    this.menuToggled.emit(menuId);
   }
 
 }

@@ -4,7 +4,8 @@
         [subItems]="option.children ?? []" 
         [menuSection]="option"
         (menuToggled)="toggleActiveMenu($event)"
-        [activeMenu]="activeMenu" 
+        [activeMenu]="activeMenu()" 
+        [isActive]="isItemActive(option)"
         [menuId]="option.title"/>
 </div>
 }

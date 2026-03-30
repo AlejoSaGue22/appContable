@@ -69,7 +69,7 @@
                                                transition duration-300 ease focus:outline-none focus:border-slate-400
                                                hover:border-slate-400 shadow-sm focus:shadow-md cursor-pointer">
                                     <option value="">— Seleccionar —</option>
-                                    @for (cuenta of cuentasList; track cuenta.id) {
+                                    @for (cuenta of cuentasPrincipales(); track cuenta.id) {
                                         <option [value]="cuenta.id">{{ cuenta.codigo }} · {{ cuenta.nombre }}</option>
                                     }
                                 </select>
@@ -89,7 +89,7 @@
                                                transition duration-300 ease focus:outline-none focus:border-slate-400
                                                hover:border-slate-400 shadow-sm focus:shadow-md cursor-pointer">
                                     <option value="">— Seleccionar —</option>
-                                    @for (cuenta of cuentasList; track cuenta.id) {
+                                    @for (cuenta of cuentasIva(); track cuenta.id) {
                                         <option [value]="cuenta.id">{{ cuenta.codigo }} · {{ cuenta.nombre }}</option>
                                     }
                                 </select>

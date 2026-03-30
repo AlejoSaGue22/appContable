@@ -44,7 +44,7 @@ export class CuentasContablesComponent {
     this.catalogsStore.initialize();
     
     // Configurar tamaño de página a 2 para ver la paginación con pocos elementos
-    this.paginationService.pageSize.set(2);
+    this.paginationService.pageSize.set(10);
 
     // Sync pagination total items
     effect(() => {

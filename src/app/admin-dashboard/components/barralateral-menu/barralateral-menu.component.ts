@@ -16,6 +16,7 @@ export class BarralateralMenuComponent {
   subItems = input.required<MenuItem[]>();
   defaultOpen = input<boolean>(false);
   activeMenu = input<string | null>(null);
+  isActive = input<boolean>(false);
   menuId = input<string>();
   menuToggled = output<string>();
 

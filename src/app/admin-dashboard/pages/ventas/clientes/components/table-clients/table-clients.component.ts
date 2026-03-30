@@ -14,8 +14,13 @@ export class TableClientsComponent {
 
   clientesData = input<ClientesInterfaceResponse[]>([]);
   @Output() delete = new EventEmitter<modalOpen>();
+  @Output() view = new EventEmitter<ClientesInterfaceResponse>();
 
   onDeleteCliente(id: string) {
     this.delete.emit({ open: true, id });
+  }
+
+  onViewCliente(cliente: ClientesInterfaceResponse) {
+    this.view.emit(cliente);
   }
 }

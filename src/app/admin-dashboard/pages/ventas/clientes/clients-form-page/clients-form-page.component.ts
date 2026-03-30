@@ -32,7 +32,13 @@ export class ClientsFormPageComponent implements OnInit {
     router = inject(Router);
     activateRoute = inject(ActivatedRoute);
     catalogsStore = inject(CatalogsStore);
-    headTitleCliente: HeaderInput = { title: 'Crear Cliente', slog: 'Registra un nuevo cliente al sistema' };
+    clienteID = toSignal(
+        this.activateRoute.params.pipe(map((params) => params['id']))
+    );
+    headTitleCliente: HeaderInput = { title: (this.clienteID() && this.clienteID() !== 'new-Item' ? 'Actualizar Cliente' :
+                                            'Guardar Cliente'),
+                                      slog: (this.clienteID() && this.clienteID() !== 'new-Item' ? 'Actualiza la información del cliente' :
+                                            'Registra un nuevo cliente al sistema') };
     loading = signal<boolean>(false);
 
     clientsForm = this.fb.group({
@@ -52,9 +58,7 @@ export class ClientsFormPageComponent implements OnInit {
         dv: [''],
     })
 
-    clienteID = toSignal(
-        this.activateRoute.params.pipe(map((params) => params['id']))
-    )
+    
 
     clienteIdResource = rxResource({
         request: () => {
@@ -67,6 +71,7 @@ export class ClientsFormPageComponent implements OnInit {
             if (!request) {
                 return this.clienteService.getClientesById('new-Item');
             }
+
             return this.clienteService.getClientesById(request.id).pipe(
                 tap((el) => this.clientsForm.reset(el))
             );

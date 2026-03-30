@@ -108,7 +108,7 @@
                                                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm cursor-pointer" formControlName="tipoDocumento">
                                 <option value="">Selecciona un documento</option>
                                 @for (doc of catalogsStore.documentTypes(); track doc.id) {
-                                    <option [value]="doc.id">{{ doc.nombre }}</option>
+                                    <option [ngValue]="doc.id">{{ doc.nombre }}</option>
                                 }
                             </select>
 
@@ -128,7 +128,7 @@
                                 <form-error-label [errorType]="clientsForm.get('numeroDocumento')!" />
                             </div>
 
-                            @if (clientsForm.get('tipoDocumento')?.value === '6') {
+                            @if (clientsForm.get('tipoDocumento')?.value == '6') {
                                 <div class="col-span-1">
                                     <label class="block mb-2 text-sm font-medium text-slate-600">
                                         DV <span class="text-red-500">*</span>
@@ -176,7 +176,7 @@
                                                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm cursor-pointer" formControlName="ciudad">
                                 <option value="">Selecciona una ciudad o municipio</option>
                                 @for (city of catalogsStore.municipalities(); track city.id) {
-                                <option [value]="city.id">{{ city.name }} - {{ city.department }}</option>
+                                    <option [ngValue]="city.id">{{ city.name }} - {{ city.department }}</option>
                                 }
                             </select>
                             <form-error-label [errorType]="clientsForm.get('ciudad')!" />

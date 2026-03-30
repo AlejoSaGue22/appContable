@@ -40,7 +40,11 @@
 
     <!-- Table Section -->
     <div class="space-y-4">
-        <app-table-clients [clientesData]="clientesResource.value().clientes" (delete)="openModal($event)" />
+        <app-table-clients 
+            [clientesData]="clientesResource.value().clientes" 
+            (delete)="openModal($event)" 
+            (view)="onViewDetail($event)"
+        />
 
         @if (clientesResource.value().clientes.length > 0) {
             <div class="flex items-center justify-between px-2 py-4">
@@ -70,6 +74,26 @@
             <button (click)="deleteCliente()" 
                 class="flex-1 px-6 py-3 bg-red-500 text-white text-sm font-bold rounded-xl hover:bg-red-600 shadow-lg shadow-red-200 transition-all active:scale-95">
                 Sí, eliminar
+            </button>
+        </div>
+    </div>
+  </app-modal>
+
+  <!-- Detail Modal -->
+  <app-modal [(visible)]="isModalDetail">
+    <div class="p-2">
+        <div class="flex items-center justify-between mb-8 px-4">
+            <h3 class="text-lg font-black text-gray-900">Detalle del Cliente</h3>
+        </div>
+
+        @if (selectedCliente(); as cliente) {
+            <app-client-detail [cliente]="cliente" />
+        }
+
+        <div class="mt-10 px-4">
+            <button (click)="isModalDetail = false" 
+                class="w-full cursor-pointer py-4 bg-gray-900 text-white text-sm font-bold rounded-2xl hover:bg-gray-800 transition-all shadow-xl active:scale-[0.98]">
+                Cerrar Vista
             </button>
         </div>
     </div>

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, inject, signal } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, computed, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CatalogsService } from '../../../../../services/catalogs.service';
 import { CategoryArticle, GetCuentasContables } from '../../../../../interfaces/catalogs-interface';
@@ -30,6 +30,8 @@ export class CategoriaFormModalComponent implements OnInit {
   });
 
   isSubmitting = signal(false);
+  cuentasIva = computed(() => this.cuentasList.filter(c => c.codigo.includes('1355') || c.codigo.includes('2408')));
+  cuentasPrincipales = computed(() => this.cuentasList.filter(c => !c.codigo.includes('1355') && !c.codigo.includes('2408')));
 
   ngOnInit() {
     if (this.category) {

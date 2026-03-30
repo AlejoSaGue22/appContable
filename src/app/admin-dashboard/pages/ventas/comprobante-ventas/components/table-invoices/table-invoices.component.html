@@ -272,9 +272,8 @@
                   }
 
                   <!-- Botón Anular (Si no está ya cancelada) -->
-                  @if (invoice.status == 'accepted' || invoice.status == 'issued') {
+                  @if (invoice.tipoFactura !== 'ELECTRONICA' && (invoice.status == 'accepted' || invoice.status == 'issued')) {
                       <button (click)="onAnular(invoice.id)"
-                          [disabled]="invoice.tipoFactura == 'ELECTRONICA'"
                           class="inline-flex items-center rounded-lg p-2 text-sm text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 cursor-pointer"
                           title="Anular Factura">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

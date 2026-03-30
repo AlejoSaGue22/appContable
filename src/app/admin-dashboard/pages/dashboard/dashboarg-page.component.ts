@@ -8,6 +8,8 @@ import { TransaccionesRecientesCard } from "./components/transacciones-recientes
 import { FlujoCajaCard } from "./components/flujo-caja-card/flujo-caja-card.component";
 import { DashboardAvanzadoKPIs } from '../../interfaces/reportes-avanzados.interface';
 import { DecimalPipe, CurrencyPipe } from '@angular/common';
+import { AuthService } from 'src/app/auth/services/auth.service';
+import { HelpersUtils } from '@utils/helpers.utils';
 
 
 @Component({
@@ -19,10 +21,10 @@ export class DashboargPageComponent implements OnInit {
 
    private dashboardService = inject(DashboardService);
 
-   headTitle: HeaderInput = {
+   headTitle = signal<HeaderInput>({
       title: 'Dashboard Avanzado',
       slog: 'Vista estratégica y proyecciones de tu negocio'
-   }
+   })
 
    accesoRapido = [
       {
@@ -39,6 +41,14 @@ export class DashboargPageComponent implements OnInit {
       }
    ]
 
+   roles = signal([
+      'Super Admin',
+      'Admin',
+      'User'
+   ]);
+   role = inject(AuthService).user()?.role;
+   logoApp = HelpersUtils.logoApp;
+   nameApp = HelpersUtils.nameApp;
    cardsValor = signal<CardsTotales[]>([]);
    recentTransactions = signal<RecentTransaction[]>([]);
    history = signal<DashboardHistory[]>([]);

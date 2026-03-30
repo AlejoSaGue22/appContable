@@ -8,7 +8,10 @@
             type="button"
             class="flex items-center p-3 w-full text-sm font-semibold text-gray-500 rounded-xl transition-all duration-300 group 
                     hover:bg-white/5 hover:text-white cursor-pointer"
-            [class.bg-white]="isOpen">
+            [class.bg-white]="isOpen"
+            [ngClass]="{
+                '!bg-blue-600 !text-white !shadow-lg !shadow-blue-500/30': isActive()
+            }">
 
             <div class="flex-shrink-0 w-5 h-5 transition-all duration-300 group-hover:scale-110" 
                  [innerHTML]="menuSection()?.icon"

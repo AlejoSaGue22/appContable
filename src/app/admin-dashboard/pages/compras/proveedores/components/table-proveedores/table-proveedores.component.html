@@ -35,7 +35,7 @@
                 <span class="font-medium">{{ proveedor.tipoDocumentoRel.abreviatura }}</span> - {{ proveedor.identificacion }}
               </td>
               <td class="px-8 py-4">
-                <span class="text-gray-900">{{ proveedor.razonSocial || proveedor.nombre }}</span>
+                <span class="text-gray-900">{{ proveedor.razonSocial || proveedor.nombre + ' ' + proveedor.apellido }}</span>
               </td>
               <td class="px-8 py-4 text-gray-500">{{ proveedor.telefono }}</td>
               <td class="px-8 py-4 text-gray-500">{{ proveedor.email }}</td>

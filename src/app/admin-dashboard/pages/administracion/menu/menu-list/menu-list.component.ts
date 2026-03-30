@@ -6,10 +6,12 @@ import { MenuService } from '../../../../services/menu.service';
 import { MenuItem } from '../../../../interfaces/menu.interface';
 import { MenuFormComponent } from '../menu-form/menu-form.component';
 
+import { ModalComponent } from '@shared/components/modal/modal.component';
+
 @Component({
   selector: 'app-menu-list',
   standalone: true,
-  imports: [CommonModule, DragDropModule, MenuFormComponent],
+  imports: [CommonModule, DragDropModule, MenuFormComponent, ModalComponent],
   templateUrl: './menu-list.component.html',
 })
 export class MenuListComponent implements OnInit {
@@ -20,6 +22,11 @@ export class MenuListComponent implements OnInit {
   isModalOpen         = signal(false);
   selectedItemForEdit = signal<MenuItem | null>(null);
   expandedItems       = signal<Set<string>>(new Set());
+
+  // Modales de confirmación
+  isDeleteModalVisible = signal(false);
+  itemToDelete = signal<MenuItem | null>(null);
+  isSeedModalVisible = signal(false);
 
   ngOnInit(): void {
     this.loadMenu();
@@ -107,24 +114,40 @@ export class MenuListComponent implements OnInit {
 
   deleteItem(item: MenuItem): void {
     if (item.children?.length) {
+      // Usamos alert nativo para validación simple, pero podríamos usar un modal de advertencia también
       alert('No se puede eliminar un ítem con sub-ítems. Elimine los hijos primero.');
       return;
     }
-    if (confirm(`¿Eliminar el ítem "${item.title}"?`)) {
-      this.menuService.deleteMenu(item.id).subscribe({
-        next:  () => this.loadMenu(),
-        error: err => console.error(err),
-      });
-    }
+    this.itemToDelete.set(item);
+    this.isDeleteModalVisible.set(true);
+  }
+
+  confirmDeleteItem(): void {
+    const item = this.itemToDelete();
+    if (!item) return;
+
+    this.menuService.deleteMenu(item.id).subscribe({
+      next:  () => {
+        this.loadMenu();
+        this.isDeleteModalVisible.set(false);
+        this.itemToDelete.set(null);
+      },
+      error: err => console.error(err),
+    });
   }
 
   seedMenu(): void {
-    if (confirm('¿Cargar el menú por defecto? Solo aplica si no hay ítems.')) {
-      this.menuService.seedMenu().subscribe({
-        next:  () => this.loadMenu(),
-        error: err => console.error(err),
-      });
-    }
+    this.isSeedModalVisible.set(true);
+  }
+
+  confirmSeedMenu(): void {
+    this.menuService.seedMenu().subscribe({
+      next:  () => {
+        this.loadMenu();
+        this.isSeedModalVisible.set(false);
+      },
+      error: err => console.error(err),
+    });
   }
 
   // ── Drag & Drop ───────────────────────────────────────────────────

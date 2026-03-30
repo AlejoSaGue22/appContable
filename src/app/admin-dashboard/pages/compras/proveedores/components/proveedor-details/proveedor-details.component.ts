@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, signal, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ProveedoresRequest } from '@dashboard/interfaces/proveedores-interface';
 import { ProveedoresService } from '@dashboard/pages/compras/services/proveedores.service';
 import { firstValueFrom } from 'rxjs';
 
@@ -11,7 +12,7 @@ import { firstValueFrom } from 'rxjs';
   standalone: true
 })
 export class ProveedorDetailsComponent implements OnInit {
-  proveedor = signal<any | null>(null);
+  proveedor = signal<ProveedoresRequest | null>(null);
   loading = signal(true);
   error = signal<string | null>(null);
 
@@ -33,7 +34,7 @@ export class ProveedorDetailsComponent implements OnInit {
     try {
 
       const proveedor = await firstValueFrom(this.proveedoresService.getProveedoresById(id));
-      this.proveedor.set(proveedor);
+      this.proveedor.set(proveedor as any);
       this.loading.set(false);
 
     } catch (error: any) {

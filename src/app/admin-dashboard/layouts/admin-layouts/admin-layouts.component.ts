@@ -61,10 +61,10 @@ export default class AdminLayoutsComponent implements OnInit, OnDestroy {
     this.routeSubscription = this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: any) => {
+        this.activeRoute.set(event.url);
         if (event instanceof NavigationEnd) {
           this.setActiveMenuBasedOnRoute();
         }
-        // this.activeRoute.set(event.url);
         this.updateExpandedPanels(event.url);
       });
 
@@ -88,50 +88,10 @@ export default class AdminLayoutsComponent implements OnInit, OnDestroy {
     this.isMobileMenuOpen.update(v => !v);
   }
 
-  // menuLateral: Sidebar[] = [
-  //     {
-  //       title: 'Dashboard',
-  //       icon: '<i class="fa-solid fa-chart-simple"></i>',
-  //       route: '/dashboard/index',
-  //     },
-  //     {
-  //       title: 'Ventas',
-  //       icon: '<i class="fa-solid fa-hand-holding-dollar"></i>',
-  //       subItems: [
-  //           {
-  //             title: 'Clientes',
-  //             route: '/dashboard/ventas/clients',
-  //             icon: 'fa-solid fa-users'
-  //           },
-  //           {
-  //             title: 'Comprobante de venta',
-  //             route: '/dashboard/ventas/comprobantes',
-  //             icon: 'fa-solid fa-users'
-  //           },
-  //           {
-  //             title: 'Productos y Servicios',
-  //             route: '/dashboard/ventas/products_services',
-  //             icon: 'fa-solid fa-users'
-  //           }
-  //       ]
-  //     },
-  //     {
-  //       title: 'Compras y gastos',
-  //       icon: '<i class="fa-solid fa-money-bill-1-wave"></i>',
-  //       subItems: [
-  //           {
-  //             title: 'Comprobantes de compra',
-  //             route: '/dashboard/compra',
-  //             icon: 'fa-solid fa-users'
-  //           },
-  //           {
-  //             title: 'Proveedores',
-  //             route: '/dashboard/proveedor',
-  //             icon: 'fa-solid fa-warehouse'
-  //           }
-  //       ]
-  //     }
-  // ];
+   async cerrarSesion() {
+    this.authService.logout();
+    await this.router.navigateByUrl("/")
+  }
 
   private updateExpandedPanels(currentUrl: string): void {
     const newExpanded = new Set<string>();
@@ -174,15 +134,20 @@ export default class AdminLayoutsComponent implements OnInit, OnDestroy {
 
   setActiveMenuBasedOnRoute() {
     const currentRoute = this.router.url.split('?')[0];  // Remove query params
-    const currentRoute2 = this.router.url.includes('new-Item') ? this.router.url.split('/') : [];  // Remove params
-    currentRoute2.pop();
-
+    
+    // Check main menu items
     for (const sidebar of this.menuItems()) {
-      const matchingItem = sidebar.children?.find((item: MenuItem) => item.route === currentRoute || item.route === currentRoute2.join("/"));
-
-      if (matchingItem) {
+      if (this.isItemActive(sidebar)) {
         this.activeMenu = sidebar.title;
-        break;
+        return;
+      }
+    }
+
+    // Check other menu items
+    for (const sidebar of this.menuItemsOther()) {
+      if (this.isItemActive(sidebar)) {
+        this.activeMenu = sidebar.title;
+        return;
       }
     }
   }

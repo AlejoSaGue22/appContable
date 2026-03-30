@@ -50,5 +50,8 @@ export interface ProveedoresRequest {
     tipoDocumento: string;
     tipoDocumentoRel: DocumentType;
     updatedAt: string;
+    estado: string;
+    nombreContacto: string;
+    telefonoContacto: string;
 }
 
