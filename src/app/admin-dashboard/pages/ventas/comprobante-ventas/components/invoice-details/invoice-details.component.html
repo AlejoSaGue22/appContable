@@ -63,6 +63,17 @@
             </svg>
             Volver
           </a>
+
+          @if (factura()!.status !== 'draft' && factura()!.status !== 'cancelled') {
+            <a [routerLink]="['/panel/ventas/notas-ajuste/new']" 
+              [queryParams]="{ facturaId: factura()!.id }"
+              class="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-orange-200 bg-orange-50 px-4 py-2 text-sm font-medium text-orange-700 hover:bg-orange-100 transition-colors">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path>
+              </svg>
+              Crear Nota Ajuste
+            </a>
+          }
         </div>
       </div>
     </div>

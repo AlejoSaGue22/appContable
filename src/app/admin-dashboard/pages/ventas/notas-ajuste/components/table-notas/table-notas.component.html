@@ -1,0 +1,172 @@
+<div class="mb-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <!-- Buscador Principal -->
+        <div class="relative w-full sm:max-w-md flex-1">
+            <div class="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3">
+                <svg class="h-4 w-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                </svg>
+            </div>
+            <input type="text" id="clienteNombreSearch" placeholder="Buscar por cliente..." [(ngModel)]="clienteNombre" (keyup.enter)="applyFilters()"
+                class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 ps-10 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400" />
+        </div>
+
+        <!-- Botones Principales -->
+        <div class="flex w-full sm:w-auto items-center gap-2">
+            <button (click)="toggleFilters()" 
+                class="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 cursor-pointer text-sm font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700">
+                <svg class="h-4 w-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M5.05 3C3.291 3 2.352 5.024 3.51 6.182l5.42 5.421a1.002 1.002 0 0 1 .253.535l1.09 5.45a1 1 0 0 0 1.954-.035l1.045-5.228a1.002 1.002 0 0 1 .28-.564l5.441-5.442C20.15 5.16 19.21 3 17.5 3H5.05Z"/>
+                </svg>
+                Filtros
+                @if (activeFiltersCount() > 0) {
+                    <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+                        {{ activeFiltersCount() }}
+                    </span>
+                }
+            </button>
+
+            <button (click)="applyFilters()"
+                class="rounded-lg bg-blue-700 px-4 py-2 text-sm cursor-pointer font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                Buscar
+            </button>
+            
+            @if (activeFiltersCount() > 0) {
+                <button (click)="clearFilters()" title="Limpiar todos los filtros"
+                    class="rounded-lg p-2 text-gray-500 cursor-pointer hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                    <svg class="h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            }
+        </div>
+    </div>
+
+    <!-- Filtros Extendidos -->
+    @if (showFilters()) {
+        <div class="mt-4 border-t border-gray-200 pt-4 dark:border-gray-700">
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <!-- Filtro Tipo -->
+                <div>
+                    <label for="tipo" class="mb-2 block text-xs font-medium text-gray-900 dark:text-gray-300">Tipo de Nota</label>
+                    <select id="tipo" [(ngModel)]="tipo"
+                        class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                        @for (t of tipos; track t.value) {
+                            <option [value]="t.value">{{ t.label }}</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Filtro Estado -->
+                <div>
+                    <label for="estado" class="mb-2 block text-xs font-medium text-gray-900 dark:text-gray-300">Estado</label>
+                    <select id="estado" [(ngModel)]="estado"
+                        class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+                        @for (e of estados; track e.value) {
+                            <option [value]="e.value">{{ e.label }}</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Filtro Factura -->
+                <div>
+                    <label for="facturaNumero" class="mb-2 block text-xs font-medium text-gray-900 dark:text-gray-300">Nº Factura Original</label>
+                    <input type="text" id="facturaNumero" placeholder="Ej: FV-001" [(ngModel)]="facturaNumero"
+                        class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white" />
+                </div>
+            </div>
+            
+            <div class="mt-4 flex justify-end gap-2">
+                <button (click)="clearFilters()" class="rounded-lg cursor-pointer border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-100">
+                    Limpiar
+                </button>
+                <button (click)="applyFilters()" class="rounded-lg cursor-pointer bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                    Aplicar
+                </button>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-gray-500 dark:text-gray-400">
+            <thead class="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                    <th scope="col" class="px-6 py-3">Fecha</th>
+                    <th scope="col" class="px-6 py-3">Nº Nota</th>
+                    <th scope="col" class="px-6 py-3">Tipo</th>
+                    <th scope="col" class="px-6 py-3">Concepto</th>
+                    <th scope="col" class="px-6 py-3">Factura Rel.</th>
+                    <th scope="col" class="px-6 py-3">Cliente</th>
+                    <th scope="col" class="px-6 py-3">Estado</th>
+                    <th scope="col" class="px-6 py-3 text-right">Total</th>
+                    <th scope="col" class="px-6 py-3 text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (notaDataArray.length == 0) {
+                    <tr>
+                        <td colspan="10" class="px-6 py-12 text-center text-gray-500">
+                            No se encontraron notas de ajuste
+                        </td>
+                    </tr>
+                }
+
+                @for (nota of notaDataArray; track nota.id) {
+                    <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td class="px-6 py-4">{{ nota.fecha }}</td>
+                        <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">{{ nota.prefijo }}-{{ nota.numero }}</td>
+                        <td class="px-6 py-4">
+                            <span [class]="nota.tipo === 'CREDITO' ? 'bg-orange-100 text-orange-800' : 'bg-blue-100 text-blue-800'" class="rounded px-2 py-0.5 text-xs font-semibold">
+                                {{ nota.tipo }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 truncate max-w-[200px]" [title]="getConceptoLabel(nota.tipo, nota.concepto)">
+                            {{ getConceptoLabel(nota.tipo, nota.concepto) }}
+                        </td>
+                        <td class="px-6 py-4">{{ nota.facturaOriginal?.comprobante_completo || '-' }}</td>
+                        <td class="px-6 py-4">{{ nota.client?.nombre }} {{ nota.client?.apellido }}</td>
+                        <td class="px-6 py-4">
+                            <span [class]="'inline-flex rounded-full px-2 py-1 text-xs ' + getStatusClass(nota.status)">
+                                {{ getStatusLabel(nota.status) }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right font-semibold">{{ formatCurrency(nota.total) }}</td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center justify-center gap-2">
+                                @if (nota.status === 'draft' || nota.status === 'rejected') {
+                                    <a [routerLink]="['/panel/ventas/notas-ajuste/', nota.id]" class="text-blue-600 hover:text-blue-900" title="Editar">
+                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                    </a>
+                                }
+                                
+                                @if (nota.status === 'draft') {
+                                    <button (click)="onEmitir(nota.id)" class="text-purple-600 hover:text-purple-900 cursor-pointer" title="Emitir a DIAN">
+                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                                    </button>
+                                }
+
+                                @if (nota.status === 'accepted') {
+                                    <button (click)="onDownloadPDF(nota.id)" class="text-red-600 hover:text-red-900 cursor-pointer" title="Descargar PDF">
+                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                                    </button>
+                                    <button (click)="onDownloadXML(nota.id)" class="text-orange-600 hover:text-orange-900 cursor-pointer" title="Descargar XML">
+                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                                    </button>
+                                }
+
+                                @if (nota.status === 'draft') {
+                                    <button (click)="onDelete(nota.id)" class="text-red-600 hover:text-red-900 cursor-pointer" title="Eliminar">
+                                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <app-pagination />
+</div>

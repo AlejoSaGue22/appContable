@@ -1,0 +1,183 @@
+<div class="p-4 sm:p-6 lg:p-8">
+    <header-title-page [titleHead]="headTitle" />
+
+    <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <!-- Columna Formulario Principal -->
+        <div class="lg:col-span-2 space-y-6">
+            <form [formGroup]="form" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 dark:bg-gray-800 dark:border-gray-700">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <!-- Tipo de Nota -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1 dark:text-gray-300">Tipo de Nota</label>
+                        <div class="flex gap-2">
+                           <button type="button" (click)="tipoNota.set('CREDITO')" 
+                                [class]="tipoNota() === 'CREDITO' ? 'bg-orange-600 text-white' : 'bg-gray-100 text-gray-600'"
+                                class="flex-1 py-2 px-4 rounded-xl text-sm font-bold transition-all cursor-pointer">Nota Crédito</button>
+                           <button type="button" (click)="tipoNota.set('DEBITO')" 
+                                [class]="tipoNota() === 'DEBITO' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600'"
+                                class="flex-1 py-2 px-4 rounded-xl text-sm font-bold transition-all cursor-pointer">Nota Débito</button>
+                        </div>
+                    </div>
+
+                    <!-- Factura Original -->
+                    <div class="relative">
+                        <label class="block text-sm font-bold text-gray-700 mb-1 dark:text-gray-300">Factura Original</label>
+                        <input type="text" formControlName="facturaSearch" placeholder="Buscar factura..."
+                            class="w-full px-4 py-2 bg-gray-50 border-0 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 placeholder-gray-400 dark:bg-gray-900 dark:text-white" />
+                        <app-list-group-dropdown 
+                            title="Seleccionar Factura" 
+                            [dataList]="facturasDisponibles()" 
+                            [labelKey]="['comprobante_completo']"
+                            (objectSelect)="onFacturaSeleccionada($event)">
+                            <ng-template let-factura>
+                                <div class="flex flex-col">
+                                    <span class="font-bold text-sm">{{ factura.comprobante_completo }}</span>
+                                    <span class="text-xs text-gray-500">{{ factura.client.nombre }} {{ factura.client.apellido }}</span>
+                                </div>
+                            </ng-template>
+                        </app-list-group-dropdown>
+                        <form-error-label [errorType]="form.get('facturaOriginalId')!" />
+                    </div>
+
+                    <!-- Concepto DIAN -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1 dark:text-gray-300">Concepto DIAN</label>
+                        <select formControlName="concepto" class="w-full px-4 py-2 bg-gray-50 border-0 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 dark:bg-gray-900 dark:text-white">
+                            <option value="">Seleccione un concepto</option>
+                            @for (c of conceptos(); track c.value) {
+                                <option [value]="c.value">{{ c.label }}</option>
+                            }
+                        </select>
+                        <form-error-label [errorType]="form.get('concepto')!" />
+                    </div>
+
+                    <!-- Fecha -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1 dark:text-gray-300">Fecha</label>
+                        <input type="date" formControlName="fecha" class="w-full px-4 py-2 bg-gray-50 border-0 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 dark:bg-gray-900 dark:text-white" />
+                        <form-error-label [errorType]="form.get('fecha')!" />
+                    </div>
+                </div>
+
+                <!-- Motivo -->
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-gray-700 mb-1 dark:text-gray-300">Motivo del Ajuste</label>
+                    <textarea formControlName="motivo" rows="3" placeholder="Explique brevemente el motivo de la nota..."
+                        class="w-full px-4 py-2 bg-gray-50 border-0 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 placeholder-gray-400 dark:bg-gray-900 dark:text-white"></textarea>
+                    <form-error-label [errorType]="form.get('motivo')!" />
+                </div>
+            </form>
+
+            <!-- Tabla de Items -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden dark:bg-gray-800 dark:border-gray-700">
+                <div class="p-4 border-b border-gray-50 flex justify-between items-center dark:border-gray-700">
+                    <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300">Ítems a Ajustar</h3>
+                    <span class="text-xs text-gray-500">Cargados desde la factura original</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-gray-50 text-xs font-bold uppercase text-gray-500 dark:bg-gray-700">
+                            <tr>
+                                <th class="px-4 py-3">Descripción</th>
+                                <th class="px-4 py-3 text-center">Cant. Original</th>
+                                <th class="px-4 py-3 text-center">Cant. Ajuste</th>
+                                <th class="px-4 py-3 text-right">Unitario</th>
+                                <th class="px-4 py-3 text-center">IVA %</th>
+                                <th class="px-4 py-3 text-right">Subtotal</th>
+                                <th class="px-4 py-3 text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50 dark:divide-gray-700">
+                            @for (item of itemsSeleccionados(); track $index) {
+                                <tr>
+                                    <td class="px-4 py-3">{{ item.descripcion }}</td>
+                                    <td class="px-4 py-3 text-center text-gray-400">{{ item.cantidad }}</td>
+                                    <td class="px-4 py-3">
+                                        <input type="number" [value]="item.cantidad" (input)="updateItemQuantity($index, $any($event.target).value)"
+                                            class="w-20 mx-auto block px-2 py-1 bg-gray-50 border-0 rounded text-center text-sm focus:ring-1 focus:ring-blue-500 dark:bg-gray-900 dark:text-white" />
+                                    </td>
+                                    <td class="px-4 py-3 text-right">{{ item.valorUnitario | currency:'COP':'symbol':'1.0-0' }}</td>
+                                    <td class="px-4 py-3 text-center">{{ item.porcentajeIVA }}%</td>
+                                    <td class="px-4 py-3 text-right font-medium">
+                                        {{ (item.cantidad * item.valorUnitario) | currency:'COP':'symbol':'1.0-0' }}
+                                    </td>
+                                    <td class="px-4 py-3 text-center">
+                                        <button (click)="removeItem($index)" class="text-red-500 hover:text-red-700 p-1">
+                                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                            @if (itemsSeleccionados().length === 0) {
+                                <tr>
+                                    <td colspan="7" class="px-4 py-8 text-center text-gray-500">
+                                        Seleccione una factura para cargar los ítems
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna Resumen y Totales -->
+        <div class="space-y-6">
+            @if (facturaSeleccionada()) {
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 dark:bg-gray-800 dark:border-gray-700">
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Información de la Factura</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Cliente:</span>
+                            <span class="font-bold text-gray-900 dark:text-white">{{ facturaSeleccionada()?.client?.nombre }} {{ facturaSeleccionada()?.client?.apellido }}</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Total Factura:</span>
+                            <span class="font-bold text-gray-900 dark:text-white">{{ facturaSeleccionada()?.total | currency:'COP':'symbol':'1.0-0' }}</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Saldo Pendiente:</span>
+                            <span class="font-bold text-red-600">{{ facturaSeleccionada()?.saldoPendiente | currency:'COP':'symbol':'1.0-0' }}</span>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 dark:bg-gray-800 dark:border-gray-700">
+                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Resumen del Ajuste</h3>
+                <div class="space-y-4">
+                    <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                        <span>Subtotal</span>
+                        <span class="font-bold text-gray-900 dark:text-white">{{ totales().subtotal | currency:'COP':'symbol':'1.0-0' }}</span>
+                    </div>
+                    <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+                        <span>Impuestos (IVA)</span>
+                        <span class="font-bold text-gray-900 dark:text-white">{{ totales().iva | currency:'COP':'symbol':'1.0-0' }}</span>
+                    </div>
+                    <div class="pt-4 border-t border-gray-50 flex justify-between items-center dark:border-gray-700">
+                        <span class="text-base font-black text-gray-900 dark:text-white">Total Ajuste</span>
+                        <span class="text-xl font-black text-blue-600">{{ totales().total | currency:'COP':'symbol':'1.0-0' }}</span>
+                    </div>
+                </div>
+
+                <div class="mt-8 space-y-3">
+                    <button (click)="onSubmit()" 
+                        class="w-full bg-blue-600 text-white py-4 rounded-2xl text-base font-black shadow-lg shadow-blue-200 transition-all hover:bg-blue-700 active:scale-95 cursor-pointer">
+                        Guardar Nota de Ajuste
+                    </button>
+                    <a routerLink="/panel/ventas/notas-ajuste" 
+                        class="block w-full text-center text-sm font-bold text-gray-400 hover:text-gray-600 transition-all">
+                        Cancelar y Volver
+                    </a>
+                </div>
+            </div>
+
+            <!-- Observaciones -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 dark:bg-gray-800 dark:border-gray-700">
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Observaciones Internas</label>
+                <textarea [formControl]="$any(form.get('observaciones'))" rows="4" 
+                    class="w-full px-4 py-2 bg-gray-50 border-0 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 placeholder-gray-400 dark:bg-gray-900 dark:text-white"></textarea>
+            </div>
+        </div>
+    </div>
+</div>
