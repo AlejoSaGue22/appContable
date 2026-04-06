@@ -64,10 +64,10 @@ export class RolesComponent {
   }
 
   async openEditModal(role: Role) {
-    if (role.isSystem) {
-      this.notificationService.warning('Los roles del sistema no pueden ser editados', 'Información');
-      return;
-    }
+    // if (role.isSystem) {
+    //   this.notificationService.warning('Los roles del sistema no pueden ser editados', 'Información');
+    //   return;
+    // }
 
     this.isEditing.set(true);
     this.selectedRoleId.set(role.id);

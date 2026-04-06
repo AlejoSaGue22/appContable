@@ -46,44 +46,44 @@ export class CategoriaFormModalComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
+      if (this.form.invalid) {
+        this.form.markAllAsTouched();
+        return;
+      }
 
-    this.isSubmitting.set(true);
-    const dto = this.form.value;
+      this.isSubmitting.set(true);
+      const dto = this.form.value;
 
-    if (this.category) {
-      this.catalogsService.updateCategoryArticle(this.category.id.toString(), dto).subscribe({
-        next: () => {
-          this.notificationService.success('Categoría actualizada correctamente', 'Éxito');
-          this.submitForm.emit();
-          this.isSubmitting.set(false);
-          this.onClose();
-        },
-        error: (err: any) => {
-          this.notificationService.error('Error al actualizar la categoría', err.error?.message || 'Error desconocido');
-          this.isSubmitting.set(false);
-        }
-      });
-    } else {
-      this.catalogsService.createCategoryArticle(dto).subscribe({
-        next: () => {
-          this.notificationService.success('Categoría creada correctamente', 'Éxito');
-          this.submitForm.emit();
-          this.isSubmitting.set(false);
-          this.onClose();
-        },
-        error: (err: any) => {
-          this.notificationService.error('Error al crear la categoría', err.error?.message || 'Error desconocido');
-          this.isSubmitting.set(false);
-        }
-      });
-    }
+      if (this.category) {
+        this.catalogsService.updateCategoryArticle(this.category.id.toString(), dto).subscribe({
+          next: () => {
+            this.notificationService.success('Categoría actualizada correctamente', 'Éxito');
+            this.submitForm.emit();
+            this.isSubmitting.set(false);
+            this.onClose();
+          },
+          error: (err: any) => {
+            this.notificationService.error('Error al actualizar la categoría', err.error?.message || 'Error desconocido');
+            this.isSubmitting.set(false);
+          } 
+        });
+      } else {
+        this.catalogsService.createCategoryArticle(dto).subscribe({
+          next: () => {
+            this.notificationService.success('Categoría creada correctamente', 'Éxito');
+            this.submitForm.emit();
+            this.isSubmitting.set(false);
+            this.onClose();
+          },
+          error: (err: any) => {
+            this.notificationService.error('Error al crear la categoría', err.error?.message || 'Error desconocido');
+            this.isSubmitting.set(false);
+          }
+        });
+      }
   }
 
   onClose() {
-    this.close.emit();
+      this.close.emit();
   }
 }
