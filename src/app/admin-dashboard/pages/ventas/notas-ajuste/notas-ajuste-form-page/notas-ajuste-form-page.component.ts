@@ -12,6 +12,7 @@ import { LoaderService } from '@utils/services/loader.service';
 import { ListGroupDropdownComponent } from "@shared/components/list-group-dropdown/list-group-dropdown.component";
 import { ComprobantesVentasService } from '../../services/comprobantes-ventas.service';
 import { NotasAjusteService } from '../../services/notas-ajuste.service';
+import { CatalogsStore } from '@dashboard/services/catalogs.store';
 import { ConceptosNotaCredito, ConceptosNotaDebito, NotaAjusteItem, NotaAjuste } from "../../../../interfaces/notas-ajuste-interface";
 import { GetFacturaRequest } from '@dashboard/interfaces/documento-venta-interface';
 
@@ -42,6 +43,7 @@ export class NotasAjusteFormPageComponent implements OnInit {
   private ventasService = inject(ComprobantesVentasService);
   private notificationService = inject(NotificationService);
   private loaderService = inject(LoaderService);
+  public catalogsStore = inject(CatalogsStore);
 
   notaId = toSignal(this.route.params.pipe(map(p => p['id'])));
   facturaIdFromQuery = toSignal(this.route.queryParams.pipe(map(p => p['facturaId'])));
@@ -58,6 +60,7 @@ export class NotasAjusteFormPageComponent implements OnInit {
     facturaSearch: [''],
     tipo: ['CREDITO', Validators.required],
     concepto: ['', Validators.required],
+    metodoPago: ['', Validators.required],
     motivo: ['', [Validators.required, Validators.maxLength(1000)]],
     fecha: [new Date().toISOString().split('T')[0], Validators.required],
     fechaVencimiento: [''],
@@ -66,12 +69,26 @@ export class NotasAjusteFormPageComponent implements OnInit {
 
   totales = computed(() => {
     const items = this.itemsSeleccionados();
-    const subtotal = items.reduce((acc, item) => acc + (item.cantidad * item.valorUnitario), 0);
-    const iva = items.reduce((acc, item) => acc + (item.cantidad * item.valorUnitario * (item.porcentajeIVA / 100)), 0);
+    let subtotal = 0;
+    let totalDescuento = 0;
+    let totalIVA = 0;
+
+    items.forEach(item => {
+      const gross = item.cantidad * item.valorUnitario;
+      const discount = gross * ((item.discount || 0) / 100);
+      const afterDiscount = gross - discount;
+      const iva = afterDiscount * (item.porcentajeIVA / 100);
+
+      subtotal += gross;
+      totalDescuento += discount;
+      totalIVA += iva;
+    });
+
     return {
       subtotal,
-      iva,
-      total: subtotal + iva
+      descuento: totalDescuento,
+      iva: totalIVA,
+      total: subtotal - totalDescuento + totalIVA
     };
   });
 
@@ -105,6 +122,7 @@ export class NotasAjusteFormPageComponent implements OnInit {
           facturaOriginalId: nota.facturaOriginalId,
           tipo: nota.tipo,
           concepto: nota.concepto,
+          metodoPago: nota.metodoPago,
           motivo: nota.motivo,
           fecha: nota.fecha,
           fechaVencimiento: nota.fechaVencimiento,
@@ -133,6 +151,7 @@ export class NotasAjusteFormPageComponent implements OnInit {
       cantidad: item.quantity,
       valorUnitario: item.unitPrice,
       porcentajeIVA: item.iva,
+      descuento: item.discount || 0,
       subtotal: item.subtotal,
       total: item.total
     }));
@@ -151,12 +170,30 @@ export class NotasAjusteFormPageComponent implements OnInit {
     this.itemsSeleccionados.update(items => items.filter((_, i) => i !== index));
   }
 
-  updateItemQuantity(index: number, quantity: number) {
+  updateItemField(index: number, field: keyof NotaAjusteItem, value: any) {
     this.itemsSeleccionados.update(items => {
       const newItems = [...items];
-      newItems[index] = { ...newItems[index], cantidad: quantity };
+      newItems[index] = { 
+        ...newItems[index], 
+        [field]: (field === 'descripcion') ? value : Number(value) 
+      };
+      
+      // Recalculate subtotal and total for the row item if needed (though computed totales handles global)
+      const item = newItems[index];
+      const gross = item.cantidad * item.valorUnitario;
+      const discount = gross * ((item.discount || 0) / 100);
+      const afterDiscount = gross - discount;
+      const iva = afterDiscount * (item.porcentajeIVA / 100);
+      
+      newItems[index].subtotal = gross;
+      newItems[index].total = afterDiscount + iva;
+      
       return newItems;
     });
+  }
+
+  updateItemQuantity(index: number, quantity: number) {
+    this.updateItemField(index, 'cantidad', quantity);
   }
 
   onSubmit() {
@@ -170,7 +207,11 @@ export class NotasAjusteFormPageComponent implements OnInit {
     const data = {
       ...this.form.value,
       items: this.itemsSeleccionados(),
-      tipo: this.tipoNota()
+      tipo: this.tipoNota(),
+      subtotal: this.totales().subtotal,
+      descuento: this.totales().descuento,
+      iva: this.totales().iva,
+      total: this.totales().total
     };
 
     const id = this.notaId();

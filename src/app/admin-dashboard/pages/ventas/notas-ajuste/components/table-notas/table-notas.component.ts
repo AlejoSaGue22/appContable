@@ -45,10 +45,10 @@ export class TableNotasComponent {
 
   activeFiltersCount = computed(() => {
     let count = 0;
-    if (this.clienteNombre()) count++;
-    if (this.estado()) count++;
-    if (this.tipo()) count++;
-    if (this.facturaNumero()) count++;
+      if (this.clienteNombre()) count++;
+      if (this.estado()) count++;
+      if (this.tipo()) count++;
+      if (this.facturaNumero()) count++;
     return count;
   });
 

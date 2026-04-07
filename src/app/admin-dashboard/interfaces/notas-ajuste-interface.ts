@@ -24,6 +24,7 @@ export interface NotaAjuste {
   facturaOriginalId: string;
   facturaOriginal?: GetFacturaRequest;
   items: NotaAjusteItem[];
+  metodoPago?: string;
   observaciones?: string;
   status: NotaAjusteStatus;
   dianStatus: DianStatus;
@@ -46,6 +47,7 @@ export interface NotaAjusteItem {
   cantidad: number;
   valorUnitario: number;
   porcentajeIVA: number;
+  discount?: number;
   subtotal?: number;
   total?: number;
 }
