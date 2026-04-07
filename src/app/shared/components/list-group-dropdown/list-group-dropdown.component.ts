@@ -26,6 +26,7 @@ export class ListGroupDropdownComponent<T extends Record<string, any>> implement
   createOption = output<void>(); // Evento para crear nuevo
   searchOption = signal<string>('');
   showDropdown = signal<boolean>(false);
+  searchable = input<boolean>(true);
 
   ngOnChanges(changes: SimpleChanges): void {
     this.searchOption.set(this.valueInput());

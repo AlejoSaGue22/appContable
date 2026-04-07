@@ -30,10 +30,8 @@ import { RouterLink } from '@angular/router';
         </p>
       </div>
 
-      <a
-        routerLink="/panel/compras/articles/new-Item"
-        class="inline-flex items-center rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300"
-      >
+      <a routerLink="/panel/compras/articles/new-Item" class="inline-flex items-center rounded-lg bg-blue-700 
+          px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300">
         <svg class="mr-2 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
           <path d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" />
         </svg>

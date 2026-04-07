@@ -16,7 +16,7 @@ import { TableNotasComponent, NotaFilters } from './components/table-notas/table
 @Component({
   selector: 'app-notas-ajuste',
   standalone: true,
-  imports: [LoaderComponent, ErrorPages, ModalComponent, TableNotasComponent, RouterLink],
+  imports: [LoaderComponent, ErrorPages, ModalComponent, TableNotasComponent, RouterLink, HeaderTitlePageComponent],
   templateUrl: './notas-ajuste.component.html',
 })
 export class NotasAjusteComponent {

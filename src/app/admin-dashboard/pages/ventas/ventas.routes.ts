@@ -48,10 +48,6 @@ export const ventasRoutes: Routes = [
         component: NotasAjusteFormPageComponent
     },
     {
-        path: 'nota-credito',
-        component: NotasAjusteComponent
-    },
-    {
         path: '**',
         component: ErrorPageComponent
     }
