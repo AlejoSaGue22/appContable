@@ -48,7 +48,7 @@ export class ListGroupDropdownComponent<T extends Record<string, any>> implement
     return keys
       .map(key => String(item[key] ?? '').trim())
       .filter(Boolean)
-      .join(' ');
+      .join(' - ');
   }
 
   constructor(private elementRef: ElementRef) { }
@@ -93,6 +93,7 @@ export class ListGroupDropdownComponent<T extends Record<string, any>> implement
   }
 
   selectedItem(item: T) {
+    console.log(item);
     this.value = item[this.labelKey()[0]];
     this.objectSelect.emit(item);
     this.searchOption.set(item[this.labelKey()[0]]);

@@ -1,6 +1,7 @@
 import { ClientesInterfaceResponse } from "./clientes-interface";
 import { CreatedBy } from "./factura-compra-interface";
 import { DianStatus, GetFacturaRequest } from "./documento-venta-interface";
+import { GetProductosDetalle } from "./productos-interface";
 
 export interface NotaAjusteResponse {
   success: boolean;
@@ -14,19 +15,26 @@ export interface NotaAjusteResponse {
   };
 }
 
+export interface NotaAjusteResponseById {
+  success: boolean;
+  data: NotaAjuste;
+  message?: string;
+}
+
 export interface NotaAjuste {
   id: string;
-  tipo: 'CREDITO' | 'DEBITO';
+  tipo: 'credito' | 'debito';
   concepto: string; // Codigo del concepto DIAN
   motivo: string;
   fecha: string;
   fechaVencimiento?: string;
   facturaOriginalId: string;
+  facturaOriginalNumero: string;
   facturaOriginal?: GetFacturaRequest;
   items: NotaAjusteItem[];
   metodoPago?: string;
   observaciones?: string;
-  status: NotaAjusteStatus;
+  estado: NotaAjusteStatus;
   dianStatus: DianStatus;
   numero: string;
   prefijo: string;
@@ -34,8 +42,8 @@ export interface NotaAjuste {
   total: number;
   iva: number;
   subtotal: number;
-  client?: ClientesInterfaceResponse;
-  clientId: string;
+  cliente?: ClientesInterfaceResponse;
+  clienteId: string;
   createdBy?: CreatedBy;
   createdAt: string;
   mensajeError?: string;
@@ -44,20 +52,22 @@ export interface NotaAjuste {
 export interface NotaAjusteItem {
   id?: string;
   descripcion: string;
+  articuloId: string;
+  articulo?: GetProductosDetalle;
   cantidad: number;
   valorUnitario: number;
   porcentajeIVA: number;
-  discount?: number;
+  descuento?: number;
   subtotal?: number;
   total?: number;
 }
 
 export enum NotaAjusteStatus {
-  DRAFT = 'draft',
-  SENT = 'sent',
-  ACCEPTED = 'accepted',
-  REJECTED = 'rejected',
-  CANCELLED = 'cancelled'
+  DRAFT = 'borrador',
+  SENT = 'enviada',
+  ACCEPTED = 'aceptada',
+  REJECTED = 'rechazada',
+  CANCELLED = 'anulada'
 }
 
 export const ConceptosNotaCredito = [

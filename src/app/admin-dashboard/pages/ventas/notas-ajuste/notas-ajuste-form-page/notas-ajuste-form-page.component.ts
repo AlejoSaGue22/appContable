@@ -31,10 +31,13 @@ import { GetFacturaRequest } from '@dashboard/interfaces/documento-venta-interfa
 })
 export class NotasAjusteFormPageComponent implements OnInit {
 
-  headTitle: HeaderInput = {
-    title: 'Nueva Nota de Ajuste',
-    slog: 'Registra una nota crédito o débito vinculada a una factura'
-  };
+  headTitle = computed(() => {
+    const id = this.notaId();
+    return {
+      title: id ? 'Editar Nota de Ajuste' : 'Nueva Nota de Ajuste',
+      slog: id ? 'Edita una nota crédito o débito vinculada a una factura' : 'Registra una nota crédito o débito vinculada a una factura'
+    };
+  });
 
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
@@ -48,8 +51,8 @@ export class NotasAjusteFormPageComponent implements OnInit {
   notaId = toSignal(this.route.params.pipe(map(p => p['id'])));
   facturaIdFromQuery = toSignal(this.route.queryParams.pipe(map(p => p['facturaId'])));
   
-  tipoNota = signal<'CREDITO' | 'DEBITO'>('CREDITO');
-  conceptos = computed(() => this.tipoNota() === 'CREDITO' ? ConceptosNotaCredito : ConceptosNotaDebito);
+  tipoNota = signal<'credito' | 'debito'>('credito');
+  conceptos = computed(() => this.tipoNota() === 'credito' ? ConceptosNotaCredito : ConceptosNotaDebito);
   
   facturasDisponibles = signal<GetFacturaRequest[]>([]);
   itemsSeleccionados = signal<NotaAjusteItem[]>([]);
@@ -58,7 +61,7 @@ export class NotasAjusteFormPageComponent implements OnInit {
   form = this.fb.group({
     facturaOriginalId: ['', Validators.required],
     facturaSearch: [''],
-    tipo: ['CREDITO', Validators.required],
+    tipo: ['credito', Validators.required],
     concepto: ['', Validators.required],
     metodoPago: ['', Validators.required],
     motivo: ['', [Validators.required, Validators.maxLength(1000)]],
@@ -75,7 +78,7 @@ export class NotasAjusteFormPageComponent implements OnInit {
 
     items.forEach(item => {
       const gross = item.cantidad * item.valorUnitario;
-      const discount = gross * ((item.discount || 0) / 100);
+      const discount = gross * ((item.descuento || 0) / 100);
       const afterDiscount = gross - discount;
       const iva = afterDiscount * (item.porcentajeIVA / 100);
 
@@ -115,26 +118,55 @@ export class NotasAjusteFormPageComponent implements OnInit {
   }
 
   loadNota(id: string) {
-    this.notasService.getNotaAjusteById(id).subscribe({
-      next: (res) => {
-        const nota = res.data[0];
-        this.form.patchValue({
-          facturaOriginalId: nota.facturaOriginalId,
-          tipo: nota.tipo,
-          concepto: nota.concepto,
-          metodoPago: nota.metodoPago,
-          motivo: nota.motivo,
-          fecha: nota.fecha,
-          fechaVencimiento: nota.fechaVencimiento,
-          observaciones: nota.observaciones
-        });
-        this.tipoNota.set(nota.tipo as any);
-        this.itemsSeleccionados.set(nota.items);
-        this.facturaSeleccionada.set(nota.facturaOriginal || null);
-        this.loaderService.hide();
-      },
-      error: () => this.loaderService.hide()
-    });
+
+      this.notasService.getNotaAjusteById(id).subscribe({
+        next: (res) => {
+            try {
+              
+            const nota = res.data;
+            this.form.patchValue({
+              facturaSearch: nota.facturaOriginalNumero,
+              facturaOriginalId: nota.facturaOriginalNumero,
+              tipo: nota.tipo,
+              concepto: nota.concepto,
+              metodoPago: nota.metodoPago,
+              motivo: nota.motivo,
+              fecha: nota.fecha,
+              fechaVencimiento: nota.fechaVencimiento,
+              observaciones: nota.observaciones
+            });
+            this.tipoNota.set(nota.tipo);
+            const mappedItems = nota.items.map(item => {
+              const gross = item.cantidad * item.valorUnitario;
+              const discountVal = gross * ((item.descuento || 0) / 100);
+              const afterDiscount = gross - discountVal;
+              const ivaVal = afterDiscount * (item.porcentajeIVA / 100);
+              return {
+                ...item,
+                articuloId: item.articuloId,
+                descripcion: item.articulo?.nombre || '',
+                descuento: item.descuento,
+                subtotal: gross,
+                total: afterDiscount + ivaVal
+              };
+            });
+            this.itemsSeleccionados.set(mappedItems);
+            const factura = { ...nota.facturaOriginal, client: nota.cliente } as GetFacturaRequest;
+            this.facturaSeleccionada.set(factura);
+            this.loaderService.hide();
+            } catch (error) {
+              console.log('Error al cargar la nota de ajuste 2', error);
+              this.loaderService.hide();
+              this.notificationService.error('Error al cargar la nota de ajuste', 'Error');
+            }
+        },
+        error: (error) => {
+          console.log('Error al cargar la nota de ajuste 1', error);
+          this.loaderService.hide();
+          this.notificationService.error(error.error.message || 'Error al cargar la nota de ajuste', 'Error');
+        }
+      });
+    
   }
 
   onFacturaSeleccionada(factura: any) {
@@ -142,19 +174,28 @@ export class NotasAjusteFormPageComponent implements OnInit {
     this.facturaSeleccionada.set(f);
     this.form.patchValue({
       facturaOriginalId: f.id,
-      facturaSearch: f.comprobante_completo
+      facturaSearch: f.comprobante_completo,
+      metodoPago: f.metodoPago
     });
     
     // Auto-load items from invoice
-    const items: NotaAjusteItem[] = f.items.map(item => ({
-      descripcion: item.description,
-      cantidad: item.quantity,
-      valorUnitario: item.unitPrice,
-      porcentajeIVA: item.iva,
-      descuento: item.discount || 0,
-      subtotal: item.subtotal,
-      total: item.total
-    }));
+    const items: NotaAjusteItem[] = f.items.map(item => {
+      const gross = item.quantity * item.unitPrice;
+      const discountVal = gross * ((item.discount || 0) / 100);
+      const afterDiscount = gross - discountVal;
+      const ivaVal = afterDiscount * (item.iva / 100);
+
+      return {
+        descripcion: item.articulo.nombre,
+        articuloId: item.articuloId,
+        cantidad: item.quantity,
+        valorUnitario: item.unitPrice,
+        porcentajeIVA: item.iva,
+        descuento: item.discount || 0,
+        subtotal: gross,
+        total: afterDiscount + ivaVal
+      };
+    });
     this.itemsSeleccionados.set(items);
   }
 
@@ -181,7 +222,7 @@ export class NotasAjusteFormPageComponent implements OnInit {
       // Recalculate subtotal and total for the row item if needed (though computed totales handles global)
       const item = newItems[index];
       const gross = item.cantidad * item.valorUnitario;
-      const discount = gross * ((item.discount || 0) / 100);
+      const discount = gross * ((item.descuento || 0) / 100);
       const afterDiscount = gross - discount;
       const iva = afterDiscount * (item.porcentajeIVA / 100);
       
@@ -205,9 +246,15 @@ export class NotasAjusteFormPageComponent implements OnInit {
 
     this.loaderService.show();
     const data = {
-      ...this.form.value,
-      items: this.itemsSeleccionados(),
       tipo: this.tipoNota(),
+      facturaOriginalId: this.form.value.facturaOriginalId,
+      metodoPago: this.form.value.metodoPago,
+      concepto: this.form.value.concepto,
+      motivo: this.form.value.motivo,
+      fecha: this.form.value.fecha,
+      fechaVencimiento: this.form.value.fechaVencimiento,
+      items: this.itemsSeleccionados(),
+      observaciones: this.form.value.observaciones,
       subtotal: this.totales().subtotal,
       descuento: this.totales().descuento,
       iva: this.totales().iva,
@@ -217,7 +264,7 @@ export class NotasAjusteFormPageComponent implements OnInit {
     const id = this.notaId();
     const request = (id && id !== 'new') 
       ? this.notasService.updateNotaAjuste(id, data)
-      : (this.tipoNota() === 'CREDITO' ? this.notasService.createNotaCredito(data) : this.notasService.createNotaDebito(data));
+      : (this.tipoNota() === 'credito' ? this.notasService.createNotaCredito(data) : this.notasService.createNotaDebito(data));
 
     request.subscribe({
       next: (res) => {

@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { Options, ResponseResult } from '@shared/interfaces/services.interfaces';
 import { catchError, delay, map, Observable, of } from 'rxjs';
 import { environment } from 'src/app/environments/environment';
-import { NotaAjuste, NotaAjusteResponse } from '../../../interfaces/notas-ajuste-interface';
+import { NotaAjuste, NotaAjusteResponse, NotaAjusteResponseById } from '../../../interfaces/notas-ajuste-interface';
 
 const baseUrl = environment.baseUrl;
 
@@ -39,8 +39,8 @@ export class NotasAjusteService {
     );
   }
 
-  getNotaAjusteById(id: string): Observable<NotaAjusteResponse> {
-    return this.http.get<NotaAjusteResponse>(`${baseUrl}/notas-ajuste/${id}`);
+  getNotaAjusteById(id: string): Observable<NotaAjusteResponseById> {
+    return this.http.get<NotaAjusteResponseById>(`${baseUrl}/notas-ajuste/${id}`);
   }
 
   createNotaCredito(data: any): Observable<ResponseResult> {
