@@ -126,10 +126,10 @@ export class NotasAjusteFormPageComponent implements OnInit {
             const nota = res.data;
             this.form.patchValue({
               facturaSearch: nota.facturaOriginalNumero,
-              facturaOriginalId: nota.facturaOriginalNumero,
+              facturaOriginalId: nota.facturaOriginalId,
               tipo: nota.tipo,
               concepto: nota.concepto,
-              metodoPago: nota.metodoPago,
+              metodoPago: nota.metodoPago?.toString(),
               motivo: nota.motivo,
               fecha: nota.fecha,
               fechaVencimiento: nota.fechaVencimiento,
@@ -137,17 +137,21 @@ export class NotasAjusteFormPageComponent implements OnInit {
             });
             this.tipoNota.set(nota.tipo);
             const mappedItems = nota.items.map(item => {
-              const gross = item.cantidad * item.valorUnitario;
+              const cantidad = item.cantidad;
+              const valorUnitario = item.valorUnitario;
+              const gross = cantidad * valorUnitario;
               const discountVal = gross * ((item.descuento || 0) / 100);
               const afterDiscount = gross - discountVal;
               const ivaVal = afterDiscount * (item.porcentajeIVA / 100);
               return {
-                ...item,
                 articuloId: item.articuloId,
                 descripcion: item.articulo?.nombre || '',
                 descuento: item.descuento,
                 subtotal: gross,
-                total: afterDiscount + ivaVal
+                total: afterDiscount + ivaVal,
+                cantidad: item.cantidad,
+                valorUnitario: item.valorUnitario,
+                porcentajeIVA: item.porcentajeIVA,
               };
             });
             this.itemsSeleccionados.set(mappedItems);

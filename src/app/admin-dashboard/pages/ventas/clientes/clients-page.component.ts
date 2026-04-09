@@ -65,8 +65,7 @@ export class ClientsPageComponent {
 
     onSearch(term: string) {
         this.searchTerm.set(term);
-        // Navigate back to page 1 on search
-        this.router.navigate([], { queryParams: { page: 1 }, queryParamsHandling: 'merge' });
+        this.router.navigate([], { queryParams: { search: term }, queryParamsHandling: 'merge' });
     }
 
     openModal(event: modalOpen) {

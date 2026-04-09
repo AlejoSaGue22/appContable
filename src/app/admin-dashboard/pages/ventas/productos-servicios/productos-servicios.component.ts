@@ -75,11 +75,7 @@ export class ProductosServiciosComponent {
    async deleteProducto() {
       const ID = this.idProductoToModal();
       if (!ID) {
-         this.notificacionService.error(
-            'No se obtuvo el Producto o Servicio',
-            'Error',
-            5000
-         );
+         this.notificacionService.error('No se obtuvo el Producto o Servicio', 'Error', 5000);
          return;
       }
 
@@ -88,18 +84,14 @@ export class ProductosServiciosComponent {
       if (product.success == false) {
          this.isModalEdit = false;
          this.notificacionService.error(
-            `Hubo un error al guardar el Producto o Servicio ${product.error.message}`,
+            `Hubo un error al eliminar el Producto o Servicio ${product.error.message}`,
             'Error',
             5000
          );
          return;
       }
 
-      this.notificacionService.success(
-         'Se ha eliminado el producto correctamente',
-         'Eliminado!',
-         3000
-      );
+      this.notificacionService.success('Se ha eliminado el producto correctamente', 'Eliminado!', 3000);
       setTimeout(() => {
          window.location.reload();
       }, 600);
