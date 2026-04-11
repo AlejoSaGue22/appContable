@@ -142,8 +142,8 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
 
   getClientesAndProductos() {
     forkJoin({
-      clientes: this.clienteServicios.getClientes({ limit: 10000, offset: 0 }),
-      productos: this.productoServicios.getProductos({ limit: 10000, offset: 0, venta_compra: 'venta' })
+      clientes: this.clienteServicios.getClientes({ limit: 10, offset: 0 }),
+      productos: this.productoServicios.getProductos({ limit: 10, offset: 0, venta_compra: 'venta' })
     }).subscribe({
       next: ({ clientes, productos }) => {
         const clienteMap = clientes.clientes.map((item) => {

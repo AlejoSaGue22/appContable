@@ -22,6 +22,7 @@ export interface ComprobanteCompraResponse {
 
 export interface FacturaCompra {
     id: string;
+    isDraft: string;
     proveedorId: string;
     numero: string;
     status: InvoiceCompraStatus;

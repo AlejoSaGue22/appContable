@@ -19,6 +19,7 @@
         [pageSize]="pageSize()"
         (filterChange)="onFilterChange($event)" 
         (anular)="openModalItem($event, 'anular')"
+        (delete)="openModalItem($event, 'delete')"
         (pageChange)="onPageChange($event)"  />
   }
 

@@ -39,22 +39,21 @@ export class ClientesService {
   private municipalitiesCache: Municipality[] | null = null;
 
   getClientes(options: Options): Observable<ClientesResponse> {
-    const { limit = 10, offset = 0 } = options;
+    const { limit = 10, offset = 0, search } = options;
 
-    const key = `${limit}-${offset}`;
+    const params: any = {
+      limit,
+      offset
+    };
 
-    // if (this.clientCache.has(key)) {
-    //   return of(this.clientCache.get(key)!)
-    // }
+    if (search) {
+      params.search = search;
+    }
 
     return this.http.get<ClientesResponse>(`${baseUrl}/clientes`, {
-      params: {
-        limit,
-        offset
-      }
+      params
     }).pipe(
       delay(100),
-      //  tap((client) => this.clientCache.set(key, client))
     )
 
   }

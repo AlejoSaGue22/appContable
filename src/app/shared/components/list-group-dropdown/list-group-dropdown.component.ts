@@ -21,7 +21,7 @@ export class ListGroupDropdownComponent<T extends Record<string, any>> implement
 
   dataList = input<T[]>([]);
   valueInput = input<string>('');
-  labelKey = input<string[]>(['nombre']);
+  labelKey = input<string[]>([]);
   objectSelect = output<T>();
   createOption = output<void>(); // Evento para crear nuevo
   searchOption = signal<string>('');

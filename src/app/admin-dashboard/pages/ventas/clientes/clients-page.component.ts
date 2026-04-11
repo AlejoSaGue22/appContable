@@ -11,7 +11,7 @@ import { PaginationService } from '@shared/components/pagination/pagination.serv
 import { NotificationService } from '@shared/services/notification.service';
 import { TableClientsComponent } from './components/table-clients/table-clients.component';
 import { PaginationComponent } from '@shared/components/pagination/pagination';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { HelpersUtils } from '@utils/helpers.utils';
 import { ClientDetailComponent } from './components/client-detail/client-detail.component';
 import { ClientesInterfaceResponse } from '@dashboard/interfaces/clientes-interface';
@@ -31,6 +31,7 @@ export class ClientsPageComponent {
 
     paginationService = inject(PaginationService);
     router = inject(Router);
+    route = inject(ActivatedRoute);
     clienteServices = inject(ClientesService);
     notificacionService = inject(NotificationService);
     cardsTotales = signal<CardsTotales[]>([]);
@@ -39,13 +40,14 @@ export class ClientsPageComponent {
     selectedCliente = signal<ClientesInterfaceResponse | null>(null);
     isModalEdit = false;
     isModalDetail = false;
-    searchTerm = signal<string>('');
+    searchTerm = signal<string>(this.route.snapshot.queryParams['search'] || '');
+    appliedSearchTerm = signal<string>(this.route.snapshot.queryParams['search'] || '');
 
     clientesResource = rxResource({
         request: () => ({ 
             page: this.paginationService.currentPage() - 1, 
             limit: 10,
-            search: this.searchTerm()
+            search: this.appliedSearchTerm()
         }),
         loader: ({ request }) => this.clienteServices.getClientes({ 
             offset: request.page * request.limit, 
@@ -65,6 +67,11 @@ export class ClientsPageComponent {
 
     onSearch(term: string) {
         this.searchTerm.set(term);
+    }
+
+    executeSearch() {
+        const term = this.searchTerm();
+        this.appliedSearchTerm.set(term);
         this.router.navigate([], { queryParams: { search: term }, queryParamsHandling: 'merge' });
     }
 

@@ -32,6 +32,7 @@ export class TableComprasComponent {
   totalItems = input<number>(0);
   pageSize = input<number>(10);
   anular = output<string>();
+  delete = output<string>();
 
   // Output events
   filterChange = output<PurchaseInvoiceFilters>();
@@ -128,6 +129,10 @@ export class TableComprasComponent {
 
   onAnular(id: string): void {
     this.anular.emit(id);
+  }
+
+  onDelete(id: string): void {
+    this.delete.emit(id);
   }
 
   clearFilters(): void {

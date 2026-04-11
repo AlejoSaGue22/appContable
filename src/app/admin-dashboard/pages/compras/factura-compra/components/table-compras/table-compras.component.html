@@ -38,12 +38,12 @@
         </button>
 
         <button (click)="applyFilters()" 
-          class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm cursor-pointer rounded-xl shadow-lg shadow-blue-100 transition-all active:scale-95">
+          class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm cursor-pointer rounded-xl transition-all active:scale-95">
           Consultar
         </button>
 
         <a routerLink="/panel/compras/purchases/new"
-          class="flex items-center gap-2 px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm cursor-pointer rounded-xl shadow-lg shadow-emerald-100 transition-all active:scale-95">
+          class="flex items-center gap-2 px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm cursor-pointer rounded-xl transition-all active:scale-95">
           <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
@@ -106,24 +106,24 @@
     }
   </div>
 
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+  <div class="relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
     <div class="overflow-x-auto">
-      <table class="w-full text-left text-sm">
-        <thead class="bg-gray-50/50 text-[11px] text-gray-400 border-b border-gray-100">
+      <table class="w-full text-left text-sm text-gray-500 dark:text-gray-400">
+        <thead class="bg-gray-50 text-xs text-gray-700 dark:bg-gray-700 dark:text-gray-400">
           <tr>
-            <th scope="col" class="px-8 py-5">Fecha Emisión</th>
-            <th scope="col" class="px-8 py-5">N° Comprobante</th>
-            <th scope="col" class="px-8 py-5">Proveedor</th>
-            <th scope="col" class="px-8 py-5 text-right">Monto Total</th>
-            <th scope="col" class="px-8 py-5 text-right">Saldo Pendiente</th>
-            <th scope="col" class="px-8 py-5 text-center">Estado</th>
-            <th scope="col" class="px-8 py-5 text-right">Opciones</th>
+            <th scope="col" class="px-6 py-3">Fecha Emisión</th>
+            <th scope="col" class="px-6 py-3">N° Comprobante</th>
+            <th scope="col" class="px-6 py-3">Proveedor</th>
+            <th scope="col" class="px-6 py-3 text-right">Monto Total</th>
+            <th scope="col" class="px-6 py-3 text-right">Saldo Pendiente</th>
+            <th scope="col" class="px-6 py-3 text-center">Estado</th>
+            <th scope="col" class="px-6 py-3 text-center">Acciones</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-50">
           @if (compraData().length === 0) {
             <tr>
-              <td colspan="7" class="px-8 py-20 text-center">
+              <td colspan="7" class="px-6 py-20 text-center">
                 <div class="flex flex-col items-center justify-center">
                   <div class="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
                     <svg class="h-10 w-10 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -139,28 +139,24 @@
 
           @for (compra of compraData(); track compra.id) {
             <tr class="hover:bg-blue-50/30 transition-all duration-200 group">
-              <td class="px-8 py-4 text-gray-500">
+              <td class="px-6 py-4 text-gray-500">
                 {{ compra.fecha }}
               </td>
-              <td class="px-8 py-4">
+              <td class="px-6 py-4">
                 <span class="font-mono text-xs text-gray-900">{{ compra.numero }}</span>
               </td>
-              <td class="px-8 py-4">
+              <td class="px-6 py-4">
                 <span class="text-gray-900">{{ compra.proveedor.razonSocial || (compra.proveedor.nombre) }}</span>
               </td>
-              <td class="px-8 py-4 text-right">
+              <td class="px-6 py-4 text-right">
                 <span class="text-gray-900">{{ compra.total | currency:'COP':'$':'1.0-0' }}</span>
               </td>
-              <td class="px-8 py-4 text-right">
-                @if (compra.formaPago === 'credito') {
-                  <span [class.text-red-500]="compra.saldoPendiente > 0" [class.text-emerald-500]="compra.saldoPendiente === 0">
-                    {{ compra.saldoPendiente | currency:'COP':'$':'1.0-0' }}
-                  </span>
-                } @else {
-                  <span class="text-[10px] text-gray-300 font-semibold uppercase tracking-tighter">— CONTADO —</span>
-                }
+              <td class="px-6 py-4 text-right">
+                <span [class.text-red-500]="compra.saldoPendiente > 0" [class.text-emerald-500]="compra.saldoPendiente === 0">
+                  {{ compra.saldoPendiente | currency:'COP':'$':'1.0-0' }}
+                </span>
               </td>
-              <td class="px-8 py-4 text-center">
+              <td class="px-6 py-4 text-center">
                 <span class="px-2.5 py-1 text-[10px] font-semibold uppercase tracking-tighter rounded-lg border"
                   [class]="getStatusClass(compra.estado)"
                   [class.bg-emerald-50]="compra.estado === 'registrado'"
@@ -175,36 +171,46 @@
                   {{ compra.estado === 'error_contable' ? 'Error Registro' : (compra.estado | titlecase) }}
                 </span>
               </td>
-              <td class="px-8 py-4 text-right">
-                <div class="flex items-center justify-end gap-2 text-primary">
+              <td class="px-6 py-4 text-right">
+                <div class="flex items-center justify-center gap-2 text-primary">
                   @if(compra.estado !== 'borrador'){
                     <a [routerLink]="['/panel/compras/purchases/', compra.id, 'details']"
-                      class="flex items-center justify-center w-9 h-9 rounded-xl text-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-300"
+                      class="inline-flex items-center rounded-lg p-2 text-sm text-blue-600 hover:bg-blue-50 dark:text-blue-500 dark:hover:bg-gray-700"
                       title="Ver Comprobante">
-                      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                          <path fill-rule="evenodd"
+                            d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                            clip-rule="evenodd" />
                       </svg>
                     </a>
                   }
 
                   @if (compra.estado === 'borrador') {
                     <a [routerLink]="['/panel/compras/purchases/', compra.id]"
-                      class="flex items-center justify-center w-9 h-9 rounded-xl text-emerald-600 hover:bg-emerald-600 hover:text-white transition-all duration-300"
+                      class="text-blue-600 hover:text-blue-900"
                       title="Editar Borrador">
-                      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
+                      <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                     </a>
+
+                    <button (click)="onDelete(compra.id)"
+                        class="inline-flex items-center rounded-lg p-2 text-sm text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 cursor-pointer"
+                        title="Eliminar Factura">
+                        <svg class="h-5 w-5 text-red-600 dark:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
                   }
+
+
 
                   @if (compra.estado === 'registrado') {
                     <button (click)="onAnular(compra.id)"
-                      class="flex items-center justify-center w-9 h-9 rounded-xl text-red-400 hover:bg-red-500 hover:text-white transition-all duration-300 cursor-pointer"
+                      class="inline-flex items-center rounded-lg p-1 text-sm text-red-600 hover:bg-red-100 dark:text-red-400 dark:hover:bg-red-700 cursor-pointer"
                       title="Anular Transacción">
-                      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
                     </button>
                   }
                 </div>

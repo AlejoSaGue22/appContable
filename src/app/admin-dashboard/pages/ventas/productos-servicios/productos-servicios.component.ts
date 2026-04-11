@@ -11,7 +11,7 @@ import { modalOpen } from '@shared/interfaces/services.interfaces';
 import { NotificationService } from '@shared/services/notification.service';
 import { TableProductosComponent } from './components/table-productos/table-productos.component';
 import { PaginationComponent } from '@shared/components/pagination/pagination';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 
 @Component({
    selector: 'app-productos-servicios',
@@ -28,19 +28,21 @@ export class ProductosServiciosComponent {
 
    paginationService = inject(PaginationService);
    router = inject(Router);
+   route = inject(ActivatedRoute);
    productoServicio = inject(ProductosService);
    notificacionService = inject(NotificationService);
    totalProducto = signal(0);
    idProductoToModal = signal<string>('');
    isModalEdit = false;
    cardValor = signal<CardsTotales[]>([])
-   searchTerm = signal<string>('');
+   searchTerm = signal<string>(this.route.snapshot.queryParams['search'] || '');
+   appliedSearchTerm = signal<string>(this.route.snapshot.queryParams['search'] || '');
 
    productorxResource = rxResource({
       request: () => ({ 
           page: this.paginationService.currentPage() - 1, 
           limit: 10,
-          search: this.searchTerm()
+          search: this.appliedSearchTerm()
       }),
       loader: ({ request }) => {
          return this.productoServicio.getProductos({ 
@@ -64,7 +66,12 @@ export class ProductosServiciosComponent {
 
    onSearch(term: string) {
        this.searchTerm.set(term);
-       this.router.navigate([], { queryParams: { page: 1 }, queryParamsHandling: 'merge' });
+   }
+
+   executeSearch() {
+       const term = this.searchTerm();
+       this.appliedSearchTerm.set(term);
+       this.router.navigate([], { queryParams: { search: term }, queryParamsHandling: 'merge' });
    }
 
    openModal(event: modalOpen) {

@@ -125,7 +125,7 @@ export class ProveedoresComponent {
          3000
       );
       setTimeout(() => {
-         window.location.reload();
-      }, 600);
+         this.proveedoresResource.reload();
+      }, 300);
    }
 }

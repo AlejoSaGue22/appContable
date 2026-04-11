@@ -32,13 +32,14 @@ export class ProductosService {
 
   getProductos(options: Options): Observable<ArticulosResponse> {
 
-    const { limit = 10, offset = 0, venta_compra = 'venta' } = options;
+    const { limit = 10, offset = 0, venta_compra = 'venta', search = '' } = options;
 
     return this.http.get<ArticulosResponse>(`${baseUrl}/articulos`, {
       params: {
         limit,
         offset,
-        venta_compra
+        venta_compra,
+        search
       }
     }).pipe(
       delay(800)

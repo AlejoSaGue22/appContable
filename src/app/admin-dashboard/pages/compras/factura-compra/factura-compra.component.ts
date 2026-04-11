@@ -113,7 +113,17 @@ export class FacturaCompraComponent {
    }  
 
    onDelete(): void {
-      this.isModalItem.set(false);
+      this.isModalItem.set(false);  
+      this.facturaService.deleteFacturaCompra(this.idItem()).subscribe((res: ResponseResult) => {
+         if (res.success) {
+            this.isModalItem.set(false);
+            this.notificacionService.success('Factura eliminada con éxito', 'Éxito');
+            this.facturasCompraResource.reload();
+         } else {
+            const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
+            this.notificacionService.error('Error al eliminar factura', message || 'Error desconocido');
+         }
+      });
    }
 
    formatCurrency(value: number): string {

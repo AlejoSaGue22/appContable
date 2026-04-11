@@ -20,6 +20,7 @@ import { FacturaCompraService } from '../../services/factura-compra.service';
 import { FacturaCompra, ItemFacturaResponse } from '@dashboard/interfaces/factura-compra-interface';
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
 import { HelpersUtils } from '@utils/helpers.utils';
+import { FormaPago } from '@dashboard/interfaces/documento-venta-interface';
 
 @Component({
     selector: 'app-factura-compra-forms-page',
@@ -88,7 +89,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         telefono: [''],
         fechaEmision: [new Date().toISOString().substring(0, 10), Validators.required],
         fechaVencimiento: [''],
-        formaPago: ['1', Validators.required],
+        formaPago: [FormaPago.CONTADO, Validators.required],
         metodoPago: [''],
         referencia: [''],
         observaciones: [''],
@@ -99,7 +100,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         this.formCompra.get('formaPago')?.valueChanges.subscribe(value => {
             const metodoPagoControl = this.formCompra.get('metodoPago');
             const fechaVencimientoControl = this.formCompra.get('fechaVencimiento');
-            if (value === '1') {
+            if (value === FormaPago.CONTADO) {
                 metodoPagoControl?.setValidators([Validators.required]);
                 fechaVencimientoControl?.clearValidators();
                 fechaVencimientoControl?.setValue('');
@@ -128,7 +129,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
 
     ngOnInit(): void {
         this.setupPaymentLogic();
-        if (this.facturaId() && this.facturaId() !== 'new-Item') {
+        if (this.facturaId() && this.facturaId() !== 'new') {
             this.headTitle.title = 'Editar Factura de Compra';
             this.headTitle.slog = 'Se edita factura de compra del sistema';
             this.loadFactura(this.facturaId());
@@ -159,8 +160,8 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     getProveedoresAndProductos() {
         this.loaderService.show();
         forkJoin({
-            proveedores: this.proveedoresServicios.getProveedores({ limit: 10000, offset: 0 }),
-            productos: this.productoServicios.getProductos({ limit: 10000, offset: 0, venta_compra: 'compra' })
+            proveedores: this.proveedoresServicios.getProveedores({ limit: 10, offset: 0 }),
+            productos: this.productoServicios.getProductos({ limit: 10, offset: 0, venta_compra: 'compra' })
         }).subscribe({
             next: ({ proveedores, productos }) => {
                 this.proveedoresList.set(proveedores.proveedores);
@@ -326,7 +327,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     });
 
 
-    onSubmit() {
+    onSubmit(type: string) {
         this.formCompra.markAllAsTouched();
         if (this.formCompra.invalid) {
             this.notificationService.error(
@@ -351,6 +352,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         const items = this.formCompra.controls.items.value;
 
         const invoiceData: Partial<FacturaCompra> = {
+            isDraft: type,
             proveedorId: factura.proveedor!,
             fecha: factura.fechaEmision!,
             numero: factura.referencia || '',
@@ -374,7 +376,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
 
         // Log removed
 
-        if (this.facturaId() == 'new-Item') {
+        if (this.facturaId() == 'new') {
             this.facturaService.createFacturaCompra(invoiceData).subscribe((response) => {
                 this.loading.set(false);
                 if (response.success == false) {
@@ -440,24 +442,18 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     }
 
     onProviderSaved(newProvider: any) {
-        // Add new provider to list
         this.proveedoresList.update(list => [...list, newProvider]);
 
-        // Log removed
-
-
-        // Select the new provider in the form
         this.formCompra.patchValue({
             proveedor: newProvider.id,
-            proveedorSearch: newProvider.nombre || newProvider.razonSocial,
+            proveedorSearch: newProvider.nombre.trim() || newProvider.razonSocial.trim(),
             numeroIdentificacion: newProvider.tipoDocumentoRel.abreviatura + ' - ' + newProvider.identificacion,
             tipoIdentificacion: newProvider.tipoDocumentoRel.abreviatura,
             telefono: newProvider.telefono,
             email: newProvider.email,
         });
-
+        
         this.closeProviderModal();
-        this.notificationService.success('Proveedor creado y seleccionado', 'Listo');
     }
 
 
