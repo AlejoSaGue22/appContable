@@ -25,9 +25,10 @@ export interface FacturaCompra {
     isDraft: string;
     proveedorId: string;
     numero: string;
+    numeroFacturaProveedor: string;
     status: InvoiceCompraStatus;
     fecha: string;
-    fechaVencimiento?: string;
+    fechaVencimiento?: string;  
     formaPago: string;
     metodoPago?: string;
     observaciones?: string;

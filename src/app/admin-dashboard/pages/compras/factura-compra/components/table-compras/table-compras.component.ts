@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { CommonModule, TitleCasePipe } from '@angular/common';
 import { PaginationComponent } from '@shared/components/pagination/pagination';
 import { FormsModule } from '@angular/forms';
+import { UserAuth } from 'src/app/auth/interfaces/user-auth.interface';
 
 export interface PurchaseInvoiceFilters {
   estado?: string;
@@ -25,7 +26,7 @@ export class TableComprasComponent {
   compraData = input<any[]>([]);
 
   activeFilters = input<PurchaseInvoiceFilters>({});
-
+  userAuth = input<UserAuth | null>(null);
   // Pagination inputs
   currentPage = input<number>(1);
   totalPages = input<number>(1);
@@ -33,6 +34,8 @@ export class TableComprasComponent {
   pageSize = input<number>(10);
   anular = output<string>();
   delete = output<string>();
+  register = output<string>();
+  retryAsiento = output<string>();
 
   // Output events
   filterChange = output<PurchaseInvoiceFilters>();
@@ -133,6 +136,14 @@ export class TableComprasComponent {
 
   onDelete(id: string): void {
     this.delete.emit(id);
+  }
+
+  onRegister(id: string): void {
+    this.register.emit(id);
+  }
+
+  onRetryAsiento(id: string): void {
+    this.retryAsiento.emit(id);
   }
 
   clearFilters(): void {

@@ -72,4 +72,19 @@ export class FacturaCompraService {
         )
     }
 
+    registrarFacturaCompra(id: string): Observable<ResponseResult> {
+        return this.http.patch<ComprobanteCompraResponse>(`${baseUrl}/facturas-compras/${id}/registrar`, {}).pipe(
+            map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+            catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+        )
+    }
+
+    retryAsiento(id: string): Observable<ResponseResult> {
+        return this.http.post<ComprobanteCompraResponse>(`${baseUrl}/facturas-compras/${id}/reintentar-asiento`, {}).pipe(
+            delay(800),
+            map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+            catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+        )
+    }
+
 }

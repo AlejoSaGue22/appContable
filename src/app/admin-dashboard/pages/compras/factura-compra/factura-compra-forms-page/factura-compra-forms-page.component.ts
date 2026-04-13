@@ -91,7 +91,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         fechaVencimiento: [''],
         formaPago: [FormaPago.CONTADO, Validators.required],
         metodoPago: [''],
-        referencia: [''],
+        referencia: ['', Validators.required],
         observaciones: [''],
         items: this.fb.array([])
     });
@@ -355,7 +355,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
             isDraft: type,
             proveedorId: factura.proveedor!,
             fecha: factura.fechaEmision!,
-            numero: factura.referencia || '',
+            numeroFacturaProveedor: factura.referencia || '',
             observaciones: factura.observaciones || '',
             fechaVencimiento: factura.fechaVencimiento || '',
             formaPago: factura.formaPago!,

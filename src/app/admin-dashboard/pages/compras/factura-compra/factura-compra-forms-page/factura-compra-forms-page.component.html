@@ -102,7 +102,7 @@
                                                         focus:shadow-md cursor-pointer" formControlName="metodoPago">
                                         <option value="">Selecciona un método de pago</option>
                                         @for (method of catalogsStore.paymentMethods(); track method.id) {
-                                            <option [value]="method.id">{{ method.nombre }}</option>
+                                            <option [value]="method.codigo">{{ method.nombre }}</option>
                                         }
                                     </select>
                                 </div>

@@ -350,10 +350,10 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   onClienteSeleccionado(cliente: Partial<ClientesInterfaceResponse>) {
     this.formVentas.patchValue({
       cliente: cliente.id,
-      clienteSearch: cliente.nombre + ' ' + cliente.apellido,
+      clienteSearch: cliente.razonSocial ? cliente.razonSocial : `${cliente.nombre} ${cliente.apellido}`,
       tipoDocumento: cliente.tipoDocumento,
       contacto: cliente.email,
-      identificacion: cliente.tipoDocumentoRel?.abreviatura + ' - ' + cliente.numeroDocumento
+      identificacion: `${cliente.tipoDocumentoRel?.abreviatura} - ${cliente.numeroDocumento}`,
     })
   }
 

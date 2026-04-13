@@ -1,7 +1,7 @@
 @if (visible()) {
 <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
 
-  <div class="fixed inset-0 bg-black/5 backdrop-blur-xs" (click)="close()"></div>
+  <div class="fixed inset-0 bg-black/5 backdrop-blur-xs cursor-pointer" (click)="close()"></div>
 
   <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
 
@@ -15,7 +15,7 @@
           <h3 class="text-base font-semibold leading-6 text-gray-900" id="modal-title">
             {{ title() }}
           </h3>
-          <button (click)="close()" type="button" class="text-gray-400 hover:text-gray-500 focus:outline-none">
+          <button (click)="close()" type="button" class="text-gray-400 hover:text-gray-500 focus:outline-none cursor-pointer">
             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>

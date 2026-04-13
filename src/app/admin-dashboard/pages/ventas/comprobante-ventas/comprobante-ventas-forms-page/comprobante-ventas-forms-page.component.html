@@ -234,6 +234,7 @@
                             <label class="block mb-1 text-xs font-semibold text-slate-500 uppercase tracking-wider">Producto/Servicio</label>
                             <app-list-group-dropdown title="" [dataList]="getAllProductos()"
                                 (objectSelect)="onProductoSeleccionado($event)"
+                                [labelKey]="['nombre', 'codigo']"
                                 (createOption)="openProductModal()" formControlName="articulo" 
                                 [valueInput]="productosItemsForm.get('articulo')?.value || ''" />
                         </div>

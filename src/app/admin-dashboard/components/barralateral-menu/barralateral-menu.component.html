@@ -3,14 +3,14 @@
         class="flex items-center w-full p-0 leading-tight mb-1 transition-all rounded-xl outline-none text-start">
         <button 
             [routerLink]="children().length > 0 ? null : menuSection()?.route"
-            routerLinkActive="!bg-blue-600 !text-white !shadow-lg !shadow-blue-500/30"
+            routerLinkActive="!bg-blue-600 !text-white !shadow-lg"
             [routerLinkActiveOptions]="{ exact: true }"
             type="button"
             class="flex items-center p-3 w-full text-sm font-semibold text-gray-500 rounded-xl transition-all duration-300 group 
                     hover:bg-white/5 hover:text-white cursor-pointer"
             [class.bg-white]="isOpen"
             [ngClass]="{
-                '!bg-blue-600 !text-white !shadow-lg !shadow-blue-500/30': isActive()
+                '!bg-blue-600 !text-white !shadow-lg': isActive()
             }">
 
             <div class="flex-shrink-0 w-5 h-5 transition-all duration-300 group-hover:scale-110" 
