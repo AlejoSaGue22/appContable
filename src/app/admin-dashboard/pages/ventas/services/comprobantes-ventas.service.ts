@@ -104,4 +104,11 @@ export class ComprobantesVentasService {
     return this.http.get(`${baseUrl}/facturas-ventas/${id}/xml`, { responseType: 'blob' });
   }
 
+  reintentarAsiento(id: string) {
+    return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/reintentar-asiento`, {}).pipe(
+      map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+    );
+  }
+
 }

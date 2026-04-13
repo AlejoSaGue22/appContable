@@ -7,6 +7,7 @@ import { RegistrarPagoModalData } from '@dashboard/pages/pagos/components/modal-
 import { PagosHttpService } from '@dashboard/pages/pagos/services/pagos.service';
 import { ComprobantesVentasService } from '@dashboard/pages/ventas/services/comprobantes-ventas.service';
 import { AsientosHttpService } from '@dashboard/services/asientos-http.service';
+import { NotificationService } from '@shared/services/notification.service';
 
 @Component({
   selector: 'app-invoice-details',
@@ -28,6 +29,7 @@ export class InvoiceDetailsComponent {
     private route: ActivatedRoute,
     private pagosService: PagosHttpService,
     private asientosService: AsientosHttpService,
+    private notificationService: NotificationService
   ) { }
 
   ngOnInit(): void {
@@ -74,10 +76,12 @@ export class InvoiceDetailsComponent {
   
   // ── Reintentar asiento ────────────────────────────────────────────────
   reintentarAsiento(): void {
-    // Llama al endpoint que regener el asiento
-    // this.asientosService.reintentarAsientoFactura(this.factura()!.id).subscribe({
-    //   next: () => { this.cargarFactura(); },
-    // });
+    this.facturasService.reintentarAsiento(this.factura()!.id).subscribe({
+      next: () => { this.loadInvoice(this.factura()!.id); },
+      error: (error) => {
+        this.notificationService.error(error.message || 'Ocurrio un error al reintentar asiento', 'Error');
+      }
+    });
   }
   
   // ── Helpers labels ────────────────────────────────────────────────────

@@ -121,6 +121,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     productosItemsForm = this.fb.group({
         producto: [{ id: '', nombre: '' }, Validators.required],
         quantity: [1, [Validators.required, Validators.min(1)]],
+        descripcion: [''],
         unitPrice: [0, [Validators.required, Validators.min(0)]],
         iva: [0, [Validators.min(0), Validators.max(100)]],
         discount: [0, [Validators.min(0), Validators.max(100)]],
@@ -145,7 +146,8 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                     unitPrice: prod.precio,
                     iva: parseInt(prod.impuesto!),
                     quantity: 1,
-                    discount: 0
+                    discount: 0,
+                    descripcion: prod.descripcion
                 });
                 this.calculateItemTotal();
             }
@@ -181,8 +183,6 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         this.facturaService.getFacturaCompraById(id).subscribe({
             next: (factura) => {
                 if (factura.success) {
-                    // Log removed
-
                     const invoice = factura.data.data[0]!;
 
                     while (this.items.length > 0) {
@@ -199,12 +199,10 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                             iva: item.porcentajeIva,
                             descuento: item.descuento,
                             subtotal: item.valorSubtotal,
-                            total: item.itemTotal
+                            total: item.itemTotal,
+                            descripcion: item.descripcion || ''
                         });
                     });
-
-                    // Log removed
-
 
                     this.formCompra.patchValue({
                         proveedorSearch: invoice.proveedor?.nombre,
@@ -366,6 +364,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                 unitPrice: item.precioUnitario,
                 iva: item.iva,
                 discount: item.descuento,
+                descripcion: item.description || ''
             })),
             subtotal: this.totales.subtotal,
             descuento: this.totales.descuentoTotal,

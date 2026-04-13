@@ -67,7 +67,7 @@ export interface ItemFacturaResponse {
     articuloId: string;
     articulo?: ArticulosInterface;
     facturaCompraId: string;
-    description?: string;
+    descripcion?: string;
     unitPrice: number;
     porcentajeIva: number;
     descuento?: number;
