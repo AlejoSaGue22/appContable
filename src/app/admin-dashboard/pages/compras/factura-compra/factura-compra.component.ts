@@ -67,7 +67,7 @@ export class FacturaCompraComponent {
             this.totalCompras.set(el.data.length);
             this.totalItems.set(el.meta?.total ?? 0);
             this.paginationService.totalItems.set(el.meta?.total ?? 0);
-            this.totalPages.set(el.meta?.totalPages ?? 1);
+            this.paginationService.pageSize.set(el.meta?.totalPages ?? 1);
             this.cardsTotales.set([
                { title: 'Total Facturas Compra', valor: this.totalCompras().toString(), percent: '0' },
                { title: 'Total Gastos', valor: '0', percent: '0' },

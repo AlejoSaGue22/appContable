@@ -1,6 +1,6 @@
 export enum TipoCuentaBancaria {
-  AHORROS = 'AHORROS',
-  CORRIENTE = 'CORRIENTE',
+  AHORROS = 'ahorro',
+  CORRIENTE = 'corriente',
 }
 
 export interface Banco {
@@ -35,8 +35,10 @@ export interface CreateCuentaBancariaDto {
 }
 
 export interface ResponseCuentasBancarias {
-  data: CuentaBancaria[];
+  cuentas: CuentaBancaria[];
   message: string;
+  count: number;
+  pages: number;
 }
 
 export interface ResponseBancos {

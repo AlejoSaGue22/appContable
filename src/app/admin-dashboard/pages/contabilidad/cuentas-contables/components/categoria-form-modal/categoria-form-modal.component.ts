@@ -48,6 +48,7 @@ export class CategoriaFormModalComponent implements OnInit {
   onSubmit() {
       if (this.form.invalid) {
         this.form.markAllAsTouched();
+        this.notificationService.error('Formulario inválido', 'Por favor, complete todos los campos');
         return;
       }
 
@@ -59,24 +60,26 @@ export class CategoriaFormModalComponent implements OnInit {
           next: () => {
             this.notificationService.success('Categoría actualizada correctamente', 'Éxito');
             this.submitForm.emit();
-            this.isSubmitting.set(false);
             this.onClose();
           },
           error: (err: any) => {
             this.notificationService.error('Error al actualizar la categoría', err.error?.message || 'Error desconocido');
+          }, 
+          complete: () => {
             this.isSubmitting.set(false);
-          } 
+          }
         });
       } else {
         this.catalogsService.createCategoryArticle(dto).subscribe({
           next: () => {
             this.notificationService.success('Categoría creada correctamente', 'Éxito');
             this.submitForm.emit();
-            this.isSubmitting.set(false);
             this.onClose();
           },
           error: (err: any) => {
             this.notificationService.error('Error al crear la categoría', err.error?.message || 'Error desconocido');
+          },
+          complete: () => {
             this.isSubmitting.set(false);
           }
         });

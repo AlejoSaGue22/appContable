@@ -53,7 +53,9 @@ export class ProductosServiciosComponent {
          }).pipe(
             tap((p) => {
                this.totalProducto.set(p.count);
+               const size = Math.ceil(p.count / request.limit);
                this.paginationService.totalItems.set(p.count);
+               this.paginationService.pageSize.set(size);
                this.cardValor.set([
                   { title: 'Total Productos y Servicios', valor: this.totalProducto().toString(), percent: '100' },
                   { title: 'Nuevos este Mes', valor: '0', percent: '20' },

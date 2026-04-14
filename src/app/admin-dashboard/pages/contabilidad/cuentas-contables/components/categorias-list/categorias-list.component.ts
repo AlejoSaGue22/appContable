@@ -6,6 +6,7 @@ import { CatalogsStore } from '@dashboard/services/catalogs.store';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ModalComponent } from '@shared/components/modal/modal.component';
+import { LoaderService } from '@utils/services/loader.service';
 
 @Component({
   selector: 'app-categorias-list',
@@ -18,6 +19,7 @@ export class CategoriasListComponent {
   private catalogsService = inject(CatalogsService);
   private notificationService = inject(NotificationService);
   private catalogsStore = inject(CatalogsStore);
+  private loaderService = inject(LoaderService);
   
   categories = input<CategoryArticle[]>();
   cuentasAceptanMovimiento = input<GetCuentasContables[]>();
@@ -56,6 +58,8 @@ export class CategoriasListComponent {
     const category = this.categoryToDelete();
     if (!category) return;
 
+    this.loaderService.show();
+
     this.catalogsService.removeCategoryArticle(category.id.toString()).subscribe({
       next: () => {
         this.notificationService.success('Categoría eliminada correctamente', 'Éxito');
@@ -65,6 +69,9 @@ export class CategoriasListComponent {
       },
       error: (err) => {
         this.notificationService.error('Error al eliminar la categoría', err.error?.message || 'Error desconocido');
+      },
+      complete: () => {
+        this.loaderService.hide();
       }
     });
   }

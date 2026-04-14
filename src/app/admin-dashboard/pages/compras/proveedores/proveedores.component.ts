@@ -55,9 +55,9 @@ export class ProveedoresComponent {
          tap((response) => {
             this.proveedoresList.set(response.proveedores); // TODO: Agregar el tipo de dato correcto
             this.totalProveedores.set(response.count ?? 0);
-            
-            // Set pagination total
+            const size = Math.ceil(response.count / request.limit);
             this.paginationService.totalItems.set(response.count ?? 0);
+            this.paginationService.pageSize.set(size);
          })
       )
    })

@@ -50,7 +50,7 @@
                 
                 <td class="px-8 py-4">
                   <span class="px-2.5 py-1 text-[10px] font-black uppercase rounded-lg border"
-                        [class]="cuenta.tipoCuenta === 'CORRIENTE' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'">
+                        [class]="cuenta.tipoCuenta === 'corriente' ? 'bg-indigo-50 text-indigo-600 border-indigo-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'">
                     {{ cuenta.tipoCuenta }}
                   </span>
                 </td>
@@ -121,6 +121,8 @@
           </tbody>
         </table>
       </div>
+
+      <app-pagination />  
     }
   </div>
 </div>

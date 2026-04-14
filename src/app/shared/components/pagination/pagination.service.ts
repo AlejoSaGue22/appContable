@@ -21,5 +21,5 @@ export class PaginationService {
   )
 
   totalItems = signal(0);
-  pageSize = signal(10);
+  pageSize = signal(1);
 }

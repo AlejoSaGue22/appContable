@@ -52,9 +52,9 @@ export class NotasAjusteComponent {
       ...request.filters
     }).pipe(
       tap((res) => {
-        this.totalItems.set(res.meta?.total ?? 0);
-        this.totalPages.set(res.meta?.totalPages ?? 1);
+        const size = res.meta?.totalPages ? res.meta.totalPages : 1;
         this.paginationService.totalItems.set(res.meta?.total ?? 0);
+        this.paginationService.pageSize.set(size);
       })
     )
   });

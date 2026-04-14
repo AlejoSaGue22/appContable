@@ -76,10 +76,15 @@ export class InvoiceDetailsComponent {
   
   // ── Reintentar asiento ────────────────────────────────────────────────
   reintentarAsiento(): void {
+    this.loading.set(true);
     this.facturasService.reintentarAsiento(this.factura()!.id).subscribe({
-      next: () => { this.loadInvoice(this.factura()!.id); },
+      next: () => { 
+        this.loadInvoice(this.factura()!.id); 
+        this.loading.set(false);
+      },
       error: (error) => {
         this.notificationService.error(error.message || 'Ocurrio un error al reintentar asiento', 'Error');
+        this.loading.set(false);
       }
     });
   }

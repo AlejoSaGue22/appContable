@@ -66,6 +66,7 @@ export class UsersComponent {
     loader: ({ request }) => this.usersService.getUsers(request).pipe(
       tap((response) => {
         this.paginationService.totalItems.set(response.meta?.total || 0);
+        this.paginationService.pageSize.set(response.meta?.totalPages || 10);
       })
     )
   });

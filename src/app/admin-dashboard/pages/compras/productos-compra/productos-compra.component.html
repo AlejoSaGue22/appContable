@@ -8,12 +8,40 @@
 
 @if ( productorxResource.hasValue() ) {
     <div class="p-4 sm:p-6 lg:p-8">
-        <app-header-title-productos-compra />
+        <header-title-page [titleHead]="headTitle" />
 
-        <app-table-productos-compra [productoData]="productorxResource.value().articulos" (delete)="openModal($event)" />
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="relative flex-1 max-w-lg group">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <svg class="h-4 w-4 text-gray-400 group-hover:text-blue-500 transition-colors" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+                <input 
+                    #txtSearch (input)="onSearch(txtSearch.value)"
+                    type="text" 
+                    placeholder="Buscar por nombre o código..."
+                    class="block w-full pl-11 pr-4 py-2.5 bg-white border border-gray-100 rounded-2xl text-sm placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/50 transition-all shadow-sm"
+                >
+            </div>
+
+            <div class="flex items-center gap-3">
+                <a routerLink="/panel/compras/productos-compra/new-Item"
+                    class="inline-flex items-center justify-center px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 group">
+                    <svg class="mr-2 h-4 w-4 transition-transform group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Nuevo Producto o Servicio
+                </a>
+            </div>
+        </div>
         
         <div class="mt-4">
-            <app-pagination />
+            <app-table-productos-compra [productoData]="productorxResource.value().articulos" (delete)="openModal($event)" />
+            
+            <div class="mt-4">
+                <app-pagination />
+            </div>
         </div>
     </div>
 }

@@ -57,9 +57,8 @@ export class ComprobanteVentasComponent {
          .pipe(
             tap((el) => {
                this.totalComprobantes.set(el.meta?.total ?? 0);
-               this.totalItems.set(el.meta?.total ?? 0);
-                this.totalPages.set(el.meta?.totalPages ?? 1);
                 this.paginationService.totalItems.set(el.meta?.total ?? 0);
+                this.paginationService.pageSize.set(el.meta?.totalPages ?? 0);
                 this.cardsTotales.set([
                   { title: 'Total Facturas', valor: this.totalComprobantes().toString(), percent: '0' },
                   { title: 'Balance General', valor: '0', percent: '0' },

@@ -13,11 +13,10 @@ import { PaginationService } from '@shared/components/pagination/pagination.serv
 import { PaginationComponent } from '@shared/components/pagination/pagination';
 import { effect } from '@angular/core';
 import { CategoriasListComponent } from './components/categorias-list/categorias-list.component';
-import { ActivatedRoute } from '@angular/router';
-import { map } from 'rxjs';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { catchError, of, tap } from 'rxjs';
 import { CategoriaFormModalComponent } from './components/categoria-form-modal/categoria-form-modal.component';
 import { CategoryArticle } from '@dashboard/interfaces/catalogs-interface';
+import { NotificationService } from '@shared/services/notification.service';
 
 @Component({
   selector: 'app-cuentas-contables',
@@ -28,11 +27,11 @@ import { CategoryArticle } from '@dashboard/interfaces/catalogs-interface';
   providers: [PaginationService]
 })
 export class CuentasContablesComponent {
-  private activatedRoute = inject(ActivatedRoute);
   private cuentasService = inject(CuentasContablesService);
   private catalogsStore = inject(CatalogsStore);
   private catalogsService = inject(CatalogsService);
   private paginationService = inject(PaginationService);
+  private notificationService = inject(NotificationService);
 
   tabs = signal<'cuentas' | 'categorias'>('cuentas');
   isLoadingCatalogs = this.catalogsStore.loading;
@@ -66,11 +65,21 @@ export class CuentasContablesComponent {
   categoriesResource = rxResource({
     request: () => ({
       page: this.paginationService.currentPage(),
-      limit: this.paginationService.pageSize()
+      limit: 10
     }),
     loader: ({ request }) => {
       const offset = (request.page - 1) * request.limit;
-      return this.catalogsService.findAllCategoriesArticles(request.limit, offset);
+      return this.catalogsService.findAllCategoriesArticles(request.limit, offset).pipe(
+        tap((res) => {
+          const size = Math.ceil(res.count / request.limit);
+          this.paginationService.totalItems.set(res.count);
+          this.paginationService.pageSize.set(size);
+        }),
+        catchError((err) => {
+          this.notificationService.error('Error al cargar las categorías', err.error?.message || 'Error desconocido');
+          return of(null);
+        })
+      );
     }
   });
 

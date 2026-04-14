@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CuentasBancariasService } from '../../../services/cuentas-bancarias.service';
 import { Banco, CuentaBancaria, TipoCuentaBancaria } from '../../../interfaces/cuenta-bancaria.interface';
+import { NotificationService } from '@shared/services/notification.service';
+import { LoaderService } from '@utils/services/loader.service';
 
 @Component({
   selector: 'app-cuenta-form-modal',
@@ -13,6 +15,8 @@ import { Banco, CuentaBancaria, TipoCuentaBancaria } from '../../../interfaces/c
 export class CuentaFormModalComponent implements OnInit {
   private fb = inject(FormBuilder);
   private cuentasService = inject(CuentasBancariasService);
+  private notificationService = inject(NotificationService);
+  private loaderService = inject(LoaderService);
 
   @Input() isOpen = false;
   @Input() account: CuentaBancaria | null = null;
@@ -51,17 +55,21 @@ export class CuentaFormModalComponent implements OnInit {
   loadBancos() {
     this.cuentasService.getBancos().subscribe({
       next: (data) => this.bancos.set(data.data),
-      error: (err) => console.error('Error loading banks', err)
+      error: (err) => {
+        this.notificationService.error('Error al cargar los bancos', err);
+      }
     });
   }
 
   onSubmit() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.notificationService.error('Por favor, complete el formulario correctamente');
       return;
     }
 
     this.isSubmitting.set(true);
+    this.loaderService.show();
     const dto = this.form.getRawValue();
 
     if (this.account) {
@@ -71,8 +79,11 @@ export class CuentaFormModalComponent implements OnInit {
           this.isSubmitting.set(false);
         },
         error: (err) => {
-          console.error('Error updating account', err);
+          this.notificationService.error('Error al actualizar la cuenta', err);
           this.isSubmitting.set(false);
+        },
+        complete: () => {
+          this.loaderService.hide();
         }
       });
     } else {
@@ -82,8 +93,11 @@ export class CuentaFormModalComponent implements OnInit {
           this.isSubmitting.set(false);
         },
         error: (err) => {
-          console.error('Error creating account', err);
+          this.notificationService.error('Error al crear la cuenta', err);
           this.isSubmitting.set(false);
+        },
+        complete: () => {
+          this.loaderService.hide();
         }
       });
     }

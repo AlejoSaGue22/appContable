@@ -23,11 +23,13 @@ export class PagosHttpService {
   }
 
   // ── CxC ───────────────────────────────────────────────────────────────
-  getCxc(filtros?: { clienteId?: string; paymentStatus?: PaymentStatus; soloVencidas?: boolean; }): Observable<CxcResponse> {
+  getCxc(filtros?: { clienteId?: string; paymentStatus?: PaymentStatus; soloVencidas?: boolean; }, page: number, limit: number): Observable<CxcResponse> {
     let params = new HttpParams();
     if (filtros?.clienteId)     params = params.set('clienteId',     filtros.clienteId);
     if (filtros?.paymentStatus) params = params.set('paymentStatus', filtros.paymentStatus);
     if (filtros?.soloVencidas)  params = params.set('soloVencidas',  'true');
+    params = params.set('page', page.toString());
+    params = params.set('limit', limit.toString());
     return this.http
       .get<PagoResponseDto<CxcResponse>>(`${this.base}/pagos/cxc`, { params })
       .pipe(map(r => r.data));

@@ -168,11 +168,11 @@ export class FacturaCompraFormsPageComponent implements OnInit {
             next: ({ proveedores, productos }) => {
                 this.proveedoresList.set(proveedores.proveedores);
                 this.productosList.set(productos.articulos);
-                this.loaderService.hide();
             },
             error: (error) => {
-                // Log removed
-
+                this.notificationService.error('Error al cargar los datos de la factura de compra', error);
+            },
+            complete: () => {
                 this.loaderService.hide();
             }
         });
@@ -221,10 +221,12 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                     this.totales.subtotal = invoice.subtotal;
                     this.totales.totalIVA = invoice.iva;
                     this.totales.descuentoTotal = invoice.descuento;
-                    this.loaderService.hide();
                 }
             },
             error: (error) => {
+                this.notificationService.error('Error al cargar los datos de la factura de compra', error);
+            },
+            complete: () => {
                 this.loaderService.hide();
             }
 

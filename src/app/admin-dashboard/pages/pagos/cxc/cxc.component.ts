@@ -10,6 +10,7 @@ import { ModalComponent } from "@shared/components/modal/modal.component";
 import { HeaderInput, HeaderTitlePageComponent } from "@dashboard/components/header-title-page/header-title-page.component";
 import { ModalHistorialpagoComponent } from "../components/modal-historialpago/modal-historialpago..component";
 import { TarjetasResumenPagos } from "../components/tarjetas-resumen-pagos/tarjetas-resumen-pagos.component";
+import { PaginationComponent } from "@shared/components/pagination/pagination";
 
 @Component({
   selector: 'app-cxc',
@@ -21,7 +22,8 @@ import { TarjetasResumenPagos } from "../components/tarjetas-resumen-pagos/tarje
     ModalComponent,
     HeaderTitlePageComponent,
     ModalHistorialpagoComponent,
-    TarjetasResumenPagos
+    TarjetasResumenPagos,
+    PaginationComponent
 ],
   templateUrl: './cxc.component.html',
 })

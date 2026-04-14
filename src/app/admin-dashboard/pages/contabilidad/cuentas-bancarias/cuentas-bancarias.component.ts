@@ -9,35 +9,49 @@ import { CuentaBancaria } from '../interfaces/cuenta-bancaria.interface';
 
 import { CuentaFormModalComponent } from './components/cuenta-form-modal/cuenta-form-modal.component';
 import { ModalComponent } from '@shared/components/modal/modal.component';
+import { PaginationService } from '@shared/components/pagination/pagination.service';
+import { tap } from 'rxjs';
+import { PaginationComponent } from "@shared/components/pagination/pagination";
+import { NotificationService } from '@shared/services/notification.service';
+import { LoaderService } from '@utils/services/loader.service';
 
 @Component({
   selector: 'app-cuentas-bancarias',
   standalone: true,
-  imports: [CommonModule, LoaderComponent, CurrencyPipe, CuentaFormModalComponent, HeaderTitlePageComponent, ModalComponent],
+  imports: [CommonModule, LoaderComponent, CurrencyPipe, CuentaFormModalComponent, HeaderTitlePageComponent, ModalComponent, PaginationComponent],
   templateUrl: './cuentas-bancarias.component.html'
 })
 export default class CuentasBancariasComponent {
   private cuentasService = inject(CuentasBancariasService);
+  private paginationService = inject(PaginationService);
+  private notificationService = inject(NotificationService);
+  private loaderService = inject(LoaderService);
 
   headTitle: HeaderInput = {
     title: 'Cuentas Bancarias',
     slog: 'Gestión centralizada de recursos financieros'
   }
 
-
-  // Modal control
   isModalOpen = signal(false);
   selectedAccount = signal<CuentaBancaria | null>(null);
-
-  // Modal de eliminación
   isDeleteModalVisible = signal(false);
   idToDelete = signal<string | null>(null);
 
   cuentasResource = rxResource({
-    loader: () => this.cuentasService.getCuentas()
+    request: () => ({
+      offset: this.paginationService.currentPage() - 1,
+      limit: 10,
+    }),
+    loader: ({ request }) => this.cuentasService.getCuentas(request).pipe(
+      tap((res) => {
+        const size = Math.ceil(res.count / request.limit);
+        this.paginationService.totalItems.set(res.count);
+        this.paginationService.pageSize.set(size);
+      })
+    )
   });
 
-  cuentas = computed(() => this.cuentasResource.value()?.data ?? []);
+  cuentas = computed(() => this.cuentasResource.value()?.cuentas ?? []);
 
   openCreateModal() {
     this.selectedAccount.set(null);
@@ -60,9 +74,15 @@ export default class CuentasBancariasComponent {
   }
 
   toggleStatus(id: string) {
+    this.loaderService.show();
     this.cuentasService.toggleStatus(id).subscribe({
       next: () => this.cuentasResource.reload(),
-      error: (err) => {}
+      error: (err) => {
+        this.notificationService.error('Error al cambiar el estado de la cuenta', err);
+      },
+      complete: () => {
+        this.loaderService.hide();
+      }
     });
 
   }
@@ -76,13 +96,20 @@ export default class CuentasBancariasComponent {
     const id = this.idToDelete();
     if (!id) return;
 
+    this.loaderService.show();
+
     this.cuentasService.deleteCuenta(id).subscribe({
       next: () => {
         this.cuentasResource.reload();
         this.isDeleteModalVisible.set(false);
         this.idToDelete.set(null);
       },
-      error: (err) => {}
+      error: (err) => {
+        this.notificationService.error('Error al eliminar la cuenta', err);
+      },
+      complete: () => {
+        this.loaderService.hide();
+      }
     });
   }
 }

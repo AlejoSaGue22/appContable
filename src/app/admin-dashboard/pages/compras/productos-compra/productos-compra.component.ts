@@ -11,10 +11,12 @@ import { ProductosService } from '@dashboard/pages/ventas/services/productos.ser
 import { HeaderTitleProductosCompraComponent } from "./components/header-title-productos-compra/header-title-productos-compra.component";
 import { TableProductosCompra } from "./components/table-productos-compra/table-productos-compra/table-productos-compra.component";
 import { PaginationComponent } from '@shared/components/pagination/pagination';
+import { HeaderTitlePageComponent, HeaderInput } from "@dashboard/components/header-title-page/header-title-page.component";
+import { GetProductosDetalle } from '@dashboard/interfaces/productos-interface';
 
 @Component({
-   imports: [CommonModule, LoaderComponent, ModalComponents, HeaderTitleProductosCompraComponent, TableProductosCompra, 
-            PaginationComponent],
+   imports: [CommonModule, LoaderComponent, ModalComponents, HeaderTitleProductosCompraComponent, TableProductosCompra,
+    PaginationComponent, HeaderTitlePageComponent],
    templateUrl: './productos-compra.component.html',
    standalone: true,
 })
@@ -23,17 +25,24 @@ export class ProductosCompraComponent {
    paginationService = inject(PaginationService);
    productoServicio = inject(ProductosService);
    notificacionService = inject(NotificationService);
-   totalProducto = signal(0);
+   totalProducto = signal<GetProductosDetalle[]>([]);
    idProductoToModal = signal<string>('');
    isModalEdit = false;
+
+   headTitle: HeaderInput = {
+      title: 'Productos y Servicios',
+      slog: 'Administra la información de tus productos y servicios'
+   }
 
    productorxResource = rxResource({
       request: () => ({ page: this.paginationService.currentPage() - 1, limit: 10 }),
       loader: ({ request }) => {
          return this.productoServicio.getProductos({ offset: request.page * request.limit, limit: request.limit, venta_compra: 'compra' }).pipe(
             tap((p) => {
-               this.totalProducto.set(p.count);
+               this.totalProducto.set(p.articulos);
+               const size = Math.ceil(p.count / request.limit);
                this.paginationService.totalItems.set(p.count);
+               this.paginationService.pageSize.set(size);
             })
          )
       }
@@ -75,6 +84,10 @@ export class ProductosCompraComponent {
       setTimeout(() => {
          window.location.reload();
       }, 600);
+   }
+
+   onSearch(searchTerm: string) {
+      
    }
 
 }

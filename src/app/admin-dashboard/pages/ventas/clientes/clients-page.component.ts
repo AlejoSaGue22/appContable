@@ -56,7 +56,9 @@ export class ClientsPageComponent {
         }).pipe(
             tap((el) => {
                 this.totalCliente.set(el.count);
+                const size = Math.ceil(el.count / request.limit);
                 this.paginationService.totalItems.set(el.count);
+                this.paginationService.pageSize.set(size);
                 this.cardsTotales.set([
                     { title: 'Total Clientes', valor: this.totalCliente().toString(), percent: '0' },
                     { title: 'Nuevos este Mes', valor: '0', percent: '0' },
