@@ -48,6 +48,11 @@ export interface CxcResumen {
 export interface CxcResponse {
   items:   CxcItem[];
   resumen: CxcResumen;
+  meta: {
+    page: number;
+    total: number;
+    totalPages: number;
+  };
 }
 
 // ── CxP ────────────────────────────────────────────────────────────────────
@@ -78,6 +83,20 @@ export interface CxpResumen {
 export interface CxpResponse {
   items:   CxpItem[];
   resumen: CxpResumen;
+  meta: {
+    page: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export interface CxFiltros {
+  clienteId?: string;
+  proveedorId?: string;
+  paymentStatus?: PaymentStatus;
+  soloVencidas?: boolean;
+  page: number;
+  limit: number;
 }
 
 // ── Aging ──────────────────────────────────────────────────────────────────

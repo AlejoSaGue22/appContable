@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/app/environments/environment';
 import { AgingReporte, CuentaBancaria, CxcResponse, CxpResponse, HistorialPagosResponse, PagoHistorial, 
-         PagoResponseDto, PaymentStatus, RegistrarCobroDto, RegistrarPagoDto, ResumenCartera
+         PagoResponseDto, PaymentStatus, RegistrarCobroDto, RegistrarPagoDto, ResumenCartera, CxFiltros
 } from '@dashboard/interfaces/pagos-interface';
 
 
@@ -23,13 +23,13 @@ export class PagosHttpService {
   }
 
   // ── CxC ───────────────────────────────────────────────────────────────
-  getCxc(filtros?: { clienteId?: string; paymentStatus?: PaymentStatus; soloVencidas?: boolean; }, page: number, limit: number): Observable<CxcResponse> {
+  getCxc(filtros: CxFiltros): Observable<CxcResponse> {
     let params = new HttpParams();
     if (filtros?.clienteId)     params = params.set('clienteId',     filtros.clienteId);
     if (filtros?.paymentStatus) params = params.set('paymentStatus', filtros.paymentStatus);
     if (filtros?.soloVencidas)  params = params.set('soloVencidas',  'true');
-    params = params.set('page', page.toString());
-    params = params.set('limit', limit.toString());
+    params = params.set('page', filtros.page.toString());
+    params = params.set('limit', filtros.limit.toString());
     return this.http
       .get<PagoResponseDto<CxcResponse>>(`${this.base}/pagos/cxc`, { params })
       .pipe(map(r => r.data));
@@ -46,11 +46,13 @@ export class PagosHttpService {
   }
 
   // ── CxP ───────────────────────────────────────────────────────────────
-  getCxp(filtros?: { proveedorId?: string; paymentStatus?: PaymentStatus; soloVencidas?: boolean; }): Observable<CxpResponse> {
+  getCxp(filtros: CxFiltros): Observable<CxpResponse> {
     let params = new HttpParams();
     if (filtros?.proveedorId)   params = params.set('proveedorId',   filtros.proveedorId);
     if (filtros?.paymentStatus) params = params.set('paymentStatus', filtros.paymentStatus);
     if (filtros?.soloVencidas)  params = params.set('soloVencidas',  'true');
+    params = params.set('page',   filtros.page.toString());
+    params = params.set('limit',  filtros.limit.toString());
     return this.http
       .get<PagoResponseDto<CxpResponse>>(`${this.base}/pagos/cxp`, { params })
       .pipe(map(r => r.data));

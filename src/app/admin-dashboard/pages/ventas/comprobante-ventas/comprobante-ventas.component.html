@@ -12,11 +12,7 @@
     <app-table-invoices 
         [invoiceData]="comprobanteVentasResource.value()!.data"
         [activeFilters]="filters()"
-        [currentPage]="paginationService.currentPage()"
-        [totalItems]="totalItems()"
-        [totalPages]="totalPages()"
         (filterChange)="onFilterChange($event)"
-        (pageChange)="onPageChange($event)"
         (emitir)="onEmitir($event)"
         (anular)="openModalItem($event, 'anular')"
         (delete)="openModalItem($event, 'delete')"

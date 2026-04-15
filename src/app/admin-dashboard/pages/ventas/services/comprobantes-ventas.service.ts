@@ -1,4 +1,4 @@
-import { ComprobanteVentaResponse, FacturaVenta } from './../../../interfaces/documento-venta-interface';
+import { ComprobanteVentaResponse, FacturaVenta, InvoiceFilters } from './../../../interfaces/documento-venta-interface';
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Options, ResponseResult } from '@shared/interfaces/services.interfaces';
@@ -14,14 +14,8 @@ export class ComprobantesVentasService {
 
   private http = inject(HttpClient);
 
-  getComprobanteVentas(options: Options & {
-    status?: string;
-    type?: string;
-    clientName?: string;
-    startDate?: string;
-    endDate?: string;
-  }): Observable<ComprobanteVentaResponse> {
-    const { limit = 10, page = 1, status, type, clientName, startDate, endDate } = options;
+  getComprobanteVentas(options: Options & InvoiceFilters): Observable<ComprobanteVentaResponse> {
+    const { limit = 10, page = 1, status, type, clientName, startDate, endDate, tipoFactura, numeroFactura, dianStatus } = options;
 
     const params: any = {
       limit,
@@ -33,11 +27,14 @@ export class ComprobantesVentasService {
     if (clientName) params.clientName = clientName;
     if (startDate) params.startDate = startDate;
     if (endDate) params.endDate = endDate;
+    if (tipoFactura) params.tipoFactura = tipoFactura;
+    if (numeroFactura) params.numeroFactura = numeroFactura;
+    if (dianStatus) params.dianStatus = dianStatus;
 
     return this.http.get<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas`, {
       params
     }).pipe(
-      delay(800)  
+      delay(800)
     )
   }
 

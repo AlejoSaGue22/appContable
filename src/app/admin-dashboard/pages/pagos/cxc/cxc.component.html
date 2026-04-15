@@ -5,10 +5,10 @@
 <div class="w-full space-y-8 animate-fade-in">
 
     <!-- Tarjetas resumen -->
-    <app-tarjetas-resumen-pagos [resumen]="resumen" />
+    <app-tarjetas-resumen-pagos [resumen]="resumen()" />
 
     <!-- Tabla principal -->
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+    <div class="bg-white rounded-xl shadow-lg overflow-hidden border-">
       <div class="p-6">
 
         <!-- Header tabla -->
@@ -49,27 +49,25 @@
               <option value="vencida">Vencida</option>
             </select>
 
-            <button (click)="cargar()" [disabled]="loading"
+            <button (click)="cargar()" [disabled]="loading()"
                     class="flex items-center gap-1.5 px-4 py-2 text-sm border border-slate-200 rounded-md cursor-pointer
                           hover:bg-slate-50 transition-colors shadow-sm disabled:opacity-50">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" [class.animate-spin]="loading"
-                  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="23 4 23 10 17 10"></polyline>
-                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
-              </svg>
-              Actualizar
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" [class.animate-spin]="loading()"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="23 4 23 10 17 10"></polyline>
+                      <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                    </svg>
+                    Actualizar
             </button>
           </div>
         </div>
 
-        <!-- Progress bar -->
-        @if (loading) {
+        @if (loading()) {
           <div class="w-full h-1 bg-blue-100 rounded-full mb-4 overflow-hidden">
             <div class="h-full bg-blue-500 rounded-full animate-pulse w-3/4"></div>
           </div>
         }
 
-        <!-- Tabla -->
         <div class="overflow-x-auto">
           <table class="w-full text-left table-auto shadow-sm rounded-xl">
             <thead>

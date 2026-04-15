@@ -7,7 +7,7 @@
     <div class="flex border-b border-gray-200">
       <button type="button"
               (click)="vistaActiva.set('cobrar')"
-              class="flex-1 py-3.5 text-sm font-semibold flex items-center justify-center gap-2 transition-colors"
+              class="flex-1 py-3.5 text-sm font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
               [ngClass]="vistaActiva() === 'cobrar'
                 ? 'bg-green-50 text-green-700 border-b-2 border-green-500'
                 : 'text-slate-500 hover:bg-slate-50'">
@@ -24,7 +24,7 @@
       </button>
       <button type="button"
               (click)="vistaActiva.set('pagar')"
-              class="flex-1 py-3.5 text-sm font-semibold flex items-center justify-center gap-2 transition-colors"
+              class="flex-1 py-3.5 text-sm font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
               [ngClass]="vistaActiva() === 'pagar'
                 ? 'bg-orange-50 text-orange-700 border-b-2 border-orange-500'
                 : 'text-slate-500 hover:bg-slate-50'">

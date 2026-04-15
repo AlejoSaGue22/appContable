@@ -10,15 +10,19 @@ import { HeaderTitlePageComponent, HeaderInput } from "@dashboard/components/hea
 import { ModalHistorialpagoComponent } from "../components/modal-historialpago/modal-historialpago..component";
 import { TarjetasResumenPagos } from "../components/tarjetas-resumen-pagos/tarjetas-resumen-pagos.component";
 import { map, startWith } from 'rxjs';
+import { PaginationComponent } from "@shared/components/pagination/pagination";
+import { PaginationService } from '@shared/components/pagination/pagination.service';
 
 @Component({
   selector: 'app-cxp',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RegistrarPagoModalComponent, ModalComponent, HeaderTitlePageComponent, ModalHistorialpagoComponent, TarjetasResumenPagos],
+  imports: [CommonModule, ReactiveFormsModule, RegistrarPagoModalComponent, ModalComponent, HeaderTitlePageComponent, ModalHistorialpagoComponent,
+          TarjetasResumenPagos, PaginationComponent],
   templateUrl: './cxp.component.html',
 })
 export class CxpComponent {
   private svc = inject(PagosHttpService);
+  private paginationService = inject(PaginationService);
 
   headTitle = signal<HeaderInput> ({
     title: 'Cuentas por Pagar',
@@ -67,10 +71,12 @@ export class CxpComponent {
   cargar(): void {
     this.loading.set(true);
     const currentEstado = this.filtroEstado.value || undefined;
-    this.svc.getCxp({ paymentStatus: currentEstado as PaymentStatus }).subscribe({
+    this.svc.getCxp({ paymentStatus: currentEstado, page: this.paginationService.currentPage() - 1, limit: 10 }).subscribe({
       next: res => { 
         this.rawData.set({ items: res.items, resumen: res.resumen }); 
         this.loading.set(false); 
+        this.paginationService.totalItems.set(res.meta.total);
+        this.paginationService.pageSize.set(res.meta.totalPages);
       },
       error: () => this.loading.set(false),
     });

@@ -102,7 +102,7 @@
                                                         focus:shadow-md cursor-pointer" formControlName="metodoPago">
                                         <option value="">Selecciona un método de pago</option>
                                         @for (method of catalogsStore.paymentMethods(); track method.id) {
-                                            <option [value]="method.codigo">{{ method.nombre }}</option>
+                                            <option [value]="method.id">{{ method.nombre }}</option>
                                         }
                                     </select>
                                 </div>
@@ -118,7 +118,7 @@
                                 </label>
                                 <input class="w-full bg-transparent text-slate-700 text-sm border 
                                 rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 
-                                shadow-sm focus:shadow" formControlName="fechaVencimiento" type="date" />
+                                shadow-sm focus:shadow" formControlName="fechaVencimiento" type="date" [min]="minDate()"/>
 
                                 <form-error-label [errorType]="formCompra.get('fechaVencimiento')!" />
                             </div>
@@ -369,7 +369,7 @@
                     {{ loading() ? 'Guardando...' : 'Guardar Borrador' }}
                 </button>
                 <button type="submit" [disabled]="loading()"
-                    (click)="onSubmit('final')"
+                    (click)="onSubmit('registered')"
                     class="inline-flex items-center justify-center rounded-lg cursor-pointer bg-blue-600 px-5 py-2.5 text-sm font-medium
                      text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
 
@@ -391,13 +391,11 @@
 
         <!-- Modals -->
         <app-modal [(visible)]="isProviderModalVisible" title="Crear Nuevo Proveedor" width="max-w-4xl">
-            <!-- We reuse the Provider Form Page Component here -->
             <app-proveedores-forms-page [isModal]="true" (saveSuccess)="onProviderSaved($event)"
                 (cancel)="closeProviderModal()"></app-proveedores-forms-page>
         </app-modal>
 
         <app-modal [(visible)]="isProductModalVisible" title="Crear Nuevo Producto/Servicio" width="max-w-4xl">
-            <!-- We reuse the Products/Services Form Page Component here -->
             <app-productos-servicios-forms [isModal]="true" (saveSuccess)="onProductSaved($event)"
                 (cancel)="closeProductModal()"></app-productos-servicios-forms>
         </app-modal>

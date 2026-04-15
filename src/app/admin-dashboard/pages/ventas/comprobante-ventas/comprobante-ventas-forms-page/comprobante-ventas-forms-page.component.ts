@@ -69,6 +69,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   getAllProductos = signal<GetProductosDetalle[]>([]);
   getAllClientes = signal<ClientesInterfaceResponse[]>([]);
   loading = signal<boolean>(false);
+  minDate = signal<string>(new Date().toISOString().substring(0, 10));
 
   invoiceID = toSignal(
     this.activateRoute.params.pipe(
@@ -90,12 +91,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   }
 
   onClientSaved(newClient: any) {
-    // Add to the list
-    // Note: getAllClientes is currently set from a service response. 
-    // We might simply want to re-fetch or append. For now, appending locally.
     this.getAllClientes.update(list => [...list, newClient]);
-
-    // Select it
     this.onClienteSeleccionado(newClient);
     this.closeClientModal();
     this.notificacionService.success('Cliente creado y seleccionado', 'Éxito');
@@ -111,12 +107,8 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   }
 
   onProductSaved(newProduct: any) {
-    // Appending locally.
     this.getAllProductos.update(list => [...list, newProduct]);
-
-    // Select it
     this.onProductoSeleccionado(newProduct);
-
     this.closeProductModal();
     this.notificacionService.success('Producto creado y seleccionado', 'Éxito');
   }
@@ -128,8 +120,6 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
 
     this.getClientesAndProductos();
     if (this.invoiceID() == 'new-Item') {
-      this.formVentas.reset();
-      this.productosItemsForm.reset();
       this.loaderservice.hide();
       return;
     }
@@ -212,11 +202,10 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     fechaVencimiento: [''],
     fecha: ['', Validators.required],
     canal: [0, Validators.required],
-    tipoFactura: [TipoFactura.ELECTRONICA, Validators.required],
+    tipoFactura: [TipoFactura.STANDARD, Validators.required],
     productos: [[]]
   })
 
-  // Signal to track the selected invoice type for UI logic
   tipoFacturaSignal = toSignal(
     this.formVentas.get('tipoFactura')!.valueChanges,
     { initialValue: this.formVentas.get('tipoFactura')?.value as TipoFactura }
@@ -260,7 +249,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     articulo: ['', Validators.required],
     articuloId: ['', Validators.required],
     description: [''],
-    quantity: [0, [Validators.required, Validators.min(1)]],
+    quantity: [1, [Validators.required, Validators.min(1)]],
     unitPrice: [0, [Validators.required, Validators.min(0)]],
     iva: [0, [Validators.min(0), Validators.max(100)]],
     iva_valor: [0],
@@ -414,6 +403,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     }
 
     this.loading.set(true);
+    this.loaderservice.show('Guardando factura de venta...');
     const valueFormFactura = this.formVentas.value;
     const productos = this.productSeleccionados();
 
@@ -444,7 +434,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     if (this.invoiceID() == 'new-Item') {
 
       this.ventaServices.createInvoice(invoiceData).subscribe((response) => {
-        this.loading.set(false);
+        this.loaderservice.hide();
         if (response.success == false) {
           this.notificacionService.error(
             `Ocurrio un problema al crear la factura ${HelpersUtils.getMessageError(response.message)}`,
@@ -454,17 +444,12 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
           return;
         }
 
-        // Log removed
-
-        this.notificacionService.success(
-          'Factura creada con exito',
-          'Accion Completada',
-          5000
-        );
+        this.notificacionService.success('Factura creada con exito', 'Accion Completada', 5000);
 
         setTimeout(() => {
+          this.loading.set(false);
           this.router.navigateByUrl('/panel/ventas/comprobantes')
-        }, 1500);
+        }, 800);
       })
 
     } else {
@@ -472,6 +457,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       const currentInvoice = this.factura();
       if (currentInvoice && currentInvoice.status !== InvoiceStatus.DRAFT) {
         this.loading.set(false);
+        this.loaderservice.hide();
         this.notificacionService.error(
           'Solo se pueden editar facturas en estado borrador.',
           'Acción denegada',
@@ -498,8 +484,9 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
         );
 
         setTimeout(() => {
+          this.loaderservice.hide();
           this.router.navigateByUrl('/panel/ventas/comprobantes')
-        }, 1500);
+        }, 800);
       });
     }
 

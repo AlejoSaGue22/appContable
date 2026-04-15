@@ -4,6 +4,7 @@ import { CommonModule, TitleCasePipe } from '@angular/common';
 import { PaginationComponent } from '@shared/components/pagination/pagination';
 import { FormsModule } from '@angular/forms';
 import { UserAuth } from 'src/app/auth/interfaces/user-auth.interface';
+import { InvoiceCompraStatus } from '@dashboard/interfaces/factura-compra-interface';
 
 export interface PurchaseInvoiceFilters {
   estado?: string;
@@ -27,11 +28,6 @@ export class TableComprasComponent {
 
   activeFilters = input<PurchaseInvoiceFilters>({});
   userAuth = input<UserAuth | null>(null);
-  // Pagination inputs
-  currentPage = input<number>(1);
-  totalPages = input<number>(1);
-  totalItems = input<number>(0);
-  pageSize = input<number>(10);
   anular = output<string>();
   delete = output<string>();
   register = output<string>();
@@ -95,9 +91,9 @@ export class TableComprasComponent {
 
   readonly statuses = [
     { value: '', label: 'Todos los estados' },
-    { value: 'registrado', label: 'Registrado' },
-    { value: 'error_contable', label: 'Error Contable' },
-    { value: 'anulado', label: 'Anulado' }
+    { value: InvoiceCompraStatus.REGISTRADO, label: 'Registrado' },
+    { value: InvoiceCompraStatus.ERROR_ASIENTO, label: 'Error Contable' },
+    { value: InvoiceCompraStatus.ANULADO, label: 'Anulado' }
   ];
 
   readonly tiposFactura = [
@@ -158,31 +154,12 @@ export class TableComprasComponent {
     this.filterChange.emit({});
   }
 
-  // Pagination methods
-  goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages()) {
-      this.pageChange.emit(page);
-    }
-  }
-
-  previousPage(): void {
-    if (this.currentPage() > 1) {
-      this.pageChange.emit(this.currentPage() - 1);
-    }
-  }
-
-  nextPage(): void {
-    if (this.currentPage() < this.totalPages()) {
-      this.pageChange.emit(this.currentPage() + 1);
-    }
-  }
-
   getStatusClass(status: string): string {
     const classes: Record<string, string> = {
-      'registrado': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-      'pagado': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-      'error_contable': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-      'anulado': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+      [InvoiceCompraStatus.REGISTRADO]: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+      [InvoiceCompraStatus.PAGADO]: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+      [InvoiceCompraStatus.ERROR_ASIENTO]: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
+      [InvoiceCompraStatus.ANULADO]: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
     };
     return classes[status] || 'bg-gray-100 text-gray-800';
   }

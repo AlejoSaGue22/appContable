@@ -37,12 +37,6 @@ export class FacturaCompraComponent {
    idItem = signal<string>('');
    action = signal<string>('');
 
-   // Paginación
-   currentPage = signal(1);
-   totalPages = signal(1);
-   totalItems = signal(0);
-   pageSize = signal(10);
-
    // Filtros
    filters = signal<PurchaseInvoiceFilters>({});
 
@@ -65,7 +59,6 @@ export class FacturaCompraComponent {
       }).pipe(
          tap((el) => {
             this.totalCompras.set(el.data.length);
-            this.totalItems.set(el.meta?.total ?? 0);
             this.paginationService.totalItems.set(el.meta?.total ?? 0);
             this.paginationService.pageSize.set(el.meta?.totalPages ?? 1);
             this.cardsTotales.set([

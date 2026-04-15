@@ -1,19 +1,10 @@
 import { Component, computed, input, output, signal, effect } from '@angular/core';
-import { FacturaVenta, GetFacturaRequest, InvoiceStatus } from '@dashboard/interfaces/documento-venta-interface';
+import { FacturaVenta, GetFacturaRequest, InvoiceFilters, InvoiceStatus } from '@dashboard/interfaces/documento-venta-interface';
 import { RouterLink } from "@angular/router";
 import { FormsModule } from '@angular/forms';
 import { PaginationComponent } from '@shared/components/pagination/pagination';
 
-export interface InvoiceFilters {
-  status?: string;
-  type?: string;
-  tipoFactura?: string;
-  numeroFactura?: string;
-  dianStatus?: string;
-  clientName?: string;
-  startDate?: string;
-  endDate?: string;
-}
+
 
 @Component({
   selector: 'app-table-invoices',
@@ -27,15 +18,8 @@ export class TableInvoices {
   // Input for active filters to restore state if component is recreated
   activeFilters = input<InvoiceFilters>({});
 
-  // Pagination inputs
-  currentPage = input<number>(1);
-  totalPages = input<number>(1);
-  totalItems = input<number>(0);
-  pageSize = input<number>(10);
-
   // Output events
   filterChange = output<InvoiceFilters>();
-  pageChange = output<number>();
   emitir = output<string>();
   anular = output<string>();
   retry = output<string>();
@@ -155,35 +139,16 @@ export class TableInvoices {
     this.filterChange.emit({});
   }
 
-  // Pagination methods
-  goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages()) {
-      this.pageChange.emit(page);
-    }
-  }
-
-  previousPage(): void {
-    if (this.currentPage() > 1) {
-      this.pageChange.emit(this.currentPage() - 1);
-    }
-  }
-
-  nextPage(): void {
-    if (this.currentPage() < this.totalPages()) {
-      this.pageChange.emit(this.currentPage() + 1);
-    }
-  }
-
   getStatusClass(status: InvoiceStatus): string {
     const classes: Record<InvoiceStatus, string> = {
-      [InvoiceStatus.DRAFT]: 'bg-gray-100 text-gray-800',
+      [InvoiceStatus.DRAFT]: 'bg-gray-100 text-gray-800 border-gray-200',
       [InvoiceStatus.PENDING_DIAN]: 'bg-yellow-100 text-yellow-800',
-      [InvoiceStatus.ACCEPTED]: 'bg-green-100 text-green-800',
-      [InvoiceStatus.REJECTED]: 'bg-red-100 text-red-800',
+      [InvoiceStatus.ACCEPTED]: 'bg-green-100 text-green-800 bg-emerald-50 text-emerald-600 border-emerald-100',
+      [InvoiceStatus.REJECTED]: 'bg-red-50 text-red-500 border-red-100',
       [InvoiceStatus.PAID]: 'bg-blue-100 text-blue-800',
-      [InvoiceStatus.CANCELLED]: 'bg-gray-500 text-gray-800',
+      [InvoiceStatus.CANCELLED]: 'bg-red-50 text-red-500 border-red-100',
       [InvoiceStatus.ISSUED]: 'bg-blue-100 text-blue-800',
-      [InvoiceStatus.ERROR_ASIENTO]: 'bg-red-100 text-red-800'
+      [InvoiceStatus.ERROR_ASIENTO]: 'bg-red-100 text-red-800 border-red-100'
     };
     return classes[status];
   }

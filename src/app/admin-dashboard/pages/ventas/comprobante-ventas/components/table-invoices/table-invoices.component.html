@@ -126,8 +126,7 @@
 </div>
 
 <!-- Tabla de Facturas -->
-<div
-  class="relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+<div class="relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
   <div class="overflow-x-auto">
     <table class="w-full text-left text-sm text-gray-500 dark:text-gray-400">
       <thead class="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
@@ -178,7 +177,9 @@
                 {{ invoice.client.razonSocial || invoice.client.nombre + ' ' + invoice.client.apellido }} 
               </td>
               <td class="px-6 py-4">
-                <span [class]="'inline-flex rounded-full px-2 py-1 text-xs ' + getStatusClass(invoice.status)">
+                <span 
+                  class="px-2.5 py-1 text-[10px] font-semibold uppercase tracking-tighter rounded-lg border"
+                  [class]="getStatusClass(invoice.status)">
                   {{ getStatusLabel(invoice.status) }}
                 </span>
               </td>
@@ -196,15 +197,6 @@
                   <span class="text-xs text-slate-400">—</span>
                 }
               </td>
-              <!-- <td class="px-6 py-4 text-right">
-                @if (invoice.formaPago === 'CREDITO') {
-                  <span class="text-sm font-semibold" [class.text-red-600]="invoice.saldoPendiente > 0" [class.text-green-600]="invoice.saldoPendiente === 0">
-                    {{ formatCurrency(invoice.saldoPendiente) }}
-                  </span>
-                } @else {
-                  <span class="text-xs text-slate-400">—</span>
-                }
-              </td> -->
               <td class="px-6 py-4">
                 <div class="flex justify-center gap-2">
                   @if(invoice.status !== 'draft') {

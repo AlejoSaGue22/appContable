@@ -9,11 +9,12 @@ import { tap } from 'rxjs';
 import { LoaderComponent } from "src/app/utils/components/loader/loader.component";
 import { ErrorPages } from "@shared/components/error-pages/error-pages.component";
 import { HeaderTitleInvoices } from "./components/header-title-invoices/header-title-invoices.component";
-import { TableInvoices, InvoiceFilters } from "./components/table-invoices/table-invoices.component";
+import { TableInvoices } from "./components/table-invoices/table-invoices.component";
 import { NotificationService } from '@shared/services/notification.service';
 import { ResponseResult } from '@shared/interfaces/services.interfaces';
 import { ModalComponent } from "@shared/components/modal/modal.component";
 import { LoaderService } from '@utils/services/loader.service';
+import { InvoiceFilters } from '@dashboard/interfaces/documento-venta-interface';
 
 @Component({
    selector: 'app-comprobante-ventas',
@@ -31,10 +32,6 @@ export class ComprobanteVentasComponent {
    paginationService = inject(PaginationService);
    loaderService = inject(LoaderService);
 
-   currentPage = signal(1);
-   totalPages = signal(1);
-   totalItems = signal(0);
-   pageSize = signal(10);
    isModalItem = signal<boolean>(false);
    idItem = signal<string>('');
    action = signal<string>('');
@@ -68,14 +65,8 @@ export class ComprobanteVentasComponent {
    })
 
    onFilterChange(filters: InvoiceFilters): void {
+      console.log(filters);
       this.filters.set(filters);
-   }
-
-   onPageChange(page: number): void {
-      // Page changes are handled by PaginationService via query params
-      // This would require navigation, which is typically handled by the pagination component
-// Removed log
-
    }
 
    formatCurrency(value: number): string {

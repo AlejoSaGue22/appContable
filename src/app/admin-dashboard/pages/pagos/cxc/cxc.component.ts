@@ -1,5 +1,5 @@
 // cxc.component.ts
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -11,6 +11,7 @@ import { HeaderInput, HeaderTitlePageComponent } from "@dashboard/components/hea
 import { ModalHistorialpagoComponent } from "../components/modal-historialpago/modal-historialpago..component";
 import { TarjetasResumenPagos } from "../components/tarjetas-resumen-pagos/tarjetas-resumen-pagos.component";
 import { PaginationComponent } from "@shared/components/pagination/pagination";
+import { PaginationService } from '@shared/components/pagination/pagination.service';
 
 @Component({
   selector: 'app-cxc',
@@ -28,12 +29,14 @@ import { PaginationComponent } from "@shared/components/pagination/pagination";
   templateUrl: './cxc.component.html',
 })
 export class CxcComponent implements OnInit {
+
+  private paginationService = inject(PaginationService);
   headTitle = signal<HeaderInput>({ title: 'Cuentas por Cobrar', slog: 'Facturas de venta a crédito pendientes de pago' });
 
   // Estado
-  private todosLosItems: CxcItem[] = [];
-  resumen: CxcResumen = { totalCartera: 0, porVencer: 0, vencida: 0, cantidadPorVencer: 0, cantidadVencida: 0 };
-  loading = false;
+  private todosLosItems = signal<CxcItem[]>([]);
+  resumen = signal<CxcResumen>({ totalCartera: 0, porVencer: 0, vencida: 0, cantidadPorVencer: 0, cantidadVencida: 0 });
+  loading = signal(false);  
 
   // Filtros
   filtroTexto  = new FormControl('');
@@ -44,7 +47,7 @@ export class CxcComponent implements OnInit {
     const texto  = (this.filtroTexto.value  ?? '').toLowerCase().trim();
     const estado = this.filtroEstado.value ?? '';
 
-    return this.todosLosItems.filter(item => {
+    return this.todosLosItems().filter(item => {
       const pasaTexto  = !texto  || item.clienteNombre.toLowerCase().includes(texto) || item.numeroFactura.toLowerCase().includes(texto);
       const pasaEstado = !estado || item.paymentStatus === estado;
       return pasaTexto && pasaEstado;
@@ -72,16 +75,18 @@ export class CxcComponent implements OnInit {
   }
 
   cargar(): void {
-    this.loading = true;
+    this.loading.set(true);
     const estado = this.filtroEstado.value || undefined;
 
-    this.svc.getCxc({ paymentStatus: estado as PaymentStatus }).subscribe({
+    this.svc.getCxc({ paymentStatus: estado, page: this.paginationService.currentPage() - 1, limit: 10 }).subscribe({
       next: res => {
-        this.todosLosItems = res.items;
-        this.resumen       = res.resumen;
-        this.loading       = false;
+        this.todosLosItems.set(res.items);
+        this.resumen.set(res.resumen);
+        this.loading.set(false);
+        this.paginationService.totalItems.set(res.meta.total);
+        this.paginationService.pageSize.set(res.meta.totalPages);
       },
-      error: () => { this.loading = false; },
+      error: () => { this.loading.set(false); },
     });
   }
 

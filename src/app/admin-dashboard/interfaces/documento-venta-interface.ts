@@ -133,6 +133,17 @@ interface GetFacturaItemRequest {
   createdAt: string; // ISO datetime
 }
 
+export interface InvoiceFilters {
+  status?: string;
+  type?: string;
+  tipoFactura?: string;
+  numeroFactura?: string;
+  dianStatus?: string;
+  clientName?: string;
+  startDate?: string;
+  endDate?: string;
+}
+
 export enum TipoFactura {
   ELECTRONICA = 'ELECTRONICA',
   STANDARD = 'ESTANDAR',

@@ -21,21 +21,23 @@ import { FacturaCompra, ItemFacturaResponse } from '@dashboard/interfaces/factur
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
 import { HelpersUtils } from '@utils/helpers.utils';
 import { FormaPago } from '@dashboard/interfaces/documento-venta-interface';
+import { LoaderComponent } from "@utils/components/loader/loader.component";
 
 @Component({
     selector: 'app-factura-compra-forms-page',
     standalone: true,
     imports: [
-        CommonModule,
-        ReactiveFormsModule,
-        RouterLink,
-        HeaderTitlePageComponent,
-        FormErrorLabelComponent,
-        ListGroupDropdownComponent,
-        ModalComponent,
-        ProveedoresFormsPageComponent,
-        ProductosServiciosFormsComponent
-    ],
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    HeaderTitlePageComponent,
+    FormErrorLabelComponent,
+    ListGroupDropdownComponent,
+    ModalComponent,
+    ProveedoresFormsPageComponent,
+    ProductosServiciosFormsComponent,
+    LoaderComponent
+],
     providers: [
         DecimalPipe
     ],
@@ -114,10 +116,10 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         });
     }
 
-    // Signal for loading state
-    loading = signal<boolean>(false);
 
-    // Form for adding new items
+    loading = signal<boolean>(false);
+    minDate = signal<string>(new Date().toISOString().substring(0, 10));
+
     productosItemsForm = this.fb.group({
         producto: [{ id: '', nombre: '' }, Validators.required],
         quantity: [1, [Validators.required, Validators.min(1)]],
@@ -348,6 +350,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         }
 
         this.loading.set(true);
+        this.loaderService.show('Guardando factura de compra...');
         const factura = this.formCompra.value;
         const items = this.formCompra.controls.items.value;
 
@@ -397,8 +400,9 @@ export class FacturaCompraFormsPageComponent implements OnInit {
 
 
                 setTimeout(() => {
+                    this.loaderService.hide();
                     this.router.navigateByUrl('/panel/compras/purchases')
-                }, 1500);
+                }, 800);
             });
 
         } else {
@@ -419,8 +423,6 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                 return;
             }
 
-            // Log removed
-
             this.notificationService.success(
                 'Factura actualizada con exito',
                 'Accion Completada',
@@ -428,6 +430,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
             );
 
             setTimeout(() => {
+                this.loaderService.hide();
                 this.router.navigateByUrl('/panel/compras/purchases')
             }, 1500);
         });
