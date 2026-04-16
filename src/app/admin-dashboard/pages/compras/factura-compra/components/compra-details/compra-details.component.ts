@@ -2,11 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, signal, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormaPago } from '@dashboard/interfaces/documento-venta-interface';
+import { FacturaCompraResponse } from '@dashboard/interfaces/factura-compra-interface';
 import { PagoHistorial, PaymentStatus } from '@dashboard/interfaces/pagos-interface';
 import { FacturaCompraService } from '@dashboard/pages/compras/services/factura-compra.service';
 import { RegistrarPagoModalData } from '@dashboard/pages/pagos/components/modal-registrarpago/modal-registrarpago.component';
 import { PagosHttpService } from '@dashboard/pages/pagos/services/pagos.service';
 import { AsientosHttpService } from '@dashboard/services/asientos-http.service';
+import { NotificationService } from '@shared/services/notification.service';
 
 @Component({
   selector: 'app-compra-details',
@@ -15,7 +17,7 @@ import { AsientosHttpService } from '@dashboard/services/asientos-http.service';
   standalone: true
 })
 export class CompraDetailsComponent implements OnInit {
-  compra = signal<any | null>(null);
+  compra = signal<FacturaCompraResponse | null>(null);
   loading = signal(true);
   error = signal<string | null>(null);
  
@@ -33,6 +35,7 @@ export class CompraDetailsComponent implements OnInit {
     private route: ActivatedRoute,
     private asientosService: AsientosHttpService,
     private pagosService:   PagosHttpService,
+    private notificationService: NotificationService
   ) { }
 
   ngOnInit(): void {
@@ -76,9 +79,23 @@ export class CompraDetailsComponent implements OnInit {
     // Historial de pagos al proveedor (solo si es crédito)
     if (c.formaPago === FormaPago.CREDITO) {
       this.pagosService.getHistorialPagos(c.id).subscribe({
-        next: p => { this.pagos = p; },
+        next: p => { this.pagos = p.data; },
       });
     }
+  }
+
+  reintentarAsiento(): void {
+    this.loading.set(true);
+    this.facturasService.retryAsiento(this.compra()!.id).subscribe({
+      next: () => { 
+        this.loadCompra(this.compra()!.id); 
+        this.loading.set(false);
+      },
+      error: (error) => {
+        this.notificationService.error(error.message || 'Ocurrio un error al reintentar asiento', 'Error');
+        this.loading.set(false);
+      }
+    });
   }
 
   getPaymentStatusLabel(status: PaymentStatus | null | undefined): string {

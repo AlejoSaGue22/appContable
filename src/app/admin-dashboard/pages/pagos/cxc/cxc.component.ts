@@ -1,8 +1,8 @@
 // cxc.component.ts
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, map, startWith } from 'rxjs/operators';
 import { RegistrarPagoModalComponent, RegistrarPagoModalData } from '../components/modal-registrarpago/modal-registrarpago.component';
 import { CxcItem, CxcResumen, PagoHistorial, PaymentStatus } from '@dashboard/interfaces/pagos-interface';
 import { PagosHttpService } from '../services/pagos.service';
@@ -12,6 +12,7 @@ import { ModalHistorialpagoComponent } from "../components/modal-historialpago/m
 import { TarjetasResumenPagos } from "../components/tarjetas-resumen-pagos/tarjetas-resumen-pagos.component";
 import { PaginationComponent } from "@shared/components/pagination/pagination";
 import { PaginationService } from '@shared/components/pagination/pagination.service';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-cxc',
@@ -42,17 +43,21 @@ export class CxcComponent implements OnInit {
   filtroTexto  = new FormControl('');
   filtroEstado = new FormControl<PaymentStatus | ''>('');
 
+  textoSignal = toSignal(this.filtroTexto.valueChanges.pipe(startWith(''), map(v => v?.toLowerCase().trim() ?? '')));
+  estadoSignal = toSignal(this.filtroEstado.valueChanges.pipe(startWith('')));
+
   // Items filtrados en el template (calculado al vuelo)
-  get itemsFiltrados(): CxcItem[] {
-    const texto  = (this.filtroTexto.value  ?? '').toLowerCase().trim();
-    const estado = this.filtroEstado.value ?? '';
+  itemsFiltrados = computed(() => {
+    const texto  = this.textoSignal();
+    const estado = this.estadoSignal();
 
     return this.todosLosItems().filter(item => {
       const pasaTexto  = !texto  || item.clienteNombre.toLowerCase().includes(texto) || item.numeroFactura.toLowerCase().includes(texto);
       const pasaEstado = !estado || item.paymentStatus === estado;
       return pasaTexto && pasaEstado;
     });
-  }
+  
+  });
 
   // Modal cobro
   modalVisible = false;

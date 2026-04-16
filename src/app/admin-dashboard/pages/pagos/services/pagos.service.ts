@@ -5,7 +5,8 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/app/environments/environment';
 import { AgingReporte, CuentaBancaria, CxcResponse, CxpResponse, HistorialPagosResponse, PagoHistorial, 
-         PagoResponseDto, PaymentStatus, RegistrarCobroDto, RegistrarPagoDto, ResumenCartera, CxFiltros
+         PagoResponseDto, PaymentStatus, RegistrarCobroDto, RegistrarPagoDto, ResumenCartera, CxFiltros,
+         PagoHistorialResponse
 } from '@dashboard/interfaces/pagos-interface';
 
 
@@ -58,9 +59,9 @@ export class PagosHttpService {
       .pipe(map(r => r.data));
   }
 
-  getHistorialPagos(facturaCompraId: string): Observable<PagoHistorial[]> {
+  getHistorialPagos(facturaCompraId: string): Observable<PagoHistorialResponse> {
     return this.http
-      .get<PagoHistorial[]>(`${this.base}/pagos/cxp/${facturaCompraId}/historial`);
+      .get<PagoHistorialResponse>(`${this.base}/pagos/cxp/${facturaCompraId}/historial`);
   }
 
   registrarPago(facturaCompraId: string, dto: RegistrarPagoDto): Observable<PagoResponseDto<unknown>> {

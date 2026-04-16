@@ -1,7 +1,5 @@
-<!-- modal-historialpago.component.html -->
 
 @if (historialLoading()) {
-  <!-- Estado de carga -->
   <div class="flex items-center justify-center py-10 text-slate-400">
     <svg class="h-6 w-6 animate-spin mr-2" fill="none" viewBox="0 0 24 24">
       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -12,8 +10,7 @@
     Cargando historial...
   </div>
 
-} @else if (historialPagos.length === 0) {
-  <!-- Sin registros -->
+} @else if (historialPagos().length === 0) {
   <div class="flex flex-col items-center justify-center py-10 text-slate-400">
     <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-2 opacity-30"
          fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -65,6 +62,7 @@
           <th class="px-4 py-2 text-xs font-bold uppercase text-slate-500">Fecha</th>
           <th class="px-4 py-2 text-xs font-bold uppercase text-slate-500 text-right">Monto</th>
           <th class="px-4 py-2 text-xs font-bold uppercase text-slate-500">Medio de pago</th>
+          <th class="px-4 py-2 text-xs font-bold uppercase text-slate-500">Banco</th>
           <th class="px-4 py-2 text-xs font-bold uppercase text-slate-500">Referencia</th>
         </tr>
       </thead>
@@ -73,10 +71,11 @@
           <tr class="hover:bg-slate-50 transition-colors">
             <td class="px-4 py-3 text-slate-600">{{ pago.fecha | date:'dd/MM/yyyy' }}</td>
             <td class="px-4 py-3 text-right font-semibold"
-                [ngClass]="tipo() === 'cobro' ? 'text-green-700' : 'text-orange-700'">
+                [ngClass]="tipo() === 'cobro' ? 'text-green-700' : 'text-gray-900'">
               {{ pago.monto | currency:'COP':'symbol-narrow':'1.0-0' }}
             </td>
             <td class="px-4 py-3 text-slate-600 capitalize">{{ pago.medioPago }}</td>
+            <td class="px-4 py-3 text-slate-400 text-xs font-mono">{{  formatCuentaBancaria(pago.cuentaBancaria) }}</td>
             <td class="px-4 py-3 text-slate-400 text-xs font-mono">{{ pago.referencia ?? '—' }}</td>
           </tr>
         }

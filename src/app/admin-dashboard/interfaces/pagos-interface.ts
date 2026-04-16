@@ -144,6 +144,12 @@ export interface AgingReporte {
 
 // ── Pagos / Historial ──────────────────────────────────────────────────────
 
+export interface PagoHistorialResponse {
+  data: PagoHistorial[];
+  message: string;
+  success: boolean;
+}
+
 export interface PagoHistorial {
   id:              string;
   tipo:            TipoPago;
@@ -154,6 +160,15 @@ export interface PagoHistorial {
   numeroDocumento: string;
   contraparte:     string;
   asientoId:       number | null;
+  cuentaBancaria?: {
+    id: string;
+    nombre: string;
+    numeroCuenta: string;
+    banco: {
+      id: string;
+      nombre: string;
+    };
+  };
 }
 
 export interface HistorialPagosResponse {

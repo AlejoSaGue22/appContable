@@ -69,11 +69,6 @@ export class InvoiceDetailsComponent {
     this.modalCobroVisible = true;
   }
   
-  onCobroExitoso(_result: any): void {
-    this.modalCobroVisible = false;
-    // this.cargarFactura(); // recarga la factura para actualizar saldos
-  }
-  
   // ── Reintentar asiento ────────────────────────────────────────────────
   reintentarAsiento(): void {
     this.loading.set(true);

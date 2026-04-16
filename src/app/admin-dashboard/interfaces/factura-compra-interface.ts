@@ -1,3 +1,4 @@
+import { PaymentMethod } from "./catalogs-interface";
 import { PaymentStatus } from "./pagos-interface";
 import { ArticulosInterface } from "./productos-interface";
 import { ProveedoresInterface } from "./proveedores-interface";
@@ -50,7 +51,7 @@ export interface ItemFactura {
     id?: string;
     articuloId: string;
     articulo?: ArticulosInterface;
-    description?: string;
+    descripcion?: string;
     unitPrice: number;
     iva: number;
     valor_iva?: number;
@@ -62,6 +63,35 @@ export interface ItemFactura {
     total?: number;
 }
 
+export interface FacturaCompraResponse {
+    id: string;
+    isDraft: string;
+    proveedorId: string;
+    numero: string;
+    numeroFacturaProveedor: string;
+    estado: InvoiceCompraStatus;
+    descripcion: string;
+    fecha: string;
+    fechaVencimiento?: string;  
+    formaPago: string;
+    metodoPago?: string;
+    metodoPagoRel?: PaymentMethod;
+    observaciones?: string;
+    totalPagado: number;
+    saldoPendiente: number;
+    paymentStatus: PaymentStatus;
+    items: ItemFacturaResponse[];
+    asientoError?: string;  
+    iva: number;
+    descuento: number;
+    proveedor: ProveedoresInterface;
+    subtotal: number;
+    total: number;
+    createdBy?: CreatedBy;
+    createdById: string;
+    createdAt: Date;
+}
+
 export interface ItemFacturaResponse {
     id?: string;
     articuloId: string;
@@ -70,6 +100,7 @@ export interface ItemFacturaResponse {
     descripcion?: string;
     unitPrice: number;
     porcentajeIva: number;
+    valorIva?: number;
     descuento?: number;
     valorDescuento?: number;
     quantity: number;

@@ -198,11 +198,11 @@
 
 <!-- Modal Historial de Pagos -->
 <app-modal [(visible)]="historialVisible"
-           [title]="'Historial de Pagos — ' + (historialItem?.numeroFactura ?? '')"
+           [title]="'Historial de Pagos — ' + (historialItem()?.numeroFactura ?? '')"
            width="max-w-2xl">
   <app-modal-historialpago
-    [historialItem]="historialItem"
-    [historialPagos]="historialPagos"
+    [historialItem]="historialItem()"
+    [historialPagos]="historialPagos()"
     [historialLoading]="historialLoading"
     tipo="pago"
   />

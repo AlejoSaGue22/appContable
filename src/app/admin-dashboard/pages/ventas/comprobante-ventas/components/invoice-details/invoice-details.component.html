@@ -118,7 +118,7 @@
               </h3>
               <p class="text-base font-bold text-gray-900">{{ factura()!.client.nombre }} {{ factura()!.client.apellido }}</p>
               <p class="text-sm text-gray-600 mt-1">
-                <span class="font-medium">{{ factura()!.client.tipoDocumentoRel?.abreviatura }}:</span>
+                <span class="font-medium">{{ factura()!.client.tipoDocumentoRel.abreviatura }}:</span>
                 {{ factura()!.client.numeroDocumento }}
               </p>
               @if (factura()!.client.email) {
@@ -141,7 +141,7 @@
 
                 @if (factura()!.metodoPago) {
                   <span class="text-gray-500">Método:</span>
-                  <span class="font-medium text-gray-800">{{ factura()!.metodoPagoRel?.nombre || factura()!.metodoPago }}</span>
+                  <span class="font-medium text-gray-800">{{ factura()!.metodoPagoRel.nombre || factura()!.metodoPago }}</span>
                 }
 
                 @if (factura()!.vendedor) {
@@ -150,7 +150,7 @@
                 }
 
                 <span class="text-gray-500">Canal:</span>
-                <span class="font-medium text-gray-800">{{ factura()!.canalVentaRel?.nombre || '—' }}</span>
+                <span class="font-medium text-gray-800">{{ factura()!.canalVentaRel.nombre || '—' }}</span>
 
                 @if (factura()!.formaPago === 'CREDITO') {
                   <span class="text-gray-500">Estado pago:</span>
@@ -189,7 +189,7 @@
                     <tr class="hover:bg-gray-50/60 transition-colors">
                       <td class="px-4 py-3 text-gray-400 text-xs">{{ i + 1 }}</td>
                       <td class="px-4 py-3">
-                        <p class="font-medium text-gray-900">{{ item.description || item.articulo?.nombre }}</p>
+                        <p class="font-medium text-gray-900">{{ item.description || item.articulo.nombre }}</p>
                         @if (item.articulo) {
                           <p class="text-xs text-gray-400 font-mono mt-0.5">{{ item.articulo.codigo || item.articulo.nombre }}</p>
                         }

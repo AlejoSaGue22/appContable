@@ -1,5 +1,5 @@
 import { Component, inject, computed, signal } from '@angular/core';
-import { CommonModule, CurrencyPipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 
@@ -17,12 +17,13 @@ import { catchError, of, tap } from 'rxjs';
 import { CategoriaFormModalComponent } from './components/categoria-form-modal/categoria-form-modal.component';
 import { CategoryArticle } from '@dashboard/interfaces/catalogs-interface';
 import { NotificationService } from '@shared/services/notification.service';
+import { CuentasContablesList } from "./components/cuentas-contables-list/cuentas-contables-list.component";
 
 @Component({
   selector: 'app-cuentas-contables',
   standalone: true,
-  imports: [CommonModule, LoaderComponent, CurrencyPipe, HeaderTitlePageComponent, FormsModule, 
-          PaginationComponent, CategoriasListComponent, CategoriaFormModalComponent],
+  imports: [CommonModule, LoaderComponent, HeaderTitlePageComponent, FormsModule,
+    PaginationComponent, CategoriasListComponent, CategoriaFormModalComponent, CuentasContablesList],
   templateUrl: './cuentas-contables.component.html',
   providers: [PaginationService]
 })
@@ -58,9 +59,36 @@ export class CuentasContablesComponent {
     slog: 'Visualización jerárquica del plan único de cuentas (PUC)'
   }
 
+  // Campos seleccionados en el input (temporales)
+  selectedFechaInicio = signal<string>('');
+  selectedFechaFin    = signal<string>('');
+
+  // Parámetros aplicados a la búsqueda real
+  appliedFechaInicio = signal<string>('');
+  appliedFechaFin    = signal<string>('');
+
   cuentasResource = rxResource({
-    loader: () => this.cuentasService.getCuentasContables()
+    request: () => ({
+      fechaInicio: this.appliedFechaInicio(),
+      fechaFin:    this.appliedFechaFin()
+    }),
+    loader: ({ request }) => this.cuentasService.getCuentasContables({
+      fechaInicio: request.fechaInicio,
+      fechaFin:    request.fechaFin
+    })
   });
+
+  searchCuentas() {
+    this.appliedFechaInicio.set(this.selectedFechaInicio());
+    this.appliedFechaFin.set(this.selectedFechaFin());
+  }
+
+  clearSearch() {
+    this.selectedFechaInicio.set('');
+    this.selectedFechaFin.set('');
+    this.appliedFechaInicio.set('');
+    this.appliedFechaFin.set('');
+  }
 
   categoriesResource = rxResource({
     request: () => ({

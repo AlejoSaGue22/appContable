@@ -11,16 +11,10 @@ export type HistorialTipo = 'cobro' | 'pago';
   templateUrl: './modal-historialpago.component.html',
 })
 export class ModalHistorialpagoComponent {
-  /** El item de CxC o CxP seleccionado */
+
   historialItem = input<CxcItem | CxpItem | null>(null);
-  
-  /** Lista de pagos/cobros cargados */
   historialPagos = input<PagoHistorial[]>([]);
-
-  /** true mientras se espera la respuesta del servidor */
   historialLoading = input(false);
-
-  /** Controla el color/texto del resumen ('cobro' → verde, 'pago' → naranja) */
   tipo = input<HistorialTipo>('cobro');
 
   get contraparte(): string {
@@ -42,5 +36,10 @@ export class ModalHistorialpagoComponent {
 
   get colorAccent(): string {
     return this.tipo() === 'cobro' ? 'green' : 'orange';
+  }
+
+  formatCuentaBancaria(cuentaBancaria: PagoHistorial['cuentaBancaria']): string {
+    if (!cuentaBancaria) return '—';
+    return `${cuentaBancaria.banco?.nombre} - ${cuentaBancaria.numeroCuenta}`;
   }
 }

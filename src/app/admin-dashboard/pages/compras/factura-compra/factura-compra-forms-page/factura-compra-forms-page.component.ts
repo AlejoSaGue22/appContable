@@ -369,7 +369,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                 unitPrice: item.precioUnitario,
                 iva: item.iva,
                 discount: item.descuento,
-                descripcion: item.description || ''
+                descripcion: item.descripcion || ''
             })),
             subtotal: this.totales.subtotal,
             descuento: this.totales.descuentoTotal,

@@ -61,8 +61,8 @@ export class CxpComponent {
   modalData: RegistrarPagoModalData | null = null;
   historialVisible = false;
   historialLoading = false;
-  historialItem: CxpItem | null = null;
-  historialPagos: PagoHistorial[] = [];
+  historialItem = signal<CxpItem | null>(null);
+  historialPagos = signal<PagoHistorial[]>([]);
 
   constructor() {
     this.cargar();
@@ -92,12 +92,12 @@ export class CxpComponent {
   }
 
   abrirHistorial(item: CxpItem): void {
-    this.historialItem = item;
-    this.historialPagos = [];
+    this.historialItem.set(item);
+    this.historialPagos.set([]);
     this.historialVisible = true;
     this.historialLoading = true;
     this.svc.getHistorialPagos(item.facturaId).subscribe({
-      next: pagos => { this.historialPagos = pagos; this.historialLoading = false; },
+      next: pagos => { this.historialPagos.set(pagos.data); this.historialLoading = false; },
       error: () => this.historialLoading = false,
     });
   }

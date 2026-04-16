@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, computed, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AgingReporte } from '@dashboard/interfaces/pagos-interface';
 import { PagosHttpService } from '../services/pagos.service';
@@ -22,6 +22,25 @@ export class AntiguedadComponent implements OnInit {
   loadingPagar  = signal(false);
 
   gruposAbiertos = signal<Set<string>>(new Set());
+  searchQuery    = signal('');
+
+  reporteFiltrado = computed(() => {
+    const report = this.vistaActiva() === 'cobrar' ? this.agingCobrar() : this.agingPagar();
+    if (!report) return null;
+
+    const query = this.searchQuery().toLowerCase().trim();
+    if (!query) return report;
+
+    // Filtramos los grupos (clientes o proveedores) por nombre
+    const filteredGrupos = report.grupos.filter(g => 
+       g.contraparteNombre.toLowerCase().includes(query)
+    );
+
+    return {
+      ...report,
+      grupos: filteredGrupos
+    };
+  });
 
   readonly buckets: Array<{
     key: keyof AgingReporte['totales'];
@@ -60,13 +79,24 @@ export class AntiguedadComponent implements OnInit {
   }
 
   toggleGrupo(id: string): void {
-    const grupos = this.gruposAbiertos();
+    const grupos = new Set(this.gruposAbiertos());
     if (grupos.has(id)) {
       grupos.delete(id);
     } else {
       grupos.add(id);
     }
     this.gruposAbiertos.set(grupos);
+  }
+
+  expandAll(): void {
+    const report = this.reporteFiltrado();
+    if (!report) return;
+    const allIds = report.grupos.map(g => g.contraparteId);
+    this.gruposAbiertos.set(new Set(allIds));
+  }
+
+  collapseAll(): void {
+    this.gruposAbiertos.set(new Set());
   }
 
   pct(valor: number, total: number): number {
