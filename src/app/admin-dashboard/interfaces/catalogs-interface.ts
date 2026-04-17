@@ -39,6 +39,13 @@ export interface SalesChannel {
     state: boolean;
 }
 
+export interface ConceptNote {
+    id: string;
+    codigo: string;
+    nombre: string;
+    state: boolean;
+}
+
 export interface PaymentMethod extends CatalogItem {}
 export interface UnitMeasure extends CatalogItem {}
 export interface Municipality {
@@ -55,6 +62,7 @@ export interface CatalogsState {
     unitsMeasure: UnitMeasure[];
     municipalities: Municipality[];
     categoriesArticles: CategoryArticle[];
+    conceptsNotes: ConceptNote[];
     loading: boolean;
     error: string | null;
 }

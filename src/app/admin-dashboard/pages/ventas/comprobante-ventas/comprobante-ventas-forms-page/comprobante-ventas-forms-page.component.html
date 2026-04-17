@@ -120,23 +120,23 @@
                         </div>
 
                         @if (formVentas.get('formaPago')?.value === 'CONTADO') {
-                        <div>
-                            <label class="block mb-2 text-sm text-slate-600">
-                                Metodo de Pago <span class="text-red-500">*</span>
-                            </label>
-                            <div class="relative">
-                                <select class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded 
-                                                    pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm
-                                                    focus:shadow-md cursor-pointer" formControlName="metodoPago">
-                                    <option value="">Selecciona un método de pago</option>
-                                    @for (method of catalogsStore.paymentMethods(); track method.id) {
-                                        <option [value]="method.id">{{ method.nombre }}</option>
-                                    }
-                                </select>
-                            </div>
+                            <div>
+                                <label class="block mb-2 text-sm text-slate-600">
+                                    Metodo de Pago <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <select class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded 
+                                                        pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm
+                                                        focus:shadow-md cursor-pointer" formControlName="metodoPago">
+                                        <option value="">Selecciona un método de pago</option>
+                                        @for (method of catalogsStore.paymentMethods(); track method.id) {
+                                            <option [value]="method.id">{{ method.nombre }}</option>
+                                        }
+                                    </select>
+                                </div>
 
-                            <form-error-label [errorType]="formVentas.get('metodoPago')!" />
-                        </div>
+                                <form-error-label [errorType]="formVentas.get('metodoPago')!" />
+                            </div>
                         }
 
                         @if (formVentas.get('formaPago')?.value === 'CREDITO') {

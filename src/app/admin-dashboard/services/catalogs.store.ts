@@ -21,6 +21,7 @@ export class CatalogsStore {
     unitsMeasure: [],
     municipalities: [],
     categoriesArticles: [],
+    conceptsNotes: [],
     loading: false,
     error: null
   });
@@ -42,6 +43,7 @@ export class CatalogsStore {
   salesChannels = computed(() => this.state().salesChannels);
   unitsMeasure = computed(() => this.state().unitsMeasure);
   municipalities = computed(() => this.state().municipalities);
+  conceptsNotes = computed(() => this.state().conceptsNotes);
   loading = computed(() => this.state().loading);
   error = computed(() => this.state().error);
 
@@ -56,9 +58,10 @@ export class CatalogsStore {
               documentTypes: this.catalogsService.findAllDocumentTypes(),
               paymentMethods: this.catalogsService.findAllPaymentMethods(),
               salesChannels: this.catalogsService.findAllSalesChannels(),
-              unitsMeasure: this.catalogsService.findAllUnitsMeasure()
+              unitsMeasure: this.catalogsService.findAllUnitsMeasure(),
+              conceptsNotes: this.catalogsService.findAllConceptsNotes()
         }).pipe(
-          tap(({ categoriesArticles, documentTypes, paymentMethods, salesChannels, unitsMeasure, municipalities }) => {
+          tap(({ categoriesArticles, documentTypes, paymentMethods, salesChannels, unitsMeasure, municipalities, conceptsNotes }) => {
             this.state.set({
               categoriesArticles: categoriesArticles.categoriesArticles,
               documentTypes,
@@ -66,6 +69,7 @@ export class CatalogsStore {
               salesChannels,
               unitsMeasure,
               municipalities,
+              conceptsNotes,
               loading: false,
               error: null
             });
@@ -90,6 +94,7 @@ export class CatalogsStore {
       unitsMeasure: [],
       municipalities: [],
       categoriesArticles: [],
+      conceptsNotes: [],
       loading: false,
       error: null
     });
