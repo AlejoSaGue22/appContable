@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DianStatus, FormaPago, GetFacturaRequest, InvoiceStatus, TipoFactura } from '@dashboard/interfaces/documento-venta-interface';
 import { PagoHistorial, PaymentStatus } from '@dashboard/interfaces/pagos-interface';
@@ -8,6 +8,7 @@ import { PagosHttpService } from '@dashboard/pages/pagos/services/pagos.service'
 import { ComprobantesVentasService } from '@dashboard/pages/ventas/services/comprobantes-ventas.service';
 import { AsientosHttpService } from '@dashboard/services/asientos-http.service';
 import { NotificationService } from '@shared/services/notification.service';
+import { PrintService } from '@shared/services/print.service';
 
 @Component({
   selector: 'app-invoice-details',
@@ -23,6 +24,8 @@ export class InvoiceDetailsComponent {
   loadingAsientos = false;
   modalCobroVisible = false;
   modalCobroData: RegistrarPagoModalData | null = null;
+
+  private printService = inject(PrintService);
 
   constructor(
     private facturasService: ComprobantesVentasService,
@@ -203,9 +206,19 @@ export class InvoiceDetailsComponent {
     window.print();
   }
 
+  printInvoice(): void {
+    const f = this.factura();
+    if (f) this.printService.printInvoice(f);
+  }
+
+  printAsiento(): void {
+    const f = this.factura();
+    if (f && this.asientos.length > 0) {
+      this.printService.printAsientoContable(this.asientos, f.comprobante_completo);
+    }
+  }
+
   exportPDF(): void {
     // Implementar exportación a PDF
-    // Log removed
-
   }
 }
