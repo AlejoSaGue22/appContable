@@ -33,7 +33,7 @@ export class NotificationService {
     const newNotification: Notification = {
       id: this.nextId++,
       ...notification,
-      duration: notification.duration || 5000 // 5 segundos por defecto
+      duration: notification.duration || 10000 // 10 segundos por defecto
     };
 
     this.notifications.push(newNotification);

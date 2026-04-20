@@ -88,7 +88,7 @@ export class ProveedoresFormsPageComponent implements OnInit {
     });
 
     this.formProveedor.get('identificacion')?.valueChanges.subscribe(value => {
-      if (this.formProveedor.get('tipoDocumento')?.value === '6') {
+      if (this.formProveedor.get('tipoDocumento')?.value == '6') {
         this.updateDV(value);
       }
     });
@@ -117,7 +117,7 @@ export class ProveedoresFormsPageComponent implements OnInit {
 
   private handleTipoDocumentoChange(tipo: string | null | undefined) {
     const dvControl = this.formProveedor.get('dv');
-    if (tipo === '6') { // NIT
+    if (tipo == '6') { // NIT
       dvControl?.setValidators([Validators.required]);
       this.updateDV(this.formProveedor.get('identificacion')?.value);
     } else {
@@ -144,15 +144,15 @@ export class ProveedoresFormsPageComponent implements OnInit {
     let y = 0;
 
     for (let i = 0; i < z; i++) {
-      y = parseInt(cleanNit.substr(i, 1));
-      x += y * vpri[z - 1 - i];
+        y = parseInt(cleanNit.substring(i, i + 1));
+        x += y * vpri[z - 1 - i];
     }
 
     y = x % 11;
     if (y > 1) {
-      return (11 - y).toString();
+        return (11 - y).toString();
     } else {
-      return y.toString();
+        return y.toString();
     }
   }
 

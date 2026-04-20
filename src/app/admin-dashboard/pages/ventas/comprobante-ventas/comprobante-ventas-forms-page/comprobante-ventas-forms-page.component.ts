@@ -234,15 +234,17 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   });
 
   ivaLogic = effect(() => {
-      const tipoFactura = this.tipoFacturaSignal();
-      const ivaControl = this.productosItemsForm.get('iva');
+    const tipoFactura = this.tipoFacturaSignal();
+    const ivaControl = this.productosItemsForm.get('iva');
 
-      if (tipoFactura === TipoFactura.STANDARD) {
-        ivaControl?.setValue(0);
-        ivaControl?.disable();
-      } else {
-        ivaControl?.enable();
-      }
+    if (tipoFactura === TipoFactura.STANDARD) {
+      ivaControl?.setValue(0);
+      ivaControl?.disable();
+    } else {
+      ivaControl?.enable();
+    }
+
+    this.productSeleccionados.set([]);
   });
 
   productosItemsForm = this.fb.group({
@@ -371,12 +373,9 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     const validFactura = this.formVentas.valid;
     const validProduct = this.productosItemsForm.valid;
     this.formVentas.markAllAsTouched();
-    // Log removed
-    // Log removed
 
 
     if (!validFactura) {
-      // Identificar campos no válidos para depuración
       const invalidFields = [];
       const controls = this.formVentas.controls;
       for (const name in controls) {
@@ -385,25 +384,18 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
         }
       }
 
-      this.notificacionService.error(
-        `Por favor, completa los campos requeridos: ${invalidFields.join(', ')}`,
-        'Campos no validos',
-        5000
-      );
+      this.notificacionService.error(`Por favor, completa los campos requeridos: ${invalidFields.join(', ')}`,
+                                    'Campos no validos',5000);
       return;
     }
 
     if (this.productSeleccionados().length == 0) {
-      this.notificacionService.error(
-        'Debes agregar productos a la factura',
-        'Error',
-        5000
-      );
+      this.notificacionService.error('Debes agregar productos a la factura','Error',5000);
       return;
     }
 
-    this.loading.set(true);
     this.loaderservice.show('Guardando factura de venta...');
+    this.loading.set(true);
     const valueFormFactura = this.formVentas.value;
     const productos = this.productSeleccionados();
 

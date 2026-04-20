@@ -62,7 +62,7 @@
                             <form-error-label [errorType]="formProveedor.get('identificacion')!"></form-error-label>
                         </div>
                         
-                        @if (formProveedor.get('tipoDocumento')?.value === '6') {
+                        @if (formProveedor.get('tipoDocumento')?.value == '6') {
                             <div class="col-span-1">
                                 <label class="block text-sm font-medium text-gray-700 mb-1">DV <span class="text-red-500">*</span></label>
                                 <input type="text" formControlName="dv" [readOnly]="true"
@@ -73,7 +73,7 @@
                     </div>
 
                     <!-- Razón Social / Nombre -->
-                    @if (formProveedor.get('tipoPersona')?.value === 'PN') {
+                    @if (formProveedor.get('tipoPersona')?.value == 'PN') {
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Nombre 
                                 <span class="text-red-500">*</span></label>

@@ -127,7 +127,7 @@ export class ComprobanteVentasComponent {
             this.comprobanteVentasResource.reload();
          } else {
             const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
-            this.notificacionService.error('Error al emitir factura', message || 'Error desconocido');
+            this.notificacionService.error(message || 'Error desconocido', 'Error al emitir factura');
          }
       }, () => this.loaderService.hide());
    }
@@ -142,7 +142,7 @@ export class ComprobanteVentasComponent {
             this.comprobanteVentasResource.reload();
          } else {
             const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
-            this.notificacionService.error('Error al anular factura', message || 'Error desconocido');
+            this.notificacionService.error(message || 'Error desconocido', 'Error al anular factura');
          }
       });
    }
@@ -154,7 +154,7 @@ export class ComprobanteVentasComponent {
             this.comprobanteVentasResource.reload();
          } else {
             const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
-            this.notificacionService.error('Error al reintentar factura', message || 'Error desconocido');
+            this.notificacionService.error(message || 'Error desconocido', 'Error al reintentar factura');
          }
       });
    }
@@ -167,7 +167,7 @@ export class ComprobanteVentasComponent {
             this.comprobanteVentasResource.reload();
          } else {
             const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
-            this.notificacionService.error('Error al eliminar factura', message || 'Error desconocido');
+            this.notificacionService.error(message || 'Error desconocido', 'Error al eliminar factura');
          }
       });
    }

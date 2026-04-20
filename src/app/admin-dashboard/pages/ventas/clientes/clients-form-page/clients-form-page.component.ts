@@ -86,10 +86,11 @@ export class ClientsFormPageComponent implements OnInit {
 
         this.clientsForm.get('tipoDocumento')?.valueChanges.subscribe(value => {
             this.handleTipoDocumentoChange(value);
+            console.log('tipoDocumento',value);
         });
 
         this.clientsForm.get('numeroDocumento')?.valueChanges.subscribe(value => {
-            if (this.clientsForm.get('tipoDocumento')?.value === '6') {
+            if (this.clientsForm.get('tipoDocumento')?.value == '6') {
                 this.updateDV(value);
             }
         });
@@ -208,17 +209,19 @@ export class ClientsFormPageComponent implements OnInit {
             return;
         }
         const dv = this.calculateDV(nit);
+        console.log('dv',dv);
         this.clientsForm.get('dv')?.setValue(dv);
     }
 
     private calculateDV(nit: string): string {
+        const cleanNit = nit.replace(/\D/g, ''); // Solo números
         const vpri = [3, 7, 13, 17, 19, 23, 29, 37, 41, 43, 47, 53, 59, 67, 71];
-        const z = nit.length;
+        const z = cleanNit.length;
         let x = 0;
         let y = 0;
 
         for (let i = 0; i < z; i++) {
-            y = parseInt(nit.substr(i, 1));
+            y = parseInt(cleanNit.substring(i, i + 1));
             x += y * vpri[z - 1 - i];
         }
 
