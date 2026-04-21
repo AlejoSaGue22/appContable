@@ -40,7 +40,7 @@
             <app-table-productos-compra [productoData]="productorxResource.value().articulos" (delete)="openModal($event)" />
             
             <div class="mt-4">
-                <app-pagination />
+                <app-pagination [length]="productorxResource.value().articulos.length" />
             </div>
         </div>
     </div>

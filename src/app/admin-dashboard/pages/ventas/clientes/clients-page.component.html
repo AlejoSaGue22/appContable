@@ -65,10 +65,7 @@
         />
 
         @if (clientesResource.value().clientes.length > 0) {
-            <div class="flex items-center justify-between px-2 py-4">
-                <p class="text-xs text-gray-500 font-medium">Mostrando registros sincronizados</p>
-                <app-pagination />
-            </div>
+            <app-pagination [length]="clientesResource.value().clientes.length"/>
         }
     </div>
   }

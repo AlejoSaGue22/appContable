@@ -1,6 +1,6 @@
 <div class="relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
   <div class="overflow-x-auto">
-    <table class="w-full text-left text-sm text-gray-500 dark:text-gray-400">
+    <table class="w-full text-left text-sm text-gray-500">
       <thead class="bg-gray-50 text-xs text-gray-700 dark:bg-gray-700 dark:text-gray-400">
         <tr>
           <th scope="col" class="px-6 py-3">Identificación</th>
@@ -11,7 +11,7 @@
           <th scope="col" class="px-6 py-3 text-center">Acciones</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-gray-50">
+      <tbody>
         @if (proveedorData().length === 0) {
             <tr>
               <td colspan="6" class="px-6 py-20 text-center">
@@ -30,7 +30,7 @@
         }
 
         @for (proveedor of proveedorData(); track proveedor.id) {
-            <tr class="hover:bg-blue-50/30 transition-all duration-200 group">
+            <tr class="border-b border-gray-200 transition-all duration-200 group">
               <td class="px-6 py-4 font-mono text-xs text-gray-900">
                 <span class="font-medium">{{ proveedor.tipoDocumentoRel.abreviatura }}</span> - {{ proveedor.identificacion }}
               </td>

@@ -23,7 +23,7 @@
 
       <div class="flex items-center gap-3">
         <button (click)="toggleFilters()" 
-          class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm transition-all border cursor-pointer border-gray-100 hover:bg-gray-50 group"
+          class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm transition-all border cursor-pointer border-gray-200 hover:bg-gray-50 group"
           [class.bg-blue-50]="showFilters()"
           [class.text-blue-600]="showFilters()">
           <svg class="h-4 w-4 transition-transform group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -38,12 +38,12 @@
         </button>
 
         <button (click)="applyFilters()" 
-          class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm cursor-pointer rounded-xl transition-all active:scale-95">
+          class="px-6 py-2 hover:bg-gray-100 border border-gray-200 text-sm cursor-pointer rounded-xl transition-all">
           Consultar
         </button>
 
         <a routerLink="/panel/compras/purchases/new"
-          class="flex items-center gap-2 px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm cursor-pointer rounded-xl transition-all active:scale-95">
+          class="flex items-center gap-2 px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm cursor-pointer rounded-xl transition-all active:scale-95">
           <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
@@ -237,7 +237,7 @@
     </div>
 
     <!-- Modernized Pagination Content -->
-    <app-pagination />
+    <app-pagination [length]="compraData().length"/>
   </div>
 </div>
 

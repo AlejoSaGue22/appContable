@@ -61,7 +61,7 @@ export class PrintService {
   //  PRIVATE — Abrir ventana de impresión
   // ══════════════════════════════════════════════════════════════════════
   private openPrintWindow(html: string, title: string): void {
-    const printWindow = window.open('', '', 'width=900,height=700');
+    const printWindow = window.open('', '_blank', 'width=900,height=700');
     if (!printWindow) return;
 
     printWindow.document.open();
@@ -461,7 +461,10 @@ export class PrintService {
     .total-debito { color:#15803d; text-align:right; }
     .total-credito { color:#b91c1c; text-align:right; }
 
-    .page-break { page-break-after:always; height:0; }
+    .page-break { 
+      /* page-break-after:always;  */
+      height:0; 
+    }
 
     @media print {
       @page { margin:10mm; size:A4 landscape; }
@@ -658,8 +661,8 @@ export class PrintService {
             <td style="padding:6px 12px;font-size:10px;color:#dc2626;text-align:right;border-bottom:1px solid #f1f5f9;">-${this.fmt(c.descuento)}</td>
           </tr>` : ''}
           <tr>
-            <td style="padding:8px 12px;font-size:11px;font-weight:800;color:#ffffff;background:#f97316;">Total Compra</td>
-            <td style="padding:8px 12px;font-size:12px;color:#ffffff;text-align:right;background:#f97316;font-weight:800;">${this.fmt(c.total)}</td>
+            <td style="padding:8px 12px;font-size:11px;font-weight:800;color:#000000;background:#efefef;">Total Compra</td>
+            <td style="padding:8px 12px;font-size:12px;color:#000000;text-align:right;background:#efefef;font-weight:800;">${this.fmt(c.total)}</td>
           </tr>
         </table>
       </td>

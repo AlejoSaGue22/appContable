@@ -8,13 +8,13 @@
             <div class="flex flex-col md:flex-row md:items-end gap-6">
                 <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1">Fecha Inicio</label>
+                        <label class="text-[10px] font-medium text-gray-400 ml-1">Fecha Inicio</label>
                         <input type="date" [(ngModel)]="fechaInicio"
                             class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all">
                     </div>
 
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black uppercase tracking-wider text-gray-400 ml-1">Fecha Fin</label>
+                        <label class="text-[10px] font-medium text-gray-400 ml-1">Fecha Fin</label>
                         <input type="date" [(ngModel)]="fechaFin"
                             class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all">
                     </div>
@@ -22,7 +22,7 @@
 
                 <button (click)="generarReporte()"
                     [disabled]="loading"
-                    class="h-[46px] px-8 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-blue-100 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[160px]">
+                    class="h-[36px] px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[160px]">
                     @if (loading) {
                         <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
@@ -42,22 +42,22 @@
         <div class="flex items-center p-1 bg-gray-100/50 backdrop-blur-md rounded-2xl w-fit">
             <button (click)="activeTab = 'facturacion'"
                 [class]="activeTab === 'facturacion' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
-                class="px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all duration-300 cursor-pointer">
+                class="px-6 py-2.5 rounded-xl text-xs font-bold uppercase transition-all duration-300 cursor-pointer">
                 Facturación
             </button>
             <button (click)="activeTab = 'dian'"
                 [class]="activeTab === 'dian' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
-                class="px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all duration-300 cursor-pointer">
+                class="px-6 py-2.5 rounded-xl text-xs font-bold uppercase transition-all duration-300 cursor-pointer">
                 Conciliación DIAN
             </button>
             <button (click)="activeTab = 'recaudos'"
                 [class]="activeTab === 'recaudos' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
-                class="px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all duration-300 cursor-pointer">
+                class="px-6 py-2.5 rounded-xl text-xs font-bold uppercase transition-all duration-300 cursor-pointer">
                 Recaudos
             </button>
             <button (click)="activeTab = 'impuestos'"
                 [class]="activeTab === 'impuestos' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
-                class="px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all duration-300 cursor-pointer">
+                class="px-6 py-2.5 rounded-xl text-xs font-bold uppercase transition-all duration-300 cursor-pointer">
                 Impuestos
             </button>
         </div>
@@ -91,42 +91,42 @@
 
             <!-- Facturación Detallada Content -->
             @if (!loading && facturacion && activeTab === 'facturacion') {
-                <div class="animate-slide-up space-y-8">
+                <div class="animate-slide-up space-y-8">    
                     <!-- Summary Cards (Premium) -->
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
-                            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Total Facturas</p>
+                            <p class="text-[12px] font-bold text-gray-400 mb-1">Total Facturas</p>
                             <h4 class="text-3xl font-semibold text-gray-900">{{ facturacion.resumen.totalFacturas }}</h4>
                             <div class="mt-4 flex items-center justify-between p-2 bg-blue-50/50 rounded-xl">
-                                <span class="text-[10px] font-bold text-blue-600">{{ facturacion.resumen.totalElectronicas }} Elec.</span>
-                                <span class="text-[10px] font-bold text-gray-500">{{ facturacion.resumen.totalStandard }} Std.</span>
+                                <span class="text-[10px] font-medium text-blue-600">{{ facturacion.resumen.totalElectronicas }} Elec.</span>
+                                <span class="text-[10px] font-medium text-gray-500">{{ facturacion.resumen.totalStandard }} Std.</span>
                             </div>
                         </div>
 
                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
-                            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Monto Total</p>
+                            <p class="text-[12px] font-bold text-gray-400 mb-1">Monto Total</p>
                             <h4 class="text-3xl font-semibold text-gray-900">{{ facturacion.resumen.montoTotal | currency:'COP':'$':'1.0-0' }}</h4>
                             <div class="mt-4 flex items-center gap-2">
                                 <span class="flex-1 h-1.5 rounded-full bg-emerald-100 overflow-hidden">
                                     <span class="block h-full bg-emerald-500" [style.width.%]="(facturacion.resumen.montoElectronicas / facturacion.resumen.montoTotal) * 100"></span>
                                 </span>
-                                <span class="text-[10px] font-black text-emerald-600">IVA: {{ facturacion.resumen.ivaTotal | currency:'COP':'$':'1.0-0' }}</span>
+                                <span class="text-[10px] font-medium text-emerald-600">IVA: {{ facturacion.resumen.ivaTotal | currency:'COP':'$':'1.0-0' }}</span>
                             </div>
                         </div>
 
                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
-                            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Efectividad DIAN</p>
+                            <p class="text-[12px] font-bold text-gray-400 mb-1">Efectividad DIAN</p>
                             <h4 class="text-3xl font-semibold text-gray-900">{{ facturacion.electronicas.tasaAceptacion }}%</h4>
-                            <div class="mt-4 flex items-center justify-between text-[10px] font-bold">
+                            <div class="mt-4 flex items-center justify-between text-[10px] font-medium">
                                 <span class="text-emerald-500">Aceptadas: {{ facturacion.electronicas.aceptadas }}</span>
                                 <span class="text-red-500">Rechazadas: {{ facturacion.electronicas.rechazadas }}</span>
                             </div>
                         </div>
 
                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
-                            <p class="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Ticket Promedio</p>
+                            <p class="text-[12px] font-bold text-gray-400 mb-1">Ticket Promedio</p>
                             <h4 class="text-3xl font-semibold text-gray-900">{{ (facturacion.resumen.montoTotal / (facturacion.resumen.totalFacturas || 1)) | currency:'COP':'$':'1.0-0' }}</h4>
-                            <p class="text-[10px] text-gray-400 mt-4 font-bold uppercase tracking-tighter">Valor Medio por Transacción</p>
+                            <p class="text-[10px] text-gray-400 mt-4 font-medium uppercase tracking-tighter">Valor Medio por Transacción</p>
                         </div>
                     </div>
 
@@ -194,12 +194,12 @@
                     <!-- Top Clientes (Premium Table) -->
                     <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
                         <div class="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/30">
-                            <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-[0.2em]">Ranking de Negocios</h4>
+                            <h4 class="text-xs font-semibold text-gray-500 uppercase">Ranking de Negocios</h4>
                             <span class="px-3 py-1 bg-blue-100 text-blue-600 text-[10px] font-semibold uppercase rounded-lg">Top 5 Clientes</span>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-sm">
-                                <thead class="bg-gray-50/50 text-[11px] uppercase tracking-[0.1em] text-gray-400 border-b border-gray-100">
+                                <thead class="bg-gray-50/50 text-[11px] text-gray-500 border-b border-gray-100">
                                     <tr>
                                         <th class="px-8 py-5">Nombre del Cliente</th>
                                         <th class="px-8 py-5 text-center">Frecuencia (Doc)</th>
@@ -233,7 +233,7 @@
                     <!-- Ventas Diarias (Timeline Style) -->
                     <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
                         <div class="px-8 py-6 border-b border-gray-50 bg-gray-50/30">
-                            <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-[0.2em]">Desempeño Cronológico</h4>
+                            <h4 class="text-xs font-semibold text-gray-400 uppercase">Desempeño Cronológico</h4>
                         </div>
                         <div class="p-8">
                             <div class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
@@ -265,7 +265,7 @@
                             <!-- Comparison Grid -->
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-t-4 border-t-blue-500">
-                                    <p class="text-[10px] font-semibold uppercase tracking-widest text-gray-400 mb-1">Monto DIAN (Accepted)</p>
+                                    <p class="text-[10px] font-semibold uppercase text-gray-400 mb-1">Monto DIAN (Accepted)</p>
                                     <h4 class="text-2xl font-semibold text-gray-900">{{ conciliacionDIAN.facturasElectronicas.montoAcceptedDIAN | currency:'COP':'$':'1.0-0' }}</h4>
                                     <p class="text-[10px] text-blue-500 font-bold mt-4 flex items-center gap-1">
                                         <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -273,12 +273,12 @@
                                     </p>
                                 </div>
                                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-t-4 border-t-indigo-500">
-                                    <p class="text-[10px] font-semibold uppercase tracking-widest text-gray-400 mb-1">Débito en Libros</p>
+                                    <p class="text-[10px] font-semibold uppercase text-gray-400 mb-1">Débito en Libros</p>
                                     <h4 class="text-2xl font-semibold text-gray-900">{{ conciliacionDIAN.facturasElectronicas.montoDebito | currency:'COP':'$':'1.0-0' }}</h4>
                                     <p class="text-[10px] text-gray-400 font-bold mt-4 uppercase tracking-tighter">Cuentas por Cobrar</p>
                                 </div>
                                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-t-4 border-t-purple-500">
-                                    <p class="text-[10px] font-semibold uppercase tracking-widest text-gray-400 mb-1">Saldo Cuentas 41XX</p>
+                                    <p class="text-[10px] font-semibold uppercase text-gray-400 mb-1">Saldo Cuentas 41XX</p>
                                     <h4 class="text-2xl font-semibold text-gray-900">{{ conciliacionDIAN.contabilidad.saldoCuentasIngreso | currency:'COP':'$':'1.0-0' }}</h4>
                                     <p class="text-[10px] text-gray-400 font-bold mt-4 uppercase tracking-tighter">Ingresos Operacionales</p>
                                 </div>
@@ -287,7 +287,7 @@
                             <!-- Detail Breakdown Table -->
                             <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
                                 <div class="px-8 py-6 border-b border-gray-50 bg-gray-50/30">
-                                    <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-[0.2em]">Desglose de Ingresos Operacionales</h4>
+                                    <h4 class="text-xs font-semibold text-gray-400 uppercase">Desglose de Ingresos Operacionales</h4>
                                 </div>
                                 <div class="divide-y divide-gray-50">
                                     @for (d of conciliacionDIAN.contabilidad.detallePorCuenta; track d.codigo) {
@@ -318,11 +318,11 @@
                                     <div class="w-20 h-20 bg-white/20 rounded-3xl backdrop-blur-md flex items-center justify-center text-4xl mb-6 mx-auto animate-bounce-slow">
                                         {{ conciliacionDIAN.cuadra ? '✨' : '⚠️' }}
                                     </div>
-                                    <h3 class="text-sm font-semibold uppercase tracking-[0.3em] opacity-80">Estado Global</h3>
-                                    <p class="text-xl font-semibold mt-2 uppercase tracking-widest">{{ conciliacionDIAN.cuadra ? 'Conciliado' : 'Requiere Ajuste' }}</p>
+                                    <h3 class="text-sm font-semibold uppercase opacity-80">Estado Global</h3>
+                                    <p class="text-xl font-semibold mt-2 uppercase">{{ conciliacionDIAN.cuadra ? 'Conciliado' : 'Requiere Ajuste' }}</p>
                                     <div class="mt-8 py-4 px-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10">
                                         <p class="text-4xl font-semibold">{{ (conciliacionDIAN.diferencia < 0 ? conciliacionDIAN.diferencia * -1 : conciliacionDIAN.diferencia) | currency:'COP':'$':'1.0-0' }}</p>
-                                        <p class="text-[10px] font-bold mt-1 opacity-60 uppercase tracking-widest">Diferencia Neta</p>
+                                        <p class="text-[10px] font-bold mt-1 opacity-60 uppercase">Diferencia Neta</p>
                                     </div>
                                 </div>
                                 <div class="absolute -right-10 -bottom-10 w-44 h-44 bg-white/10 rounded-full blur-3xl"></div>
@@ -331,7 +331,7 @@
                             <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm relative group overflow-hidden">
                                 <div class="flex items-center gap-2 mb-4">
                                     <span class="text-blue-500">📋</span>
-                                    <h4 class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Memorándum del Período</h4>
+                                    <h4 class="text-[10px] font-semibold text-gray-400 uppercase">Memorándum del Período</h4>
                                 </div>
                                 <p class="text-sm text-gray-700 leading-relaxed italic border-l-4 border-blue-500/30 pl-4">
                                     {{ conciliacionDIAN.explicacion || 'No se han registrado discrepancias manuales o ajustes para esta conciliación. El sistema asume integridad basándose en los registros existentes.' }}
@@ -348,7 +348,7 @@
                     <div class="bg-gray-900 rounded-3xl p-12 text-white shadow-2xl relative overflow-hidden">
                         <div class="relative z-10 flex flex-col md:flex-row items-center gap-12">
                             <div class="text-center md:text-left flex-1">
-                                <p class="text-xs font-semibold text-gray-400 uppercase tracking-[0.3em] mb-4">Eficiencia en Recaudos</p>
+                                <p class="text-xs font-semibold text-gray-400 uppercase mb-4">Eficiencia en Recaudos</p>
                                 <div class="flex items-baseline gap-4">
                                     <h3 class="text-5xl font-semibold">{{ (conciliacionRecaudos.totalPagosRegistrados / (conciliacionRecaudos.totalMovimientosBancos || 1) * 100).toFixed(1) }}%</h3>
                                     <span class="text-xl font-semibold text-emerald-400">Tasa de Cruce</span>
@@ -356,12 +356,12 @@
                             </div>
                             <div class="flex gap-8">
                                 <div class="text-center">
-                                    <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Registros</p>
+                                    <p class="text-[10px] text-gray-500 font-bold uppercase mb-1">Registros</p>
                                     <p class="text-xl font-semibold">{{ conciliacionRecaudos.totalPagosRegistrados | currency:'COP':'$':'1.0-0' }}</p>
                                 </div>
                                 <div class="w-px h-12 bg-gray-800"></div>
                                 <div class="text-center">
-                                    <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">Banco (1110)</p>
+                                    <p class="text-[10px] text-gray-500 font-bold uppercase mb-1">Banco (1110)</p>
                                     <p class="text-xl font-semibold text-blue-400">{{ conciliacionRecaudos.totalMovimientosBancos | currency:'COP':'$':'1.0-0' }}</p>
                                 </div>
                             </div>
@@ -380,7 +380,7 @@
                                         @else { 🧾 }
                                     </div>
                                     <div class="flex-1 overflow-hidden">
-                                        <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest truncate">{{ m.medio }}</p>
+                                        <p class="text-[10px] font-semibold text-gray-400 uppercase truncate">{{ m.medio }}</p>
                                         <p class="text-lg font-semibold text-gray-900">{{ m.monto | currency:'COP':'$':'1.0-0' }}</p>
                                     </div>
                                 </div>
@@ -399,14 +399,14 @@
                     <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
                         <div class="grid grid-cols-1 lg:grid-cols-2">
                             <div class="p-12 bg-indigo-950 text-white flex flex-col justify-center">
-                                <p class="text-xs font-semibold text-indigo-400 uppercase tracking-[0.3em] mb-4">Obligación Tributaria</p>
+                                <p class="text-xs font-semibold text-indigo-400 uppercase mb-4">Obligación Tributaria</p>
                                 <h3 class="text-5xl font-semibold mb-2">IVA Generado</h3>
                                 <p class="text-6xl font-semibold text-indigo-300">{{ impuestos.totalIVAGenerado | currency:'COP':'$':'1.0-0' }}</p>
                                 <p class="mt-8 text-sm text-indigo-400 leading-relaxed font-medium">IVA acumulado en el período seleccionado basado en facturación electrónica y estándar consolidada.</p>
                             </div>
                             <div class="p-12 space-y-10">
                                 <div class="space-y-4">
-                                    <div class="flex justify-between items-center text-xs font-semibold uppercase tracking-widest text-gray-400">
+                                    <div class="flex justify-between items-center text-xs font-semibold uppercase text-gray-400">
                                         <span>Iva Fact. Electrónica</span>
                                         <span class="text-gray-900">{{ impuestos.porTipoFactura.electronicas.iva | currency:'COP':'$':'1.0-0' }}</span>
                                     </div>
@@ -417,14 +417,14 @@
                                 </div>
 
                                 <div class="space-y-4">
-                                    <div class="flex justify-between items-center text-xs font-semibold uppercase tracking-widest text-gray-400">
+                                    <div class="flex justify-between items-center text-xs font-semibold uppercase text-gray-400">
                                         <span>Iva Fact. Estándar</span>
                                         <span class="text-gray-900">{{ impuestos.porTipoFactura.standard.iva | currency:'COP':'$':'1.0-0' }}</span>
                                     </div>
                                     <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
                                         <div class="h-full bg-indigo-400 rounded-full" [style.width.%]="(impuestos.porTipoFactura.standard.iva / (impuestos.totalIVAGenerado || 1)) * 100"></div>
                                     </div>
-                                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">Base: {{ impuestos.porTipoFactura.standard.base | currency:'COP':'$':'1.0-0' }}</p>
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase">Base: {{ impuestos.porTipoFactura.standard.base | currency:'COP':'$':'1.0-0' }}</p>
                                 </div>
                             </div>
                         </div>
@@ -432,11 +432,11 @@
 
                     <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
                         <div class="px-8 py-6 border-b border-gray-50 bg-gray-50/30">
-                            <h4 class="text-xs font-black text-gray-400 uppercase tracking-[0.2em]">Liquidación por Tarifas</h4>
+                            <h4 class="text-xs font-black text-gray-400 uppercase">Liquidación por Tarifas</h4>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-sm">
-                                <thead class="bg-gray-50/50 text-[11px] uppercase tracking-[0.1em] text-gray-400 border-b border-gray-100">
+                                <thead class="bg-gray-50/50 text-[11px] uppercase text-gray-400 border-b border-gray-100">
                                     <tr>
                                         <th class="px-8 py-5">Tarifa Impositiva</th>
                                         <th class="px-8 py-5 text-right">Base Imponible</th>

@@ -10,9 +10,10 @@ import { PaginationService } from './pagination.service';
 export class PaginationComponent implements OnDestroy { 
 
   paginationService = inject(PaginationService);
+  length = input.required<number>();
 
   pages = computed(() => {
-    return this.paginationService.pageSize();
+    return this.paginationService.pageSize() || 1;
   });
 
   selectPage = linkedSignal(this.paginationService.currentPage);

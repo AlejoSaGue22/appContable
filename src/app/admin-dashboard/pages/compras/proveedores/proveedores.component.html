@@ -41,10 +41,7 @@
         <app-table-proveedores [proveedorData]="proveedoresResource.value().proveedores" (delete)="openModal($event)" />
 
         @if (proveedoresList().length > 0) {
-            <div class="flex items-center justify-between px-2 py-4">
-                <p class="text-xs text-gray-400 font-medium">Directorio de proveedores activo</p>
-                <app-pagination />
-            </div>
+            <app-pagination [length]="proveedoresResource.value().proveedores.length" />
         }
     </div>
   }

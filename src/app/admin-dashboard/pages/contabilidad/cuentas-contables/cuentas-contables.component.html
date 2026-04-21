@@ -129,7 +129,7 @@
                 (categoryUpdated)="categoriesResource.reload()" (editCategory)="openEditModal($event)" />
 
             <div class="p-6 border-t border-gray-100 bg-gray-50/50 dark:bg-gray-800/50">
-                <app-pagination />
+                <app-pagination [length]="categories().length"/>
             </div>
         }
     }

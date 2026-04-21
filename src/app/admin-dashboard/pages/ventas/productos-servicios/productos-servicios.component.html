@@ -63,7 +63,7 @@
         @if (productorxResource.value().articulos.length > 0) {
             <div class="flex items-center justify-between px-2 py-4">
                 <p class="text-xs text-gray-500 font-medium">Catálogo sincronizado exitosamente</p>
-                <app-pagination />
+                <app-pagination [length]="productorxResource.value().articulos.length" />
             </div>
         }
     </div>
