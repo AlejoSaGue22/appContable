@@ -9,6 +9,7 @@ import { RegistrarPagoModalData } from '@dashboard/pages/pagos/components/modal-
 import { PagosHttpService } from '@dashboard/pages/pagos/services/pagos.service';
 import { AsientosHttpService } from '@dashboard/services/asientos-http.service';
 import { NotificationService } from '@shared/services/notification.service';
+import { PrintService } from '@shared/services/print.service';
 
 @Component({
   selector: 'app-compra-details',
@@ -35,7 +36,8 @@ export class CompraDetailsComponent implements OnInit {
     private route: ActivatedRoute,
     private asientosService: AsientosHttpService,
     private pagosService:   PagosHttpService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private printService: PrintService
   ) { }
 
   ngOnInit(): void {
@@ -138,5 +140,17 @@ export class CompraDetailsComponent implements OnInit {
 
   print(): void {
     window.print();
+  }
+
+  printPurchaseInvoice(): void {
+    const c = this.compra();
+    if (c) this.printService.printPurchaseInvoice(c);
+  }
+
+  printAsiento(): void {
+    const c = this.compra();
+    if (c && this.asientos.length > 0) {
+      this.printService.printAsientoContable(this.asientos, c.numero);
+    }
   }
 }
