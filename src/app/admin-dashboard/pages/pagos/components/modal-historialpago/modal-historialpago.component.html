@@ -40,7 +40,7 @@
       <p class="text-xs text-slate-500">Total {{ tipo() === 'cobro' ? 'cobrado' : 'pagado' }}</p>
       <p class="text-base font-bold"
          [ngClass]="tipo() === 'cobro' ? 'text-green-700' : 'text-orange-700'">
-        {{ totalPagado | currency:'COP':'symbol-narrow':'1.0-0' }}
+        {{ totalPagado | currency:'':'symbol-narrow':'1.0-0' }}
       </p>
     </div>
 
@@ -49,7 +49,7 @@
       <p class="text-base font-bold"
          [class.text-red-600]="saldoPendiente > 0"
          [class.text-green-600]="saldoPendiente === 0">
-        {{ saldoPendiente | currency:'COP':'symbol-narrow':'1.0-0' }}
+        {{ saldoPendiente | currency:'':'symbol-narrow':'1.0-0' }}
       </p>
     </div>
   </div>
@@ -72,7 +72,7 @@
             <td class="px-4 py-3 text-slate-600">{{ pago.fecha | date:'dd/MM/yyyy' }}</td>
             <td class="px-4 py-3 text-right font-semibold"
                 [ngClass]="tipo() === 'cobro' ? 'text-green-700' : 'text-gray-900'">
-              {{ pago.monto | currency:'COP':'symbol-narrow':'1.0-0' }}
+              {{ pago.monto | currency:'':'symbol-narrow':'1.0-0' }}
             </td>
             <td class="px-4 py-3 text-slate-600 capitalize">{{ pago.medioPago }}</td>
             <td class="px-4 py-3 text-slate-400 text-xs font-mono">{{  formatCuentaBancaria(pago.cuentaBancaria) }}</td>

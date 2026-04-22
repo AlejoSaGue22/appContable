@@ -16,10 +16,11 @@ import { HeaderInput, HeaderTitlePageComponent } from '@dashboard/components/hea
 import { ErrorPages } from "@shared/components/error-pages/error-pages.component";
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { UserAuth } from 'src/app/auth/interfaces/user-auth.interface';
+import { CurrencyPipe } from '@angular/common';
 
 @Component({
    selector: 'app-factura-compra',
-   imports: [CommonModule, LoaderComponent, TableComprasComponent, ModalComponent, HeaderTitlePageComponent, ErrorPages],
+   imports: [CommonModule, LoaderComponent, TableComprasComponent, ModalComponent, HeaderTitlePageComponent, ErrorPages, CurrencyPipe],
    templateUrl: './factura-compra.component.html',
    standalone: true
 })
@@ -153,14 +154,6 @@ export class FacturaCompraComponent {
             this.notificacionService.error('Error al eliminar factura', message || 'Error desconocido');
          }
       });
-   }
-
-   formatCurrency(value: number): string {
-      return new Intl.NumberFormat('es-CO', {
-         style: 'currency',
-         currency: 'COP',
-         minimumFractionDigits: 0
-      }).format(value);
    }
 
    get columnsTable() {

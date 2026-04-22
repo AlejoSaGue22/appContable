@@ -3,12 +3,13 @@ import { FacturaVenta, GetFacturaRequest, InvoiceFilters, InvoiceStatus } from '
 import { RouterLink } from "@angular/router";
 import { FormsModule } from '@angular/forms';
 import { PaginationComponent } from '@shared/components/pagination/pagination';
+import { CurrencyPipe } from '@angular/common';
 
 
 
 @Component({
   selector: 'app-table-invoices',
-  imports: [RouterLink, FormsModule, PaginationComponent],
+  imports: [RouterLink, FormsModule, PaginationComponent, CurrencyPipe],
   templateUrl: './table-invoices.component.html',
 })
 export class TableInvoices {
@@ -165,14 +166,6 @@ export class TableInvoices {
       [InvoiceStatus.ERROR_ASIENTO]: 'Error Asiento'
     };
     return labels[status];
-  }
-
-  formatCurrency(value: number): string {
-    return new Intl.NumberFormat('es-CO', {
-      style: 'currency',
-      currency: 'COP',
-      minimumFractionDigits: 0
-    }).format(value);
   }
 
   formatDate(date: string | Date): string {

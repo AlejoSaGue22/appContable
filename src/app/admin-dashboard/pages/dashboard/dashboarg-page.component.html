@@ -44,7 +44,7 @@
             <div class="bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl p-6 text-white shadow-lg mt-4">
               <p class="text-[10px] font-bold uppercase tracking-widest opacity-70">Rendimiento Hoy</p>
                 <div class="flex justify-between items-end mt-2">
-                  <h4 class="text-2xl font-black">{{ data.hoy.total | currency:'COP':'$':'1.0-0' }}</h4>
+                  <h4 class="text-2xl font-black">{{ data.hoy.total | currency:'':'$':'1.0-0' }}</h4>
                   <span class="text-xs bg-white/20 px-2 py-0.5 rounded">{{ data.hoy.cantidad }} ops.</span>
                 </div>
                 <p class="text-[10px] mt-4 opacity-80 uppercase font-bold">Tasa de Rechazo</p>
@@ -63,7 +63,7 @@
                   <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Esta Semana</p>
                   <span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded">+{{ data.semana.crecimiento }}%</span>
                 </div>
-                <h4 class="text-3xl font-black text-gray-900 mt-2">{{ data.semana.total | currency:'COP':'$':'1.0-0' }}</h4>
+                <h4 class="text-3xl font-black text-gray-900 mt-2">{{ data.semana.total | currency:'':'$':'1.0-0' }}</h4>
               </div>
               <div class="mt-4 flex items-center gap-2">
                 <span class="p-1 bg-gray-100 rounded text-xs">📝 {{ data.semana.cantidad }} Facturas</span>
@@ -77,11 +77,11 @@
                   <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Este Mes</p>
                   <span class="px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded">+{{ data.mes.crecimiento }}%</span>
                 </div>
-                <h4 class="text-3xl font-black text-gray-900 mt-2">{{ data.mes.total | currency:'COP':'$':'1.0-0' }}</h4>
+                <h4 class="text-3xl font-black text-gray-900 mt-2">{{ data.mes.total | currency:'':'$':'1.0-0' }}</h4>
               </div>
               <div class="mt-6 pt-4 border-t border-gray-100">
                 <p class="text-[10px] font-bold text-blue-600 uppercase tracking-widest">Proyección Cierre de Mes</p>
-                <p class="text-xl font-bold text-gray-800">{{ data.mes.proyeccionFinMes | currency:'COP':'$':'1.0-0' }}</p>
+                <p class="text-xl font-bold text-gray-800">{{ data.mes.proyeccionFinMes | currency:'':'$':'1.0-0' }}</p>
               </div>
               <!-- Background decoration -->
               <div class="absolute -right-2 -bottom-2 text-blue-50/50 transform -rotate-12 translate-y-4">

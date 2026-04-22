@@ -59,17 +59,17 @@
                       <span class="text-base font-semibold">Cuentas por Cobrar</span>
                     </div>
                     <span class="text-xl font-bold text-white">
-                      {{ resumen.cxc.total | currency:'COP':'symbol-narrow':'1.0-0' }}
+                      {{ resumen.cxc.total | currency:'':'symbol-narrow':'1.0-0' }}
                     </span>
                   </div>
                   <div class="divide-y divide-green-100">
                     <div class="flex justify-between px-5 py-3">
                       <span class="text-sm text-green-800">Por vencer</span>
-                      <span class="text-sm font-semibold text-green-900">{{ resumen.cxc.porVencer | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+                      <span class="text-sm font-semibold text-green-900">{{ resumen.cxc.porVencer | currency:'':'symbol-narrow':'1.0-0' }}</span>
                     </div>
                     <div class="flex justify-between px-5 py-3">
                       <span class="text-sm text-red-700 font-medium">Vencida</span>
-                      <span class="text-sm font-bold text-red-700">{{ resumen.cxc.vencida | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+                      <span class="text-sm font-bold text-red-700">{{ resumen.cxc.vencida | currency:'':'symbol-narrow':'1.0-0' }}</span>
                     </div>
                     <div class="flex justify-between px-5 py-3">
                       <span class="text-sm text-green-700">Total facturas</span>
@@ -90,17 +90,17 @@
                       <span class="text-base font-semibold">Cuentas por Pagar</span>
                     </div>
                     <span class="text-xl font-bold text-white">
-                      {{ resumen.cxp.total | currency:'COP':'symbol-narrow':'1.0-0' }}
+                      {{ resumen.cxp.total | currency:'':'symbol-narrow':'1.0-0' }}
                     </span>
                   </div>
                   <div class="divide-y divide-orange-100">
                     <div class="flex justify-between px-5 py-3">
                       <span class="text-sm text-orange-800">Por vencer</span>
-                      <span class="text-sm font-semibold text-orange-900">{{ resumen.cxp.porVencer | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+                      <span class="text-sm font-semibold text-orange-900">{{ resumen.cxp.porVencer | currency:'':'symbol-narrow':'1.0-0' }}</span>
                     </div>
                     <div class="flex justify-between px-5 py-3">
                       <span class="text-sm text-red-700 font-medium">Vencida</span>
-                      <span class="text-sm font-bold text-red-700">{{ resumen.cxp.vencida | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+                      <span class="text-sm font-bold text-red-700">{{ resumen.cxp.vencida | currency:'':'symbol-narrow':'1.0-0' }}</span>
                     </div>
                     <div class="flex justify-between px-5 py-3">
                       <span class="text-sm text-orange-700">Total facturas</span>
@@ -122,7 +122,7 @@
                 <div class="text-right">
                   <p class="text-2xl font-bold"
                      [ngClass]="(resumen.cxc.total - resumen.cxp.total) >= 0 ? 'text-green-700' : 'text-red-700'">
-                    {{ (resumen.cxc.total - resumen.cxp.total) | currency:'COP':'symbol-narrow':'1.0-0' }}
+                    {{ (resumen.cxc.total - resumen.cxp.total) | currency:'':'symbol-narrow':'1.0-0' }}
                   </p>
                   <p class="text-xs text-slate-400 mt-0.5">
                     {{ (resumen.cxc.total - resumen.cxp.total) >= 0 ? 'Posición favorable' : 'Posición desfavorable' }}
@@ -189,14 +189,14 @@
                         </div>
                       </div>
                       <span class="w-36 text-right text-xs font-semibold flex-shrink-0" [ngClass]="b.textClass">
-                        {{ reporte!.totales[b.key] | currency:'COP':'symbol-narrow':'1.0-0' }}
+                        {{ reporte!.totales[b.key] | currency:'':'symbol-narrow':'1.0-0' }}
                       </span>
                     </div>
                   }
                 </div>
                 <div class="mt-3 flex justify-end gap-3 border-t border-gray-100 pt-3 text-sm">
                   <span class="text-slate-500">Total:</span>
-                  <strong class="text-slate-800">{{ reporte!.totales.total | currency:'COP':'symbol-narrow':'1.0-0' }}</strong>
+                  <strong class="text-slate-800">{{ reporte!.totales.total | currency:'':'symbol-narrow':'1.0-0' }}</strong>
                 </div>
               </div>
 
@@ -241,7 +241,7 @@
                             <td class="p-3 text-right">
                               @if (grupo[b.key] > 0) {
                                 <span class="text-xs font-semibold" [ngClass]="b.textClass">
-                                  {{ grupo[b.key] | currency:'COP':'symbol-narrow':'1.0-0' }}
+                                  {{ grupo[b.key] | currency:'':'symbol-narrow':'1.0-0' }}
                                 </span>
                               } @else {
                                 <span class="text-slate-300 text-xs">—</span>
@@ -249,7 +249,7 @@
                             </td>
                           }
                           <td class="p-3 text-right font-bold text-slate-800">
-                            {{ grupo.total | currency:'COP':'symbol-narrow':'1.0-0' }}
+                            {{ grupo.total | currency:'':'symbol-narrow':'1.0-0' }}
                           </td>
                         </tr>
 
@@ -270,7 +270,7 @@
                                 <td class="p-2.5 text-right">
                                   @if (f.bucket === b.key) {
                                     <span class="text-xs font-semibold" [ngClass]="b.textClass">
-                                      {{ f.saldo | currency:'COP':'symbol-narrow':'1.0-0' }}
+                                      {{ f.saldo | currency:'':'symbol-narrow':'1.0-0' }}
                                     </span>
                                   } @else {
                                     <span class="text-slate-200 text-xs">—</span>
@@ -279,7 +279,7 @@
                               }
                               <td class="p-2.5 text-right">
                                 <span class="text-xs font-bold text-slate-700">
-                                  {{ f.saldo | currency:'COP':'symbol-narrow':'1.0-0' }}
+                                  {{ f.saldo | currency:'':'symbol-narrow':'1.0-0' }}
                                 </span>
                               </td>
                             </tr>
@@ -293,12 +293,12 @@
                         @for (b of buckets; track b.key) {
                           <td class="p-3 text-right">
                             <span class="text-xs font-bold" [ngClass]="b.textClass">
-                              {{ reporte!.totales[b.key] | currency:'COP':'symbol-narrow':'1.0-0' }}
+                              {{ reporte!.totales[b.key] | currency:'':'symbol-narrow':'1.0-0' }}
                             </span>
                           </td>
                         }
                         <td class="p-3 text-right font-bold text-slate-900">
-                          {{ reporte!.totales.total | currency:'COP':'symbol-narrow':'1.0-0' }}
+                          {{ reporte!.totales.total | currency:'':'symbol-narrow':'1.0-0' }}
                         </td>
                       </tr>
 
@@ -366,13 +366,13 @@
                 <div class="bg-green-50 border border-green-200 rounded-lg px-5 py-4 text-center">
                   <p class="text-xs font-semibold uppercase tracking-wider text-green-700 mb-1">Total Cobrado</p>
                   <p class="text-xl font-bold text-green-800">
-                    {{ historial.totalCobros | currency:'COP':'symbol-narrow':'1.0-0' }}
+                    {{ historial.totalCobros | currency:'':'symbol-narrow':'1.0-0' }}
                   </p>
                 </div>
                 <div class="bg-orange-50 border border-orange-200 rounded-lg px-5 py-4 text-center">
                   <p class="text-xs font-semibold uppercase tracking-wider text-orange-700 mb-1">Total Pagado</p>
                   <p class="text-xl font-bold text-orange-800">
-                    {{ historial.totalPagos | currency:'COP':'symbol-narrow':'1.0-0' }}
+                    {{ historial.totalPagos | currency:'':'symbol-narrow':'1.0-0' }}
                   </p>
                 </div>
                 <div class="rounded-lg px-5 py-4 text-center border-2"
@@ -383,7 +383,7 @@
                      [ngClass]="historial.neto >= 0 ? 'text-blue-700' : 'text-red-700'">Neto</p>
                   <p class="text-xl font-bold"
                      [ngClass]="historial.neto >= 0 ? 'text-blue-800' : 'text-red-800'">
-                    {{ historial.neto | currency:'COP':'symbol-narrow':'1.0-0' }}
+                    {{ historial.neto | currency:'':'symbol-narrow':'1.0-0' }}
                   </p>
                 </div>
               </div>
@@ -427,7 +427,7 @@
                         <td class="p-3 text-slate-400 text-xs">{{ pago.referencia || '—' }}</td>
                         <td class="p-3 text-right font-semibold"
                             [ngClass]="pago.tipo === 'cobro' ? 'text-green-700' : 'text-orange-700'">
-                          {{ pago.monto | currency:'COP':'symbol-narrow':'1.0-0' }}
+                          {{ pago.monto | currency:'':'symbol-narrow':'1.0-0' }}
                         </td>
                       </tr>
                     }

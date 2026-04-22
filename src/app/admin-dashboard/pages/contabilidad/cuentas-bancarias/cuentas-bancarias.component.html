@@ -63,7 +63,7 @@
                   <span class="text-base" 
                         [class.text-red-500]="cuenta.saldoActual < 0" 
                         [class.text-gray-900]="cuenta.saldoActual >= 0">
-                    {{ cuenta.saldoActual | currency:'COP':'symbol-narrow':'1.0-0' }}
+                    {{ cuenta.saldoActual | currency:'':'symbol-narrow':'1.0-0' }}
                   </span>
                 </td>
 

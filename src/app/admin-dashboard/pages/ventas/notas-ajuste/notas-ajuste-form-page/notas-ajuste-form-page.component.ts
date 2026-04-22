@@ -14,7 +14,7 @@ import { ComprobantesVentasService } from '../../services/comprobantes-ventas.se
 import { NotasAjusteService } from '../../services/notas-ajuste.service';
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
 import { ConceptosNotaCredito, ConceptosNotaDebito, NotaAjusteItem, NotaAjuste } from "../../../../interfaces/notas-ajuste-interface";
-import { GetFacturaRequest } from '@dashboard/interfaces/documento-venta-interface';
+import { GetFacturaRequest, FormaPago } from '@dashboard/interfaces/documento-venta-interface';
 
 @Component({
   selector: 'app-notas-ajuste-form-page',
@@ -58,16 +58,66 @@ export class NotasAjusteFormPageComponent implements OnInit {
   itemsSeleccionados = signal<NotaAjusteItem[]>([]);
   facturaSeleccionada = signal<GetFacturaRequest | null>(null);
 
+  // Computed signals for payment logic
+  facturaEsCredito = computed(() => this.facturaSeleccionada()?.formaPago === FormaPago.CREDITO);
+  facturaConAbonos = computed(() => (this.facturaSeleccionada()?.totalPagado ?? 0) > 0);
+  
+  formaPagoBloqueada = computed(() => {
+    const factura = this.facturaSeleccionada();
+    if (!factura) return false;
+    
+    // Concepto de Anulación (valor '2') siempre bloquea para espejar
+    if (this.form.get('concepto')?.value === '2') return true;
+
+    // Crédito sin abonos: bloqueada a CREDITO
+    if (factura.formaPago === FormaPago.CREDITO && (factura.totalPagado ?? 0) === 0) return true;
+    
+    // Contado: bloqueada a CONTADO
+    if (factura.formaPago === FormaPago.CONTADO) return true;
+    
+    return false;
+  });
+
   form = this.fb.group({
     facturaOriginalId: ['', Validators.required],
     facturaSearch: [''],
     tipo: ['credito', Validators.required],
     concepto: ['', Validators.required],
-    metodoPago: ['', Validators.required],
+    formaPago: ['', Validators.required],
+    metodoPago: [''],
+    esReembolsoAbono: [false],
     motivo: ['', [Validators.required, Validators.maxLength(1000)]],
     fecha: [new Date().toISOString().split('T')[0], Validators.required],
     fechaVencimiento: [''],
     observaciones: [''],
+  });
+
+  // Watchers for reactive logic
+  paymentLogic = effect(() => {
+    const formaPago = this.form.get('formaPago')?.value;
+    const metodoPagoControl = this.form.get('metodoPago');
+    
+    if (formaPago === FormaPago.CONTADO) {
+      metodoPagoControl?.setValidators([Validators.required]);
+    } else {
+      metodoPagoControl?.clearValidators();
+      // Opcional: limpiar si no es contado
+      if (formaPago === FormaPago.CREDITO) metodoPagoControl?.setValue('');
+    }
+    metodoPagoControl?.updateValueAndValidity();
+  });
+
+  // Effect to handle "Anulación" logic
+  anulacionLogic = effect(() => {
+    const concepto = this.form.get('concepto')?.value;
+    const factura = this.facturaSeleccionada();
+    
+    if (concepto === '2' && factura) {
+      this.form.patchValue({
+        formaPago: factura.formaPago,
+        metodoPago: factura.metodoPago ?? ''
+      }, { emitEvent: false });
+    }
   });
 
   totales = computed(() => {
@@ -129,7 +179,9 @@ export class NotasAjusteFormPageComponent implements OnInit {
               facturaOriginalId: nota.facturaOriginalId,
               tipo: nota.tipo,
               concepto: nota.concepto,
+              formaPago: nota.formaPago,
               metodoPago: nota.metodoPago?.toString(),
+              esReembolsoAbono: nota.esReembolsoAbono,
               motivo: nota.motivo,
               fecha: nota.fecha,
               fechaVencimiento: nota.fechaVencimiento,
@@ -179,7 +231,9 @@ export class NotasAjusteFormPageComponent implements OnInit {
     this.form.patchValue({
       facturaOriginalId: f.id,
       facturaSearch: f.comprobante_completo,
-      metodoPago: f.metodoPago
+      formaPago: f.formaPago,
+      metodoPago: f.formaPago === FormaPago.CONTADO ? f.metodoPago : '',
+      esReembolsoAbono: false
     });
     
     // Auto-load items from invoice
@@ -252,7 +306,9 @@ export class NotasAjusteFormPageComponent implements OnInit {
     const data = {
       tipo: this.tipoNota(),
       facturaOriginalId: this.form.value.facturaOriginalId,
+      formaPago: this.form.value.formaPago,
       metodoPago: this.form.value.metodoPago,
+      esReembolsoAbono: this.form.value.esReembolsoAbono,
       concepto: this.form.value.concepto,
       motivo: this.form.value.motivo,
       fecha: this.form.value.fecha,
@@ -264,6 +320,17 @@ export class NotasAjusteFormPageComponent implements OnInit {
       iva: this.totales().iva,
       total: this.totales().total
     };
+
+    // Validación de Saldo (Impedir envío si excede el saldo pendiente)
+    const saldoPendiente = this.facturaSeleccionada()?.saldoPendiente ?? 0;
+    if (data.total > saldoPendiente && data.formaPago === FormaPago.CREDITO) {
+      this.notificationService.error(
+        `El valor de la nota (${this.totales().total}) no puede ser mayor al saldo pendiente (${saldoPendiente}) para ajustes de cartera.`,
+        'Error de Validación'
+      );
+      this.loaderService.hide();
+      return;
+    }
 
     const id = this.notaId();
     const request = (id && id !== 'new') 

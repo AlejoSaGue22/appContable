@@ -137,7 +137,7 @@
 
         <!-- Pagination -->
         @if (usersResource.value().meta?.totalPages) {
-            <app-pagination />
+            <app-pagination [length]="usersResource.value().data.length" />
         }
     </div>
     }

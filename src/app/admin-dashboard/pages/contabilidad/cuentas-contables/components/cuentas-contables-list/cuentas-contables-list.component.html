@@ -52,7 +52,7 @@
             <td class="px-8 py-4 text-right whitespace-nowrap font-semibold" 
                 [class.text-red-500]="cuenta.saldo < 0"
                 [class.text-gray-900]="cuenta.saldo >= 0">
-                {{ cuenta.saldo | currency:'COP':'$':'1.0-0' }}
+                {{ cuenta.saldo | currency:'':'$':'1.0-0' }}
             </td>
 
             <td class="px-8 py-4">

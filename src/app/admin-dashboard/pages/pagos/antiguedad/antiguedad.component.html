@@ -18,7 +18,7 @@
         Cartera por Cobrar
         @if (agingCobrar()?.totales?.total) {
           <span class="px-2 py-0.5 rounded-full text-xs bg-green-100 text-green-700">
-            {{ agingCobrar()!.totales.total | currency:'COP':'symbol-narrow':'1.0-0' }}
+            {{ agingCobrar()!.totales.total | currency:'':'symbol-narrow':'1.0-0' }}
           </span>
         }
       </button>
@@ -35,7 +35,7 @@
         Deuda por Pagar
         @if (agingPagar()?.totales?.total) {
           <span class="px-2 py-0.5 rounded-full text-xs bg-orange-100 text-orange-700">
-            {{ agingPagar()!.totales.total | currency:'COP':'symbol-narrow':'1.0-0' }}
+            {{ agingPagar()!.totales.total | currency:'':'symbol-narrow':'1.0-0' }}
           </span>
         }
       </button>
@@ -106,7 +106,7 @@
                   </div>
                   <span class="w-36 text-right text-xs font-semibold flex-shrink-0"
                         [ngClass]="b.textClass">
-                    {{ reporte!.totales[b.key] | currency:'COP':'symbol-narrow':'1.0-0' }}
+                    {{ reporte!.totales[b.key] | currency:'':'symbol-narrow':'1.0-0' }}
                   </span>
                 </div>
               }
@@ -114,7 +114,7 @@
             <div class="mt-4 flex justify-end border-t border-gray-100 pt-3">
               <span class="text-sm text-slate-500 mr-3">Total:</span>
               <span class="text-sm font-bold text-slate-800">
-                {{ reporte!.totales.total | currency:'COP':'symbol-narrow':'1.0-0' }}
+                {{ reporte!.totales.total | currency:'':'symbol-narrow':'1.0-0' }}
               </span>
             </div>
         </div>
@@ -157,7 +157,7 @@
                             <td class="p-3 text-right">
                               @if (grupo[b.key] > 0) {
                                 <span class="text-xs font-semibold" [ngClass]="b.textClass">
-                                  {{ grupo[b.key] | currency:'COP':'symbol-narrow':'1.0-0' }}
+                                  {{ grupo[b.key] | currency:'':'symbol-narrow':'1.0-0' }}
                                 </span>
                               } @else {
                                 <span class="text-slate-300 text-xs">—</span>
@@ -165,7 +165,7 @@
                             </td>
                           }
                           <td class="p-3 text-right font-bold text-slate-800">
-                            {{ grupo.total | currency:'COP':'symbol-narrow':'1.0-0' }}
+                            {{ grupo.total | currency:'':'symbol-narrow':'1.0-0' }}
                           </td>
                         </tr>
 
@@ -181,7 +181,7 @@
                                 <td class="p-3 text-right">
                                   @if (f.bucket === b.key) {
                                     <span class="text-xs font-semibold" [ngClass]="b.textClass">
-                                      {{ f.saldo | currency:'COP':'symbol-narrow':'1.0-0' }}
+                                      {{ f.saldo | currency:'':'symbol-narrow':'1.0-0' }}
                                     </span>
                                   } @else {
                                     <span class="text-slate-200 text-xs">—</span>
@@ -191,7 +191,7 @@
                               <td class="p-3 text-right">
                                 <div class="flex items-center justify-end gap-2">
                                   <span class="text-xs font-bold text-slate-700">
-                                    {{ f.saldo | currency:'COP':'symbol-narrow':'1.0-0' }}
+                                    {{ f.saldo | currency:'':'symbol-narrow':'1.0-0' }}
                                   </span>
                                   <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium"
                                         [ngClass]="{
@@ -216,12 +216,12 @@
                         @for (b of buckets; track b.key) {
                           <td class="p-4 text-right border-t border-slate-300">
                             <span class="text-xs font-bold" [ngClass]="b.textClass">
-                              {{ reporte!.totales[b.key] | currency:'COP':'symbol-narrow':'1.0-0' }}
+                              {{ reporte!.totales[b.key] | currency:'':'symbol-narrow':'1.0-0' }}
                             </span>
                           </td>
                         }
                         <td class="p-4 text-right text-slate-900 border-t border-slate-300">
-                          {{ reporte!.totales.total | currency:'COP':'symbol-narrow':'1.0-0' }}
+                          {{ reporte!.totales.total | currency:'':'symbol-narrow':'1.0-0' }}
                         </td>
                       </tr>
 

@@ -186,18 +186,18 @@
                         }
                       </td>
                       <td class="px-4 py-3 text-center text-gray-700">{{ item.quantity }}</td>
-                      <td class="px-4 py-3 text-right text-gray-700">{{ formatCurrency(item.unitPrice) }}</td>
+                      <td class="px-4 py-3 text-right text-gray-700">{{ item.unitPrice | currency: '' : 'symbol' : '0.0-0' }}</td>
                       <td class="px-4 py-3 text-center">
                         @if (item.porcentajeIva! > 0) {
                           <div>
                             <span class="text-xs font-semibold text-blue-700">{{ item.porcentajeIva }}%</span>
-                            <p class="text-xs text-gray-400">{{ formatCurrency(item.valorIva || 0) }}</p>
+                            <p class="text-xs text-gray-400">{{ item.valorIva | currency: '' : 'symbol' : '0.0-0' }}</p>
                           </div>
                         } @else {
                           <span class="text-xs text-gray-300">0%</span>
                         }
                       </td>
-                      <td class="px-4 py-3 text-right font-bold text-gray-900">{{ formatCurrency(item.itemTotal || 0) }}</td>
+                      <td class="px-4 py-3 text-right font-bold text-gray-900">{{ item.itemTotal | currency: '' : 'symbol' : '0.0-0' }}</td>
                     </tr>
                   }
                 </tbody>
@@ -235,27 +235,27 @@
                 <div class="divide-y divide-gray-100">
                   <div class="flex justify-between px-4 py-2 text-sm">
                     <span class="text-gray-600">Valor Bruto</span>
-                    <span class="font-medium text-gray-900">{{ formatCurrency(compra()!.subtotal) }}</span>
+                    <span class="font-medium text-gray-900">{{ compra()!.subtotal | currency: '' : 'symbol' : '0.0-0' }}</span>
                   </div>
                   <div class="flex justify-between px-4 py-2 text-sm">
                     <span class="text-gray-600">Base Imponible</span>
-                    <span class="font-medium text-gray-900">{{ formatCurrency(compra()!.subtotal) }}</span>
+                    <span class="font-medium text-gray-900">{{ compra()!.subtotal | currency: '' : 'symbol' : '0.0-0' }}</span>
                   </div>
                   @if (compra()!.iva > 0) {
                     <div class="flex justify-between px-4 py-2 text-sm">
                       <span class="text-gray-600">IVA</span>
-                      <span class="font-medium text-gray-900">{{ formatCurrency(compra()!.iva) }}</span>
+                      <span class="font-medium text-gray-900">{{ compra()!.iva | currency: '' : 'symbol' : '0.0-0' }}</span>
                     </div>
                   }
                   @if (compra()!.descuento > 0) {
                     <div class="flex justify-between px-4 py-2 text-sm">
                       <span class="text-gray-600">Descuento global(-)</span>
-                      <span class="font-medium text-red-600">-{{ formatCurrency(compra()!.descuento) }}</span>
+                      <span class="font-medium text-red-600">-{{ compra()!.descuento | currency: '' : 'symbol' : '0.0-0' }}</span>
                     </div>
                   }
                   <div class="flex justify-between px-4 py-3 bg-blue-500">
                     <span class="text-sm font-bold text-white">Total Factura</span>
-                    <span class="text-base font-bold text-white">{{ formatCurrency(compra()!.total) }}</span>
+                    <span class="text-base font-bold text-white">{{ compra()!.total | currency: '' : 'symbol' : '0.0-0' }}</span>
                   </div>
                 </div>
               </div>
@@ -293,16 +293,16 @@
               <div class="grid grid-cols-3 gap-4 mb-4">
                 <div class="text-center">
                   <p class="text-xs text-gray-500 mb-1">Total Compra</p>
-                  <p class="text-base font-bold text-gray-900">{{ formatCurrency(compra()!.total) }}</p>
+                  <p class="text-base font-bold text-gray-900">{{ compra()!.total | currency: '' : 'symbol' : '0.0-0' }}</p>
                 </div>
                 <div class="text-center">
                   <p class="text-xs text-gray-500 mb-1">Total Pagado</p>
-                  <p class="text-base font-bold text-green-700">{{ formatCurrency(compra()!.totalPagado || 0) }}</p>
+                  <p class="text-base font-bold text-green-700">{{ compra()!.totalPagado | currency: '' : 'symbol' : '0.0-0' }}</p>
                 </div>
                 <div class="text-center">
                   <p class="text-xs text-gray-500 mb-1">Saldo Pendiente</p>
                   <p class="text-base font-bold" [ngClass]="(compra()!.saldoPendiente || 0) > 0 ? 'text-orange-700' : 'text-green-700'">
-                    {{ formatCurrency(compra()!.saldoPendiente || 0) }}
+                    {{ compra()!.saldoPendiente | currency: '' : 'symbol' : '0.0-0' }}
                   </p>
                 </div>
               </div>
@@ -325,7 +325,7 @@
                           <td class="px-3 py-2 text-gray-700 text-xs">{{ pago.fecha | date:'dd/MM/yyyy' }}</td>
                           <td class="px-3 py-2 text-gray-600 text-xs capitalize">{{ pago.medioPago }}</td>
                           <td class="px-3 py-2 text-gray-500 text-xs">{{ pago.referencia || '—' }}</td>
-                          <td class="px-3 py-2 text-right font-semibold">{{ formatCurrency(pago.monto) }}</td>
+                          <td class="px-3 py-2 text-right font-semibold">{{ pago.monto | currency: '' : 'symbol' : '0.0-0' }}</td>
                         </tr>
                       }
                     </tbody>
@@ -392,10 +392,10 @@
                             </td>
                             <td class="px-4 py-2 text-gray-500">{{ detalle.descripcion }}</td>
                             <td class="px-4 py-2 text-right font-semibold" [ngClass]="detalle.debito > 0 ? 'text-green-700' : 'text-gray-300'">
-                              {{ detalle.debito > 0 ? formatCurrency(detalle.debito) : '—' }}
+                              {{ detalle.debito > 0 ? (detalle.debito | currency: '' : 'symbol' : '0.0-0') : '—' }}
                             </td>
                             <td class="px-4 py-2 text-right font-semibold" [ngClass]="detalle.credito > 0 ? 'text-red-700' : 'text-gray-300'">
-                              {{ detalle.credito > 0 ? formatCurrency(detalle.credito) : '—' }}
+                              {{ detalle.credito > 0 ? (detalle.credito | currency: '' : 'symbol' : '0.0-0') : '—' }}
                             </td>
                           </tr>
                         }
@@ -403,8 +403,8 @@
                       <tfoot class="border-t-2 border-gray-200 bg-gray-50">
                         <tr>
                           <td colspan="2" class="px-4 py-2 text-xs font-bold uppercase text-gray-500">Total</td>
-                          <td class="px-4 py-2 text-right text-xs font-bold text-green-700">{{ formatCurrency(asiento.totalDebito) }}</td>
-                          <td class="px-4 py-2 text-right text-xs font-bold text-red-700">{{ formatCurrency(asiento.totalCredito) }}</td>
+                          <td class="px-4 py-2 text-right text-xs font-bold text-green-700">{{ asiento.totalDebito | currency: '' : 'symbol' : '0.0-0' }}</td>
+                          <td class="px-4 py-2 text-right text-xs font-bold text-red-700">{{ asiento.totalCredito | currency: '' : 'symbol' : '0.0-0' }}</td>
                         </tr>
                       </tfoot>
                     </table>

@@ -1,6 +1,6 @@
 import { Component, computed, input, output, signal, effect } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { CommonModule, TitleCasePipe } from '@angular/common';
+import { CommonModule, CurrencyPipe, TitleCasePipe } from '@angular/common';
 import { PaginationComponent } from '@shared/components/pagination/pagination';
 import { FormsModule } from '@angular/forms';
 import { UserAuth } from 'src/app/auth/interfaces/user-auth.interface';
@@ -19,7 +19,7 @@ export interface PurchaseInvoiceFilters {
 
 @Component({
   selector: 'app-table-compras',
-  imports: [CommonModule, RouterLink, TitleCasePipe, FormsModule, PaginationComponent],
+  imports: [CommonModule, RouterLink, TitleCasePipe, FormsModule, PaginationComponent, CurrencyPipe],
   templateUrl: './table-compras.component.html',
   standalone: true
 })
@@ -164,11 +164,4 @@ export class TableComprasComponent {
     return classes[status] || 'bg-gray-100 text-gray-800';
   }
 
-  formatCurrency(value: number): string {
-    return new Intl.NumberFormat('es-CO', {
-      style: 'currency',
-      currency: 'COP',
-      minimumFractionDigits: 0
-    }).format(value);
-  }
 }

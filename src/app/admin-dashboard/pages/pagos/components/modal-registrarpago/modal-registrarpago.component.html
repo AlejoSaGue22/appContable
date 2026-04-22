@@ -32,7 +32,7 @@
           <p class="text-xs text-slate-500">Saldo pendiente</p>
           <p class="text-base font-bold"
             [ngClass]="data.tipo === 'cobro' ? 'text-green-700' : 'text-orange-700'">
-            {{ data.saldoPendiente | currency:'COP':'symbol-narrow':'1.0-0' }}
+            {{ data.saldoPendiente | currency:'':'symbol-narrow':'1.0-0' }}
           </p>
         </div>
   </div>

@@ -53,17 +53,51 @@
                         <form-error-label [errorType]="form.get('fecha')!" />
                     </div>
 
-                    <!-- Método de Pago -->
+                    <!-- Forma de Pago -->
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1 dark:text-gray-300">Método de Pago</label>
-                        <select formControlName="metodoPago" class="w-full px-4 py-2 bg-gray-50 border-0 rounded-xl text-sm focus:ring-2 focus:ring-blue-200 dark:bg-gray-900">
-                            <option value="">Seleccione un método</option>
-                            @for (m of catalogsStore.paymentMethods(); track m.id) {
-                                <option [value]="m.id">{{ m.nombre }}</option>
-                            }
+                        <label class="block text-sm font-bold text-gray-700 mb-1 dark:text-gray-300">Forma de Pago</label>
+                        <select formControlName="formaPago" 
+                                [attr.disabled]="formaPagoBloqueada() ? '' : null"
+                                class="w-full px-4 py-2 bg-gray-50 border-0 rounded-xl text-sm focus:ring-2 focus:ring-blue-200 dark:bg-gray-900 disabled:opacity-70 disabled:cursor-not-allowed">
+                            <option value="CONTADO">Contado</option>
+                            <option value="CREDITO">Crédito</option>
                         </select>
-                        <form-error-label [errorType]="form.get('metodoPago')!" />
+                        <form-error-label [errorType]="form.get('formaPago')!" />
+                        @if (formaPagoBloqueada()) {
+                            <p class="text-[10px] text-amber-600 mt-1 font-medium flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                Bloqueado según factura original
+                            </p>
+                        }
                     </div>
+
+                    <!-- Método de Pago (Solo si es Contado) -->
+                    @if (form.get('formaPago')?.value === 'CONTADO') {
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-1 dark:text-gray-300">Método de Pago</label>
+                            <select formControlName="metodoPago" class="w-full px-4 py-2 bg-gray-50 border-0 rounded-xl text-sm focus:ring-2 focus:ring-blue-200 dark:bg-gray-900">
+                                <option value="">Seleccione un método</option>
+                                @for (m of catalogsStore.paymentMethods(); track m.id) {
+                                    <option [value]="m.id">{{ m.nombre }}</option>
+                                }
+                            </select>
+                            <form-error-label [errorType]="form.get('metodoPago')!" />
+                        </div>
+                    }
+
+                    <!-- Opción de Reembolso (Solo para Crédito con Abonos) -->
+                    @if (facturaEsCredito() && facturaConAbonos()) {
+                        <div class="md:col-span-2 bg-amber-50 p-4 rounded-2xl border border-amber-100 dark:bg-amber-900/20 dark:border-amber-800/50">
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <input type="checkbox" formControlName="esReembolsoAbono" 
+                                    class="w-5 h-5 rounded border-amber-300 text-amber-600 focus:ring-amber-500 cursor-pointer">
+                                <div>
+                                    <span class="block text-sm font-bold text-amber-800 dark:text-amber-400">Reembolso de abono previo</span>
+                                    <span class="block text-xs text-amber-600 dark:text-amber-500/80">Marque esta opción si va a devolver dinero ya recibido (Total abonado: {{ facturaSeleccionada()?.totalPagado | currency:'':'symbol':'1.0-0' }}).</span>
+                                </div>
+                            </label>
+                        </div>
+                    }
                 </div>
 
                 <!-- Motivo -->
@@ -103,7 +137,10 @@
                                         <input type="number" [value]="item.cantidad" (input)="updateItemField($index, 'cantidad', $any($event.target).value)"
                                             class="w-16 mx-auto block px-2 py-1 bg-gray-50 border-0 rounded text-center text-sm focus:ring-1 focus:ring-blue-200 dark:bg-gray-900" />
                                     </td>
-                                    <td class="px-4 py-3 text-right">{{ item.valorUnitario | currency:'COP':'symbol':'1.0-0' }}</td>
+                                    <td class="px-4 py-3 text-right">
+                                        <input type="number" [value]="item.valorUnitario" (input)="updateItemField($index, 'valorUnitario', $any($event.target).value)"
+                                            class="w-16 mx-auto block px-2 py-1 bg-gray-50 border-0 rounded text-center text-sm focus:ring-1 focus:ring-blue-200 dark:bg-gray-900" />
+                                    </td>
                                     <td class="px-4 py-3">
                                         <input type="number" [value]="item.descuento || 0" (input)="updateItemField($index, 'descuento', $any($event.target).value)"
                                             class="w-16 mx-auto block px-2 py-1 bg-gray-50 border-0 rounded text-center text-sm focus:ring-1 focus:ring-blue-200 dark:bg-gray-900" />
@@ -143,50 +180,69 @@
         <div class="space-y-6">
             @if (facturaSeleccionada()) {
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 dark:bg-gray-800 dark:border-gray-700">
-                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Información de la Factura</h3>
+                    <h3 class="text-xs font-bold text-gray-500 uppercase mb-4">Información de la Factura</h3>
                     <div class="space-y-3">
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-500">Cliente:</span>
                             <span class="font-medium text-gray-900 dark:text-white">{{ facturaSeleccionada()?.client?.razonSocial || facturaSeleccionada()?.client?.nombre + ' ' + facturaSeleccionada()?.client?.apellido }}</span>
                         </div>
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-500">Total Factura:</span>
-                            <span class="font-medium text-gray-900 dark:text-white">{{ facturaSeleccionada()?.total | currency:'COP':'symbol':'1.0-0' }}</span>
+                            <span class="text-gray-500">Forma de Pago:</span>
+                            <span class="font-medium px-2 py-0.5 rounded-lg">
+                                {{ facturaSeleccionada()?.formaPago }}
+                            </span>
                         </div>
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-500">Saldo Pendiente:</span>
-                            <span class="font-medium text-red-600">{{ facturaSeleccionada()?.saldoPendiente | currency:'COP':'symbol':'1.0-0' }}</span>
+                            <span class="text-gray-500">Total Factura:</span> 
+                            <span class="font-medium text-gray-900 dark:text-white">{{ facturaSeleccionada()?.total | currency:'':'symbol':'1.0-0' }}</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Total Abonado:</span>
+                            <span class="font-medium text-green-600">{{ (facturaSeleccionada()?.totalPagado || 0) | currency:'':'symbol':'1.0-0' }}</span>
+                        </div>
+                        <div class="flex justify-between text-sm pt-2 border-t border-gray-50 dark:border-gray-700">
+                            <span class="text-gray-500 font-bold">Saldo Pendiente:</span>
+                            <span class="font-bold text-red-600">{{ (facturaSeleccionada()?.saldoPendiente || 0) | currency:'':'symbol':'1.0-0' }}</span>
                         </div>
                     </div>
+
+                    @if (totales().total > (facturaSeleccionada()?.saldoPendiente ?? 0) && form.get('formaPago')?.value === 'CREDITO') {
+                        <div class="mt-4 p-3 bg-red-50 border border-red-100 rounded-xl flex gap-x-3 dark:bg-red-900/20 dark:border-red-800/50">
+                            <svg class="h-5 w-5 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            <p class="text-xs text-red-700 leading-tight font-medium dark:text-red-400">
+                                <strong>Advertencia:</strong> El valor de la nota excede el saldo pendiente. Para ajustes de cartera, el total no puede ser mayor al saldo.
+                            </p>
+                        </div>
+                    }
                 </div>
             }
 
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 dark:bg-gray-800 dark:border-gray-700">
-                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Resumen del Ajuste</h3>
+                <h3 class="text-xs font-bold text-gray-500 uppercase mb-4">Resumen del Ajuste</h3>
                 <div class="space-y-4">
                     <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                         <span>Subtotal</span>
-                        <span class="font-medium text-gray-900 dark:text-white">{{ totales().subtotal | currency:'COP':'symbol':'1.0-0' }}</span>
+                        <span class="font-medium text-gray-900 dark:text-white">{{ totales().subtotal | currency:'':'symbol':'1.0-0' }}</span>
                     </div>
                     @if (totales().descuento > 0) {
                         <div class="flex justify-between text-sm text-red-500">
                             <span>Descuento</span>
-                            <span class="font-medium">-{{ totales().descuento | currency:'COP':'symbol':'1.0-0' }}</span>
+                            <span class="font-medium">-{{ totales().descuento | currency:'':'symbol':'1.0-0' }}</span>
                         </div>
                     }
                     <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400">
                         <span>Impuestos (IVA)</span>
-                        <span class="font-medium text-gray-900 dark:text-white">{{ totales().iva | currency:'COP':'symbol':'1.0-0' }}</span>
+                        <span class="font-medium text-gray-900 dark:text-white">{{ totales().iva | currency:'':'symbol':'1.0-0' }}</span>
                     </div>
                     <div class="pt-4 border-t border-gray-50 flex justify-between items-center dark:border-gray-700">
                         <span class="text-base font-medium text-gray-900 dark:text-white">Total Ajuste</span>
-                        <span class="text-xl text-blue-600 font-medium">{{ totales().total | currency:'COP':'symbol':'1.0-0' }}</span>
+                        <span class="text-xl font-medium">{{ totales().total | currency:'':'symbol':'1.0-0' }}</span>
                     </div>
                 </div>
 
                 <div class="mt-8 space-y-3">
                     <button (click)="onSubmit()" 
-                        class="w-full bg-blue-600 text-white py-2 rounded-2xl text-base transition-all hover:bg-blue-700 active:scale-95 cursor-pointer">
+                        class="w-full bg-black font-semibold text-white py-2 rounded-2xl text-base transition-all hover:bg-blue-700 active:scale-95 cursor-pointer">
                         {{ notaId() ? 'Actualizar Nota' : 'Registrar Nota' }}
                     </button>
                     <a routerLink="/panel/ventas/notas-ajuste" 

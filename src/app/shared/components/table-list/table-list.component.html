@@ -126,7 +126,7 @@
       </table>
 
       @if (dataTableTemp().length > 0) {
-      <app-pagination />
+      <app-pagination [length]="dataTableTemp().length" />
       }
     </div>
 

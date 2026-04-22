@@ -184,14 +184,14 @@
                 </span>
               </td>
               <td class="px-6 py-4 text-right">
-                {{ formatCurrency(invoice.total) }}
+                {{ invoice.total | currency: '' : 'symbol' : '0.0-0' }}
               </td>
               <td class="px-6 py-4 text-center">
                 @if (invoice.formaPago === 'CREDITO') {
-                  <p class="text-sm text-slate-500">{{ formatCurrency(invoice.totalPagado) }}</p>
+                  <p class="text-sm text-slate-500">{{ invoice.totalPagado | currency: '' : 'symbol' : '0.0-0' }}</p>
                   <p class="text-sm mt-2" [class.text-red-600]="invoice.saldoPendiente > 0"
                         [class.text-green-600]="invoice.saldoPendiente === 0">
-                    {{ formatCurrency(invoice.saldoPendiente) }}
+                    {{ invoice.saldoPendiente | currency: '' : 'symbol' : '0.0-0' }}
                   </p>
                 } @else {
                   <span class="text-xs text-slate-400">—</span>

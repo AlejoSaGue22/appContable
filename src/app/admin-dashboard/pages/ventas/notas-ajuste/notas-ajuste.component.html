@@ -24,11 +24,7 @@
         <app-table-notas 
             [notaData]="notasResource.value()!.data"
             [activeFilters]="filters()"
-            [currentPage]="paginationService.currentPage()"
-            [totalItems]="totalItems()"
-            [totalPages]="totalPages()"
             (filterChange)="onFilterChange($event)"
-            (pageChange)="onPageChange($event)"
             (emitir)="onEmitir($event)"
             (delete)="confirmDelete($event)"
             (downloadPDF)="onDownloadPDF($event)"

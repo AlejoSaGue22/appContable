@@ -32,7 +32,9 @@ export interface NotaAjuste {
   facturaOriginalNumero: string;
   facturaOriginal?: GetFacturaRequest;
   items: NotaAjusteItem[];
+  formaPago?: string;         // 'CONTADO' | 'CREDITO'
   metodoPago?: string;
+  esReembolsoAbono?: boolean;  // true si la NC es un reembolso de un abono previo en factura crédito
   observaciones?: string;
   estado: NotaAjusteStatus;
   dianStatus: DianStatus;

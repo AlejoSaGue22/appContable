@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, CurrencyPipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DianStatus, FormaPago, GetFacturaRequest, InvoiceStatus, TipoFactura } from '@dashboard/interfaces/documento-venta-interface';
@@ -12,7 +12,7 @@ import { PrintService } from '@shared/services/print.service';
 
 @Component({
   selector: 'app-invoice-details',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, CurrencyPipe],
   templateUrl: './invoice-details.component.html',
 })
 export class InvoiceDetailsComponent {
@@ -184,14 +184,6 @@ export class InvoiceDetailsComponent {
       [TipoFactura.STANDARD]: 'Factura de Venta',
     };
     return labels[tipo] || tipo;
-  }
-
-  formatCurrency(value: number): string {
-    return new Intl.NumberFormat('es-CO', {
-      style: 'currency',
-      currency: 'COP',
-      minimumFractionDigits: 0
-    }).format(value);
   }
 
   formatDate(date: string | Date): string {

@@ -67,7 +67,7 @@ export class PrintService {
     printWindow.document.open();
     printWindow.document.write(html);
     printWindow.document.close();
-
+    
     printWindow.onload = () => {
       setTimeout(() => {
         printWindow.focus();
@@ -729,7 +729,7 @@ export class PrintService {
   private fmt(value: number): string {
     return new Intl.NumberFormat('es-CO', {
       style: 'currency',
-      currency: 'COP',
+      currency: '',
       minimumFractionDigits: 0,
     }).format(value ?? 0);
   }

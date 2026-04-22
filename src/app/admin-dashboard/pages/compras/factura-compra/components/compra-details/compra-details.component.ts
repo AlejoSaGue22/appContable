@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, CurrencyPipe } from '@angular/common';
 import { Component, signal, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormaPago } from '@dashboard/interfaces/documento-venta-interface';
@@ -13,7 +13,7 @@ import { PrintService } from '@shared/services/print.service';
 
 @Component({
   selector: 'app-compra-details',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, CurrencyPipe],
   templateUrl: './compra-details.component.html',
   standalone: true
 })
@@ -128,14 +128,6 @@ export class CompraDetailsComponent implements OnInit {
       error_asiento: 'bg-amber-100 text-amber-800 border-amber-200',
     };
     return map[estado] ?? 'bg-gray-100 text-gray-600 border-gray-200';
-  }
-
-  formatCurrency(value: number): string {
-    return new Intl.NumberFormat('es-CO', {
-      style: 'currency',
-      currency: 'COP',
-      minimumFractionDigits: 0
-    }).format(value);
   }
 
   print(): void {

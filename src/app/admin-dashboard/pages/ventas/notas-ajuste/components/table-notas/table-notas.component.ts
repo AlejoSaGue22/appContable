@@ -3,6 +3,7 @@ import { RouterLink } from "@angular/router";
 import { FormsModule } from '@angular/forms';
 import { PaginationComponent } from '@shared/components/pagination/pagination';
 import { NotaAjuste, NotaAjusteStatus, ConceptosNotaCredito, ConceptosNotaDebito } from '../../../../../interfaces/notas-ajuste-interface';
+import { CurrencyPipe } from '@angular/common';
 
 export interface NotaFilters {
   tipo?: string;
@@ -14,7 +15,7 @@ export interface NotaFilters {
 @Component({
   selector: 'app-table-notas',
   standalone: true,
-  imports: [RouterLink, FormsModule, PaginationComponent],
+  imports: [RouterLink, FormsModule, PaginationComponent, CurrencyPipe],
   templateUrl: './table-notas.component.html',
 })
 export class TableNotasComponent {
@@ -22,15 +23,8 @@ export class TableNotasComponent {
   notaData = input.required<NotaAjuste[]>();
   activeFilters = input<NotaFilters>({});
 
-  // Pagination inputs
-  currentPage = input<number>(1);
-  totalPages = input<number>(1);
-  totalItems = input<number>(0);
-  pageSize = input<number>(10);
-
   // Output events
   filterChange = output<NotaFilters>();
-  pageChange = output<number>();
   emitir = output<string>();
   anular = output<string>();
   delete = output<string>();
@@ -134,14 +128,6 @@ export class TableNotasComponent {
   getConceptoLabel(tipo: string, concepto: string): string {
     const list = tipo === 'CREDITO' ? ConceptosNotaCredito : ConceptosNotaDebito;
     return list.find(c => c.value === concepto)?.label || concepto;
-  }
-
-  formatCurrency(value: number): string {
-    return new Intl.NumberFormat('es-CO', {
-      style: 'currency',
-      currency: 'COP',
-      minimumFractionDigits: 0
-    }).format(value);
   }
 
   onEmitir(id: string): void {

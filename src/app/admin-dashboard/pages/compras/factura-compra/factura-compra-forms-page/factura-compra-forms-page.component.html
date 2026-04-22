@@ -210,8 +210,7 @@
                                             <label class="block text-xs font-medium text-gray-700 mb-1">Total</label>
                                             <div
                                                 class="px-2 py-[9px] bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 border-l-4 border-l-blue-500 overflow-hidden text-ellipsis whitespace-nowrap">
-                                                {{ productosItemsForm.get('total')?.value |
-                                                currency:'USD':'symbol':'1.0-0' }}
+                                                {{ productosItemsForm.get('total')?.value | currency:'':'symbol':'1.0-0' }}
                                             </div>
                                         </div>
 
@@ -275,7 +274,7 @@
                                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{
                                                         item.value.cantidad }}</td>
                                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{
-                                                        item.value.precioUnitario | currency:'USD':'symbol':'1.0-0' }}
+                                                        item.value.precioUnitario | currency:'':'symbol':'1.0-0' }}
                                                     </td>
                                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{
                                                         item.value.descuento }}%</td>
@@ -283,10 +282,10 @@
                                                         item.value.iva }}%</td>
                                                     <td
                                                         class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                        {{ item.value.subtotal | currency:'USD':'symbol':'1.0-0' }}</td>
+                                                        {{ item.value.subtotal | currency:'':'symbol':'1.0-0' }}</td>
                                                     <td
                                                         class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                        {{ item.value.total | currency:'USD':'symbol':'1.0-0' }}</td>
+                                                        {{ item.value.total | currency:'':'symbol':'1.0-0' }}</td>
                                                     <td
                                                         class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                         <button type="button" (click)="removeItem($index)"
@@ -324,21 +323,20 @@
                         <div class="w-full bg-gray-50 p-6 rounded-lg space-y-3">
                             <div class="flex justify-between text-sm text-gray-600">
                                 <span>Subtotal</span>
-                                <span>{{ totales.subtotal | currency:'USD':'symbol':'1.0-0' }}</span>
+                                <span>{{ totales.subtotal | currency:'':'symbol':'1.0-0' }}</span>
                             </div>
                             <div class="flex justify-between text-sm text-gray-600">
                                 <span>Descuentos</span>
-                                <span class="text-green-600">- {{ totales.descuentoTotal |
-                                    currency:'USD':'symbol':'1.0-0' }}</span>
+                                <span class="text-green-600">- {{ totales.descuentoTotal | currency:'':'symbol':'1.0-0' }}</span>
                             </div>
                             <div class="flex justify-between text-sm text-gray-600">
                                 <span>Impuestos (IVA)</span>
-                                <span>{{ totales.totalIVA | currency:'USD':'symbol':'1.0-0' }}</span>
+                                <span>{{ totales.totalIVA | currency:'':'symbol':'1.0-0' }}</span>
                             </div>
                             <div
                                 class="pt-3 border-t border-gray-200 flex justify-between text-lg font-bold text-gray-900">
                                 <span>Total a Pagar</span>
-                                <span>{{ totales.facturaTotal | currency:'USD':'symbol':'1.0-0' }}</span>
+                                <span>{{ totales.facturaTotal | currency:'':'symbol':'1.0-0' }}</span>
                             </div>
                         </div>
                     </div>

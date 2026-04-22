@@ -31,9 +31,9 @@
           </svg>
           {{ showFilters() ? 'Ocultar Filtros' : 'Filtros Avanzados' }}
           @if (activeFiltersCount() > 0) {
-            <span class="flex items-center justify-center w-5 h-5 rounded-full bg-blue-600 text-[10px] text-white font-black animate-pulse">
-              {{ activeFiltersCount() }}
-            </span>
+              <span class="flex items-center justify-center w-5 h-5 rounded-full bg-blue-600 text-[10px] text-white font-black animate-pulse">
+                {{ activeFiltersCount() }}
+              </span>
           }
         </button>
 
@@ -149,11 +149,11 @@
                 <span class="text-gray-900">{{ compra.proveedor.razonSocial || (compra.proveedor.nombre + ' ' + compra.proveedor.apellido) }}</span>
               </td>
               <td class="px-6 py-4 text-right">
-                <span class="text-gray-900">{{ compra.total | currency:'COP':'$':'1.0-0' }}</span>
+                <span class="text-gray-900">{{ compra.total | currency:'':'$':'1.0-0' }}</span>
               </td>
               <td class="px-6 py-4 text-right">
                 <span [class.text-red-500]="compra.saldoPendiente > 0" [class.text-emerald-500]="compra.saldoPendiente === 0">
-                  {{ compra.saldoPendiente | currency:'COP':'$':'1.0-0' }}
+                  {{ compra.saldoPendiente | currency:'':'$':'1.0-0' }}
                 </span>
               </td>
               <td class="px-6 py-4 text-center">

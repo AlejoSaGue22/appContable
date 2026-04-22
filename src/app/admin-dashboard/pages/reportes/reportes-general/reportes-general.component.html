@@ -105,12 +105,12 @@
 
                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
                             <p class="text-[12px] font-bold text-gray-400 mb-1">Monto Total</p>
-                            <h4 class="text-3xl font-semibold text-gray-900">{{ facturacion.resumen.montoTotal | currency:'COP':'$':'1.0-0' }}</h4>
+                            <h4 class="text-3xl font-semibold text-gray-900">{{ facturacion.resumen.montoTotal | currency:'':'$':'1.0-0' }}</h4>
                             <div class="mt-4 flex items-center gap-2">
                                 <span class="flex-1 h-1.5 rounded-full bg-emerald-100 overflow-hidden">
                                     <span class="block h-full bg-emerald-500" [style.width.%]="(facturacion.resumen.montoElectronicas / facturacion.resumen.montoTotal) * 100"></span>
                                 </span>
-                                <span class="text-[10px] font-medium text-emerald-600">IVA: {{ facturacion.resumen.ivaTotal | currency:'COP':'$':'1.0-0' }}</span>
+                                <span class="text-[10px] font-medium text-emerald-600">IVA: {{ facturacion.resumen.ivaTotal | currency:'':'$':'1.0-0' }}</span>
                             </div>
                         </div>
 
@@ -125,7 +125,7 @@
 
                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
                             <p class="text-[12px] font-bold text-gray-400 mb-1">Ticket Promedio</p>
-                            <h4 class="text-3xl font-semibold text-gray-900">{{ (facturacion.resumen.montoTotal / (facturacion.resumen.totalFacturas || 1)) | currency:'COP':'$':'1.0-0' }}</h4>
+                            <h4 class="text-3xl font-semibold text-gray-900">{{ (facturacion.resumen.montoTotal / (facturacion.resumen.totalFacturas || 1)) | currency:'':'$':'1.0-0' }}</h4>
                             <p class="text-[10px] text-gray-400 mt-4 font-medium uppercase tracking-tighter">Valor Medio por Transacción</p>
                         </div>
                     </div>
@@ -156,7 +156,7 @@
                                 </div>
                                 <div class="flex items-center justify-between p-4 bg-blue-50 rounded-2xl border border-blue-100">
                                     <span class="text-sm font-semibold text-blue-700">Ticket Medio Elec.</span>
-                                    <span class="text-lg font-semibold text-blue-600">{{ facturacion.electronicas.montoPromedio | currency:'COP':'$':'1.0-0' }}</span>
+                                    <span class="text-lg font-semibold text-blue-600">{{ facturacion.electronicas.montoPromedio | currency:'':'$':'1.0-0' }}</span>
                                 </div>
                             </div>
                         </div>
@@ -181,11 +181,11 @@
                                 </div>
                                 <div class="flex items-center justify-between p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
                                     <span class="text-sm font-semibold text-emerald-700">Total Liquidado</span>
-                                    <span class="text-lg font-semibold text-emerald-600">{{ facturacion.standard.totalPagado| currency:'COP':'$':'1.0-0' }}</span>
+                                    <span class="text-lg font-semibold text-emerald-600">{{ facturacion.standard.totalPagado| currency:'':'$':'1.0-0' }}</span>
                                 </div>
                                 <div class="flex items-center justify-between p-4 bg-red-50 rounded-2xl border border-red-100">
                                     <span class="text-sm font-semibold text-red-700">Saldo Cartera</span>
-                                    <span class="text-lg font-semibold text-red-600">{{ facturacion.standard.saldoPendiente | currency:'COP':'$':'1.0-0' }}</span>
+                                    <span class="text-lg font-semibold text-red-600">{{ facturacion.standard.saldoPendiente | currency:'':'$':'1.0-0' }}</span>
                                 </div>
                             </div>
                         </div>
@@ -221,7 +221,7 @@
                                                 <span class="px-2 py-1 bg-gray-100 rounded text-xs font-mono text-gray-600 font-semibold">{{ c.cantidadFacturas }}</span>
                                             </td>
                                             <td class="px-8 py-4 text-right">
-                                                <span class="text-sm font-semibold text-blue-600">{{ c.montoTotal | currency:'COP':'$':'1.0-0' }}</span>
+                                                <span class="text-sm font-semibold text-blue-600">{{ c.montoTotal | currency:'':'$':'1.0-0' }}</span>
                                             </td>
                                         </tr>
                                     }
@@ -240,7 +240,7 @@
                                 @for (v of facturacion.ventasPorDia; track v.fecha) {
                                     <div class="flex-none w-32 p-4 bg-gray-50/50 rounded-2xl border border-gray-100 text-center hover:bg-white hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                                         <p class="text-[10px] font-semibold text-gray-400 uppercase mb-2">{{ v.fecha | date:'dd MMM' }}</p>
-                                        <p class="text-sm font-semibold text-gray-900 mb-3">{{ v.montoTotal | currency:'COP':'$':'1.0-0' }}</p>
+                                        <p class="text-sm font-semibold text-gray-900 mb-3">{{ v.montoTotal | currency:'':'$':'1.0-0' }}</p>
                                         <div class="flex justify-center -space-x-1.5">
                                             @for (i of [].constructor(v.cantidadElectronicas > 3 ? 3 : v.cantidadElectronicas); track $index) {
                                                 <span class="w-2.5 h-2.5 rounded-full bg-blue-500 border-2 border-white"></span>
@@ -266,7 +266,7 @@
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-t-4 border-t-blue-500">
                                     <p class="text-[10px] font-semibold uppercase text-gray-400 mb-1">Monto DIAN (Accepted)</p>
-                                    <h4 class="text-2xl font-semibold text-gray-900">{{ conciliacionDIAN.facturasElectronicas.montoAcceptedDIAN | currency:'COP':'$':'1.0-0' }}</h4>
+                                    <h4 class="text-2xl font-semibold text-gray-900">{{ conciliacionDIAN.facturasElectronicas.montoAcceptedDIAN | currency:'':'$':'1.0-0' }}</h4>
                                     <p class="text-[10px] text-blue-500 font-bold mt-4 flex items-center gap-1">
                                         <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                         Validado vía API DIAN
@@ -274,12 +274,12 @@
                                 </div>
                                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-t-4 border-t-indigo-500">
                                     <p class="text-[10px] font-semibold uppercase text-gray-400 mb-1">Débito en Libros</p>
-                                    <h4 class="text-2xl font-semibold text-gray-900">{{ conciliacionDIAN.facturasElectronicas.montoDebito | currency:'COP':'$':'1.0-0' }}</h4>
+                                    <h4 class="text-2xl font-semibold text-gray-900">{{ conciliacionDIAN.facturasElectronicas.montoDebito | currency:'':'$':'1.0-0' }}</h4>
                                     <p class="text-[10px] text-gray-400 font-bold mt-4 uppercase tracking-tighter">Cuentas por Cobrar</p>
                                 </div>
                                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-t-4 border-t-purple-500">
                                     <p class="text-[10px] font-semibold uppercase text-gray-400 mb-1">Saldo Cuentas 41XX</p>
-                                    <h4 class="text-2xl font-semibold text-gray-900">{{ conciliacionDIAN.contabilidad.saldoCuentasIngreso | currency:'COP':'$':'1.0-0' }}</h4>
+                                    <h4 class="text-2xl font-semibold text-gray-900">{{ conciliacionDIAN.contabilidad.saldoCuentasIngreso | currency:'':'$':'1.0-0' }}</h4>
                                     <p class="text-[10px] text-gray-400 font-bold mt-4 uppercase tracking-tighter">Ingresos Operacionales</p>
                                 </div>
                             </div>
@@ -299,7 +299,7 @@
                                                 <span class="text-sm font-semibold text-gray-900">{{ d.nombre }}</span>
                                             </div>
                                             <div class="flex items-center gap-6">
-                                                <span class="text-sm font-semibold text-gray-900">{{ d.saldo | currency:'COP':'$':'1.0-0' }}</span>
+                                                <span class="text-sm font-semibold text-gray-900">{{ d.saldo | currency:'':'$':'1.0-0' }}</span>
                                                 <div class="w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                                                     <div class="h-full bg-blue-500/30 group-hover:bg-blue-500 transition-all" [style.width.%]="(d.saldo / (conciliacionDIAN.contabilidad.saldoCuentasIngreso || 1)) * 100"></div>
                                                 </div>
@@ -321,7 +321,7 @@
                                     <h3 class="text-sm font-semibold uppercase opacity-80">Estado Global</h3>
                                     <p class="text-xl font-semibold mt-2 uppercase">{{ conciliacionDIAN.cuadra ? 'Conciliado' : 'Requiere Ajuste' }}</p>
                                     <div class="mt-8 py-4 px-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10">
-                                        <p class="text-4xl font-semibold">{{ (conciliacionDIAN.diferencia < 0 ? conciliacionDIAN.diferencia * -1 : conciliacionDIAN.diferencia) | currency:'COP':'$':'1.0-0' }}</p>
+                                        <p class="text-4xl font-semibold">{{ (conciliacionDIAN.diferencia < 0 ? conciliacionDIAN.diferencia * -1 : conciliacionDIAN.diferencia) | currency:'':'$':'1.0-0' }}</p>
                                         <p class="text-[10px] font-bold mt-1 opacity-60 uppercase">Diferencia Neta</p>
                                     </div>
                                 </div>
@@ -357,12 +357,12 @@
                             <div class="flex gap-8">
                                 <div class="text-center">
                                     <p class="text-[10px] text-gray-500 font-bold uppercase mb-1">Registros</p>
-                                    <p class="text-xl font-semibold">{{ conciliacionRecaudos.totalPagosRegistrados | currency:'COP':'$':'1.0-0' }}</p>
+                                    <p class="text-xl font-semibold">{{ conciliacionRecaudos.totalPagosRegistrados | currency:'':'$':'1.0-0' }}</p>
                                 </div>
                                 <div class="w-px h-12 bg-gray-800"></div>
                                 <div class="text-center">
                                     <p class="text-[10px] text-gray-500 font-bold uppercase mb-1">Banco (1110)</p>
-                                    <p class="text-xl font-semibold text-blue-400">{{ conciliacionRecaudos.totalMovimientosBancos | currency:'COP':'$':'1.0-0' }}</p>
+                                    <p class="text-xl font-semibold text-blue-400">{{ conciliacionRecaudos.totalMovimientosBancos | currency:'':'$':'1.0-0' }}</p>
                                 </div>
                             </div>
                         </div>
@@ -381,7 +381,7 @@
                                     </div>
                                     <div class="flex-1 overflow-hidden">
                                         <p class="text-[10px] font-semibold text-gray-400 uppercase truncate">{{ m.medio }}</p>
-                                        <p class="text-lg font-semibold text-gray-900">{{ m.monto | currency:'COP':'$':'1.0-0' }}</p>
+                                        <p class="text-lg font-semibold text-gray-900">{{ m.monto | currency:'':'$':'1.0-0' }}</p>
                                     </div>
                                 </div>
                                 <div class="h-1 bg-gray-50 rounded-full overflow-hidden">
@@ -401,30 +401,30 @@
                             <div class="p-12 bg-indigo-950 text-white flex flex-col justify-center">
                                 <p class="text-xs font-semibold text-indigo-400 uppercase mb-4">Obligación Tributaria</p>
                                 <h3 class="text-5xl font-semibold mb-2">IVA Generado</h3>
-                                <p class="text-6xl font-semibold text-indigo-300">{{ impuestos.totalIVAGenerado | currency:'COP':'$':'1.0-0' }}</p>
+                                <p class="text-6xl font-semibold text-indigo-300">{{ impuestos.totalIVAGenerado | currency:'':'$':'1.0-0' }}</p>
                                 <p class="mt-8 text-sm text-indigo-400 leading-relaxed font-medium">IVA acumulado en el período seleccionado basado en facturación electrónica y estándar consolidada.</p>
                             </div>
                             <div class="p-12 space-y-10">
                                 <div class="space-y-4">
                                     <div class="flex justify-between items-center text-xs font-semibold uppercase text-gray-400">
                                         <span>Iva Fact. Electrónica</span>
-                                        <span class="text-gray-900">{{ impuestos.porTipoFactura.electronicas.iva | currency:'COP':'$':'1.0-0' }}</span>
+                                        <span class="text-gray-900">{{ impuestos.porTipoFactura.electronicas.iva | currency:'':'$':'1.0-0' }}</span>
                                     </div>
                                     <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
                                         <div class="h-full bg-indigo-600 rounded-full" [style.width.%]="(impuestos.porTipoFactura.electronicas.iva / (impuestos.totalIVAGenerado || 1)) * 100"></div>
                                     </div>
-                                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">Base: {{ impuestos.porTipoFactura.electronicas.base | currency:'COP':'$':'1.0-0' }}</p>
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">Base: {{ impuestos.porTipoFactura.electronicas.base | currency:'':'$':'1.0-0' }}</p>
                                 </div>
 
                                 <div class="space-y-4">
                                     <div class="flex justify-between items-center text-xs font-semibold uppercase text-gray-400">
                                         <span>Iva Fact. Estándar</span>
-                                        <span class="text-gray-900">{{ impuestos.porTipoFactura.standard.iva | currency:'COP':'$':'1.0-0' }}</span>
+                                        <span class="text-gray-900">{{ impuestos.porTipoFactura.standard.iva | currency:'':'$':'1.0-0' }}</span>
                                     </div>
                                     <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
                                         <div class="h-full bg-indigo-400 rounded-full" [style.width.%]="(impuestos.porTipoFactura.standard.iva / (impuestos.totalIVAGenerado || 1)) * 100"></div>
                                     </div>
-                                    <p class="text-[10px] text-gray-400 font-bold uppercase">Base: {{ impuestos.porTipoFactura.standard.base | currency:'COP':'$':'1.0-0' }}</p>
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase">Base: {{ impuestos.porTipoFactura.standard.base | currency:'':'$':'1.0-0' }}</p>
                                 </div>
                             </div>
                         </div>
@@ -453,10 +453,10 @@
                                                 </span>
                                             </td>
                                             <td class="px-8 py-4 text-right font-semibold text-gray-600">
-                                                {{ t.base | currency:'COP':'$':'1.0-0' }}
+                                                {{ t.base | currency:'':'$':'1.0-0' }}
                                             </td>
                                             <td class="px-8 py-4 text-right font-semibold text-gray-900">
-                                                {{ t.iva | currency:'COP':'$':'1.0-0' }}
+                                                {{ t.iva | currency:'':'$':'1.0-0' }}
                                             </td>
                                             <td class="px-8 py-4 text-center">
                                                 <span class="text-[10px] font-semibold text-gray-400">{{ t.cantidadItems }} op.</span>
