@@ -159,9 +159,9 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
 
         const invoice = response.data[0];
 
-        while (this.productSeleccionados().length > 0) {
-          this.productSeleccionados().splice(0, 1);
-        }
+        // while (this.productSeleccionados().length > 0) {
+        //   this.productSeleccionados().splice(0, 1);
+        // }<
 
         this.formVentas.patchValue({
           cliente: invoice.clientId,
@@ -179,8 +179,8 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
         });
 
         this.factura.set(invoice as any);
-        this.productSeleccionados.set(invoice.items)
-        this.calcularTotal()
+        this.productSeleccionados.set(invoice.items as ItemFactura[]);
+        this.calcularTotal();
         this.loaderservice.hide();
       },
       error: (err) => {
@@ -243,24 +243,26 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     } else {
       ivaControl?.enable();
     }
-
-    this.productSeleccionados.set([]);
+    
+    if (this.invoiceID() == 'new-Item') {
+      this.productSeleccionados.set([]);
+    }
   });
 
   productosItemsForm = this.fb.group({
-    articulo: ['', Validators.required],
-    articuloId: ['', Validators.required],
-    description: [''],
-    quantity: [1, [Validators.required, Validators.min(1)]],
-    unitPrice: [0, [Validators.required, Validators.min(0)]],
-    iva: [0, [Validators.min(0), Validators.max(100)]],
-    iva_valor: [0],
-    discount: [0, [Validators.min(0), Validators.max(100)]],
-    descuento_valor: [0],
-    subtotal: [0],
-    importe: [0],
-    total: [0]
-  })
+      articulo: ['', Validators.required],
+      articuloId: ['', Validators.required],
+      description: [''],
+      quantity: [1, [Validators.required, Validators.min(1)]],
+      unitPrice: [0, [Validators.required, Validators.min(0)]],
+      iva: [0, [Validators.min(0), Validators.max(100)]],
+      iva_valor: [0],
+      discount: [0, [Validators.min(0), Validators.max(100)]],
+      descuento_valor: [0],
+      subtotal: [0],
+      importe: [0],
+      total: [0]
+  });
 
   get productosArray() {
     return this.productSeleccionados();
