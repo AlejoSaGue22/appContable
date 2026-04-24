@@ -32,7 +32,7 @@ import { GetFacturaRequest, FormaPago } from '@dashboard/interfaces/documento-ve
 export class NotasAjusteFormPageComponent implements OnInit {
 
   headTitle = computed(() => {
-    const id = this.notaId();
+    const id = this.notaId() != 'new';
     return {
       title: id ? 'Editar Nota de Ajuste' : 'Nueva Nota de Ajuste',
       slog: id ? 'Edita una nota crédito o débito vinculada a una factura' : 'Registra una nota crédito o débito vinculada a una factura'
@@ -67,7 +67,7 @@ export class NotasAjusteFormPageComponent implements OnInit {
     if (!factura) return false;
     
     // Concepto de Anulación (valor '2') siempre bloquea para espejar
-    if (this.form.get('concepto')?.value === '2') return true;
+    if (this.form.get('concepto')?.value == '2') return true;
 
     // Crédito sin abonos: bloqueada a CREDITO
     if (factura.formaPago === FormaPago.CREDITO && (factura.totalPagado ?? 0) === 0) return true;
