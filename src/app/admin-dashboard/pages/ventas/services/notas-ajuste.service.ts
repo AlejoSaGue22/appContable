@@ -71,6 +71,13 @@ export class NotasAjusteService {
     );
   }
 
+  removeNotaAjuste(id: string): Observable<ResponseResult> {
+    return this.http.delete<NotaAjusteResponse>(`${baseUrl}/notas-ajuste/${id}`).pipe(
+      map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+    );
+  }
+
   anularNotaAjuste(id: string, motivo: string): Observable<ResponseResult> {
     return this.http.patch<NotaAjusteResponse>(`${baseUrl}/notas-ajuste/${id}/anular`, { motivo }).pipe(
       map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),

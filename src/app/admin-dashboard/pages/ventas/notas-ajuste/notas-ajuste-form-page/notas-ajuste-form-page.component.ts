@@ -53,6 +53,7 @@ export class NotasAjusteFormPageComponent implements OnInit {
   
   tipoNota = signal<'credito' | 'debito'>('credito');
   conceptos = computed(() => this.tipoNota() === 'credito' ? ConceptosNotaCredito : ConceptosNotaDebito);
+  isDraft = signal<boolean>(false);
   
   facturasDisponibles = signal<GetFacturaRequest[]>([]);
   itemsSeleccionados = signal<NotaAjusteItem[]>([]);
@@ -225,9 +226,13 @@ export class NotasAjusteFormPageComponent implements OnInit {
     
   }
 
-  onFacturaSeleccionada(factura: any) {
-    const f = factura as GetFacturaRequest;
+  onFacturaSeleccionada(factura: GetFacturaRequest) {
+    const f = factura;
     this.facturaSeleccionada.set(f);
+    this.isDraft.set(false);
+    if(factura.tipoFactura == 'ESTANDAR') {
+      this.isDraft.set(true);
+    }
     this.form.patchValue({
       facturaOriginalId: f.id,
       facturaSearch: f.comprobante_completo,
@@ -295,7 +300,7 @@ export class NotasAjusteFormPageComponent implements OnInit {
     this.updateItemField(index, 'cantidad', quantity);
   }
 
-  onSubmit() {
+  onSubmit(isDraft: boolean) { 
     if (this.form.invalid || this.itemsSeleccionados().length === 0) {
       this.form.markAllAsTouched();
       this.notificationService.error('Por favor completa todos los campos y agrega al menos un item.', 'Formulario inválido');
@@ -304,6 +309,7 @@ export class NotasAjusteFormPageComponent implements OnInit {
 
     this.loaderService.show();
     const data = {
+      isDraft: isDraft,
       tipo: this.tipoNota(),
       facturaOriginalId: this.form.value.facturaOriginalId,
       formaPago: this.form.value.formaPago,

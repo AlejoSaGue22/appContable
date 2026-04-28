@@ -28,7 +28,6 @@
                             title=""
                             [dataList]="facturasDisponibles()" 
                             [labelKey]="['comprobante_completo', 'prefijo', 'client.razonSocial', 'client.nombre']"
-
                             [searchable]="false"
                             [valueInput]="form.get('facturaSearch')?.value || ''"
                             (objectSelect)="onFacturaSeleccionada($event)">
@@ -243,10 +242,16 @@
                 </div>
 
                 <div class="mt-8 space-y-3">
-                    <button (click)="onSubmit()" 
+                    <button (click)="onSubmit(false)" 
                         class="w-full bg-black font-semibold text-white py-2 rounded-2xl text-base transition-all hover:bg-blue-700 active:scale-95 cursor-pointer">
                         {{ notaId() != 'new' ? 'Actualizar Nota' : 'Registrar Nota' }}
                     </button>
+                    @if(isDraft()) {
+                        <button (click)="onSubmit(true)" 
+                            class="w-full bg-black font-semibold text-white py-2 rounded-2xl text-base transition-all hover:bg-blue-700 active:scale-95 cursor-pointer">
+                            Guardar Borrador
+                        </button>
+                    }
                     <a routerLink="/panel/ventas/notas-ajuste" 
                         class="block bg-gray-200 w-full py-2.5 rounded-2xl text-center text-sm font-bold text-gray-400 hover:text-gray-600 transition-all">
                         Cancelar

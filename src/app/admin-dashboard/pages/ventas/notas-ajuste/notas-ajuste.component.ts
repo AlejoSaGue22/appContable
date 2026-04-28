@@ -100,7 +100,7 @@ export class NotasAjusteComponent {
 
   onDelete(): void {
     this.loaderService.show('Eliminando nota...');
-    this.notasService.updateNotaAjuste(this.idToDelete(), { status: 'cancelled' }).subscribe({
+    this.notasService.removeNotaAjuste(this.idToDelete()).subscribe({
       next: (res: ResponseResult) => {
         this.loaderService.hide();
         this.isDeleteModalVisible.set(false);

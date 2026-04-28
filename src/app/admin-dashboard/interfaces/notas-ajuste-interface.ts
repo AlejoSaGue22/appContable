@@ -73,9 +73,9 @@ export enum NotaAjusteStatus {
 }
 
 export const ConceptosNotaCredito = [
-  { value: '1', label: 'Devolución parcial de bienes/servicios' },
-  { value: '2', label: 'Anulación de factura (devolución total)' },
-  { value: '3', label: 'Rebaja o descuento' },
+  { value: '1', label: 'Descuento comercial por volumen de ventas' },
+  { value: '2', label: 'Ajuste de precio' },
+  { value: '3', label: 'Devolución de bienes' },
   { value: '4', label: 'Ajuste de precio' },
   { value: '5', label: 'Otros conceptos' },
 ];

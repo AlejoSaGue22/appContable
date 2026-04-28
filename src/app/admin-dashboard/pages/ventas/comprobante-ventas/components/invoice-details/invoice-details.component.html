@@ -126,7 +126,7 @@
                 </svg>
                 Cliente
               </h3>
-              <p class="text-base font-bold text-gray-900">{{ factura()!.client.nombre }} {{ factura()!.client.apellido }}</p>
+              <p class="text-base font-bold text-gray-900">{{ factura()!.client.razonSocial || factura()!.client.nombre + ' ' + factura()!.client.apellido }}</p>
               <p class="text-sm text-gray-600 mt-1">
                 <span class="font-medium">{{ factura()!.client.tipoDocumentoRel.abreviatura }}:</span>
                 {{ factura()!.client.numeroDocumento }}

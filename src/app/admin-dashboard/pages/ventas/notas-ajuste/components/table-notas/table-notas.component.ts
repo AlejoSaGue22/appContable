@@ -1,9 +1,10 @@
-import { Component, computed, input, output, signal, effect } from '@angular/core';
+import { Component, computed, input, output, signal, effect, inject } from '@angular/core';
 import { RouterLink } from "@angular/router";
 import { FormsModule } from '@angular/forms';
 import { PaginationComponent } from '@shared/components/pagination/pagination';
 import { NotaAjuste, NotaAjusteStatus, ConceptosNotaCredito, ConceptosNotaDebito } from '../../../../../interfaces/notas-ajuste-interface';
 import { CurrencyPipe } from '@angular/common';
+import { CatalogsStore } from '@dashboard/services/catalogs.store';
 
 export interface NotaFilters {
   tipo?: string;
@@ -19,6 +20,8 @@ export interface NotaFilters {
   templateUrl: './table-notas.component.html',
 })
 export class TableNotasComponent {
+
+  private catalogs = inject(CatalogsStore);
 
   notaData = input.required<NotaAjuste[]>();
   activeFilters = input<NotaFilters>({});
@@ -126,8 +129,8 @@ export class TableNotasComponent {
   }
 
   getConceptoLabel(tipo: string, concepto: string): string {
-    const list = tipo === 'CREDITO' ? ConceptosNotaCredito : ConceptosNotaDebito;
-    return list.find(c => c.value === concepto)?.label || concepto;
+    const list = tipo == 'credito' ? this.catalogs.conceptsNotes() : []; // TODO: Implementar conceptos de nota debito
+    return list.find(c => c.codigo === concepto)?.nombre || concepto;
   }
 
   onEmitir(id: string): void {

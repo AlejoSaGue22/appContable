@@ -126,7 +126,7 @@
                             {{ getConceptoLabel(nota.tipo, nota.concepto) }}
                         </td>
                         <td class="px-6 py-4">{{ nota.facturaOriginal?.comprobante_completo || '-' }}</td>
-                        <td class="px-6 py-4">{{ nota.cliente?.nombre }} {{ nota.cliente?.apellido }}</td>
+                        <td class="px-6 py-4">{{ nota.cliente?.razonSocial || nota.cliente?.nombre + ' ' + nota.cliente?.apellido }}</td>
                         <td class="px-6 py-4">
                             <span [class]="'inline-flex rounded-full px-2 py-1 text-xs ' + getStatusClass(nota.estado)">
                                 {{ getStatusLabel(nota.estado) }}
