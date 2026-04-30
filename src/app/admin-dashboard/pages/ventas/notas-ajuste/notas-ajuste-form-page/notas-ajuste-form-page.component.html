@@ -32,6 +32,7 @@
                             [valueInput]="form.get('facturaSearch')?.value || ''"
                             (objectSelect)="onFacturaSeleccionada($event)">
                         </app-list-group-dropdown>
+
                         <form-error-label [errorType]="form.get('facturaOriginalId')!" />
                     </div>
 
@@ -188,6 +189,12 @@
                             <span class="font-medium text-gray-900 dark:text-white">{{ facturaSeleccionada()?.client?.razonSocial || facturaSeleccionada()?.client?.nombre + ' ' + facturaSeleccionada()?.client?.apellido }}</span>
                         </div>
                         <div class="flex justify-between text-sm">
+                            <span class="text-gray-500">Tipo Factura:</span>
+                            <span class="font-medium px-2 py-0.5 rounded-lg">
+                                {{ facturaSeleccionada()?.tipoFactura }}
+                            </span>
+                        </div>
+                        <div class="flex justify-between text-sm">
                             <span class="text-gray-500">Forma de Pago:</span>
                             <span class="font-medium px-2 py-0.5 rounded-lg">
                                 {{ facturaSeleccionada()?.formaPago }}
@@ -211,7 +218,8 @@
                         <div class="mt-4 p-3 bg-red-50 border border-red-100 rounded-xl flex gap-x-3 dark:bg-red-900/20 dark:border-red-800/50">
                             <svg class="h-5 w-5 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                             <p class="text-xs text-red-700 leading-tight font-medium dark:text-red-400">
-                                <strong>Advertencia:</strong> El valor de la nota excede el saldo pendiente. Para ajustes de cartera, el total no puede ser mayor al saldo.
+                                <strong>Advertencia:</strong> El valor de la nota excede el saldo pendiente. Para ajustes de cartera, 
+                                el total no puede ser mayor al saldo.
                             </p>
                         </div>
                     }
@@ -248,7 +256,7 @@
                     </button>
                     @if(isDraft()) {
                         <button (click)="onSubmit(true)" 
-                            class="w-full bg-black font-semibold text-white py-2 rounded-2xl text-base transition-all hover:bg-blue-700 active:scale-95 cursor-pointer">
+                            class="w-full bg-gray-400 font-semibold text-white py-2 rounded-2xl text-base transition-all hover:bg-gray-500 active:scale-95 cursor-pointer">
                             Guardar Borrador
                         </button>
                     }

@@ -1,0 +1,146 @@
+import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { Component, inject, signal } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { NotaAjuste, NotaAjusteStatus } from '@dashboard/interfaces/notas-ajuste-interface';
+import { NotasAjusteService } from '@dashboard/pages/ventas/services/notas-ajuste.service';
+import { AsientosHttpService } from '@dashboard/services/asientos-http.service';
+import { NotificationService } from '@shared/services/notification.service';
+import { PrintService } from '@shared/services/print.service';
+import { DianStatus } from '@dashboard/interfaces/documento-venta-interface';
+import { CatalogsStore } from '@dashboard/services/catalogs.store';
+
+@Component({
+  selector: 'app-notas-ajuste-details',
+  standalone: true,
+  imports: [CommonModule, RouterLink, CurrencyPipe, DatePipe],
+  templateUrl: './notas-ajuste-details.component.html',
+})
+export class NotasAjusteDetailsComponent {
+  nota = signal<NotaAjuste | null>(null);
+  loading = signal(true);
+  error = signal<string | null>(null);
+  asientos: any[] = [];
+  loadingAsientos = false;
+
+  private notasService = inject(NotasAjusteService);
+  private route = inject(ActivatedRoute);
+  private asientosService = inject(AsientosHttpService);
+  private notificationService = inject(NotificationService);
+  private printService = inject(PrintService);
+  private catalogs = inject(CatalogsStore);
+
+  ngOnInit(): void {
+    const id = this.route.snapshot.params['id'];
+    this.loadNota(id);
+  }
+
+  loadNota(id: string): void {
+    this.loading.set(true);
+    this.error.set(null);
+
+    this.notasService.getNotaAjusteById(id).subscribe({
+      next: (response) => {
+        this.nota.set(response.data);
+        this.loading.set(false);
+        this.cargarDatosContables();
+      },
+      error: (err) => {
+        this.error.set('Error al cargar la nota de ajuste');
+        this.loading.set(false);
+      }
+    });
+  }
+
+  cargarDatosContables(): void {
+    const n = this.nota();
+    if (!n) return;
+
+    this.loadingAsientos = true;
+    // Usamos el número completo (prefijo + numero) para buscar los asientos
+    const referencia = `${n.prefijo}${n.numero}`;
+    
+    this.asientosService.getByReferencia(referencia).subscribe({
+      next: (a) => {
+        this.asientos = a;
+        this.loadingAsientos = false;
+      },
+      error: () => {
+        this.loadingAsientos = false;
+      },
+    });
+  }
+
+  getStatusClass(status: NotaAjusteStatus): string {
+    const classes: Record<NotaAjusteStatus, string> = {
+      [NotaAjusteStatus.DRAFT]: 'bg-gray-100 text-gray-800 border-gray-300',
+      [NotaAjusteStatus.SENT]: 'bg-blue-100 text-blue-800 border-blue-300',
+      [NotaAjusteStatus.ACCEPTED]: 'bg-green-100 text-green-800 border-green-300',
+      [NotaAjusteStatus.REJECTED]: 'bg-red-100 text-red-800 border-red-300',
+      [NotaAjusteStatus.CANCELLED]: 'bg-red-50 text-red-500 border-red-100',
+    };
+    return classes[status] || 'bg-gray-100 text-gray-800 border-gray-300';
+  }
+
+  getStatusLabel(status: NotaAjusteStatus): string {
+    const labels: Record<NotaAjusteStatus, string> = {
+      [NotaAjusteStatus.DRAFT]: 'Borrador',
+      [NotaAjusteStatus.SENT]: 'Enviada',
+      [NotaAjusteStatus.ACCEPTED]: 'Aceptada',
+      [NotaAjusteStatus.REJECTED]: 'Rechazada',
+      [NotaAjusteStatus.CANCELLED]: 'Anulada',
+    };
+    return labels[status] || status;
+  }
+
+  getDianStatusClass(status: DianStatus): string {
+    const classes: Record<DianStatus, string> = {
+      [DianStatus.PENDING]: 'bg-yellow-100 text-yellow-800 border-yellow-300',
+      [DianStatus.SENT]: 'bg-blue-50 text-blue-700 border-blue-200',
+      [DianStatus.PROCESSING]: 'bg-blue-100 text-blue-800 border-blue-300 animate-pulse',
+      [DianStatus.ACCEPTED]: 'bg-green-100 text-green-800 border-green-300',
+      [DianStatus.REJECTED]: 'bg-red-100 text-red-800 border-red-300',
+      [DianStatus.CANCELLED]: 'bg-gray-100 text-gray-800 border-gray-300'
+    };
+    return classes[status] || 'bg-gray-100 text-gray-800';
+  }
+
+  getDianStatusLabel(status: DianStatus): string {
+    const labels: Record<DianStatus, string> = {
+      [DianStatus.PENDING]: 'Pendiente envío',
+      [DianStatus.SENT]: 'Enviada',
+      [DianStatus.PROCESSING]: 'Procesando',
+      [DianStatus.ACCEPTED]: 'Aceptada por DIAN',
+      [DianStatus.REJECTED]: 'Rechazada por DIAN',
+      [DianStatus.CANCELLED]: 'Anulada'
+    };
+    return labels[status] || status;
+  }
+
+  formatDate(date: string | Date): string {
+    if (!date) return '—';
+    return new Date(date).toLocaleDateString('es-CO', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+
+  printNota(): void {
+    // window.print();
+    // Por ahora usamos el print service si existe un método, o simplemente el print del navegador
+    // Si no hay método específico en printService, implementamos algo básico o llamamos al del navegador
+    window.print();
+  }
+
+  printAsiento(): void {
+    const n = this.nota();
+    if (n && this.asientos.length > 0) {
+      this.printService.printAsientoContable(this.asientos, `${n.prefijo}${n.numero}`);
+    }
+  }
+
+  getConceptoLabel(tipo: string, concepto: string): string {
+    const list = tipo === 'credito' ? this.catalogs.conceptsNotes() : []; 
+    return list.find(c => c.codigo === concepto)?.nombre || concepto;
+  }
+}

@@ -163,17 +163,15 @@ export class NotasAjusteFormPageComponent implements OnInit {
   }
 
   loadFacturas() {
-    this.ventasService.getComprobanteVentas({ limit: 100, page: 1, status: 'accepted' }).subscribe(res => {
+    this.ventasService.getComprobanteVentas({ limit: 100, page: 1, noStatus: 'draft' }).subscribe(res => {
       this.facturasDisponibles.set(res.data);
     });
   }
 
   loadNota(id: string) {
-
       this.notasService.getNotaAjusteById(id).subscribe({
         next: (res) => {
             try {
-              
             const nota = res.data;
             this.form.patchValue({
               facturaSearch: nota.facturaOriginalNumero,

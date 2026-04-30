@@ -135,6 +135,7 @@ interface GetFacturaItemRequest {
 
 export interface InvoiceFilters {
   status?: string;
+  noStatus?: string;
   type?: string;
   tipoFactura?: string;
   numeroFactura?: string;

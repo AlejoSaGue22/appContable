@@ -15,14 +15,12 @@ export class ComprobantesVentasService {
   private http = inject(HttpClient);
 
   getComprobanteVentas(options: Options & InvoiceFilters): Observable<ComprobanteVentaResponse> {
-    const { limit = 10, page = 1, status, type, clientName, startDate, endDate, tipoFactura, numeroFactura, dianStatus } = options;
+    const { limit = 10, page = 1, status, noStatus, type, clientName, startDate, endDate, tipoFactura, numeroFactura, dianStatus } = options;
 
-    const params: any = {
-      limit,
-      page
-    };
+    const params: any = { limit, page };
 
     if (status) params.status = status;
+    if (noStatus) params.noStatus = noStatus;
     if (type) params.type = type;
     if (clientName) params.clientName = clientName;
     if (startDate) params.startDate = startDate;

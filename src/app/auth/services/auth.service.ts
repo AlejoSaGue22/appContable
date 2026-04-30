@@ -1,15 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { catchError, delay, map, Observable, of, Subject, tap } from 'rxjs';
+import { catchError, map, Observable, of, Subject } from 'rxjs';
 import { environment } from 'src/app/environments/environment';
 import { ErrorAuthResponse, JwtPayload, LoginResponse } from '../interfaces/auth-response.interface';
 import { UserAuth } from '../interfaces/user-auth.interface';
 import { ResponseResult } from '@shared/interfaces/services.interfaces';
-import { MenuService } from '@utils/services/menu.service';
 import { jwtDecode } from 'jwt-decode';
 import { Permission, UserRole } from '@dashboard/interfaces/permission-interface';
 import { Router } from '@angular/router';
-
 
 const baseURL = environment.baseUrl;
 type AuthStatus = 'checking' | 'authenticated' | 'not-authenticated';
@@ -90,7 +88,6 @@ export class AuthService {
     this._token.set(null);
     this._authStatus.set('not-authenticated');
     this.authEvents.next('logout');
-
   }
 
   private handleAuthSuccess({ token, user, menu }: LoginResponse, isInitialLogin: boolean = false) {
@@ -152,6 +149,7 @@ export class AuthService {
       }),
       catchError(() => {
         this.logout();
+        this.router.navigate(['/login']);
         return of(false);
       })
     );

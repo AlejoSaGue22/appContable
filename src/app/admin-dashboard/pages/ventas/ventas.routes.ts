@@ -8,6 +8,7 @@ import { ProductosServiciosFormsComponent } from "./productos-servicios/producto
 import { InvoiceDetailsComponent } from "./comprobante-ventas/components/invoice-details/invoice-details.component";
 import { NotasAjusteComponent } from "./notas-ajuste/notas-ajuste.component";
 import { NotasAjusteFormPageComponent } from "./notas-ajuste/notas-ajuste-form-page/notas-ajuste-form-page.component";
+import { NotasAjusteDetailsComponent } from "./notas-ajuste/components/notas-ajuste-details/notas-ajuste-details.component";
 import { ErrorPageComponent } from "@utils/components/error-page/error-page.component";
 
 export const ventasRoutes: Routes = [
@@ -46,6 +47,10 @@ export const ventasRoutes: Routes = [
     {
         path: 'notas-ajuste/:id',
         component: NotasAjusteFormPageComponent
+    },
+    {
+        path: 'notas-ajuste/:id/details',
+        component: NotasAjusteDetailsComponent
     },
     {
         path: '**',
