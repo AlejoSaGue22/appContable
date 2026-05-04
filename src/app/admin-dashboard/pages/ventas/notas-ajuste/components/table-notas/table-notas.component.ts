@@ -33,6 +33,9 @@ export class TableNotasComponent {
   delete = output<string>();
   downloadPDF = output<string>();
   downloadXML = output<string>();
+  sincronizar = output<string>();
+  reintentarAsiento = output<string>();
+
 
   // Filter signals
   clienteNombre = signal<string>('');
@@ -112,7 +115,8 @@ export class TableNotasComponent {
       [NotaAjusteStatus.SENT]: 'bg-yellow-100 text-yellow-800',
       [NotaAjusteStatus.ACCEPTED]: 'bg-green-100 text-green-800',
       [NotaAjusteStatus.REJECTED]: 'bg-red-100 text-red-800',
-      [NotaAjusteStatus.CANCELLED]: 'bg-gray-500 text-white'
+      [NotaAjusteStatus.CANCELLED]: 'bg-gray-500 text-white',
+      [NotaAjusteStatus.ERROR_ASIENTO]: 'bg-red-600 text-white'
     };
     return classes[status] || 'bg-gray-100 text-gray-800';
   }
@@ -123,7 +127,8 @@ export class TableNotasComponent {
       [NotaAjusteStatus.SENT]: 'Enviada',
       [NotaAjusteStatus.ACCEPTED]: 'Aceptada',
       [NotaAjusteStatus.REJECTED]: 'Rechazada',
-      [NotaAjusteStatus.CANCELLED]: 'Anulada'
+      [NotaAjusteStatus.CANCELLED]: 'Anulada',
+      [NotaAjusteStatus.ERROR_ASIENTO]: 'Error Asiento'
     };
     return labels[status] || status;
   }
@@ -152,4 +157,13 @@ export class TableNotasComponent {
   onDownloadXML(id: string): void {
     this.downloadXML.emit(id);
   }
+
+  onSincronizar(id: string): void {
+    this.sincronizar.emit(id);
+  }
+
+  onReintentarAsiento(id: string): void {
+    this.reintentarAsiento.emit(id);
+  }
 }
+

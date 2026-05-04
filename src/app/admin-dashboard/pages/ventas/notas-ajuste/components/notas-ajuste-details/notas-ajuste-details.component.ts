@@ -77,6 +77,7 @@ export class NotasAjusteDetailsComponent {
       [NotaAjusteStatus.ACCEPTED]: 'bg-green-100 text-green-800 border-green-300',
       [NotaAjusteStatus.REJECTED]: 'bg-red-100 text-red-800 border-red-300',
       [NotaAjusteStatus.CANCELLED]: 'bg-red-50 text-red-500 border-red-100',
+      [NotaAjusteStatus.ERROR_ASIENTO]: 'bg-orange-100 text-orange-800 border-orange-300',
     };
     return classes[status] || 'bg-gray-100 text-gray-800 border-gray-300';
   }
@@ -88,6 +89,7 @@ export class NotasAjusteDetailsComponent {
       [NotaAjusteStatus.ACCEPTED]: 'Aceptada',
       [NotaAjusteStatus.REJECTED]: 'Rechazada',
       [NotaAjusteStatus.CANCELLED]: 'Anulada',
+      [NotaAjusteStatus.ERROR_ASIENTO]: 'Error Asiento',
     };
     return labels[status] || status;
   }
@@ -143,4 +145,37 @@ export class NotasAjusteDetailsComponent {
     const list = tipo === 'credito' ? this.catalogs.conceptsNotes() : []; 
     return list.find(c => c.codigo === concepto)?.nombre || concepto;
   }
+
+  onDownloadPDF(): void {
+    const n = this.nota();
+    if (!n) return;
+    this.notasService.downloadPDF(n.id).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${n.prefijo}${n.numero}.pdf`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => this.notificationService.error('Error al descargar PDF', err.message)
+    });
+  }
+
+  onDownloadXML(): void {
+    const n = this.nota();
+    if (!n) return;
+    this.notasService.downloadXML(n.id).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${n.prefijo}${n.numero}.xml`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => this.notificationService.error('Error al descargar XML', err.message)
+    });
+  }
 }
+

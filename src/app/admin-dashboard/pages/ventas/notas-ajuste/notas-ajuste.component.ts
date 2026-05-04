@@ -86,7 +86,7 @@ export class NotasAjusteComponent {
           this.notasResource.reload();
         } else {
           const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
-          this.notificationService.error('Error al emitir', message || 'Error desconocido');
+          this.notificationService.error(message || 'Error desconocido', 'Error al emitir');
         }
       },
       error: () => this.loaderService.hide()
@@ -109,7 +109,7 @@ export class NotasAjusteComponent {
           this.notasResource.reload();
         } else {
           const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
-          this.notificationService.error('Error al eliminar', message || 'Error desconocido');
+          this.notificationService.error(message || 'Error desconocido', 'Error al eliminar');
         }
       },
       error: () => this.loaderService.hide()
@@ -147,4 +147,39 @@ export class NotasAjusteComponent {
       error: () => this.loaderService.hide()
     });
   }
+
+  onSincronizar(id: string): void {
+    this.loaderService.show('Sincronizando con la DIAN...');
+    this.notasService.sincronizarNotaAjuste(id).subscribe({
+      next: (res: ResponseResult) => {
+        this.loaderService.hide();
+        if (res.success) {
+          this.notificationService.success('Estado sincronizado con éxito', 'Éxito');
+          this.notasResource.reload();
+        } else {
+          const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
+          this.notificationService.error(message || 'Error desconocido', 'Error al sincronizar');
+        }
+      },
+      error: () => this.loaderService.hide()
+    });
+  }
+
+  onReintentarAsiento(id: string): void {
+    this.loaderService.show('Generando asiento contable...');
+    this.notasService.reintentarAsiento(id).subscribe({
+      next: (res: ResponseResult) => {
+        this.loaderService.hide();
+        if (res.success) {
+          this.notificationService.success('Asiento generado con éxito', 'Éxito');
+          this.notasResource.reload();
+        } else {
+          const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
+          this.notificationService.error(message || 'Error desconocido', 'Error al generar asiento');
+        }
+      },
+      error: () => this.loaderService.hide()
+    });
+  }
 }
+

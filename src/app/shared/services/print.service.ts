@@ -72,6 +72,7 @@ export class PrintService {
       setTimeout(() => {
         printWindow.focus();
         printWindow.print();
+        printWindow.close();
       }, 350);
     };
   }
@@ -333,7 +334,7 @@ export class PrintService {
   </td>
 
   <!-- Right blue bar -->
-  <td style="width:22px;position:relative;">
+  <td>
     <div style="position:absolute;top:50%;left:99%;transform:translate(-50%,-50%) rotate(90deg);color:#000000;font-size:10px;letter-spacing:1px;font-weight:600;white-space:nowrap;">
       Factura generada con software propio autorizado por la DIAN
     </div>
@@ -712,7 +713,7 @@ export class PrintService {
 
   <!-- Right side bar -->
   <td style="width:22px;position:relative;">
-    <div style="position:absolute;top:50%;left:99%;transform:translate(-50%,-50%) rotate(90deg);color:#000000;font-size:10px;letter-spacing:1px;font-weight:600;white-space:nowrap;">
+    <div style="position:absolute;top:63%;left:99%;transform:translate(-50%,-50%) rotate(90deg);color:#000000;font-size:10px;letter-spacing:1px;font-weight:600;white-space:nowrap;">
       Factura de compra generada con software contable propio
     </div>
   </td>
@@ -729,7 +730,7 @@ export class PrintService {
   private fmt(value: number): string {
     return new Intl.NumberFormat('es-CO', {
       style: 'currency',
-      currency: '',
+      currency: 'COP',
       minimumFractionDigits: 0,
     }).format(value ?? 0);
   }

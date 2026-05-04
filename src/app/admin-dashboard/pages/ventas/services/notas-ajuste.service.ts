@@ -85,7 +85,22 @@ export class NotasAjusteService {
     );
   }
 
+  sincronizarNotaAjuste(id: string): Observable<ResponseResult> {
+    return this.http.patch<NotaAjusteResponse>(`${baseUrl}/notas-ajuste/${id}/sincronizar`, {}).pipe(
+      map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+    );
+  }
+
+  reintentarAsiento(id: string): Observable<ResponseResult> {
+    return this.http.patch<NotaAjusteResponse>(`${baseUrl}/notas-ajuste/${id}/reintentar-asiento`, {}).pipe(
+      map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+    );
+  }
+
   getNotasByFacturaId(facturaId: string): Observable<NotaAjusteResponse> {
+
     return this.http.get<NotaAjusteResponse>(`${baseUrl}/notas-ajuste/factura/${facturaId}`);
   }
 

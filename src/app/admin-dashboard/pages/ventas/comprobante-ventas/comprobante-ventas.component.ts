@@ -125,14 +125,16 @@ export class ComprobanteVentasComponent {
    }
 
    onAnular(): void {
-      // Simplificado: En un caso real podrías abrir un modal para pedir el motivo
       const motivo = 'Anulación solicitada por el usuario';
+      this.loaderService.show('Anulando factura...');
       this.comprobantesVentasService.anularInvoice(this.idItem(), motivo).subscribe((res: ResponseResult) => {
           if (res.success) {
+            this.loaderService.hide();
             this.isModalItem.set(false);
             this.notificacionService.success('Factura anulada con éxito', 'Éxito');
             this.comprobanteVentasResource.reload();
          } else {
+            this.loaderService.hide();
             const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
             this.notificacionService.error(message || 'Error desconocido', 'Error al anular factura');
          }

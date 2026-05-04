@@ -38,9 +38,16 @@ export interface NotaAjuste {
   observaciones?: string;
   estado: NotaAjusteStatus;
   dianStatus: DianStatus;
+  fechaAceptacionDIAN?: Date;
+  fechaEnvioDIAN?: Date;
   numero: string;
   prefijo: string;
   cufe?: string;
+  cude?: string;
+  xmlUrl?: string;
+  pdfUrl?: string;
+  qrCode?: string;
+  proveedorResponse?: any;
   total: number;
   iva: number;
   subtotal: number;
@@ -69,8 +76,10 @@ export enum NotaAjusteStatus {
   SENT = 'enviada',
   ACCEPTED = 'aceptada',
   REJECTED = 'rechazada',
-  CANCELLED = 'anulada'
+  CANCELLED = 'anulada',
+  ERROR_ASIENTO = 'error_asiento'
 }
+
 
 export const ConceptosNotaCredito = [
   { value: '1', label: 'Descuento comercial por volumen de ventas' },

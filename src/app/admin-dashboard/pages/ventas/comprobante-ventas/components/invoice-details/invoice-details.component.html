@@ -43,7 +43,7 @@
               </span>
             }
           </div>
-          <p class="mt-1 text-sm text-gray-500">Factura de Venta — {{ getTipoFacturaLabel(factura()!.tipoFactura) }}</p>
+          <p class="mt-1 text-sm text-gray-500">Detalle de la Factura — {{ getTipoFacturaLabel(factura()!.tipoFactura) }}</p>
         </div>
 
         <!-- Botones -->
@@ -189,8 +189,8 @@
                     <th class="px-4 py-3 text-left text-xs font-bold uppercase text-gray-500 tracking-wider">Descripción</th>
                     <th class="px-4 py-3 text-center text-xs font-bold uppercase text-gray-500 tracking-wider">Cant.</th>
                     <th class="px-4 py-3 text-right text-xs font-bold uppercase text-gray-500 tracking-wider">Val. Unit.</th>
-                    <th class="px-4 py-3 text-center text-xs font-bold uppercase text-gray-500 tracking-wider">IVA</th>
                     <th class="px-4 py-3 text-center text-xs font-bold uppercase text-gray-500 tracking-wider">Desc.</th>
+                    <th class="px-4 py-3 text-center text-xs font-bold uppercase text-gray-500 tracking-wider">IVA</th>
                     <th class="px-4 py-3 text-right text-xs font-bold uppercase text-gray-500 tracking-wider">Val. Item</th>
                   </tr>
                 </thead>
@@ -207,18 +207,18 @@
                       <td class="px-4 py-3 text-center text-gray-700">{{ item.quantity }}</td>
                       <td class="px-4 py-3 text-right text-gray-700">{{ item.unitPrice | currency: '' : 'symbol' : '0.0-0' }}</td>
                       <td class="px-4 py-3 text-center">
-                        @if (item.iva > 0) {
-                          <div class="text-center">
-                            <span class="text-xs font-semibold text-blue-700">{{ item.iva }}%</span>
-                            <p class="text-xs text-gray-400">{{ item.valor_iva | currency: '' : 'symbol' : '0.0-0' }}</p>
-                          </div>
+                        @if (item.discount > 0) {
+                          <span class="text-xs font-semibold text-red-600">{{ item.discount }}%</span>
                         } @else {
                           <span class="text-xs text-gray-300">0%</span>
                         }
                       </td>
                       <td class="px-4 py-3 text-center">
-                        @if (item.discount > 0) {
-                          <span class="text-xs font-semibold text-red-600">{{ item.discount }}%</span>
+                        @if (item.iva > 0) {
+                          <div class="text-center">
+                            <span class="text-xs font-semibold text-blue-700">{{ item.iva }}%</span>
+                            <p class="text-xs text-gray-400">{{ item.valor_iva | currency: '' : 'symbol' : '0.0-0' }}</p>
+                          </div>
                         } @else {
                           <span class="text-xs text-gray-300">0%</span>
                         }
