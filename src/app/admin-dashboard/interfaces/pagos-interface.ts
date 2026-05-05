@@ -157,8 +157,10 @@ export interface PagoHistorial {
   monto:           number;
   medioPago:       MedioPago;
   referencia:      string | null;
-  numeroDocumento: string;
+  numeroFactura: string;
   contraparte:     string;
+  numeroContraparte: string;
+  creadoPor:       string;
   asientoId:       number | null;
   cuentaBancaria?: {
     id: string;

@@ -69,14 +69,38 @@ export class PagosHttpService {
   }
 
   // ── Aging ─────────────────────────────────────────────────────────────
-  getAgingCobrar(): Observable<AgingReporte> {
+  getAgingCobrar(fechaInicio?: string, fechaFin?: string): Observable<AgingReporte> {
+    let params = new HttpParams();
+    if (fechaInicio) params = params.set('fechaInicio', fechaInicio);
+    if (fechaFin)    params = params.set('fechaFin',    fechaFin);
+
     return this.http
-      .get<AgingReporte>(`${this.base}/reportes/cartera/aging-cobrar`);
+      .get<AgingReporte>(`${this.base}/reportes/cartera/aging-cobrar`, { params });
   }
 
-  getAgingPagar(): Observable<AgingReporte> {
+  getAgingPagar(fechaInicio?: string, fechaFin?: string): Observable<AgingReporte> {
+    let params = new HttpParams();
+    if (fechaInicio) params = params.set('fechaInicio', fechaInicio);
+    if (fechaFin)    params = params.set('fechaFin',    fechaFin);
+
     return this.http
-      .get<AgingReporte>(`${this.base}/reportes/cartera/aging-pagar`);
+      .get<AgingReporte>(`${this.base}/reportes/cartera/aging-pagar`, { params });
+  }
+  // ── Aging (Reportes con filtros) ─────────────────────────────────────
+  getReporteAgingCobrar(fechaInicio: string, fechaFin: string): Observable<AgingReporte> {
+    const params = new HttpParams()
+      .set('fechaInicio', fechaInicio)
+      .set('fechaFin',    fechaFin);
+    return this.http
+      .get<AgingReporte>(`${this.base}/reportes/cartera/reporte-aging-cobrar`, { params });
+  }
+
+  getReporteAgingPagar(fechaInicio: string, fechaFin: string): Observable<AgingReporte> {
+    const params = new HttpParams()
+      .set('fechaInicio', fechaInicio)
+      .set('fechaFin',    fechaFin);
+    return this.http
+      .get<AgingReporte>(`${this.base}/reportes/cartera/reporte-aging-pagar`, { params });
   }
 
   // ── Historial global ──────────────────────────────────────────────────

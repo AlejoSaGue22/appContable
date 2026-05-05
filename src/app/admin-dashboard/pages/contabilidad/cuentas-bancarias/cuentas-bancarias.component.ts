@@ -14,11 +14,12 @@ import { tap } from 'rxjs';
 import { PaginationComponent } from "@shared/components/pagination/pagination";
 import { NotificationService } from '@shared/services/notification.service';
 import { LoaderService } from '@utils/services/loader.service';
+import { TableBancoComponent } from "./components/table-banco/table-banco.component";
 
 @Component({
   selector: 'app-cuentas-bancarias',
   standalone: true,
-  imports: [CommonModule, LoaderComponent, CurrencyPipe, CuentaFormModalComponent, HeaderTitlePageComponent, ModalComponent, PaginationComponent],
+  imports: [CommonModule, LoaderComponent, CurrencyPipe, CuentaFormModalComponent, HeaderTitlePageComponent, ModalComponent, PaginationComponent, TableBancoComponent],
   templateUrl: './cuentas-bancarias.component.html'
 })
 export default class CuentasBancariasComponent {
@@ -73,19 +74,6 @@ export default class CuentasBancariasComponent {
     this.cuentasResource.reload();
   }
 
-  toggleStatus(id: string) {
-    this.loaderService.show();
-    this.cuentasService.toggleStatus(id).subscribe({
-      next: () => this.cuentasResource.reload(),
-      error: (err) => {
-        this.notificationService.error('Error al cambiar el estado de la cuenta', err);
-      },
-      complete: () => {
-        this.loaderService.hide();
-      }
-    });
-
-  }
 
   deleteCuenta(id: string) {
     this.idToDelete.set(id);

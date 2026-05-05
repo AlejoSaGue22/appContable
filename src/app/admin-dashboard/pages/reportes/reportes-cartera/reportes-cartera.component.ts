@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HeaderTitlePageComponent, HeaderInput } from '@dashboard/components/header-title-page/header-title-page.component';
 import { AgingReporte, HistorialPagosResponse, ResumenCartera } from '@dashboard/interfaces/pagos-interface';
 import { PagosHttpService } from '@dashboard/pages/pagos/services/pagos.service';
+import * as XLSX from 'xlsx';
 
 type VistaActiva = 'resumen' | 'aging-cobrar' | 'aging-pagar' | 'historial';
 
@@ -78,18 +79,16 @@ export class ReportesCarteraComponent implements OnInit {
   }
 
   cargarAgingCobrar(): void {
-    if (this.agingCobrar) return; // ya cargado
     this.loadingCobrar = true;
-    this.svc.getAgingCobrar().subscribe({
+    this.svc.getReporteAgingCobrar(this.fechaInicio, this.fechaFin).subscribe({
       next:  d  => { this.agingCobrar = d; this.loadingCobrar = false; },
       error: () => { this.loadingCobrar = false; },
     });
   }
 
   cargarAgingPagar(): void {
-    if (this.agingPagar) return;
     this.loadingPagar = true;
-    this.svc.getAgingPagar().subscribe({
+    this.svc.getReporteAgingPagar(this.fechaInicio, this.fechaFin).subscribe({
       next:  d  => { this.agingPagar = d; this.loadingPagar = false; },
       error: () => { this.loadingPagar = false; },
     });
@@ -106,14 +105,91 @@ export class ReportesCarteraComponent implements OnInit {
   // ── Navegación entre vistas ────────────────────────────────────────
   cambiarVista(vista: string): void {
     this.vistaActiva = vista as VistaActiva;
-    if (vista === 'aging-cobrar') this.cargarAgingCobrar();
-    if (vista === 'aging-pagar')  this.cargarAgingPagar();
+    // Limpiamos resultados previos para forzar nueva búsqueda con el botón Generar
+    if (vista === 'aging-cobrar') this.agingCobrar = null;
+    if (vista === 'aging-pagar')  this.agingPagar = null;
+    if (vista === 'historial')    this.historial = null;
     if (vista === 'resumen' && !this.resumen) this.cargarResumen();
+  }
+
+  generarReporte(): void {
+    if (this.vistaActiva === 'aging-cobrar') this.cargarAgingCobrar();
+    if (this.vistaActiva === 'aging-pagar')  this.cargarAgingPagar();
+    if (this.vistaActiva === 'historial')    this.cargarHistorial();
   }
 
   generarHistorial(): void {
     this.historial = null;
     this.cargarHistorial();
+  }
+
+  exportarExcel(): void {
+    let data: any[] = [];
+    let filename = 'reporte';
+
+    if (this.vistaActiva === 'historial' && this.historial) {
+      filename = `Historial_Pagos_${this.fechaInicio}_${this.fechaFin}`;
+      data = this.historial.pagos.map(p => ({
+        Fecha: p.fecha,
+        Tipo: p.tipo.toUpperCase(),
+        Documento: p.numeroFactura,
+        Contraparte: p.contraparte,
+        Medio: p.medioPago,
+        Referencia: p.referencia || '',
+        Monto: p.monto
+      }));
+    } else if ((this.vistaActiva === 'aging-cobrar' || this.vistaActiva === 'aging-pagar')) {
+      const reporte = this.vistaActiva === 'aging-cobrar' ? this.agingCobrar : this.agingPagar;
+      if (!reporte) return;
+      
+      filename = this.vistaActiva === 'aging-cobrar' ? 'Antiguedad_por_Cobrar' : 'Antiguedad_por_Pagar';
+      const labelContraparte = this.vistaActiva === 'aging-cobrar' ? 'Cliente' : 'Proveedor';
+
+      reporte.grupos.forEach(grupo => {
+        // Fila del grupo
+        data.push({
+          [labelContraparte]: grupo.contraparteNombre,
+          'Por Vencer': grupo.porVencer,
+          '1-30 dias': grupo.de1a30,
+          '31-60 dias': grupo.de31a60,
+          '61-90 dias': grupo.de61a90,
+          '+90 dias': grupo.mas90,
+          'Total': grupo.total
+        });
+
+        // Detalle de facturas (opcional, pero suele ser útil)
+        grupo.facturas.forEach(f => {
+          data.push({
+            [labelContraparte]: `   Fact: ${f.numero} (${f.emision})`,
+            'Por Vencer': f.bucket === 'porVencer' ? f.saldo : 0,
+            '1-30 dias': f.bucket === 'de1a30' ? f.saldo : 0,
+            '31-60 dias': f.bucket === 'de31a60' ? f.saldo : 0,
+            '61-90 dias': f.bucket === 'de61a90' ? f.saldo : 0,
+            '+90 dias': f.bucket === 'mas90' ? f.saldo : 0,
+            'Total': f.saldo
+          });
+        });
+      });
+
+      // Añadir fila de totales
+      data.push({});
+      data.push({
+        [labelContraparte]: 'TOTAL GENERAL',
+        'Por Vencer': reporte.totales.porVencer,
+        '1-30 dias': reporte.totales.de1a30,
+        '31-60 dias': reporte.totales.de31a60,
+        '61-90 dias': reporte.totales.de61a90,
+        '+90 dias': reporte.totales.mas90,
+        'Total': reporte.totales.total
+      });
+    }
+
+    if (data.length === 0) return;
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Reporte');
+    XLSX.writeFile(wb, `${filename}.xlsx`);
   }
 
   // ── Helpers ────────────────────────────────────────────────────────
