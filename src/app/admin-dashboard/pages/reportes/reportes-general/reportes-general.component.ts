@@ -28,6 +28,8 @@ export class ReportesGeneralComponent implements OnInit {
     title: 'Reportes Generales',
     slog: 'Análisis de rentabilidad del período'
   };
+  
+  protected readonly Math = Math;
 
   constructor(
     private reportesService: ReportesService,

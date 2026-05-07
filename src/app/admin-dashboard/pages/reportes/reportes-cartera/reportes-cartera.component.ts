@@ -141,7 +141,7 @@ export class ReportesCarteraComponent implements OnInit {
       next: (d) => {
         this.agingCobrar = d;
         this.paginationService.totalItems.set(d.meta?.total || 0);
-        this.paginationService.pageSize.set(10);
+        this.paginationService.pageSize.set(d.meta?.totalPages || 0);
         this.loadingCobrar = false;
       },
       error: () => {
@@ -156,7 +156,7 @@ export class ReportesCarteraComponent implements OnInit {
       next: (d) => {
         this.agingPagar = d;
         this.paginationService.totalItems.set(d.meta?.total || 0);
-        this.paginationService.pageSize.set(10);
+        this.paginationService.pageSize.set(d.meta?.totalPages || 0);
         this.loadingPagar = false;
       },
       error: () => {
@@ -171,7 +171,7 @@ export class ReportesCarteraComponent implements OnInit {
       next: (d) => {
         this.historial = d;
         this.paginationService.totalItems.set(d.meta?.total || 0);
-        this.paginationService.pageSize.set(10);
+        this.paginationService.pageSize.set(d.meta?.totalPages || 0);
         this.loadingHistorial = false;
       },
       error: () => {

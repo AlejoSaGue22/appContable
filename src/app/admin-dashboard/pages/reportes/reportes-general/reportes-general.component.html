@@ -22,7 +22,7 @@
 
                 <button (click)="generarReporte()"
                     [disabled]="loading"
-                    class="h-[36px] px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[160px]">
+                    class="h-[36px] px-4 bg-slate-900 hover:bg-slate-700 cursor-pointer text-white text-sm font-bold rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[160px]">
                     @if (loading) {
                         <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
@@ -42,22 +42,22 @@
         <div class="flex items-center p-1 bg-gray-100/50 backdrop-blur-md rounded-2xl w-fit">
             <button (click)="activeTab = 'facturacion'"
                 [class]="activeTab === 'facturacion' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
-                class="px-6 py-2.5 rounded-xl text-xs font-bold uppercase transition-all duration-300 cursor-pointer">
+                class="px-6 py-2.5 rounded-xl text-md font-bold transition-all duration-300 cursor-pointer">
                 Facturación
             </button>
             <button (click)="activeTab = 'dian'"
                 [class]="activeTab === 'dian' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
-                class="px-6 py-2.5 rounded-xl text-xs font-bold uppercase transition-all duration-300 cursor-pointer">
+                class="px-6 py-2.5 rounded-xl text-md font-bold transition-all duration-300 cursor-pointer">
                 Conciliación DIAN
             </button>
             <button (click)="activeTab = 'recaudos'"
                 [class]="activeTab === 'recaudos' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
-                class="px-6 py-2.5 rounded-xl text-xs font-bold uppercase transition-all duration-300 cursor-pointer">
+                class="px-6 py-2.5 rounded-xl text-md font-bold transition-all duration-300 cursor-pointer">
                 Recaudos
             </button>
             <button (click)="activeTab = 'impuestos'"
                 [class]="activeTab === 'impuestos' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
-                class="px-6 py-2.5 rounded-xl text-xs font-bold uppercase transition-all duration-300 cursor-pointer">
+                class="px-6 py-2.5 rounded-xl text-md font-bold transition-all duration-300 cursor-pointer">
                 Impuestos
             </button>
         </div>
@@ -88,45 +88,112 @@
                     <p class="text-sm text-gray-400 mt-2 max-w-xs text-center">Selecciona un período válido para generar las métricas de este módulo.</p>
                 </div>
             }
-
-            <!-- Facturación Detallada Content -->
+                   <!-- Facturación Detallada Content -->
             @if (!loading && facturacion && activeTab === 'facturacion') {
                 <div class="animate-slide-up space-y-8">    
                     <!-- Summary Cards (Premium) -->
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
-                            <p class="text-[12px] font-bold text-gray-400 mb-1">Total Facturas</p>
-                            <h4 class="text-3xl font-semibold text-gray-900">{{ facturacion.resumen.totalFacturas }}</h4>
-                            <div class="mt-4 flex items-center justify-between p-2 bg-blue-50/50 rounded-xl">
-                                <span class="text-[10px] font-medium text-blue-600">{{ facturacion.resumen.totalElectronicas }} Elec.</span>
-                                <span class="text-[10px] font-medium text-gray-500">{{ facturacion.resumen.totalStandard }} Std.</span>
+                        <!-- Card 1: Total Transacciones -->
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 group">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                </div>
+                                <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg uppercase">Volumen</span>
+                            </div>
+                            <p class="text-[11px] font-bold text-gray-400 uppercase">Total Facturas</p>
+                            <h4 class="text-3xl font-bold text-gray-900 mt-1">{{ facturacion.resumen.totalFacturas }}</h4>
+                            <div class="mt-6 flex items-center gap-2">
+                                <div class="flex-1 space-y-1">
+                                    <div class="flex justify-between text-[9px] font-bold uppercase">
+                                        <span class="text-blue-600">Electrónicas</span>
+                                        <span class="text-gray-400">{{ facturacion.resumen.totalElectronicas }}</span>
+                                    </div>
+                                    <div class="h-1 bg-gray-100 rounded-full overflow-hidden">
+                                        <div class="h-full bg-blue-600" [style.width.%]="(facturacion.resumen.totalElectronicas / (facturacion.resumen.totalFacturas || 1)) * 100"></div>
+                                    </div>
+                                </div>
+                                <div class="flex-1 space-y-1">
+                                    <div class="flex justify-between text-[9px] font-bold uppercase">
+                                        <span class="text-gray-600">Estándar</span>
+                                        <span class="text-gray-400">{{ facturacion.resumen.totalStandard }}</span>
+                                    </div>
+                                    <div class="h-1 bg-gray-100 rounded-full overflow-hidden">
+                                        <div class="h-full bg-gray-400" [style.width.%]="(facturacion.resumen.totalStandard / (facturacion.resumen.totalFacturas || 1)) * 100"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
-                            <p class="text-[12px] font-bold text-gray-400 mb-1">Monto Total</p>
-                            <h4 class="text-3xl font-semibold text-gray-900">{{ facturacion.resumen.montoTotal | currency:'':'$':'1.0-0' }}</h4>
-                            <div class="mt-4 flex items-center gap-2">
-                                <span class="flex-1 h-1.5 rounded-full bg-emerald-100 overflow-hidden">
-                                    <span class="block h-full bg-emerald-500" [style.width.%]="(facturacion.resumen.montoElectronicas / facturacion.resumen.montoTotal) * 100"></span>
-                                </span>
-                                <span class="text-[10px] font-medium text-emerald-600">IVA: {{ facturacion.resumen.ivaTotal | currency:'':'$':'1.0-0' }}</span>
+                        <!-- Card 2: Valor Operativo -->
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-10 h-10 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                </div>
+                                <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg uppercase">Bruto</span>
+                            </div>
+                            <p class="text-[11px] font-bold text-gray-400 uppercase">Monto Total</p>
+                            <h4 class="text-3xl font-bold text-gray-900 mt-1">{{ facturacion.resumen.montoTotal | currency:'':'$':'1.0-0' }}</h4>
+                            <div class="mt-6 flex items-center gap-2">
+                                <div class="flex-1">
+                                    <div class="flex justify-between text-[9px] font-bold uppercase mb-1">
+                                        <span class="text-emerald-600">Elec: {{ (facturacion.resumen.montoElectronicas / (facturacion.resumen.montoTotal || 1) * 100).toFixed(0) }}%</span>
+                                    </div>
+                                    <div class="h-1 bg-gray-100 rounded-full overflow-hidden">
+                                        <div class="h-full bg-emerald-500" [style.width.%]="(facturacion.resumen.montoElectronicas / (facturacion.resumen.montoTotal || 1)) * 100"></div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-[9px] font-bold text-gray-400 uppercase">IVA</p>
+                                    <p class="text-[11px] font-bold text-emerald-600">{{ facturacion.resumen.ivaTotal | currency:'':'$':'1.0-0' }}</p>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
-                            <p class="text-[12px] font-bold text-gray-400 mb-1">Efectividad DIAN</p>
-                            <h4 class="text-3xl font-semibold text-gray-900">{{ facturacion.electronicas.tasaAceptacion }}%</h4>
-                            <div class="mt-4 flex items-center justify-between text-[10px] font-medium">
-                                <span class="text-emerald-500">Aceptadas: {{ facturacion.electronicas.aceptadas }}</span>
-                                <span class="text-red-500">Rechazadas: {{ facturacion.electronicas.rechazadas }}</span>
+                        <!-- Card 3: Cumplimiento Fiscal -->
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-10 h-10 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                </div>
+                                <span class="text-[10px] font-bold text-purple-600 bg-purple-50 px-2 py-1 rounded-lg uppercase">DIAN</span>
+                            </div>
+                            <p class="text-[11px] font-bold text-gray-400 uppercase">Tasa Aceptación</p>
+                            <h4 class="text-3xl font-bold text-gray-900 mt-1">{{ facturacion.electronicas.tasaAceptacion }}%</h4>
+                            <div class="mt-6 flex items-center justify-between">
+                                <div class="text-center">
+                                    <p class="text-[9px] font-bold text-emerald-500 uppercase">Aceptadas</p>
+                                    <p class="text-sm font-bold text-gray-700">{{ facturacion.electronicas.aceptadas }}</p>
+                                </div>
+                                <div class="w-px h-6 bg-gray-100"></div>
+                                <div class="text-center">
+                                    <p class="text-[9px] font-bold text-red-500 uppercase">Rechazadas</p>
+                                    <p class="text-sm font-bold text-gray-700">{{ facturacion.electronicas.rechazadas }}</p>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
-                            <p class="text-[12px] font-bold text-gray-400 mb-1">Ticket Promedio</p>
-                            <h4 class="text-3xl font-semibold text-gray-900">{{ (facturacion.resumen.montoTotal / (facturacion.resumen.totalFacturas || 1)) | currency:'':'$':'1.0-0' }}</h4>
-                            <p class="text-[10px] text-gray-400 mt-4 font-medium uppercase tracking-tighter">Valor Medio por Transacción</p>
+                        <!-- Card 4: Rentabilidad Unitaria -->
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-10 h-10 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                                </div>
+                                <span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-lg uppercase">Promedios</span>
+                            </div>
+                            <p class="text-[11px] font-bold text-gray-400 uppercase">Ticket Medio</p>
+                            <h4 class="text-3xl font-bold text-gray-900 mt-1">{{ (facturacion.resumen.montoTotal / (facturacion.resumen.totalFacturas || 1)) | currency:'':'$':'1.0-0' }}</h4>
+                            <div class="mt-6 flex flex-col gap-1">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[9px] font-bold text-blue-500 uppercase">Electrónica:</span>
+                                    <span class="text-[11px] font-bold text-gray-700">{{ facturacion.electronicas.montoPromedio | currency:'':'$':'1.0-0' }}</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-[9px] font-bold text-gray-400 uppercase">Estándar:</span>
+                                    <span class="text-[11px] font-bold text-gray-700">{{ facturacion.standard.montoPromedio | currency:'':'$':'1.0-0' }}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -134,58 +201,80 @@
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         <!-- Electronic (DIAN) Details Card -->
                         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden group">
-                            <div class="px-8 py-6 bg-blue-600 flex justify-between items-center">
-                                <div>
-                                    <h4 class="text-xs font-semibold text-blue-100 uppercase tracking-[0.2em]">Sincronización</h4>
-                                    <p class="text-xl font-semibold text-white mt-1">Electrónica (DIAN)</p>
+                            <div class="px-8 py-6 bg-blue-600 flex justify-between items-center relative overflow-hidden">
+                                <div class="relative z-10">
+                                    <h4 class="text-xs font-semibold text-blue-100 uppercase tracking-[0.2em]">Facturación</h4>
+                                    <p class="text-2xl font-bold text-white mt-1">Electrónica (DIAN)</p>
                                 </div>
-                                <div class="w-12 h-12 bg-white/20 rounded-2xl backdrop-blur-md flex items-center justify-center">
-                                    <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div class="w-14 h-14 bg-white/20 rounded-2xl backdrop-blur-md flex items-center justify-center relative z-10">
+                                    <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V21a2 2 0 01-2 2H10a2 2 0 01-2-2v-7" />
                                     </svg>
                                 </div>
+                                <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
                             </div>
                             <div class="p-8 space-y-6">
-                                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                    <span class="text-sm font-semibold text-gray-500">Facturas Emitidas</span>
-                                    <span class="text-lg font-semibold text-gray-900">{{ facturacion.electronicas.emitidas }}</span>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Emitidas</p>
+                                        <p class="text-xl font-bold text-gray-900">{{ facturacion.electronicas.emitidas }}</p>
+                                    </div>
+                                    <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100">
+                                        <p class="text-[10px] font-bold text-amber-700 uppercase mb-1">Pendientes</p>
+                                        <p class="text-xl font-bold text-amber-600">{{ facturacion.electronicas.pendientes }}</p>
+                                    </div>
+                                    <!-- <div class="p-4 bg-green-50 rounded-2xl border border-green-100">
+                                        <p class="text-[10px] font-bold text-green-700 uppercase mb-1">Procesadas</p>
+                                        <p class="text-xl font-bold text-green-600">{{ facturacion.electronicas.procesadas }}</p>
+                                    </div> -->
                                 </div>
-                                <div class="flex items-center justify-between p-4 bg-amber-50 rounded-2xl border border-amber-100">
-                                    <span class="text-sm font-semibold text-amber-700">Pendientes de Envío</span>
-                                    <span class="text-lg font-semibold text-amber-600">{{ facturacion.electronicas.pendientes }}</span>
-                                </div>
-                                <div class="flex items-center justify-between p-4 bg-blue-50 rounded-2xl border border-blue-100">
-                                    <span class="text-sm font-semibold text-blue-700">Ticket Medio Elec.</span>
-                                    <span class="text-lg font-semibold text-blue-600">{{ facturacion.electronicas.montoPromedio | currency:'':'$':'1.0-0' }}</span>
+                                <div class="p-5 bg-blue-50 rounded-2xl border border-blue-100 flex items-center justify-between">
+                                    <div>
+                                        <p class="text-[10px] font-bold text-blue-700 uppercase">Monto Total Elec.</p>
+                                        <p class="text-2xl font-bold text-blue-600">{{ facturacion.resumen.montoElectronicas | currency:'':'$':'1.0-0' }}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-[10px] font-bold text-blue-400 uppercase">Tasa Aceptación</p>
+                                        <p class="text-lg font-bold text-blue-600">{{ facturacion.electronicas.tasaAceptacion }}%</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Standard (Local) Details Card -->
-                        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                            <div class="px-8 py-6 bg-gray-900 flex justify-between items-center">
-                                <div>
-                                    <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-[0.2em]">Documentos</h4>
-                                    <p class="text-xl font-semibold text-white mt-1">Estándar (Local)</p>
+                        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden group">
+                            <div class="px-8 py-6 bg-slate-900 flex justify-between items-center relative overflow-hidden">
+                                <div class="relative z-10">
+                                    <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-[0.2em]">Facturación</h4>
+                                    <p class="text-2xl font-bold text-white mt-1">Estándar (Local)</p>
                                 </div>
-                                <div class="w-12 h-12 bg-white/10 rounded-2xl backdrop-blur-md flex items-center justify-center">
-                                    <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div class="w-14 h-14 bg-white/10 rounded-2xl backdrop-blur-md flex items-center justify-center relative z-10">
+                                    <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                     </svg>
                                 </div>
+                                <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl"></div>
                             </div>
                             <div class="p-8 space-y-6">
-                                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                    <span class="text-sm font-semibold text-gray-500">Facturas Emitidas</span>
-                                    <span class="text-lg font-semibold text-gray-900">{{ facturacion.standard.emitidas }}</span>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Emitidas</p>
+                                        <p class="text-xl font-bold text-gray-900">{{ facturacion.standard.emitidas }}</p>
+                                    </div>
+                                    <div class="p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
+                                        <p class="text-[10px] font-bold text-emerald-700 uppercase mb-1">Liquidado</p>
+                                        <p class="text-xl font-bold text-emerald-600">{{ facturacion.standard.totalPagado| currency:'':'$':'1.0-0' }}</p>
+                                    </div>
                                 </div>
-                                <div class="flex items-center justify-between p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
-                                    <span class="text-sm font-semibold text-emerald-700">Total Liquidado</span>
-                                    <span class="text-lg font-semibold text-emerald-600">{{ facturacion.standard.totalPagado| currency:'':'$':'1.0-0' }}</span>
-                                </div>
-                                <div class="flex items-center justify-between p-4 bg-red-50 rounded-2xl border border-red-100">
-                                    <span class="text-sm font-semibold text-red-700">Saldo Cartera</span>
-                                    <span class="text-lg font-semibold text-red-600">{{ facturacion.standard.saldoPendiente | currency:'':'$':'1.0-0' }}</span>
+                                <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-between">
+                                    <div>
+                                        <p class="text-[10px] font-bold text-slate-500 uppercase">Saldo en Cartera</p>
+                                        <p class="text-2xl font-bold text-red-600">{{ facturacion.standard.saldoPendiente | currency:'':'$':'1.0-0' }}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-[10px] font-bold text-slate-400 uppercase">Monto Total Std.</p>
+                                        <p class="text-lg font-bold text-slate-900">{{ facturacion.resumen.montoStandard | currency:'':'$':'1.0-0' }}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -194,34 +283,37 @@
                     <!-- Top Clientes (Premium Table) -->
                     <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
                         <div class="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/30">
-                            <h4 class="text-xs font-semibold text-gray-500 uppercase">Ranking de Negocios</h4>
-                            <span class="px-3 py-1 bg-blue-100 text-blue-600 text-[10px] font-semibold uppercase rounded-lg">Top 5 Clientes</span>
+                            <h4 class="text-xs font-bold text-gray-500 uppercase">Ranking de Negocios</h4>
+                            <span class="px-4 py-1.5 bg-blue-600 text-white text-[10px] font-bold uppercase rounded-xl shadow-lg shadow-blue-200">Top 5 Clientes</span>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-sm">
-                                <thead class="bg-gray-50/50 text-[11px] text-gray-500 border-b border-gray-100">
+                                <thead class="bg-gray-50/50 text-[10px] text-gray-400 font-bold uppercase border-b border-gray-100">
                                     <tr>
-                                        <th class="px-8 py-5">Nombre del Cliente</th>
-                                        <th class="px-8 py-5 text-center">Frecuencia (Doc)</th>
-                                        <th class="px-8 py-5 text-right">Monto Total Facturado</th>
+                                        <th class="px-8 py-6">Cliente</th>
+                                        <th class="px-8 py-6 text-center">Transacciones</th>
+                                        <th class="px-8 py-6 text-right">Facturación Bruta</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-50">
                                     @for (c of facturacion.topClientes; track c.clienteId) {
-                                        <tr class="hover:bg-blue-50/30 transition-all duration-200">
-                                            <td class="px-8 py-4">
-                                                <div class="flex items-center gap-3">
-                                                    <div class="w-8 h-8 rounded-xl bg-blue-100 flex items-center justify-center text-[10px] font-semibold text-blue-600">
+                                        <tr class="hover:bg-blue-50/40 transition-all duration-300 group">
+                                            <td class="px-8 py-5">
+                                                <div class="flex items-center gap-4">
+                                                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center text-xs font-bold text-blue-600 border border-blue-100 group-hover:scale-110 transition-transform">
                                                         {{ c.clienteNombre.substring(0, 2).toUpperCase() }}
                                                     </div>
-                                                    <span class="font-semibold text-gray-900">{{ c.clienteNombre }}</span>
+                                                    <div>
+                                                        <span class="font-bold text-gray-900 block">{{ c.clienteNombre }}</span>
+                                                        <span class="text-[10px] text-gray-400 font-medium">ID: {{ c.clienteId }}</span>
+                                                    </div>
                                                 </div>
                                             </td>
-                                            <td class="px-8 py-4 text-center">
-                                                <span class="px-2 py-1 bg-gray-100 rounded text-xs font-mono text-gray-600 font-semibold">{{ c.cantidadFacturas }}</span>
+                                            <td class="px-8 py-5 text-center">
+                                                <span class="px-3 py-1 bg-gray-100 rounded-lg text-xs font-bold text-gray-600">{{ c.cantidadFacturas }} doc.</span>
                                             </td>
-                                            <td class="px-8 py-4 text-right">
-                                                <span class="text-sm font-semibold text-blue-600">{{ c.montoTotal | currency:'':'$':'1.0-0' }}</span>
+                                            <td class="px-8 py-5 text-right">
+                                                <span class="text-sm font-bold text-blue-600">{{ c.montoTotal | currency:'':'$':'1.0-0' }}</span>
                                             </td>
                                         </tr>
                                     }
@@ -232,23 +324,28 @@
 
                     <!-- Ventas Diarias (Timeline Style) -->
                     <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                        <div class="px-8 py-6 border-b border-gray-50 bg-gray-50/30">
-                            <h4 class="text-xs font-semibold text-gray-400 uppercase">Desempeño Cronológico</h4>
+                        <div class="px-8 py-6 border-b border-gray-50 bg-gray-50/30 flex items-center justify-between">
+                            <h4 class="text-xs font-bold text-gray-400 uppercase">Cronología de Ventas</h4>
+                            <div class="flex items-center gap-4 text-[10px] font-bold uppercase">
+                                <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-blue-500"></span> Electrónica</div>
+                                <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-gray-300"></span> Estándar</div>
+                            </div>
                         </div>
                         <div class="p-8">
-                            <div class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+                            <div class="flex gap-4 overflow-x-auto pb-6 scrollbar-hide">
                                 @for (v of facturacion.ventasPorDia; track v.fecha) {
-                                    <div class="flex-none w-32 p-4 bg-gray-50/50 rounded-2xl border border-gray-100 text-center hover:bg-white hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                                        <p class="text-[10px] font-semibold text-gray-400 uppercase mb-2">{{ v.fecha | date:'dd MMM' }}</p>
-                                        <p class="text-sm font-semibold text-gray-900 mb-3">{{ v.montoTotal | currency:'':'$':'1.0-0' }}</p>
-                                        <div class="flex justify-center -space-x-1.5">
-                                            @for (i of [].constructor(v.cantidadElectronicas > 3 ? 3 : v.cantidadElectronicas); track $index) {
-                                                <span class="w-2.5 h-2.5 rounded-full bg-blue-500 border-2 border-white"></span>
+                                    <div class="flex-none w-36 p-5 bg-gray-50/50 rounded-3xl border border-gray-100 text-center hover:bg-white hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group">
+                                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-3">{{ v.fecha | date:'dd MMM' }}</p>
+                                        <p class="text-lg font-bold text-gray-900 mb-4">{{ v.montoTotal | currency:'':'$':'1.0-0' }}</p>
+                                        <div class="flex justify-center gap-1">
+                                            @for (i of [].constructor(Math.min(v.cantidadElectronicas, 4)); track $index) {
+                                                <span class="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-sm shadow-blue-200"></span>
                                             }
                                             @if (v.cantidadStandard > 0) {
-                                                <span class="w-2.5 h-2.5 rounded-full bg-gray-300 border-2 border-white"></span>
+                                                <span class="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
                                             }
                                         </div>
+                                        <p class="text-[9px] font-bold text-gray-400 mt-4 opacity-0 group-hover:opacity-100 transition-opacity uppercase">{{ v.cantidadElectronicas + v.cantidadStandard }} docs</p>
                                     </div>
                                 }
                             </div>

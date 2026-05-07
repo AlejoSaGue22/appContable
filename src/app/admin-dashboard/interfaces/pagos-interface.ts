@@ -178,7 +178,7 @@ export interface HistorialPagosResponse {
   totalCobros: number;
   totalPagos:  number;
   neto:        number;
-  meta?: {
+  meta: {
     total: number;
     page: number;
     limit: number;
