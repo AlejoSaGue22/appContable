@@ -221,3 +221,50 @@ export interface RegistrarCobroDto {
 }
 
 export type RegistrarPagoDto = RegistrarCobroDto;
+
+export interface ReporteAgingFlat {
+  items: Array<{
+    id: string;
+    fecha: string;
+    vencimiento: string | null;
+    numeroFactura: string;
+    contraparte: string;
+    numeroContraparte: string;
+    saldo: number;
+    diasVencidos: number;
+    estado: string;
+  }>;
+  totales: {
+    total: number;
+    porVencer: number;
+    vencido: number;
+  };
+  generadoEn: string;
+}
+
+
+export interface ReporteAgingFlatAgrupado {
+  items: Array<{
+    identificacion: string;
+    sucursal: string;
+    nombre: string;
+    deuda: number;
+    saldoFavor: number;
+    saldoCartera: number; 
+    facturas: Array<{
+      id: string;
+      fecha: string;
+      vencimiento: string | null;
+      numeroFactura: string;
+      saldo: number;
+      diasVencidos: number;
+      estado: string;
+    }>;
+  }>;
+  totales: {
+    totalDeuda: number;
+    totalSaldoFavor: number;
+    totalCartera: number;
+  };
+  generadoEn: string;
+}

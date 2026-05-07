@@ -1,0 +1,82 @@
+<div class="space-y-6">
+@if (historial()) {
+    <!-- Resumen totales -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="bg-green-50 border border-green-200 rounded-lg px-5 py-4 text-center">
+        <p class="text-xs font-semibold uppercase tracking-wider text-green-700 mb-1">Total Cobrado</p>
+        <p class="text-xl font-bold text-green-800">
+        {{ historial().totalCobros | currency:'':'symbol-narrow':'1.0-0' }}
+        </p>
+    </div>
+    <div class="bg-orange-50 border border-orange-200 rounded-lg px-5 py-4 text-center">
+        <p class="text-xs font-semibold uppercase tracking-wider text-orange-700 mb-1">Total Pagado</p>
+        <p class="text-xl font-bold text-orange-800">
+        {{ historial().totalPagos | currency:'':'symbol-narrow':'1.0-0' }}
+        </p>
+    </div>
+    <div class="rounded-lg px-5 py-4 text-center border-2"
+        [ngClass]="historial().neto >= 0
+            ? 'bg-blue-50 border-blue-300'
+            : 'bg-red-50 border-red-300'">
+        <p class="text-xs font-semibold uppercase tracking-wider mb-1"
+        [ngClass]="historial().neto >= 0 ? 'text-blue-700' : 'text-red-700'">Neto</p>
+        <p class="text-xl font-bold"
+        [ngClass]="historial().neto >= 0 ? 'text-blue-800' : 'text-red-800'">
+        {{ historial().neto | currency:'':'symbol-narrow':'1.0-0' }}
+        </p>
+    </div>
+    </div>
+
+    <!-- Tabla movimientos -->
+    <div class="overflow-x-auto">
+    <table class="w-full text-left table-auto text-sm shadow-sm rounded-xl">
+        <thead>
+        <tr class="bg-slate-50 border-b border-gray-200">
+            <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500">Fecha</th>
+            <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500">Tipo</th>
+            <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500">Factura</th>
+            <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500">Cliente/Proveedor</th>
+            <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500">Medio</th>
+            <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500">Referencia</th>
+            <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500 text-right">Monto</th>
+        </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+        @for (pago of historial().pagos; track pago.id) {
+            <tr class="hover:bg-slate-50/80 transition-colors">
+            <td class="p-3 text-slate-600 text-xs">{{ pago.fecha | date:'dd/MM/yyyy' }}</td>
+            <td class="p-3">
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs">
+                {{ pago.tipo === 'cobro' ? 'Cobro' : 'Pago' }}
+                </span>
+            </td>
+            <td class="p-3">
+                <span class="font-mono text-xs">{{ pago.numeroFactura }}</span>
+            </td>
+            <td class="p-3 text-slate-700 text-xs">{{ pago.contraparte }}</td>
+            <td class="p-3 text-slate-500 text-xs capitalize">{{ pago.medioPago }}</td>
+            <td class="p-3 text-slate-400 text-xs">{{ pago.referencia || '—' }}</td>
+            <td class="p-3 text-right font-semibold">
+                {{ pago.monto | currency:'':'symbol-narrow':'1.0-0' }}
+            </td>
+            </tr>
+        }
+        @if (historial().pagos.length === 0) {
+            <tr>
+            <td colspan="7" class="p-10 text-center text-slate-400 text-sm">
+                No hay movimientos en este período
+            </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    </div>
+} @else if (!loadingActual()) {
+    <div class="py-12 text-center">
+    <div class="text-5xl mb-3">
+        <i class="fas fa-file-invoice"></i>
+    </div>
+    <p class="text-sm text-slate-400">Seleccione un período y haga clic en "Generar"</p>
+    </div>
+}
+</div>

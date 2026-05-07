@@ -6,7 +6,8 @@ import { map } from 'rxjs/operators';
 import { environment } from 'src/app/environments/environment';
 import { AgingReporte, CuentaBancaria, CxcResponse, CxpResponse, HistorialPagosResponse, PagoHistorial, 
          PagoResponseDto, PaymentStatus, RegistrarCobroDto, RegistrarPagoDto, ResumenCartera, CxFiltros,
-         PagoHistorialResponse
+         PagoHistorialResponse, ReporteAgingFlat,
+         ReporteAgingFlatAgrupado
 } from '@dashboard/interfaces/pagos-interface';
 
 
@@ -87,20 +88,20 @@ export class PagosHttpService {
       .get<AgingReporte>(`${this.base}/reportes/cartera/aging-pagar`, { params });
   }
   // ── Aging (Reportes con filtros) ─────────────────────────────────────
-  getReporteAgingCobrar(fechaInicio: string, fechaFin: string): Observable<AgingReporte> {
+  getReporteAgingCobrar(fechaInicio: string, fechaFin: string): Observable<ReporteAgingFlatAgrupado> {
     const params = new HttpParams()
       .set('fechaInicio', fechaInicio)
       .set('fechaFin',    fechaFin);
     return this.http
-      .get<AgingReporte>(`${this.base}/reportes/cartera/reporte-aging-cobrar`, { params });
+      .get<ReporteAgingFlatAgrupado>(`${this.base}/reportes/cartera/reporte-aging-cobrar`, { params });
   }
 
-  getReporteAgingPagar(fechaInicio: string, fechaFin: string): Observable<AgingReporte> {
+  getReporteAgingPagar(fechaInicio: string, fechaFin: string): Observable<ReporteAgingFlatAgrupado> {
     const params = new HttpParams()
       .set('fechaInicio', fechaInicio)
       .set('fechaFin',    fechaFin);
     return this.http
-      .get<AgingReporte>(`${this.base}/reportes/cartera/reporte-aging-pagar`, { params });
+      .get<ReporteAgingFlatAgrupado>(`${this.base}/reportes/cartera/reporte-aging-pagar`, { params });
   }
 
   // ── Historial global ──────────────────────────────────────────────────
