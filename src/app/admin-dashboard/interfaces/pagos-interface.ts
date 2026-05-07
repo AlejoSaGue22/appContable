@@ -178,6 +178,12 @@ export interface HistorialPagosResponse {
   totalCobros: number;
   totalPagos:  number;
   neto:        number;
+  meta?: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
 }
 
 // ── Resumen cartera (dashboard) ────────────────────────────────────────────
@@ -267,4 +273,10 @@ export interface ReporteAgingFlatAgrupado {
     totalCartera: number;
   };
   generadoEn: string;
+  meta?: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
 }

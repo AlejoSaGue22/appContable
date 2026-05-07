@@ -88,27 +88,33 @@ export class PagosHttpService {
       .get<AgingReporte>(`${this.base}/reportes/cartera/aging-pagar`, { params });
   }
   // ── Aging (Reportes con filtros) ─────────────────────────────────────
-  getReporteAgingCobrar(fechaInicio: string, fechaFin: string): Observable<ReporteAgingFlatAgrupado> {
+  getReporteAgingCobrar(fechaInicio: string, fechaFin: string, page: number = 1, limit: number = 10): Observable<ReporteAgingFlatAgrupado> {
     const params = new HttpParams()
       .set('fechaInicio', fechaInicio)
-      .set('fechaFin',    fechaFin);
+      .set('fechaFin',    fechaFin)
+      .set('page',        page.toString())
+      .set('limit',       limit.toString());
     return this.http
       .get<ReporteAgingFlatAgrupado>(`${this.base}/reportes/cartera/reporte-aging-cobrar`, { params });
   }
 
-  getReporteAgingPagar(fechaInicio: string, fechaFin: string): Observable<ReporteAgingFlatAgrupado> {
+  getReporteAgingPagar(fechaInicio: string, fechaFin: string, page: number = 1, limit: number = 10): Observable<ReporteAgingFlatAgrupado> {
     const params = new HttpParams()
       .set('fechaInicio', fechaInicio)
-      .set('fechaFin',    fechaFin);
+      .set('fechaFin',    fechaFin)
+      .set('page',        page.toString())
+      .set('limit',       limit.toString());
     return this.http
       .get<ReporteAgingFlatAgrupado>(`${this.base}/reportes/cartera/reporte-aging-pagar`, { params });
   }
 
   // ── Historial global ──────────────────────────────────────────────────
-  getHistorialGlobal(fechaInicio: string, fechaFin: string): Observable<HistorialPagosResponse> {
+  getHistorialGlobal(fechaInicio: string, fechaFin: string, page: number = 1, limit: number = 10): Observable<HistorialPagosResponse> {
     const params = new HttpParams()
       .set('fechaInicio', fechaInicio)
-      .set('fechaFin',    fechaFin);
+      .set('fechaFin',    fechaFin)
+      .set('page',        page.toString())
+      .set('limit',       limit.toString());
     return this.http
       .get<HistorialPagosResponse>(
         `${this.base}/reportes/cartera/historial-pagos`,

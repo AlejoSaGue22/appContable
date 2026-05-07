@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, effect, inject, OnInit } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {HeaderTitlePageComponent, HeaderInput } from '@dashboard/components/header-title-page/header-title-page.component';
@@ -7,6 +7,8 @@ import { PagosHttpService } from '@dashboard/pages/pagos/services/pagos.service'
 import * as XLSX from 'xlsx';
 import { AgingReportComponent } from "./components/aging-report/aging-report.component";
 import { HistorialPagosComponent } from "./components/historial-pagos/historial-pagos.component";
+import { PaginationComponent } from "@shared/components/pagination/pagination";
+import { PaginationService } from '@shared/components/pagination/pagination.service';
 
 type VistaActiva = 'resumen' | 'aging-cobrar' | 'aging-pagar' | 'historial';
 
@@ -19,7 +21,8 @@ type VistaActiva = 'resumen' | 'aging-cobrar' | 'aging-pagar' | 'historial';
     CurrencyPipe,
     HeaderTitlePageComponent,
     AgingReportComponent,
-    HistorialPagosComponent
+    HistorialPagosComponent,
+    PaginationComponent
 ],
   templateUrl: './reportes-cartera.component.html',
 })
@@ -28,6 +31,8 @@ export class ReportesCarteraComponent implements OnInit {
     title: 'Reporte de Cartera',
     slog: 'Antigüedad de cartera y movimientos de pagos',
   };
+
+  paginationService = inject(PaginationService);
 
   // ── Vista activa ───────────────────────────────────────────────────
   vistaActiva: VistaActiva = 'resumen';
@@ -101,6 +106,15 @@ export class ReportesCarteraComponent implements OnInit {
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
     this.fechaInicio = firstDay.toISOString().split('T')[0];
     this.fechaFin = lastDay.toISOString().split('T')[0];
+
+    // Efecto para reaccionar al cambio de página
+    effect(() => {
+      const page = this.paginationService.currentPage();
+      // Solo recargar si ya hay un reporte cargado (no al inicio vacío)
+      if (this.vistaActiva === 'aging-cobrar' && this.agingCobrar) this.cargarAgingCobrar(page);
+      if (this.vistaActiva === 'aging-pagar' && this.agingPagar) this.cargarAgingPagar(page);
+      if (this.vistaActiva === 'historial' && this.historial) this.cargarHistorial(page);
+    });
   }
 
   ngOnInit(): void {
@@ -121,11 +135,13 @@ export class ReportesCarteraComponent implements OnInit {
     });
   }
 
-  cargarAgingCobrar(): void {
+  cargarAgingCobrar(page: number = this.paginationService.currentPage()): void {
     this.loadingCobrar = true;
-    this.svc.getReporteAgingCobrar(this.fechaInicio, this.fechaFin).subscribe({
+    this.svc.getReporteAgingCobrar(this.fechaInicio, this.fechaFin, page).subscribe({
       next: (d) => {
         this.agingCobrar = d;
+        this.paginationService.totalItems.set(d.meta?.total || 0);
+        this.paginationService.pageSize.set(10);
         this.loadingCobrar = false;
       },
       error: () => {
@@ -134,11 +150,13 @@ export class ReportesCarteraComponent implements OnInit {
     });
   }
 
-  cargarAgingPagar(): void {
+  cargarAgingPagar(page: number = this.paginationService.currentPage()): void {
     this.loadingPagar = true;
-    this.svc.getReporteAgingPagar(this.fechaInicio, this.fechaFin).subscribe({
+    this.svc.getReporteAgingPagar(this.fechaInicio, this.fechaFin, page).subscribe({
       next: (d) => {
         this.agingPagar = d;
+        this.paginationService.totalItems.set(d.meta?.total || 0);
+        this.paginationService.pageSize.set(10);
         this.loadingPagar = false;
       },
       error: () => {
@@ -147,11 +165,13 @@ export class ReportesCarteraComponent implements OnInit {
     });
   }
 
-  cargarHistorial(): void {
+  cargarHistorial(page: number = this.paginationService.currentPage()): void {
     this.loadingHistorial = true;
-    this.svc.getHistorialGlobal(this.fechaInicio, this.fechaFin).subscribe({
+    this.svc.getHistorialGlobal(this.fechaInicio, this.fechaFin, page).subscribe({
       next: (d) => {
         this.historial = d;
+        this.paginationService.totalItems.set(d.meta?.total || 0);
+        this.paginationService.pageSize.set(10);
         this.loadingHistorial = false;
       },
       error: () => {

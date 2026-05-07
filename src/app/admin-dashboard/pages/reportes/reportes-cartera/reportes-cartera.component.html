@@ -199,11 +199,14 @@
               <app-aging-report [reporte]="reporte!" 
                                 [loadingActual]="loadingActual" 
                                 [vistaActiva]="vistaActiva"/>
+
+                <app-pagination [length]="paginationService.totalItems()"/>
             }
 
             <!-- ══ VISTA: HISTORIAL DE PAGOS ═══════════════════════════════ -->
             @if (vistaActiva === 'historial') {
               <app-historial-pagos [historial]="historial!" [loadingActual]="loadingHistorial"/>
+              <app-pagination [length]="paginationService.totalItems()"/>
             }
           </div>
         </div>
