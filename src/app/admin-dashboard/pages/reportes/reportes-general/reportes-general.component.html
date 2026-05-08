@@ -8,13 +8,13 @@
             <div class="flex flex-col md:flex-row md:items-end gap-6">
                 <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div class="space-y-2">
-                        <label class="text-[10px] font-medium text-gray-400 ml-1">Fecha Inicio</label>
+                        <label class="font-medium text-gray-400 ml-1">Fecha Inicio</label>
                         <input type="date" [(ngModel)]="fechaInicio"
                             class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all">
                     </div>
 
                     <div class="space-y-2">
-                        <label class="text-[10px] font-medium text-gray-400 ml-1">Fecha Fin</label>
+                        <label class="font-medium text-gray-400 ml-1">Fecha Fin</label>
                         <input type="date" [(ngModel)]="fechaFin"
                             class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all">
                     </div>
@@ -154,21 +154,21 @@
                         <!-- Card 3: Cumplimiento Fiscal -->
                         <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300">
                             <div class="flex items-center justify-between mb-4">
-                                <div class="w-10 h-10 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600">
+                                <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                                 </div>
-                                <span class="text-[10px] font-bold text-purple-600 bg-purple-50 px-2 py-1 rounded-lg uppercase">DIAN</span>
+                                <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg uppercase">DIAN</span>
                             </div>
                             <p class="text-[11px] font-bold text-gray-400 uppercase">Tasa Aceptación</p>
                             <h4 class="text-3xl font-bold text-gray-900 mt-1">{{ facturacion.electronicas.tasaAceptacion }}%</h4>
                             <div class="mt-6 flex items-center justify-between">
                                 <div class="text-center">
-                                    <p class="text-[9px] font-bold text-emerald-500 uppercase">Aceptadas</p>
+                                    <p class="text-xs font-bold text-gray-400">Aceptadas</p>
                                     <p class="text-sm font-bold text-gray-700">{{ facturacion.electronicas.aceptadas }}</p>
                                 </div>
                                 <div class="w-px h-6 bg-gray-100"></div>
                                 <div class="text-center">
-                                    <p class="text-[9px] font-bold text-red-500 uppercase">Rechazadas</p>
+                                    <p class="text-xs font-bold text-red-500">Rechazadas</p>
                                     <p class="text-sm font-bold text-gray-700">{{ facturacion.electronicas.rechazadas }}</p>
                                 </div>
                             </div>
@@ -177,20 +177,20 @@
                         <!-- Card 4: Rentabilidad Unitaria -->
                         <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300">
                             <div class="flex items-center justify-between mb-4">
-                                <div class="w-10 h-10 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600">
+                                <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
                                 </div>
-                                <span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-lg uppercase">Promedios</span>
+                                <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg uppercase">Promedios</span>
                             </div>
                             <p class="text-[11px] font-bold text-gray-400 uppercase">Ticket Medio</p>
                             <h4 class="text-3xl font-bold text-gray-900 mt-1">{{ (facturacion.resumen.montoTotal / (facturacion.resumen.totalFacturas || 1)) | currency:'':'$':'1.0-0' }}</h4>
                             <div class="mt-6 flex flex-col gap-1">
                                 <div class="flex justify-between items-center">
-                                    <span class="text-[9px] font-bold text-blue-500 uppercase">Electrónica:</span>
+                                    <span class="text-[9px] font-bold text-blue-500 uppercase">Prom. Electrónica:</span>
                                     <span class="text-[11px] font-bold text-gray-700">{{ facturacion.electronicas.montoPromedio | currency:'':'$':'1.0-0' }}</span>
                                 </div>
                                 <div class="flex justify-between items-center">
-                                    <span class="text-[9px] font-bold text-gray-400 uppercase">Estándar:</span>
+                                    <span class="text-[9px] font-bold text-gray-400 uppercase">Prom. Estándar:</span>
                                     <span class="text-[11px] font-bold text-gray-700">{{ facturacion.standard.montoPromedio | currency:'':'$':'1.0-0' }}</span>
                                 </div>
                             </div>
@@ -216,17 +216,21 @@
                             <div class="p-8 space-y-6">
                                 <div class="grid grid-cols-2 gap-4">
                                     <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Emitidas</p>
+                                        <p class="text-xs font-bold text-gray-400 mb-1">Emitidas</p>
                                         <p class="text-xl font-bold text-gray-900">{{ facturacion.electronicas.emitidas }}</p>
                                     </div>
-                                    <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100">
-                                        <p class="text-[10px] font-bold text-amber-700 uppercase mb-1">Pendientes</p>
-                                        <p class="text-xl font-bold text-amber-600">{{ facturacion.electronicas.pendientes }}</p>
+                                    <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                        <p class="text-xs font-bold text-gray-400 mb-1">Aceptadas</p>
+                                        <p class="text-xl font-bold text-gray-900">{{ facturacion.electronicas.aceptadas }}</p>
                                     </div>
-                                    <!-- <div class="p-4 bg-green-50 rounded-2xl border border-green-100">
-                                        <p class="text-[10px] font-bold text-green-700 uppercase mb-1">Procesadas</p>
-                                        <p class="text-xl font-bold text-green-600">{{ facturacion.electronicas.procesadas }}</p>
-                                    </div> -->
+                                    <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                        <p class="text-xs font-bold text-gray-400 mb-1">Pendientes</p>
+                                        <p class="text-xl font-bold text-gray-900">{{ facturacion.electronicas.pendientes }}</p>
+                                    </div>
+                                    <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                        <p class="text-xs font-bold text-gray-400 mb-1">Rechazadas</p>
+                                        <p class="text-xl font-bold text-gray-900">{{ facturacion.electronicas.rechazadas }}</p>
+                                    </div>
                                 </div>
                                 <div class="p-5 bg-blue-50 rounded-2xl border border-blue-100 flex items-center justify-between">
                                     <div>
@@ -234,7 +238,7 @@
                                         <p class="text-2xl font-bold text-blue-600">{{ facturacion.resumen.montoElectronicas | currency:'':'$':'1.0-0' }}</p>
                                     </div>
                                     <div class="text-right">
-                                        <p class="text-[10px] font-bold text-blue-400 uppercase">Tasa Aceptación</p>
+                                        <p class="text-xs font-bold text-blue-400 uppercase">Tasa Aceptación</p>
                                         <p class="text-lg font-bold text-blue-600">{{ facturacion.electronicas.tasaAceptacion }}%</p>
                                     </div>
                                 </div>
@@ -261,19 +265,23 @@
                                         <p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Emitidas</p>
                                         <p class="text-xl font-bold text-gray-900">{{ facturacion.standard.emitidas }}</p>
                                     </div>
-                                    <div class="p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
-                                        <p class="text-[10px] font-bold text-emerald-700 uppercase mb-1">Liquidado</p>
-                                        <p class="text-xl font-bold text-emerald-600">{{ facturacion.standard.totalPagado| currency:'':'$':'1.0-0' }}</p>
+                                    <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Anuladas</p>
+                                        <p class="text-xl font-bold text-gray-900">{{ facturacion.standard.anuladas }}</p>
+                                    </div>
+                                    <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Liquidado</p>
+                                        <p class="text-xl font-bold text-gray-900">{{ facturacion.standard.totalPagado| currency:'':'$':'1.0-0' }}</p>
                                     </div>
                                 </div>
                                 <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-between">
                                     <div>
-                                        <p class="text-[10px] font-bold text-slate-500 uppercase">Saldo en Cartera</p>
-                                        <p class="text-2xl font-bold text-red-600">{{ facturacion.standard.saldoPendiente | currency:'':'$':'1.0-0' }}</p>
+                                        <p class="text-[10px] font-bold text-slate-500 uppercase">Monto Total</p>
+                                        <p class="text-2xl font-bold text-slate-900">{{ facturacion.resumen.montoStandard | currency:'':'$':'1.0-0' }}</p>
                                     </div>
                                     <div class="text-right">
-                                        <p class="text-[10px] font-bold text-slate-400 uppercase">Monto Total Std.</p>
-                                        <p class="text-lg font-bold text-slate-900">{{ facturacion.resumen.montoStandard | currency:'':'$':'1.0-0' }}</p>
+                                        <p class="text-[10px] font-bold text-slate-400 uppercase">Saldo en Cartera</p>
+                                        <p class="text-lg font-bold text-red-600">{{ facturacion.standard.montoPromedio | currency:'':'$':'1.0-0' }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -283,7 +291,7 @@
                     <!-- Top Clientes (Premium Table) -->
                     <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
                         <div class="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/30">
-                            <h4 class="text-xs font-bold text-gray-500 uppercase">Ranking de Negocios</h4>
+                            <h4 class="text-xl font-bold text-gray-500">Ranking de Negocios</h4>
                             <span class="px-4 py-1.5 bg-blue-600 text-white text-[10px] font-bold uppercase rounded-xl shadow-lg shadow-blue-200">Top 5 Clientes</span>
                         </div>
                         <div class="overflow-x-auto">
@@ -325,7 +333,7 @@
                     <!-- Ventas Diarias (Timeline Style) -->
                     <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
                         <div class="px-8 py-6 border-b border-gray-50 bg-gray-50/30 flex items-center justify-between">
-                            <h4 class="text-xs font-bold text-gray-400 uppercase">Cronología de Ventas</h4>
+                            <h4 class="text-xl font-bold text-gray-400">Cronología de Ventas</h4>
                             <div class="flex items-center gap-4 text-[10px] font-bold uppercase">
                                 <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-blue-500"></span> Electrónica</div>
                                 <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-gray-300"></span> Estándar</div>

@@ -26,6 +26,7 @@ export interface ReporteFacturacionAvanzada {
   };
   standard: {
     emitidas: number;
+    anuladas: number;
     montoPromedio: number;
     totalPagado: number;
     saldoPendiente: number;
