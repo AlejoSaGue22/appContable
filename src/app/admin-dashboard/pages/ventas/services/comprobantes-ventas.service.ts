@@ -106,4 +106,11 @@ export class ComprobantesVentasService {
     );
   }
 
+  sendEmail(id: string, email: string) {
+    return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/enviar-email`, { email }).pipe(
+      map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+    );
+  }
+
 }

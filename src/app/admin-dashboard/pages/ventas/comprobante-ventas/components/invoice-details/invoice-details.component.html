@@ -66,6 +66,16 @@
             </button>
           }
 
+          @if (factura()!.tipoFactura === 'ELECTRONICA' && factura()!.dianStatus === 'accepted') {
+            <button type="button" (click)="abrirModalEmail()"
+              class="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100 transition-colors">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              Enviar Email
+            </button>
+          }
+
           <a routerLink="/panel/ventas/comprobantes"
             class="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
             <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
@@ -81,7 +91,7 @@
               <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path>
               </svg>
-              Crear Nota Ajuste
+              Nota de Ajuste
             </a>
           }
         </div>
@@ -509,6 +519,13 @@
     </div><!-- /max-w-4xl -->
   }<!-- /factura() -->
 </div>
+
+<app-modal-email 
+  [(visible)]="modalEmailVisible" 
+  [loading]="sendingEmail" 
+  [initialEmail]="factura()?.client?.email || ''"
+  (send)="enviarEmail($event)"
+></app-modal-email>
 
 <style>
   @media print {

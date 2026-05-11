@@ -11,14 +11,14 @@
     <tbody class="divide-y divide-gray-50">
         @for (cuenta of visibleCuentas(); track cuenta.id) {
             <tr class="hover:bg-blue-50/30 transition-all duration-200 group" 
-                [class.bg-gray-50]="cuenta.nivel === 1" 
-                [class.font-semibold]="cuenta.nivel <= 2"
-                [class.text-gray-900]="cuenta.nivel <= 3"
-                [class.text-gray-500]="cuenta.nivel > 3">
+                [class.bg-gray-50]="getDerivedLevel(cuenta.codigo) === 1" 
+                [class.font-semibold]="getDerivedLevel(cuenta.codigo) <= 2"
+                [class.text-gray-900]="getDerivedLevel(cuenta.codigo) <= 3"
+                [class.text-gray-500]="getDerivedLevel(cuenta.codigo) > 3">
                 
                 <!-- Código with Hierarchical Nesting & Expand/Collapse -->
                 <td class="px-8 py-4 whitespace-nowrap">
-                    <div class="flex items-center gap-2" [style.padding-left.rem]="(cuenta.nivel - 1) * 1.5">
+                    <div class="flex items-center gap-2" [style.padding-left.rem]="(getDerivedLevel(cuenta.codigo) - 1) * 1.5">
                         
                         @if (hasChildren(cuenta)) {
                             <button (click)="toggleExpand(cuenta.id)" 
@@ -40,7 +40,7 @@
                             </div>
                         }
 
-                        <span [class.text-blue-700]="cuenta.nivel === 1" class="font-mono text-xs ml-1">
+                        <span [class.text-blue-700]="getDerivedLevel(cuenta.codigo) === 1" class="font-mono text-xs ml-1">
                             {{ cuenta.codigo }}
                         </span>
                     </div>
@@ -50,7 +50,7 @@
                 <td class="px-8 py-4">
                     <div class="flex flex-col">
                         <span class="tracking-tight">{{ cuenta.nombre }}</span>
-                        @if (cuenta.descripcion && cuenta.nivel > 3) {
+                        @if (cuenta.descripcion && getDerivedLevel(cuenta.codigo) > 3) {
                             <span class="text-[10px] text-gray-400 font-normal mt-0.5 truncate max-w-xs" [title]="cuenta.descripcion">
                                 {{ cuenta.descripcion }}
                             </span>

@@ -9,10 +9,12 @@ import { ComprobantesVentasService } from '@dashboard/pages/ventas/services/comp
 import { AsientosHttpService } from '@dashboard/services/asientos-http.service';
 import { NotificationService } from '@shared/services/notification.service';
 import { PrintService } from '@shared/services/print.service';
+import { ModalEmailComponent } from '@shared/components/modal-email/modal-email.component';
+import { HelpersUtils } from '@utils/helpers.utils';
 
 @Component({
   selector: 'app-invoice-details',
-  imports: [CommonModule, RouterLink, CurrencyPipe],
+  imports: [CommonModule, RouterLink, CurrencyPipe, ModalEmailComponent],
   templateUrl: './invoice-details.component.html',
 })
 export class InvoiceDetailsComponent {
@@ -24,6 +26,10 @@ export class InvoiceDetailsComponent {
   loadingAsientos = false;
   modalCobroVisible = false;
   modalCobroData: RegistrarPagoModalData | null = null;
+
+  // ── Email Modal ───────────────────────────────────────────────────────
+  modalEmailVisible = false;
+  sendingEmail = false;
 
   private printService = inject(PrintService);
 
@@ -218,5 +224,33 @@ export class InvoiceDetailsComponent {
 
   exportPDF(): void {
     // Implementar exportación a PDF
+  }
+
+  // ── Email Actions ─────────────────────────────────────────────────────
+  abrirModalEmail(): void {
+    this.modalEmailVisible = true;
+  }
+
+  enviarEmail(email: string): void {
+    const f = this.factura();
+    if (!f) return;
+
+    this.sendingEmail = true;
+    this.facturasService.sendEmail(f.id, email).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.notificationService.success('Email enviado correctamente', 'Éxito');
+          this.modalEmailVisible = false;
+        } else {
+          this.notificationService.error(`Error al enviar email: ${HelpersUtils.getMessageError(res.message)}`, 'Error'  );
+        }
+        this.sendingEmail = false;
+      },
+      error: (err) => {
+        const message = Array.isArray(err.message) ? err.message.join(', ') : err.message;
+        this.notificationService.error(message || 'Ocurrió un error inesperado al enviar el email', 'Error');
+        this.sendingEmail = false;
+      }
+    });
   }
 }
