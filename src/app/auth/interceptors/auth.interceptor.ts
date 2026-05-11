@@ -19,6 +19,11 @@ export function authInterceptor(
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
+      if (req.url.includes('/auth/refresh') || req.url.includes('/auth/check-status')) {
+        authService.logout();
+        return throwError(() => error);
+      }
+
       if (error.status === 401 && token) {
         return authService.refreshToken().pipe(
           switchMap((success) => {

@@ -34,8 +34,8 @@ export class NotasAjusteFormPageComponent implements OnInit {
   headTitle = computed(() => {
     const id = this.notaId() != 'new';
     return {
-      title: id ? 'Editar Nota de Ajuste' : 'Nueva Nota de Ajuste',
-      slog: id ? 'Edita una nota crédito o débito vinculada a una factura' : 'Registra una nota crédito o débito vinculada a una factura'
+      title: id ? 'Editar Nota de Crédito' : 'Nueva Nota de Crédito',
+      slog: id ? 'Edita una nota crédito vinculada a una factura' : 'Registra una nota crédito vinculada a una factura'
     };
   });
 

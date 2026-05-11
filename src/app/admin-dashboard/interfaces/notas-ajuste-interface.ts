@@ -48,6 +48,7 @@ export interface NotaAjuste {
   pdfUrl?: string;
   qrCode?: string;
   proveedorResponse?: any;
+  descuento: number;
   total: number;
   iva: number;
   subtotal: number;

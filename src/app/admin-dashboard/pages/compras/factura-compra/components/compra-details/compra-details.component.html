@@ -322,7 +322,7 @@
                     <tbody class="divide-y divide-gray-100">
                       @for (pago of pagos; track pago.id) {
                         <tr class="hover:bg-slate-50/60">
-                          <td class="px-3 py-2 text-gray-700 text-xs">{{ pago.fecha | date:'dd/MM/yyyy' }}</td>
+                          <td class="px-3 py-2 text-gray-700 text-xs">{{ formatDate(pago.fecha) }}</td>
                           <td class="px-3 py-2 text-gray-600 text-xs capitalize">{{ pago.medioPago }}</td>
                           <td class="px-3 py-2 text-gray-500 text-xs">{{ pago.referencia || '—' }}</td>
                           <td class="px-3 py-2 text-right font-semibold">{{ pago.monto | currency: '' : 'symbol' : '0.0-0' }}</td>
@@ -372,7 +372,7 @@
                           {{ getTipoAsientoLabel(asiento.tipo) }}
                         </span>
                       </div>
-                      <span class="text-xs text-gray-500">{{ asiento.fecha | date:'dd/MM/yyyy' }}</span>
+                      <span class="text-xs text-gray-500">{{ formatDate(asiento.fecha) }}</span>
                     </div>
                     <table class="w-full text-xs">
                       <thead class="bg-gray-50/50">

@@ -22,8 +22,8 @@ import { TableNotasComponent, NotaFilters } from './components/table-notas/table
 export class NotasAjusteComponent {
 
   headTitle: HeaderInput = {
-    title: 'Notas de Ajuste (Crédito/Débito)',
-    slog: 'Administra las notas de ajuste aplicadas a tus facturas'
+    title: 'Notas de Crédito',
+    slog: 'Administra las notas de crédito aplicadas a tus facturas'
   };
 
   private route = inject(ActivatedRoute);

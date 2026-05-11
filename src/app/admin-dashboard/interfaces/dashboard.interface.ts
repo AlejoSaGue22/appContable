@@ -1,11 +1,3 @@
-export interface DashboardTotals {
-    ingresos: number;
-    egresos: number;
-    compras: number;
-    utilidad: number;
-    saldoCaja: number;
-}
-
 export interface RecentTransaction {
     id: string;
     type: 'venta' | 'compra';
@@ -25,7 +17,36 @@ export interface DashboardHistory {
 }
 
 export interface DashboardResponse {
-    totals: DashboardTotals;
+    sales: {
+        totalMonth: number;
+        totalLastMonth: number;
+        comparison: number;
+        trend: 'up' | 'down';
+    };
+    portfolio: {
+        receivable: {
+            total: number;
+            overdue: number;
+            nextMaturities: number;
+        };
+        payable: {
+            total: number;
+            overdue: number;
+            nextMaturities: number;
+        };
+    };
+    expenses: {
+        totalMonth: number;
+        totalLastMonth: number;
+        comparison: number;
+    };
+    cash: {
+        totalAvailable: number;
+        accounts: {
+            name: string;
+            balance: number;
+        }[];
+    };
     recentTransactions: RecentTransaction[];
     history: DashboardHistory[];
 }

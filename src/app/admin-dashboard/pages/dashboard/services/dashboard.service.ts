@@ -13,8 +13,8 @@ const baseUrl = environment.baseUrl;
 export class DashboardService {
     private http = inject(HttpClient);
 
-    getSummary(): Observable<DashboardResponse> {
-        return this.http.get<DashboardResponse>(`${baseUrl}/dashboard/summary`);
+    getSummary(period: string = 'current_month'): Observable<DashboardResponse> {
+        return this.http.get<DashboardResponse>(`${baseUrl}/dashboard/summary`, { params: { period } });
     }
 
     getDashboardAvanzado(): Observable<DashboardAvanzadoKPIs> {

@@ -169,7 +169,13 @@ export class TableInvoices {
   }
 
   formatDate(date: string | Date): string {
-    return new Date(date).toLocaleDateString('es-CO', {
+    if (!date) return '—';
+    // Evitar que JS reste un día al interpretar YYYY-MM-DD como UTC
+    const dateObj = typeof date === 'string' && date.includes('-') && !date.includes('T')
+      ? new Date(date.replace(/-/g, '\/'))
+      : new Date(date);
+
+    return dateObj.toLocaleDateString('es-CO', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'

@@ -39,10 +39,10 @@ export class NotasAjusteDetailsComponent {
     this.error.set(null);
 
     this.notasService.getNotaAjusteById(id).subscribe({
-      next: (response) => {
+      next: (response)   => {
         this.nota.set(response.data);
         this.loading.set(false);
-        this.cargarDatosContables();
+        this.cargarDatosContables();  
       },
       error: (err) => {
         this.error.set('Error al cargar la nota de ajuste');
@@ -120,18 +120,27 @@ export class NotasAjusteDetailsComponent {
 
   formatDate(date: string | Date): string {
     if (!date) return '—';
-    return new Date(date).toLocaleDateString('es-CO', {
+    // Evitar que JS reste un día al interpretar YYYY-MM-DD como UTC
+    const dateObj = typeof date === 'string' && date.includes('-') && !date.includes('T')
+      ? new Date(date.replace(/-/g, '\/'))
+      : new Date(date);
+
+    return dateObj.toLocaleDateString('es-CO', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
     });
   }
 
   printNota(): void {
-    // window.print();
-    // Por ahora usamos el print service si existe un método, o simplemente el print del navegador
-    // Si no hay método específico en printService, implementamos algo básico o llamamos al del navegador
-    window.print();
+    const n = this.nota();
+    if (n) {
+      const conceptoLabel = this.getConceptoLabel(n.tipo, n.concepto);
+      this.printService.printAdjustmentNote(n, conceptoLabel);
+    }
   }
 
   printAsiento(): void {

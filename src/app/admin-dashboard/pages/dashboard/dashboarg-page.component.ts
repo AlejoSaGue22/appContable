@@ -7,14 +7,14 @@ import { QuickAccess } from "./components/quick-access/quick-access.component";
 import { TransaccionesRecientesCard } from "./components/transacciones-recientes-card/transacciones-recientes-card.component";
 import { FlujoCajaCard } from "./components/flujo-caja-card/flujo-caja-card.component";
 import { DashboardAvanzadoKPIs } from '../../interfaces/reportes-avanzados.interface';
-import { DecimalPipe, CurrencyPipe } from '@angular/common';
+import { DecimalPipe, CurrencyPipe, NgClass } from '@angular/common';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { HelpersUtils } from '@utils/helpers.utils';
 
 
 @Component({
    selector: 'app-dashboarg-page',
-   imports: [HeaderTitlePageComponent, NumCardsTotalesComponent, QuickAccess, TransaccionesRecientesCard, FlujoCajaCard, CurrencyPipe],
+   imports: [HeaderTitlePageComponent, NumCardsTotalesComponent, QuickAccess, TransaccionesRecientesCard, FlujoCajaCard, CurrencyPipe, NgClass, DecimalPipe],
    templateUrl: './dashboarg-page.component.html',
 })
 export class DashboargPageComponent implements OnInit {
@@ -22,9 +22,18 @@ export class DashboargPageComponent implements OnInit {
    private dashboardService = inject(DashboardService);
 
    headTitle = signal<HeaderInput>({
-      title: 'Dashboard Avanzado',
-      slog: 'Vista estratégica y proyecciones de tu negocio'
+      title: 'Dashboard Estratégico',
+      slog: 'Vista avanzada y control financiero por periodos'
    })
+
+   selectedPeriod = signal<string>('current_month');
+   periods = [
+      { label: 'Mes Actual', value: 'current_month' },
+      { label: 'Mes Anterior', value: 'last_month' },
+      { label: 'Hace 3 Meses', value: 'last_3_months' },
+      { label: 'Año Actual', value: 'current_year' },
+      { label: 'Año Anterior', value: 'last_year' }
+   ];
 
    accesoRapido = [
       {
@@ -53,8 +62,8 @@ export class DashboargPageComponent implements OnInit {
    recentTransactions = signal<RecentTransaction[]>([]);
    history = signal<DashboardHistory[]>([]);
    
-   // New signals for advanced data
-   advancedData = signal<DashboardAvanzadoKPIs | null>(null);
+   // New signals for refined dashboard
+   dashboardData = signal<DashboardResponse | null>(null);
 
    chartData = computed(() => {
       const data = this.history();
@@ -76,51 +85,19 @@ export class DashboargPageComponent implements OnInit {
    }
 
    loadDashboardData() {
-      // Load standard summary
-      this.dashboardService.getSummary().subscribe({
+      this.dashboardService.getSummary(this.selectedPeriod()).subscribe({
          next: (data: DashboardResponse) => {
-            this.mappingCards(data);
+            this.dashboardData.set(data);
             this.recentTransactions.set(data.recentTransactions);
             this.history.set(data.history);
          }
       });
-
-      // Load advanced dashboard data
-      this.dashboardService.getDashboardAvanzado().subscribe({
-         next: (data) => {
-            this.advancedData.set(data);
-         }
-      });
    }
 
-   mappingCards(data: DashboardResponse) {
-      const cards: CardsTotales[] = [
-         {
-            title: 'Ingresos',
-            valor: data.totals.ingresos.toString(),
-            percent: '0'
-         },
-         {
-            title: 'Egresos',
-            valor: data.totals.egresos.toString(),
-            percent: '0'
-         },
-         {
-            title: 'Compras',
-            valor: data.totals.compras.toString(),
-            percent: '0'
-         },
-         {
-            title: 'Utilidad',
-            valor: data.totals.utilidad.toString(),
-            percent: '0'
-         },
-         {
-            title: 'Saldo Caja',
-            valor: data.totals.saldoCaja.toString(),
-            percent: '0'
-         }
-      ];
-      this.cardsValor.set(cards);
+   onPeriodChange(event: Event) {
+      const select = event.target as HTMLSelectElement;
+      this.selectedPeriod.set(select.value);
+      this.loadDashboardData();
    }
 }
+

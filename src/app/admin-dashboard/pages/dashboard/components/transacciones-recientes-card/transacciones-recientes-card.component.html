@@ -32,7 +32,7 @@
                 </span>
               </td>
               <td class="py-4 pl-3 text-right">
-                <span class="text-sm font-bold tracking-tight" [class.text-emerald-600]="tx.type === 'venta'"
+                <span class="text-sm tracking-tight" [class.text-emerald-600]="tx.type === 'venta'"
                   [class.text-gray-800]="tx.type === 'compra'">
                   {{ tx.type === 'venta' ? '+' : '-' }} {{ tx.total | currency }}
                 </span>

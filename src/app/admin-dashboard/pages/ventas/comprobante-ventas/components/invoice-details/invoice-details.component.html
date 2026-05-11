@@ -90,10 +90,8 @@
 
     <!-- ── DOCUMENTO FACTURA ──────────────────────────────────────────── -->
     <div class="mx-auto max-w-4xl space-y-4">
-
       <!-- Documento principal -->
       <div class="rounded-xl border border-gray-200 bg-white shadow-sm print:border-0 print:shadow-none overflow-hidden">
-
         <!-- Cabecera verde con número -->
         <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-5 print:bg-blue-600">
           <div class="flex items-start justify-between">
@@ -114,10 +112,8 @@
         </div>
 
         <div class="p-8">
-
           <!-- Info cliente + venta -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-
             <!-- Cliente -->
             <div class="bg-gray-50 rounded-lg border border-gray-100 p-4">
               <h3 class="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 flex items-center gap-1.5">
@@ -273,10 +269,6 @@
                 <div class="divide-y divide-gray-100">
                   <div class="flex justify-between px-4 py-2 text-sm">
                     <span class="text-gray-600">Valor Bruto</span>
-                    <span class="font-medium text-gray-900">{{ factura()!.subtotal | currency: '' : 'symbol' : '0.0-0' }}</span>
-                  </div>
-                  <div class="flex justify-between px-4 py-2 text-sm">
-                    <span class="text-gray-600">Base Imponible</span>
                     <span class="font-medium text-gray-900">{{ factura()!.subtotal | currency: '' : 'symbol' : '0.0-0' }}</span>
                   </div>
                   @if (factura()!.iva > 0) {
