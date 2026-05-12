@@ -1,20 +1,16 @@
-import { Component, EventEmitter, Output, computed, input, signal } from '@angular/core';
+import { Component, computed, input, signal } from '@angular/core';
 import { GetCuentasContables } from '@dashboard/interfaces/catalogs-interface';
-import { CommonModule } from '@angular/common';
+import { CurrencyPipe, CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-cuentas-contables-list',
+  selector: 'app-balance-cuentas-table',
   standalone: true,
-  imports: [CommonModule],
-  templateUrl: './cuentas-contables-list.component.html',
+  imports: [CurrencyPipe, CommonModule],
+  templateUrl: './balance-cuentas-table.component.html',
 })
-export class CuentasContablesList {
+export class BalanceCuentasTableComponent {
 
   cuentas = input<GetCuentasContables[]>([]);
-  selectedId = input<string | null>(null);
-
-  @Output() selectAccount = new EventEmitter<GetCuentasContables>();
-  @Output() addSubAccount = new EventEmitter<GetCuentasContables>();
 
   expandedIds = signal<Set<string>>(new Set<string>());
 
@@ -41,7 +37,7 @@ export class CuentasContablesList {
       const level = this.getDerivedLevel(code);
       if (level === 1) return true;
 
-      const prefixes = [];
+      const prefixes: string[] = [];
       if (code.length > 1) prefixes.push(code.substring(0, 1));
       if (code.length > 2) prefixes.push(code.substring(0, 2));
       if (code.length > 4) prefixes.push(code.substring(0, 4));
@@ -59,8 +55,7 @@ export class CuentasContablesList {
     });
   });
 
-  toggleExpand(event: Event, id: string): void {
-    event.stopPropagation();
+  toggleExpand(id: string): void {
     const current = new Set(this.expandedIds());
     if (current.has(id)) {
       current.delete(id);
@@ -76,14 +71,5 @@ export class CuentasContablesList {
 
   hasChildren(cuenta: GetCuentasContables): boolean {
     return !cuenta.aceptaMovimiento;
-  }
-
-  onSelect(cuenta: GetCuentasContables): void {
-    this.selectAccount.emit(cuenta);
-  }
-
-  onAdd(event: Event, cuenta: GetCuentasContables): void {
-    event.stopPropagation();
-    this.addSubAccount.emit(cuenta);
   }
 }

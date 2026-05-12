@@ -9,6 +9,7 @@ export interface GetCuentasContables {
     cuentaPadreId: string | null;
     aceptaMovimiento: boolean;
     isActive: boolean;
+    isSystemAccount: boolean;
     totalDebito: number;
     totalCredito: number;
     saldoPropio: number;

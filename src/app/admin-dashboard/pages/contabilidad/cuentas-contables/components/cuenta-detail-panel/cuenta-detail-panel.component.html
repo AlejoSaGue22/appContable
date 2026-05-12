@@ -1,0 +1,285 @@
+<!-- ── VIEW MODE ──────────────────────────────────────────────────── -->
+@if (mode === 'view' && account) {
+  <div class="h-full flex flex-col">
+
+    <!-- Header -->
+    <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+      <div>
+        <h2 class="text-base font-bold text-gray-900">Cuenta contable</h2>
+        <p class="text-xs text-gray-400 mt-0.5">Información asociada a la cuenta contable</p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-1.5">
+        <button (click)="switchToCreate()" 
+          class="p-2 rounded-lg text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
+          title="Agregar subcuenta">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+        </button>
+
+        @if (!account.isSystemAccount) {
+          <button (click)="switchToEdit()" 
+            class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition-colors cursor-pointer"
+            title="Editar cuenta">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="px-6 py-6 flex-1 overflow-y-auto space-y-6">
+
+      <!-- System account notice -->
+      @if (account.isSystemAccount) {
+        <div class="flex items-start gap-2.5 px-4 py-3 bg-amber-50 border border-amber-100 rounded-lg">
+          <svg class="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+          <p class="text-xs text-amber-700">
+            Esta cuenta funciona de manera automática como cuenta principal de <strong>{{ account.tipo | titlecase }}</strong>
+          </p>
+        </div>
+      }
+
+      <!-- Nombre -->
+      <div>
+        <p class="text-xs font-medium text-gray-400 mb-1">Nombre</p>
+        <p class="text-base font-bold text-gray-900">{{ account.nombre }}</p>
+      </div>
+
+      <!-- Código & Tipo -->
+      <div class="grid grid-cols-2 gap-6">
+        <div>
+          <p class="text-xs font-medium text-gray-400 mb-1">Código</p>
+          <p class="text-sm font-bold text-gray-900 font-mono">{{ account.codigo }}</p>
+        </div>
+        <div>
+          <p class="text-xs font-medium text-gray-400 mb-1">Tipo de cuenta</p>
+          <p class="text-sm font-semibold text-gray-700">{{ getTipoCuenta(getDerivedLevel(account.codigo)) }}</p>
+        </div>
+      </div>
+
+      <!-- Naturaleza -->
+      <div>
+        <p class="text-xs font-medium text-gray-400 mb-1">Naturaleza</p>
+        <p class="text-sm font-bold text-gray-900">{{ getNaturalezaLabel(account.naturaleza) }}</p>
+      </div>
+
+      <!-- Clase -->
+      <div>
+        <p class="text-xs font-medium text-gray-400 mb-1">Clasificación</p>
+        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider"
+          [ngClass]="{
+            'bg-emerald-50 text-emerald-700 border border-emerald-100': account.tipo === 'ACTIVO',
+            'bg-amber-50 text-amber-700 border border-amber-100': account.tipo === 'PASIVO',
+            'bg-blue-50 text-blue-700 border border-blue-100': account.tipo === 'PATRIMONIO',
+            'bg-green-50 text-green-700 border border-green-100': account.tipo === 'INGRESO',
+            'bg-red-50 text-red-700 border border-red-100': account.tipo === 'GASTO',
+            'bg-purple-50 text-purple-700 border border-purple-100': account.tipo === 'COSTO'
+          }">
+          {{ account.tipo }}
+        </span>
+      </div>
+
+      <!-- Descripción -->
+      <div>
+        <p class="text-xs font-medium text-gray-400 mb-1">Descripción</p>
+        <p class="text-sm text-gray-600">{{ account.descripcion || '-' }}</p>
+      </div>
+
+      <!-- Saldo -->
+      <div class="border-t border-gray-100 pt-5 mt-2">
+        <p class="text-xs font-medium text-gray-400 mb-1">Saldo Actual</p>
+        <p class="text-lg font-bold" 
+          [class.text-gray-900]="account.saldo >= 0"
+          [class.text-red-600]="account.saldo < 0">
+          {{ account.saldo | currency:'':'$':'1.0-0' }}
+        </p>
+      </div>
+
+      <!-- Acepta Movimiento -->
+      <div class="flex items-center gap-2">
+        <div class="w-4 h-4 rounded-full flex items-center justify-center"
+          [class.bg-blue-500]="account.aceptaMovimiento"
+          [class.bg-gray-200]="!account.aceptaMovimiento">
+          @if (account.aceptaMovimiento) {
+            <svg class="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+            </svg>
+          }
+        </div>
+        <span class="text-xs text-gray-500">{{ account.aceptaMovimiento ? 'Acepta movimientos contables' : 'No acepta movimientos (cuenta agrupadora)' }}</span>
+      </div>
+
+    </div>
+  </div>
+}
+
+<!-- ── CREATE MODE ────────────────────────────────────────────────── -->
+@if (mode === 'create' && parentAccount) {
+  <div class="h-full flex flex-col">
+    
+    <!-- Header -->
+    <div class="px-6 py-5 border-b border-gray-100">
+      <h2 class="text-base font-bold text-gray-900">Nueva cuenta contable</h2>
+      <p class="text-xs text-gray-400 mt-0.5">Se creará como una subcuenta de <strong class="text-gray-700">{{ parentAccount.nombre }}</strong></p>
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="px-6 py-6 flex-1 overflow-y-auto space-y-5">
+
+      <!-- Nombre -->
+      <div class="space-y-1.5">
+        <label class="text-xs font-medium text-gray-500">Nombre <span class="text-red-500">*</span></label>
+        <input type="text" formControlName="nombre" placeholder="Nombre de la cuenta"
+          class="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+          [ngClass]="{'border-red-300': form.get('nombre')?.invalid && form.get('nombre')?.touched}"
+        >
+      </div>
+
+      <!-- Código & Tipo -->
+      <div class="grid grid-cols-2 gap-4">
+        <div class="space-y-1.5">
+          <label class="text-xs font-medium text-gray-500">Código</label>
+          <input type="text" formControlName="codigo"
+            class="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+            [ngClass]="{'border-red-300': form.get('codigo')?.invalid && form.get('codigo')?.touched}"
+          >
+        </div>
+        <div class="space-y-1.5">
+          <label class="text-xs font-medium text-gray-500">Tipo de cuenta</label>
+          <div class="px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-lg text-sm text-gray-600">
+            {{ getTipoCuenta(getDerivedLevel(parentAccount.codigo) + 1) }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Naturaleza (readonly) -->
+      <div class="space-y-1.5">
+        <label class="text-xs font-medium text-gray-500">Naturaleza</label>
+        <div class="px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-lg text-sm text-gray-600">
+          {{ getNaturalezaLabel(parentAccount.naturaleza) }}
+        </div>
+      </div>
+
+      <!-- Descripción -->
+      <div class="space-y-1.5">
+        <label class="text-xs font-medium text-gray-500">Descripción</label>
+        <textarea formControlName="descripcion" rows="3" placeholder="Descripción opcional de la cuenta"
+          class="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"
+        ></textarea>
+      </div>
+
+      <!-- Acepta movimiento -->
+      <div class="flex items-center gap-3 py-2">
+        <input type="checkbox" formControlName="aceptaMovimiento" id="aceptaMovCreate"
+          class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer">
+        <label for="aceptaMovCreate" class="text-sm text-gray-600 cursor-pointer select-none">Acepta movimientos contables</label>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
+        <button type="button" (click)="cancelEdit()" 
+          class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
+          Cancelar
+        </button>
+        <button type="submit" [disabled]="isSubmitting()"
+          class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-lg transition-all shadow-sm disabled:opacity-50 cursor-pointer">
+          @if (isSubmitting()) {
+            <span class="flex items-center gap-2">
+              <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+              Guardando...
+            </span>
+          } @else {
+            Crear cuenta
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+}
+
+<!-- ── EDIT MODE ──────────────────────────────────────────────────── -->
+@if (mode === 'edit' && account) {
+  <div class="h-full flex flex-col">
+    
+    <!-- Header -->
+    <div class="px-6 py-5 border-b border-gray-100">
+      <h2 class="text-base font-bold text-gray-900">Editar cuenta contable</h2>
+      <p class="text-xs text-gray-400 mt-0.5">[{{ account.codigo }}] {{ account.nombre }}</p>
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="px-6 py-6 flex-1 overflow-y-auto space-y-5">
+
+      <!-- Nombre -->
+      <div class="space-y-1.5">
+        <label class="text-xs font-medium text-gray-500">Nombre <span class="text-red-500">*</span></label>
+        <input type="text" formControlName="nombre"
+          class="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+        >
+      </div>
+
+      <!-- Código (readonly) -->
+      <div class="grid grid-cols-2 gap-4">
+        <div class="space-y-1.5">
+          <label class="text-xs font-medium text-gray-500">Código</label>
+          <div class="px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-lg text-sm text-gray-600 font-mono">
+            {{ account.codigo }}
+          </div>
+        </div>
+        <div class="space-y-1.5">
+          <label class="text-xs font-medium text-gray-500">Tipo de cuenta</label>
+          <div class="px-3 py-2.5 bg-gray-50 border border-gray-100 rounded-lg text-sm text-gray-600">
+            {{ getTipoCuenta(getDerivedLevel(account.codigo)) }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Descripción -->
+      <div class="space-y-1.5">
+        <label class="text-xs font-medium text-gray-500">Descripción</label>
+        <textarea formControlName="descripcion" rows="3"
+          class="w-full px-3 py-2.5 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"
+        ></textarea>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
+        <button type="button" (click)="cancelEdit()" 
+          class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">
+          Cancelar
+        </button>
+        <button type="submit" [disabled]="isSubmitting()"
+          class="px-5 py-2 bg-[#0f172a] hover:bg-slate-800 text-white text-sm font-bold rounded-lg transition-all shadow-sm disabled:opacity-50 cursor-pointer">
+          @if (isSubmitting()) {
+            <span class="flex items-center gap-2">
+              <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+              Guardando...
+            </span>
+          } @else {
+            Actualizar cuenta
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+}
+
+<!-- ── EMPTY STATE ────────────────────────────────────────────────── -->
+@if (!account && mode === 'view') {
+  <div class="h-full flex flex-col items-center justify-center text-center px-8">
+    <div class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
+      <svg class="w-8 h-8 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+      </svg>
+    </div>
+    <p class="text-sm font-semibold text-gray-500">Selecciona una cuenta</p>
+    <p class="text-xs text-gray-400 mt-1">Haz clic en una cuenta del árbol para ver sus detalles</p>
+  </div>
+}

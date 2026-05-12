@@ -11,6 +11,7 @@ import { NotificationService } from '@shared/services/notification.service';
 import { PrintService } from '@shared/services/print.service';
 import { ModalEmailComponent } from '@shared/components/modal-email/modal-email.component';
 import { HelpersUtils } from '@utils/helpers.utils';
+import { ResponseResult } from '@shared/interfaces/services.interfaces';
 
 @Component({
   selector: 'app-invoice-details',
@@ -82,8 +83,13 @@ export class InvoiceDetailsComponent {
   reintentarAsiento(): void {
     this.loading.set(true);
     this.facturasService.reintentarAsiento(this.factura()!.id).subscribe({
-      next: () => { 
-        this.loadInvoice(this.factura()!.id); 
+      next: (response: ResponseResult) => { 
+        if(response.success){
+          this.notificationService.success(response.message || 'Asiento reintentado correctamente', 'Exito');
+          this.loadInvoice(this.factura()!.id); 
+        }else{
+          this.notificationService.error(`${response.message}`, 'Error');
+        }
         this.loading.set(false);
       },
       error: (error) => {

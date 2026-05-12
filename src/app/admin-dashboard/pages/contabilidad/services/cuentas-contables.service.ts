@@ -21,4 +21,12 @@ export class CuentasContablesService {
 
     return this.http.get<GetCuentasContables[]>(this.base, { params: httpParams });
   }
+
+  create(cuenta: any): Observable<GetCuentasContables> {
+    return this.http.post<GetCuentasContables>(this.base, cuenta);
+  }
+
+  update(id: string, cuenta: any): Observable<GetCuentasContables> {
+    return this.http.patch<GetCuentasContables>(`${this.base}/${id}`, cuenta);
+  }
 }

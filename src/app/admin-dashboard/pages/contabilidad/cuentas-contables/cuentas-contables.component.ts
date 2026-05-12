@@ -18,12 +18,15 @@ import { CategoriaFormModalComponent } from './components/categoria-form-modal/c
 import { CategoryArticle } from '@dashboard/interfaces/catalogs-interface';
 import { NotificationService } from '@shared/services/notification.service';
 import { CuentasContablesList } from "./components/cuentas-contables-list/cuentas-contables-list.component";
+import { CuentaDetailPanelComponent, PanelMode } from './components/cuenta-detail-panel/cuenta-detail-panel.component';
+import { GetCuentasContables } from '../interfaces/cuentas-contables.interface';
 
 @Component({
   selector: 'app-cuentas-contables',
   standalone: true,
   imports: [CommonModule, LoaderComponent, HeaderTitlePageComponent, FormsModule,
-    PaginationComponent, CategoriasListComponent, CategoriaFormModalComponent, CuentasContablesList],
+    PaginationComponent, CategoriasListComponent, CategoriaFormModalComponent,
+    CuentasContablesList, CuentaDetailPanelComponent],
   templateUrl: './cuentas-contables.component.html',
   providers: [PaginationService]
 })
@@ -40,13 +43,15 @@ export class CuentasContablesComponent {
   isModalOpen = signal(false);
   selectedCategory = signal<CategoryArticle | null>(null);
 
+  // ── Detail Panel State ────────────────────────────────────────────
+  selectedAccount = signal<GetCuentasContables | null>(null);
+  parentAccount = signal<GetCuentasContables | null>(null);
+  panelMode = signal<PanelMode>('view');
+
   constructor() {
     this.catalogsStore.initialize();
-    
-    // Configurar tamaño de página a 2 para ver la paginación con pocos elementos
     this.paginationService.pageSize.set(10);
 
-    // Sync pagination total items
     effect(() => {
       if (this.tabs() === 'categorias') {
         this.paginationService.totalItems.set(this.categoriesResource.value()?.count || 0);
@@ -59,11 +64,8 @@ export class CuentasContablesComponent {
     slog: 'Visualización jerárquica del plan único de cuentas (PUC)'
   }
 
-  // Campos seleccionados en el input (temporales)
   selectedFechaInicio = signal<string>('');
   selectedFechaFin    = signal<string>('');
-
-  // Parámetros aplicados a la búsqueda real
   appliedFechaInicio = signal<string>('');
   appliedFechaFin    = signal<string>('');
 
@@ -116,7 +118,6 @@ export class CuentasContablesComponent {
   cuentasOrdenadas = computed(() => {
     const data = this.cuentasResource.value();
     if (!data) return [];
-    
     return [...data].sort((a, b) => a.codigo.localeCompare(b.codigo));
   });
 
@@ -124,6 +125,7 @@ export class CuentasContablesComponent {
     return this.cuentasOrdenadas().filter(c => c.aceptaMovimiento);
   });
 
+  // ── Categories Modal ──────────────────────────────────────────────
   openCreateModal() {
     this.selectedCategory.set(null);
     this.isModalOpen.set(true);
@@ -143,5 +145,27 @@ export class CuentasContablesComponent {
     this.categoriesResource.reload();
   }
 
-  
+  // ── Detail Panel Actions ──────────────────────────────────────────
+  onSelectAccount(account: GetCuentasContables): void {
+    this.selectedAccount.set(account);
+    this.parentAccount.set(null);
+    this.panelMode.set('view');
+  }
+
+  onAddSubAccount(parent: GetCuentasContables): void {
+    this.selectedAccount.set(null);
+    this.parentAccount.set(parent);
+    this.panelMode.set('create');
+  }
+
+  onPanelModeChange(mode: PanelMode): void {
+    this.panelMode.set(mode);
+  }
+
+  onAccountSaved(): void {
+    this.cuentasResource.reload();
+    // After reload, reset selection to avoid stale data
+    this.selectedAccount.set(null);
+    this.panelMode.set('view');
+  }
 }
