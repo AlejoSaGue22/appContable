@@ -64,17 +64,17 @@ export class RolesComponent {
   }
 
   async openEditModal(role: Role) {
-    // if (role.isSystem) {
-    //   this.notificationService.warning('Los roles del sistema no pueden ser editados', 'Información');
-    //   return;
-    // }
-
     this.isEditing.set(true);
     this.selectedRoleId.set(role.id);
+
+    const normalizedPermissions = (role.permissions || []).map((p: any) =>
+      typeof p === 'string' ? p : p.name || p.slug || p.id || p
+    );
+
     this.roleForm.patchValue({
       name: role.name,
       description: role.description,
-      permissions: role.permissions,
+      permissions: normalizedPermissions,
       isActive: role.isActive
     });
     this.isModalOpen.set(true);
@@ -91,11 +91,20 @@ export class RolesComponent {
 
   togglePermission(perm: string) {
     const currentPerms = this.roleForm.get('permissions')?.value || [];
-    if (currentPerms.includes(perm)) {
-      this.roleForm.patchValue({
-        permissions: currentPerms.filter(p => p !== perm)
-      });
+    
+    // Buscar si el permiso ya existe (comparación robusta)
+    const index = currentPerms.findIndex((p: any) => {
+      const pValue = typeof p === 'string' ? p : p.name || p.slug || p.id;
+      return pValue === perm;
+    });
+
+    if (index !== -1) {
+      // Si existe, lo eliminamos
+      const newPerms = [...currentPerms];
+      newPerms.splice(index, 1);
+      this.roleForm.patchValue({ permissions: newPerms });
     } else {
+      // Si no existe, lo agregamos como string
       this.roleForm.patchValue({
         permissions: [...currentPerms, perm]
       });
@@ -103,7 +112,11 @@ export class RolesComponent {
   }
 
   isPermissionSelected(perm: string): boolean {
-    return (this.roleForm.get('permissions')?.value || []).includes(perm);
+    const perms = this.roleForm.get('permissions')?.value || [];
+    return perms.some((p: any) => {
+      const pValue = typeof p === 'string' ? p : p.name || p.slug || p.id;
+      return pValue === perm;
+    });
   }
 
   async onSubmit() {

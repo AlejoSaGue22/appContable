@@ -71,10 +71,6 @@ export class CuentaDetailPanelComponent implements OnChanges {
     return 'Auxiliar';
   }
 
-  getNaturalezaLabel(naturaleza: string): string {
-    return naturaleza === 'DEBITO' ? 'Deudora' : 'Acreedora';
-  }
-
   getDerivedLevel(codigo: string): number {
     const len = codigo.length;
     if (len === 1) return 1;

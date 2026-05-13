@@ -18,7 +18,7 @@
         <!-- Expand/Collapse Toggle -->
         @if (hasChildren(cuenta)) {
           <button (click)="toggleExpand($event, cuenta.id)" 
-            class="w-5 h-5 flex items-center justify-center text-gray-400 hover:text-blue-600 transition-colors flex-shrink-0">
+            class="w-5 h-5 flex items-center cursor-pointer justify-center text-gray-400 hover:text-blue-600 transition-colors flex-shrink-0">
             @if (isExpanded(cuenta.id)) {
               <span class="text-sm font-bold">—</span>
             } @else {
