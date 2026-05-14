@@ -1,0 +1,127 @@
+import { Component, inject, signal, OnInit, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { HeaderTitlePageComponent, HeaderInput } from '@dashboard/components/header-title-page/header-title-page.component';
+import { TableListComponent, Column } from '@shared/components/table-list/table-list.component';
+import { ModalComponent } from '@shared/components/modal/modal.component';
+import { ImpuestosService } from './services/impuestos.service';
+import { Impuesto } from './interfaces/impuesto.interface';
+import { CuentasContablesService } from '@dashboard/pages/contabilidad/services/cuentas-contables.service';
+import { firstValueFrom } from 'rxjs';
+
+@Component({
+  selector: 'app-config-impuestos',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, HeaderTitlePageComponent, TableListComponent, ModalComponent],
+  templateUrl: './impuestos.component.html',
+})
+export class ImpuestosComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private impuestosService = inject(ImpuestosService);
+  private cuentasService = inject(CuentasContablesService);
+
+  headTitle = signal<HeaderInput>({
+    title: 'Impuestos',
+    slog: 'Define los tipos de impuestos y retenciones que aplicas en tus transacciones'
+  });
+
+  columns: Column[] = [
+    { key: 'nombre', header: 'Nombre' },
+    { key: 'tipo', header: 'Tipo' },
+    { key: 'tarifa', header: 'Tarifa (%)' },
+    { key: 'activo', header: 'Estado', type: 'boolean' }
+  ];
+
+  impuestos = signal<Impuesto[]>([]);
+  cuentas = signal<any[]>([]);
+  loading = signal<boolean>(false);
+  modalVisible = signal<boolean>(false);
+  isEditing = signal<boolean>(false);
+  selectedId = signal<string | null>(null);
+  showAdvanced = signal<boolean>(false);
+
+  taxForm: FormGroup = this.fb.group({
+    nombre: ['', [Validators.required]],
+    tipo: ['IVA', [Validators.required]],
+    tarifa: [0, [Validators.required, Validators.min(0)]],
+    descripcion: [''],
+    activo: [true],
+    isAcreditable: [false],
+    cuentaVentasId: [null],
+    cuentaComprasId: [null],
+    cuentaDevVentasId: [null],
+    cuentaDevComprasId: [null]
+  });
+
+  ngOnInit(): void {
+    this.loadData();
+    this.loadCuentas();
+  }
+
+  async loadData() {
+    this.loading.set(true);
+    try {
+      const data = await firstValueFrom(this.impuestosService.getAll());
+      this.impuestos.set(data);
+    } catch (error) {
+      console.error('Error loading taxes', error);
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  async loadCuentas() {
+    try {
+      const data = await firstValueFrom(this.cuentasService.getCuentasContables());
+      this.cuentas.set(data);
+    } catch (error) {
+      console.error('Error loading accounts', error);
+    }
+  }
+
+  openNew() {
+    this.isEditing.set(false);
+    this.selectedId.set(null);
+    this.taxForm.reset({
+      activo: true,
+      tipo: 'IVA',
+      tarifa: 0,
+      isAcreditable: false
+    });
+    this.modalVisible.set(true);
+  }
+
+  async onEdit(event: any) {
+    const id = event.id;
+    this.isEditing.set(true);
+    this.selectedId.set(id);
+    try {
+      const data = await firstValueFrom(this.impuestosService.getById(id));
+      this.taxForm.patchValue(data);
+      this.modalVisible.set(true);
+    } catch (error) {
+      console.error('Error fetching tax details', error);
+    }
+  }
+
+  async save() {
+    if (this.taxForm.invalid) return;
+
+    const data = this.taxForm.value;
+    try {
+      if (this.isEditing() && this.selectedId()) {
+        await firstValueFrom(this.impuestosService.update(this.selectedId()!, data));
+      } else {
+        await firstValueFrom(this.impuestosService.create(data));
+      }
+      this.modalVisible.set(false);
+      this.loadData();
+    } catch (error) {
+      console.error('Error saving tax', error);
+    }
+  }
+
+  toggleAdvanced() {
+    this.showAdvanced.update(v => !v);
+  }
+}

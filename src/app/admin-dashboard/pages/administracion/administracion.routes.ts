@@ -22,6 +22,10 @@ export const administracionRoutes: Routes = [
         component: RolesComponent
     },
     {
+        path: 'settings',
+        loadChildren: () => import('./configuraciones/configuraciones.routes')
+    },
+    {
         path: '**',
         component: ErrorPageComponent
     }

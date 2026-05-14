@@ -1,0 +1,92 @@
+<header-title-page [titleHead]="headTitle()" />
+
+<div class="w-full px-4 sm:px-6 lg:px-8 py-8 animate-fade-in space-y-8">
+    <div class="max-w-7xl mx-auto space-y-8">
+
+        <!-- Info Bar (Sober & Professional) -->
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+            <div class="grid grid-cols-1 md:grid-cols-5 items-center gap-8 md:divide-x divide-gray-100">
+                <!-- Empresa -->
+                <div class="text-center md:text-left space-y-1">
+                    <p class="text-[10px] font-bold text-gray-400">Empresa</p>
+                    <p class="text-md font-bold text-slate-800">{{ user()?.fullName || 'Asang' }}</p>
+                </div>
+
+                <!-- Identificación -->
+                <div class="text-center md:pl-8 space-y-1">
+                    <p class="text-[10px] font-bold text-gray-400">Identificación</p>
+                    <p class="text-md font-bold text-slate-800">---</p>
+                </div>
+
+                <!-- Logo Central -->
+                <div class="flex justify-center md:px-8">
+                    <img [src]="logoApp" alt="Logo" class="h-10 w-auto transition-all duration-500">
+                </div>
+
+                <!-- Versión -->
+                <div class="text-center md:pl-8 space-y-1">
+                    <p class="text-[10px] font-bold text-gray-400">Versión de {{ nameApp }}</p>
+                    <p class="text-md font-bold text-slate-800">Colombia</p>
+                </div>
+
+                <!-- Plan -->
+                <div class="text-center md:pl-8 space-y-1">
+                    <p class="text-[10px] font-bold text-gray-400">Estado de Cuenta</p>
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-slate-900 rounded-lg">
+                        <span class="text-[10px] font-black text-white uppercase tracking-wider">Plan Pro</span>
+                    </div>
+                    <p class="text-[10px] font-bold text-slate-400 mt-1">14 días restantes</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuration Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            @for (section of menuSections; track section.title) {
+                <div class="group bg-white rounded-2xl shadow-sm border border-gray-100 p-7 hover:border-slate-300 hover:shadow-md transition-all duration-300">
+                    <div class="space-y-5">
+                        <!-- Icon & Title -->
+                        <div class="flex items-center gap-3">
+                            <div class="p-2.5 bg-slate-50 rounded-xl group-hover:bg-slate-100 transition-colors">
+                                <svg class="w-5 h-5 text-slate-500 group-hover:text-slate-900 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="section.icon"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-800 tracking-tight">{{ section.title }}</h3>
+                        </div>
+
+                        <!-- Description -->
+                        <p class="text-xs text-gray-400 font-medium leading-relaxed">
+                            {{ section.description }}
+                        </p>
+
+                        <!-- Links List -->
+                        <div class="space-y-2 pt-4 border-t border-gray-50">
+                            @for (opt of section.options; track opt.label) {
+                                <a [routerLink]="opt.route" 
+                                    class="flex items-center justify-between group/link py-1 cursor-pointer">
+                                    <span class="text-xs font-bold text-slate-500 group-hover/link:text-slate-900 transition-colors">
+                                        {{ opt.label }}
+                                    </span>
+                                    <svg class="w-3 h-3 text-gray-300 group-hover/link:text-slate-900 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease-out forwards;
+    }
+</style>

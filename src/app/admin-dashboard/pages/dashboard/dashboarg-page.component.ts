@@ -46,15 +46,11 @@ export class DashboargPageComponent implements OnInit {
       },
       {
          title: 'Pagos',
-         ruta: '/panel/contabilidad/pagos/cxp'
+         ruta: '/panel/pagos/cxc'
       }
-   ]
+   ];
 
-   roles = signal([
-      'Super Admin',
-      'Admin',
-      'User'
-   ]);
+   roles = signal(['Super Admin','Admin','User' ]);
    role = inject(AuthService).user()?.role;
    logoApp = HelpersUtils.logoApp;
    nameApp = HelpersUtils.nameApp;
