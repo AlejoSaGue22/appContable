@@ -26,8 +26,8 @@
             </div>
 
             <div class="flex items-center gap-3">
-                <a routerLink="/panel/compras/productos-compra/new-Item"
-                    class="inline-flex items-center justify-center px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 group">
+                <a routerLink="/panel/compras/articles/new-Item"
+                    class="inline-flex items-center cursor-pointer justify-center px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 group">
                     <svg class="mr-2 h-4 w-4 transition-transform group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
                     </svg>
@@ -39,9 +39,9 @@
         <div class="mt-4">
             <app-table-productos-compra [productoData]="productorxResource.value().articulos" (delete)="openModal($event)" />
             
-            <div class="mt-4">
+            <!-- <div class="mt-4"> -->
                 <app-pagination [length]="productorxResource.value().articulos.length" />
-            </div>
+            <!-- </div> -->
         </div>
     </div>
 }

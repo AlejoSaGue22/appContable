@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/app/environments/environment';
 import { CategoryArticle, CategoryArticleResponse, ConceptNote, DocumentType, PaymentMethod, SalesChannel, UnitMeasure } from '../interfaces/catalogs-interface';
+import { Impuesto } from '../pages/administracion/configuraciones/pages/impuestos/interfaces/impuesto.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +11,10 @@ import { CategoryArticle, CategoryArticleResponse, ConceptNote, DocumentType, Pa
 export class CatalogsService {
   private http = inject(HttpClient);
   private baseUrl = environment.baseUrl;
+
+  findAllImpuestos(): Observable<Impuesto[]> {
+    return this.http.get<Impuesto[]>(`${this.baseUrl}/settings/impuestos`);
+  }
 
   findAllDocumentTypes(): Observable<DocumentType[]> {
     return this.http.get<DocumentType[]>(`${this.baseUrl}/catalogs/document-types`);

@@ -23,9 +23,9 @@
                     <th scope="col" class="px-8 py-5">Impuesto</th>
                     <th scope="col" class="px-8 py-5">Tipo</th>
                     <th scope="col" class="px-8 py-5">Tarifa</th>
+                    <th scope="col" class="px-8 py-5">Descripción</th>
                     <th scope="col" class="px-8 py-5">Estado</th>
-                    <th scope="col" class="px-8 py-5">Configuración</th>
-                    <th scope="col" class="px-8 py-5 text-right">Acciones</th>
+                    <th scope="col" class="px-8 py-5 text-center">Acciones</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -33,56 +33,37 @@
                     <tr class="transition-all duration-200 group hover:bg-slate-50/50">
                         <td class="px-8 py-6">
                             <div class="flex flex-col gap-1.5">
-                                <span class="font-bold text-gray-900">{{ impuesto.nombre }}</span>
-                                @if (impuesto.descripcion) {
-                                    <p class="text-[11px] text-gray-400 line-clamp-1">{{ impuesto.descripcion }}</p>
-                                }
+                                <span class="text-gray-900">{{ impuesto.nombre }}</span>
                             </div>
                         </td>
                         <td class="px-8 py-6">
-                            <span class="px-2 py-0.5 bg-slate-50 text-slate-600 text-[10px] font-bold rounded uppercase border border-slate-100">
+                            <span class="px-2 py-0.5 bg-slate-50 text-slate-600 text-[10px] rounded uppercase border border-slate-100">
                                 {{ impuesto.tipo }}
                             </span>
                         </td>
                         <td class="px-8 py-6">
                             <div class="flex items-center gap-1">
-                                <span class="text-sm font-black text-slate-900">{{ impuesto.tarifa }}</span>
-                                <span class="text-[10px] font-bold text-gray-400">%</span>
+                                <span class="text-sm text-slate-900">{{ impuesto.tarifa }}</span>
+                                <span class="text-[10px] text-gray-400">%</span>
                             </div>
+                        </td>
+                        <td class="px-8 py-6">
+                                <p class="text-sm text-gray-500 line-clamp-2">{{ impuesto.descripcion }}</p>
                         </td>
                         <td class="px-8 py-6">
                             @if (impuesto.activo) {
                                 <div class="flex items-center gap-1.5">
                                     <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                                    <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">Activo</span>
+                                    <span class="text-[10px] text-emerald-600 uppercase tracking-wider">Activo</span>
                                 </div>
                             } @else {
                                 <div class="flex items-center gap-1.5">
                                     <div class="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
-                                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Inactivo</span>
+                                    <span class="text-[10px] text-gray-400 uppercase tracking-wider">Inactivo</span>
                                 </div>
                             }
                         </td>
-                        <td class="px-8 py-6">
-                            <div class="flex items-center gap-3">
-                                @if (impuesto.isAcreditable) {
-                                    <div class="flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 rounded-lg border border-blue-100" title="Acreditable / Descontable">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4" />
-                                        </svg>
-                                        <span class="text-[9px] font-bold uppercase">Acreditable</span>
-                                    </div>
-                                }
-                                @if (impuesto.cuentaVentasId || impuesto.cuentaComprasId) {
-                                    <div class="flex items-center gap-1 px-2 py-1 bg-purple-50 text-purple-600 rounded-lg border border-purple-100" title="Contabilizado">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                        </svg>
-                                        <span class="text-[9px] font-bold uppercase">Contable</span>
-                                    </div>
-                                }
-                            </div>
-                        </td>
+                        
                         <td class="px-8 py-6">
                             <div class="flex items-center justify-end gap-2">
                                 <button (click)="onEdit(impuesto)" 
@@ -120,6 +101,8 @@
                 }
             </tbody>
         </table>
+
+        
     </div>
 </div>
 

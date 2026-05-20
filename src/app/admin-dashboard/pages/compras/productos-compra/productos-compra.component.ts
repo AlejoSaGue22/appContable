@@ -8,14 +8,14 @@ import { ModalComponents } from "@shared/components/modal.components/modal.compo
 import { modalOpen } from '@shared/interfaces/services.interfaces';
 import { NotificationService } from '@shared/services/notification.service';
 import { ProductosService } from '@dashboard/pages/ventas/services/productos.service';
-import { HeaderTitleProductosCompraComponent } from "./components/header-title-productos-compra/header-title-productos-compra.component";
 import { TableProductosCompra } from "./components/table-productos-compra/table-productos-compra/table-productos-compra.component";
 import { PaginationComponent } from '@shared/components/pagination/pagination';
 import { HeaderTitlePageComponent, HeaderInput } from "@dashboard/components/header-title-page/header-title-page.component";
 import { GetProductosDetalle } from '@dashboard/interfaces/productos-interface';
+import { RouterLink } from '@angular/router';
 
 @Component({
-   imports: [CommonModule, LoaderComponent, ModalComponents, HeaderTitleProductosCompraComponent, TableProductosCompra,
+   imports: [CommonModule, LoaderComponent, ModalComponents, RouterLink, TableProductosCompra,
     PaginationComponent, HeaderTitlePageComponent],
    templateUrl: './productos-compra.component.html',
    standalone: true,

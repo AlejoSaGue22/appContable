@@ -55,6 +55,8 @@ export interface Municipality {
     department: string;
 }
 
+import { Impuesto } from '../pages/administracion/configuraciones/pages/impuestos/interfaces/impuesto.interface';
+
 export interface CatalogsState {
     documentTypes: DocumentType[];
     paymentMethods: PaymentMethod[];
@@ -63,6 +65,7 @@ export interface CatalogsState {
     municipalities: Municipality[];
     categoriesArticles: CategoryArticle[];
     conceptsNotes: ConceptNote[];
+    impuestos: Impuesto[];
     loading: boolean;
     error: string | null;
 }

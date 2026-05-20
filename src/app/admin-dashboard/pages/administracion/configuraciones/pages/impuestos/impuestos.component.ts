@@ -8,17 +8,20 @@ import { ImpuestosService } from './services/impuestos.service';
 import { Impuesto } from './interfaces/impuesto.interface';
 import { CuentasContablesService } from '@dashboard/pages/contabilidad/services/cuentas-contables.service';
 import { firstValueFrom } from 'rxjs';
+import { PaginationComponent } from "@shared/components/pagination/pagination";
+import { PaginationService } from '@shared/components/pagination/pagination.service';
 
 @Component({
   selector: 'app-config-impuestos',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, HeaderTitlePageComponent, ImpuestosListComponent, ModalComponent],
+  imports: [CommonModule, ReactiveFormsModule, HeaderTitlePageComponent, ImpuestosListComponent, ModalComponent, PaginationComponent],
   templateUrl: './impuestos.component.html',
 })
 export class ImpuestosComponent implements OnInit {
   private fb = inject(FormBuilder);
   private impuestosService = inject(ImpuestosService);
   private cuentasService = inject(CuentasContablesService);
+  private paginationService = inject(PaginationService);
 
   headTitle = signal<HeaderInput>({
     title: 'Impuestos',
@@ -27,6 +30,17 @@ export class ImpuestosComponent implements OnInit {
 
   impuestos = signal<Impuesto[]>([]);
   cuentas = signal<any[]>([]);
+  cuentasFiltradas = computed(() => {
+    return this.cuentas().filter(c => 
+      c.aceptaMovimiento && 
+      (c.codigo.startsWith('1355') || 
+       c.codigo.startsWith('24') || 
+       c.codigo.startsWith('2365') || 
+       c.codigo.startsWith('2367') || 
+       c.codigo.startsWith('2368') || 
+       c.codigo.startsWith('2370'))
+    );
+  });
   loading = signal<boolean>(false);
   modalVisible = signal<boolean>(false);
   isEditing = signal<boolean>(false);
@@ -56,6 +70,9 @@ export class ImpuestosComponent implements OnInit {
     try {
       const data = await firstValueFrom(this.impuestosService.getAll());
       this.impuestos.set(data);
+      this.paginationService.totalItems.set(data.length);
+      const pageSize = data.length > 0 ? Math.ceil(data.length / 10) : 1; // Default page size of 10
+      this.paginationService.pageSize.set(pageSize);
     } catch (error) {
       console.error('Error loading taxes', error);
     } finally {
