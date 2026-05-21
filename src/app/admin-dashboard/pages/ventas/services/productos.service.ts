@@ -18,6 +18,8 @@ const emptyProducto: ArticulosInterface = {
   precio: '',
   precioventa2: '',
   observacion: '',
+  isInventariable: true,
+  afectaInventario: true,
 }
 
 @Injectable({

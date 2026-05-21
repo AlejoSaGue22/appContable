@@ -17,6 +17,8 @@ export interface ArticulosInterface {
     precio: string,
     precioventa2: string,
     observacion: string,
+    isInventariable?: boolean;
+    afectaInventario?: boolean;
 }
 
 export interface UnidadMedidaRel {
@@ -63,4 +65,6 @@ export interface GetProductosDetalle {
     cuentaIva: CuentasIvaRel;
     cuentaIvaId: string;
     ind: string;
+    isInventariable?: boolean;
+    afectaInventario?: boolean;
 }

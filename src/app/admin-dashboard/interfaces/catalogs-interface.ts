@@ -11,11 +11,13 @@ export interface CategoryArticle {
     nombre: string;
     tipo: string;
     descripcion?: string;
-    cuentaContableId?: string;
-    cuentaContable?: Partial<GetCuentasContables>;
-    cuentaIvaId?: string;
-    cuentaIva?: Partial<GetCuentasContables>;
-    cuentaIvaCodigo?: string;
+    cuentaPrincipalId?: string;
+    cuentaPrincipal?: Partial<GetCuentasContables>;
+    cuentaCostoId?: string;
+    cuentaCosto?: Partial<GetCuentasContables>;
+    cuentaInventarioId?: string;
+    cuentaInventario?: Partial<GetCuentasContables>;
+    manejaInventario?: boolean;
     state?: boolean;
 }
 

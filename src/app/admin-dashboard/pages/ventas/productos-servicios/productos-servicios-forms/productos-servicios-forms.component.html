@@ -84,17 +84,17 @@
                             <form-error-label [errorType]="formProductos.get('nombre')!" />
                         </div>
 
-                        <!-- <div>
-                            <label class="block mb-2 text-sm text-slate-600">
-                                Codigo
+                        <!-- Es Inventariable Toggle -->
+                        <div class="flex items-center justify-between p-3 border border-slate-200 rounded-lg bg-slate-50/50 h-[38px] mt-[26px]">
+                            <div class="flex flex-col">
+                                <span class="text-xs font-semibold text-slate-700">¿Es Inventariable?</span>
+                                <span class="text-[10px] text-slate-500">Servicios no afectan inventario</span>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" formControlName="isInventariable" class="sr-only peer">
+                                <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
                             </label>
-                            <input class="w-full bg-transparent text-slate-700 text-sm border 
-                                                rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 
-                                                hover:border-slate-300 shadow-sm focus:shadow" formControlName="codigo"
-                                type="text" />
-
-                            <form-error-label [errorType]="formProductos.get('codigo')!" />
-                        </div> -->
+                        </div>
 
                         <div>
                             <label class="block mb-2 text-sm text-slate-600">
@@ -102,7 +102,7 @@
                             </label>
                             <div class="relative">
                                 <select [class.border-red-500]="formProductos.get('unidadmedida')?.errors ?? false"
-                                    class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm 
+                                    class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border
                                                     rounded pl-3 pr-8 py-2 transition duration-300 ease hover:border-slate-400 shadow-sm cursor-pointer"
                                     formControlName="unidadmedida">
                                     <option value="">Selecciona una unidad</option>
@@ -121,18 +121,18 @@
                             </label>
                             <div class="relative">
                                 <select [class.border-red-500]="formProductos.get('impuesto')?.errors ?? false" class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border rounded 
-                                                        pl-3 pr-8 py-2 transition duration-300 ease hover:border-slate-400 shadow-sm
-                                                        cursor-pointer" formControlName="impuesto">
-                                    <option value="19">IVA 19%</option>
-                                    <option value="16">IVA 16%</option>
-                                    <option value="6">IVA 6%</option>
-                                    <option value="0">No aplica</option>
+                                                         pl-3 pr-8 py-2 transition duration-300 ease hover:border-slate-400 shadow-sm
+                                                         cursor-pointer" formControlName="impuesto">
+                                    <option value="">Selecciona un impuesto</option>
+                                    @for (impuesto of catalogsStore.impuestos(); track impuesto.id) {
+                                        <option [value]="impuesto.id">{{ impuesto.nombre }} ({{ impuesto.tarifa }}%)</option>
+                                    }
                                 </select>
                             </div>
 
                             <form-error-label [errorType]="formProductos.get('impuesto')!" />
 
-                        </div>
+                        </div>>
 
                         <!-- Retencion -->
                         <!-- <div>

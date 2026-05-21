@@ -42,6 +42,7 @@ export class ProductosServiciosFormsComponent {
     codigo: [''],
     unidadmedida: ['', Validators.required],
     impuesto: [0, Validators.required],
+    isInventariable: [true],
     // retencion: ['', Validators.required],
 
     precioventa: this.fb.group({
@@ -50,6 +51,19 @@ export class ProductosServiciosFormsComponent {
     }),
     observacion: ['']
   });
+
+  constructor() {
+    this.formProductos.get('categoria')?.valueChanges.subscribe((categoriaId) => {
+      if (!categoriaId) return;
+      const selectedCategory = this.categorias.find((c) => c.codigo === categoriaId);
+      if (selectedCategory && selectedCategory.nombre.toLowerCase().includes('servicio')) {
+        this.formProductos.get('isInventariable')?.setValue(false);
+        this.formProductos.get('isInventariable')?.disable();
+      } else {
+        this.formProductos.get('isInventariable')?.enable();
+      }
+    });
+  }
 
   productosID = toSignal(
     this.activateRoute.params.pipe(map((param) => param['id']))
@@ -76,7 +90,9 @@ export class ProductosServiciosFormsComponent {
           this.formProductos.get('precioventa')?.setValue({
             precio1: p.precio,
             precio2: p.precioventa2
-          })
+          });
+          const isInv = p.isInventariable !== undefined ? p.isInventariable : (p.afectaInventario !== undefined ? p.afectaInventario : true);
+          this.formProductos.get('isInventariable')?.setValue(isInv);
         })
       );
     }
@@ -95,15 +111,15 @@ export class ProductosServiciosFormsComponent {
       return
     }
 
+    const rawValue = this.formProductos.getRawValue();
+    const { precioventa, ...restValue } = rawValue;
     const formValue = {
-      ...this.formProductos.value,
-      impuesto: typeof this.formProductos.value.impuesto == 'string' ? 
-                parseInt(this.formProductos.value.impuesto) : this.formProductos.value.impuesto,
-      precio: this.formProductos.value.precioventa?.precio1,
-      precioventa2: this.formProductos.value.precioventa?.precio2
+      ...restValue,
+      impuesto: typeof rawValue.impuesto == 'string' ? 
+                parseFloat(rawValue.impuesto) : rawValue.impuesto,
+      precio: precioventa?.precio1,
+      precioventa2: precioventa?.precio2
     };
-
-    delete formValue.precioventa;
 
     try {
 

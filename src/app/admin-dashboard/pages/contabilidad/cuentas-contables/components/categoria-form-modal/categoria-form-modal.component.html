@@ -52,10 +52,23 @@
                                         class="w-full bg-transparent text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2
                                                transition duration-300 ease focus:outline-none focus:border-slate-400
                                                hover:border-slate-400 shadow-sm focus:shadow-md cursor-pointer">
-                                    <option value="compra">Compra</option>
-                                    <option value="venta">Venta</option>
-                                    <option value="gasto">Gasto</option>
+                                    <option value="PRODUCTO">Producto</option>
+                                    <option value="SERVICIO">Servicio</option>
+                                    <option value="GASTO">Gasto</option>
                                 </select>
+                            </div>
+
+                            <div>
+                                <label class="block mb-1 text-[10px] font-bold text-slate-500 uppercase tracking-wider ps-1">
+                                    ¿Maneja Inventario?
+                                </label>
+                                <div class="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-md bg-slate-50/50">
+                                    <input type="checkbox" formControlName="manejaInventario" id="manejaInventario"
+                                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded cursor-pointer">
+                                    <label for="manejaInventario" class="text-xs text-slate-600 font-medium cursor-pointer select-none">
+                                        Sí, esta categoría maneja inventario
+                                    </label>
+                                </div>
                             </div>
                         </div>
 
@@ -64,16 +77,16 @@
                                 <label class="block mb-1 text-[10px] font-bold text-slate-500 uppercase tracking-wider ps-1">
                                     Cuenta Principal <span class="text-red-500">*</span>
                                 </label>
-                                <select formControlName="cuentaContableId" 
+                                <select formControlName="cuentaPrincipalId" 
                                         class="w-full bg-transparent text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2
                                                transition duration-300 ease focus:outline-none focus:border-slate-400
                                                hover:border-slate-400 shadow-sm focus:shadow-md cursor-pointer">
                                     <option value="">— Seleccionar —</option>
-                                    @for (cuenta of cuentasPrincipales(); track cuenta.id) {
+                                    @for (cuenta of cuentasList; track cuenta.id) {
                                         <option [value]="cuenta.id">{{ cuenta.codigo }} · {{ cuenta.nombre }}</option>
                                     }
                                 </select>
-                                @if (form.get('cuentaContableId')?.touched && form.get('cuentaContableId')?.invalid) {
+                                @if (form.get('cuentaPrincipalId')?.touched && form.get('cuentaPrincipalId')?.invalid) {
                                     <div class="mt-1 text-[10px] text-red-500 font-bold px-1">
                                         Obligatorio
                                     </div>
@@ -82,22 +95,32 @@
 
                             <div>
                                 <label class="block mb-1 text-[10px] font-bold text-slate-500 uppercase tracking-wider ps-1">
-                                    Cuenta IVA <span class="text-red-500">*</span>
+                                    Cuenta de Costo <span class="text-slate-400">(Opcional)</span>
                                 </label>
-                                <select formControlName="cuentaIvaId" 
+                                <select formControlName="cuentaCostoId" 
                                         class="w-full bg-transparent text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2
                                                transition duration-300 ease focus:outline-none focus:border-slate-400
                                                hover:border-slate-400 shadow-sm focus:shadow-md cursor-pointer">
-                                    <option value="">— Seleccionar —</option>
-                                    @for (cuenta of cuentasIva(); track cuenta.id) {
+                                    <option value="">— Ninguna —</option>
+                                    @for (cuenta of cuentasList; track cuenta.id) {
                                         <option [value]="cuenta.id">{{ cuenta.codigo }} · {{ cuenta.nombre }}</option>
                                     }
                                 </select>
-                                @if (form.get('cuentaIvaId')?.touched && form.get('cuentaIvaId')?.invalid) {
-                                    <div class="mt-1 text-[10px] text-red-500 font-bold px-1">
-                                        Obligatorio
-                                    </div>
-                                }
+                            </div>
+
+                            <div>
+                                <label class="block mb-1 text-[10px] font-bold text-slate-500 uppercase tracking-wider ps-1">
+                                    Cuenta de Inventario <span class="text-slate-400">(Opcional)</span>
+                                </label>
+                                <select formControlName="cuentaInventarioId" 
+                                        class="w-full bg-transparent text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2
+                                               transition duration-300 ease focus:outline-none focus:border-slate-400
+                                               hover:border-slate-400 shadow-sm focus:shadow-md cursor-pointer">
+                                    <option value="">— Ninguna —</option>
+                                    @for (cuenta of cuentasList; track cuenta.id) {
+                                        <option [value]="cuenta.id">{{ cuenta.codigo }} · {{ cuenta.nombre }}</option>
+                                    }
+                                </select>
                             </div>
                         </div>
 

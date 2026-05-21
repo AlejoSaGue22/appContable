@@ -41,10 +41,24 @@ export class ProductosCompraFormsComponent {
     codigo: [''],
     unidadmedida: ['', Validators.required],
     impuesto: [0, Validators.required],
+    isInventariable: [true],
     // retencion: ['', Validators.required],
     precio_referencial: ['', [Validators.pattern(/^\d+(\.\d{1,2})?$/)]],
     observacion: ['']
   })
+
+  constructor() {
+    this.formProductos.get('categoria')?.valueChanges.subscribe((categoriaId) => {
+      if (!categoriaId) return;
+      const selectedCategory = this.categorias.find((c) => c.codigo === categoriaId);
+      if (selectedCategory && selectedCategory.nombre.toLowerCase().includes('servicio')) {
+        this.formProductos.get('isInventariable')?.setValue(false);
+        this.formProductos.get('isInventariable')?.disable();
+      } else {
+        this.formProductos.get('isInventariable')?.enable();
+      }
+    });
+  }
 
   productosID = toSignal(
     this.activateRoute.params.pipe(map((param) => param['id']))
@@ -57,6 +71,8 @@ export class ProductosCompraFormsComponent {
         this.formProductos.reset(p);
         this.formProductos.get('categoria')?.setValue(p.tipoCodigo!)
         this.formProductos.get('precio_referencial')?.setValue(p.precio);
+        const isInv = p.isInventariable !== undefined ? p.isInventariable : (p.afectaInventario !== undefined ? p.afectaInventario : true);
+        this.formProductos.get('isInventariable')?.setValue(isInv);
       })
     )
   });
@@ -74,14 +90,14 @@ export class ProductosCompraFormsComponent {
       return
     }
 
+    const rawValue = this.formProductos.getRawValue();
+    const { precio_referencial, ...restValue } = rawValue;
     const formValue = {
-      ...this.formProductos.value,
-      impuesto: typeof this.formProductos.value.impuesto == 'string' ?
-        parseInt(this.formProductos.value.impuesto) : this.formProductos.value.impuesto,
-      precio: this.formProductos.value.precio_referencial,
+      ...restValue,
+      impuesto: typeof rawValue.impuesto == 'string' ?
+        parseFloat(rawValue.impuesto) : rawValue.impuesto,
+      precio: precio_referencial,
     };
-
-    delete formValue.precio_referencial;
     try {
 
       if (this.productosID() == 'new-Item') {

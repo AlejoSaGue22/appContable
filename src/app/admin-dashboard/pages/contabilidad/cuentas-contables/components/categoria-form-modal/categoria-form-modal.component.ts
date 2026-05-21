@@ -25,13 +25,13 @@ export class CategoriaFormModalComponent implements OnInit {
     nombre: ['', [Validators.required, Validators.maxLength(100)]],
     tipo: ['PRODUCTO', [Validators.required]],
     descripcion: ['', [Validators.maxLength(255)]],
-    cuentaContableId: ['', [Validators.required]],
-    cuentaIvaId: ['', [Validators.required]]
+    cuentaPrincipalId: ['', [Validators.required]],
+    cuentaCostoId: [''],
+    cuentaInventarioId: [''],
+    manejaInventario: [false]
   });
 
   isSubmitting = signal(false);
-  cuentasIva = computed(() => this.cuentasList.filter(c => c.codigo.includes('1355') || c.codigo.includes('2408')));
-  cuentasPrincipales = computed(() => this.cuentasList.filter(c => !c.codigo.includes('1355') && !c.codigo.includes('2408')));
 
   ngOnInit() {
     if (this.category) {
@@ -39,8 +39,10 @@ export class CategoriaFormModalComponent implements OnInit {
         nombre: this.category.nombre,
         tipo: this.category.tipo,
         descripcion: this.category.descripcion,
-        cuentaContableId: this.category.cuentaContableId || this.category.cuentaContable?.id || '',
-        cuentaIvaId: this.category.cuentaIvaId || this.category.cuentaIva?.id || ''
+        cuentaPrincipalId: this.category.cuentaPrincipalId || this.category.cuentaPrincipal?.id || '',
+        cuentaCostoId: this.category.cuentaCostoId || this.category.cuentaCosto?.id || '',
+        cuentaInventarioId: this.category.cuentaInventarioId || this.category.cuentaInventario?.id || '',
+        manejaInventario: this.category.manejaInventario || false
       });
     }
   }
@@ -48,7 +50,7 @@ export class CategoriaFormModalComponent implements OnInit {
   onSubmit() {
       if (this.form.invalid) {
         this.form.markAllAsTouched();
-        this.notificationService.error('Formulario inválido', 'Por favor, complete todos los campos');
+        this.notificationService.error('Formulario inválido', 'Por favor, complete todos los campos obligatorios');
         return;
       }
 

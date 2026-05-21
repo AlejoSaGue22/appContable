@@ -22,8 +22,8 @@
                 <tr>
                     <th scope="col" class="px-8 py-5">Categoría</th>
                     <th scope="col" class="px-8 py-5">Tipo</th>
-                    <th scope="col" class="px-8 py-5">Configuración Contable (Principal / IVA)</th>
-                    <th scope="col" class="px-8 py-5 text-center">Vínculos</th>
+                    <th scope="col" class="px-8 py-5">Configuración Contable (Principal / Costo / Inventario)</th>
+                    <th scope="col" class="px-8 py-5 text-center">Vinculación</th>
                     <th scope="col" class="px-8 py-5 text-right">Acciones</th>
                 </tr>
             </thead>
@@ -42,25 +42,40 @@
                             <span class="px-2 py-0.5 bg-gray-50 text-gray-500 text-[10px] font-semibold rounded uppercase border border-gray-100">{{ category.tipo }}</span>
                         </td>
                         <td class="px-8 py-6">
-                            <div class="flex flex-col-2 gap-4">
+                            <div class="flex flex-col gap-4">
+                                <!-- Cuenta Principal -->
                                 <div>
-                                    <div class="mt-1 flex items-center gap-1.5 overflow-hidden">
-                                        @if (category.cuentaContable) {
-                                            <span class="text-[10px] font-mono font-bold text-blue-600">{{ category.cuentaContable.codigo }}</span>
-                                            <span class="text-xs text-gray-900 truncate">{{ category.cuentaContable.nombre }}</span>
+                                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Principal</p>
+                                    <div class="flex items-center gap-1.5 overflow-hidden">
+                                        @if (category.cuentaPrincipal) {
+                                            <span class="text-[10px] font-mono font-bold text-blue-600">{{ category.cuentaPrincipal.codigo }}</span>
+                                            <span class="text-xs text-gray-900 truncate">{{ category.cuentaPrincipal.nombre }}</span>
                                         } @else {
                                             <span class="text-[11px] text-gray-400 italic">No vinculada</span>
                                         }
                                     </div>
                                 </div>
 
-                                <div class="w-px h-full bg-gray-200">-</div>
-    
+                                <!-- Cuenta Costo -->
                                 <div>
-                                    <div class="mt-1 flex items-center gap-1.5 overflow-hidden">
-                                        @if (category.cuentaIva) {
-                                            <span class="text-[10px] font-mono font-bold text-emerald-600">{{ category.cuentaIva.codigo }}</span>
-                                            <span class="text-xs text-gray-900 truncate">{{ category.cuentaIva.nombre }}</span>
+                                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Costo</p>
+                                    <div class="flex items-center gap-1.5 overflow-hidden">
+                                        @if (category.cuentaCosto) {
+                                            <span class="text-[10px] font-mono font-bold text-emerald-600">{{ category.cuentaCosto.codigo }}</span>
+                                            <span class="text-xs text-gray-900 truncate">{{ category.cuentaCosto.nombre }}</span>
+                                        } @else {
+                                            <span class="text-[11px] text-gray-400 italic">No vinculada</span>
+                                        }
+                                    </div>
+                                </div>
+
+                                <!-- Cuenta Inventario -->
+                                <div>
+                                    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Inventario</p>
+                                    <div class="flex items-center gap-1.5 overflow-hidden">
+                                        @if (category.cuentaInventario) {
+                                            <span class="text-[10px] font-mono font-bold text-purple-600">{{ category.cuentaInventario.codigo }}</span>
+                                            <span class="text-xs text-gray-900 truncate">{{ category.cuentaInventario.nombre }}</span>
                                         } @else {
                                             <span class="text-[11px] text-gray-400 italic">No vinculada</span>
                                         }
@@ -70,20 +85,20 @@
                         </td>
                         <td class="px-8 py-6 align-middle">
                             <div class="flex flex-col items-center gap-2">
-                                @if (category.cuentaContable?.id && category.cuentaIva?.id) {
-                                    <div class="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center text-green-600 border border-green-100 shadow-sm" title="Vínculos completos">
+                                @if (category.cuentaPrincipal?.id) {
+                                    <div class="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center text-green-600 border border-green-100 shadow-sm" title="Cuenta principal vinculada">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
                                     </div>
-                                    <span class="text-[9px] font-bold text-green-600 uppercase tracking-tighter">Completo</span>
+                                    <span class="text-[9px] font-bold text-green-600 uppercase tracking-tighter">Vinculada</span>
                                 } @else {
                                     <div class="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center text-amber-500 border border-amber-100 shadow-sm" title="Pendiente de vinculación">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                         </svg>
                                     </div>
-                                    <span class="text-[9px] font-bold text-amber-500 uppercase tracking-tighter">Incompleto</span>
+                                    <span class="text-[9px] font-bold text-amber-500 uppercase tracking-tighter">Incompleta</span>
                                 }
                             </div>
                         </td>

@@ -146,7 +146,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
             if (prod) {
                 this.productosItemsForm.patchValue({
                     unitPrice: prod.precio,
-                    iva: parseInt(prod.impuesto!),
+                    iva: prod.impuesto ? parseFloat(prod.impuesto) : 0,
                     quantity: 1,
                     discount: 0,
                     descripcion: prod.descripcion
@@ -239,7 +239,8 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         const val = this.productosItemsForm.value;
         const subtotal = (val.quantity || 0) * (val.unitPrice || 0);
         const discountAmount = subtotal * ((val.discount || 0) / 100);
-        const taxAmount = (subtotal - discountAmount) * ((val.iva || 0) / 100);
+        const rawIva = typeof val.iva === 'string' ? parseFloat(val.iva) : (val.iva || 0);
+        const taxAmount = (subtotal - discountAmount) * (rawIva / 100);
         const total = subtotal - discountAmount + taxAmount;
 
         this.productosItemsForm.patchValue({ total: total }, { emitEvent: false });
@@ -254,14 +255,14 @@ export class FacturaCompraFormsPageComponent implements OnInit {
 
         const itemVal = this.productosItemsForm.value;
         const subtotal = (itemVal.quantity || 0) * (itemVal.unitPrice || 0);
-        // Log removed
+        const rawIva = typeof itemVal.iva === 'string' ? parseFloat(itemVal.iva) : (itemVal.iva || 0);
 
         const newItem = this.fb.group({
             productoId: [itemVal.producto?.id],
             productoNombre: [itemVal.producto?.nombre],
             cantidad: [itemVal.quantity],
             precioUnitario: [itemVal.unitPrice],
-            iva: [itemVal.iva],
+            iva: [rawIva],
             descuento: [itemVal.discount],
             subtotal: [subtotal],
             total: [itemVal.total]
@@ -290,7 +291,8 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         items.forEach((item: any) => {
             const itemSubtotal = item.cantidad * item.precioUnitario;
             const itemDesc = itemSubtotal * (item.descuento / 100);
-            const itemTax = (itemSubtotal - itemDesc) * (item.iva / 100);
+            const rawIva = typeof item.iva === 'string' ? parseFloat(item.iva) : (item.iva || 0);
+            const itemTax = (itemSubtotal - itemDesc) * (rawIva / 100);
 
             this.totales.subtotal += itemSubtotal;
             this.totales.descuentoTotal += itemDesc;
@@ -302,9 +304,6 @@ export class FacturaCompraFormsPageComponent implements OnInit {
 
     // Computeds for Totals
     resumenTotales = computed(() => {
-        // Log removed
-        // Log removed
-
         const items = this.formCompra.controls.items.value;
         let subtotal = 0;
         let impuestos = 0;
@@ -313,7 +312,8 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         items.forEach((item: any) => {
             const itemSubtotal = item.cantidad * item.precioUnitario;
             const itemDesc = itemSubtotal * (item.descuento / 100);
-            const itemTax = (itemSubtotal - itemDesc) * (item.iva / 100);
+            const rawIva = typeof item.iva === 'string' ? parseFloat(item.iva) : (item.iva || 0);
+            const itemTax = (itemSubtotal - itemDesc) * (rawIva / 100);
 
             subtotal += itemSubtotal;
             descuentos += itemDesc;

@@ -76,17 +76,26 @@ export class CategoriasListComponent {
     });
   }
 
-  updateCategoryAccount(category: CategoryArticle, cuentaId: string, type: 'main' | 'iva' = 'main') {
+  updateCategoryAccount(category: CategoryArticle, cuentaId: string, type: 'principal' | 'costo' | 'inventario' = 'principal') {
     if (!cuentaId) return;
     
-    const payload: any = type === 'main' 
-      ? { cuentaContableId: cuentaId } 
-      : { cuentaIvaId: cuentaId };
+    const payload: any = {};
+    switch (type) {
+      case 'principal':
+        payload.cuentaPrincipalId = cuentaId;
+        break;
+      case 'costo':
+        payload.cuentaCostoId = cuentaId;
+        break;
+      case 'inventario':
+        payload.cuentaInventarioId = cuentaId;
+        break;
+    }
     
     this.catalogsService.updateCategoryArticle(category.id.toString(), payload)
       .subscribe({
         next: () => {
-          this.notificationService.success(`Asociación de cuenta ${type === 'main' ? 'principal' : 'IVA'} actualizada`, 'Éxito');
+          this.notificationService.success(`Asociación de cuenta ${type} actualizada`, 'Éxito');
           this.catalogsStore.initialize();
           this.categoryUpdated.emit();
         },

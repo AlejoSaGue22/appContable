@@ -1,6 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
 import { HeaderInput, HeaderTitlePageComponent } from "@dashboard/components/header-title-page/header-title-page.component";
-import { TableListComponent } from "@shared/components/table-list/table-list.component";
 import { CardsTotales, NumCardsTotalesComponent } from "@shared/components/num-cards-totales/num-cards-totales.component";
 import { ComprobantesVentasService } from '../services/comprobantes-ventas.service';
 import { PaginationService } from '@shared/components/pagination/pagination.service';
