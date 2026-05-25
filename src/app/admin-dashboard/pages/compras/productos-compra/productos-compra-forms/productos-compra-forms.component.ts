@@ -33,7 +33,7 @@ export class ProductosCompraFormsComponent {
   isModal = input<boolean>(false);
   saveSuccess = output<any>();
   cancel = output<void>();
-  categorias = inject(ProductosService).categorias().filter((c) => c.tipo == 'compra' || c.tipo == 'gasto');
+  categorias = inject(ProductosService).categorias().filter((c) => c.tipo == 'costo' || c.tipo == 'gasto');
 
   formProductos = this.fb.group({
     categoria: ['', Validators.required],

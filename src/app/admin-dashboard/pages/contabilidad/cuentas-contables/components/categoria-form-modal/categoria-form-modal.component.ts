@@ -32,12 +32,21 @@ export class CategoriaFormModalComponent implements OnInit {
   });
 
   isSubmitting = signal(false);
+  cuentaPrincipal = computed(() => this.cuentasList.filter((cuenta) => 
+    cuenta.aceptaMovimiento &&
+    (cuenta.codigo.startsWith('41') || cuenta.codigo.startsWith('42') || cuenta.codigo.startsWith('43'))));
+  cuentaCosto = computed(() => this.cuentasList.filter((cuenta) => 
+    cuenta.aceptaMovimiento &&
+    (cuenta.codigo.startsWith('51') || cuenta.codigo.startsWith('52') || cuenta.codigo.startsWith('53'))));
+  cuentaInventario = computed(() => this.cuentasList.filter((cuenta) => 
+    cuenta.aceptaMovimiento &&
+    (cuenta.codigo.startsWith('1435') || cuenta.codigo.startsWith('1436'))));
 
   ngOnInit() {
     if (this.category) {
       this.form.patchValue({
         nombre: this.category.nombre,
-        tipo: this.category.tipo,
+        tipo: this.category.tipo.toUpperCase(),
         descripcion: this.category.descripcion,
         cuentaPrincipalId: this.category.cuentaPrincipalId || this.category.cuentaPrincipal?.id || '',
         cuentaCostoId: this.category.cuentaCostoId || this.category.cuentaCosto?.id || '',

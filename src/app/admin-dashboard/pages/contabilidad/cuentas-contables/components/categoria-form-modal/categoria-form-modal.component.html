@@ -52,30 +52,19 @@
                                         class="w-full bg-transparent text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2
                                                transition duration-300 ease focus:outline-none focus:border-slate-400
                                                hover:border-slate-400 shadow-sm focus:shadow-md cursor-pointer">
-                                    <option value="PRODUCTO">Producto</option>
+                                    <option value="VENTA">Venta</option>
                                     <option value="SERVICIO">Servicio</option>
                                     <option value="GASTO">Gasto</option>
+                                    <option value="COSTO">Costo</option>
                                 </select>
                             </div>
 
-                            <div>
-                                <label class="block mb-1 text-[10px] font-bold text-slate-500 uppercase tracking-wider ps-1">
-                                    ¿Maneja Inventario?
-                                </label>
-                                <div class="flex items-center gap-2 px-3 py-2 border border-slate-200 rounded-md bg-slate-50/50">
-                                    <input type="checkbox" formControlName="manejaInventario" id="manejaInventario"
-                                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded cursor-pointer">
-                                    <label for="manejaInventario" class="text-xs text-slate-600 font-medium cursor-pointer select-none">
-                                        Sí, esta categoría maneja inventario
-                                    </label>
-                                </div>
-                            </div>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block mb-1 text-[10px] font-bold text-slate-500 uppercase tracking-wider ps-1">
-                                    Cuenta Principal <span class="text-red-500">*</span>
+                                    Cuenta Ingreso <span class="text-red-500">*</span>
                                 </label>
                                 <select formControlName="cuentaPrincipalId" 
                                         class="w-full bg-transparent text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2
