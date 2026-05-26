@@ -171,14 +171,15 @@
                                 Ciudad o Municipio <span class="text-red-500">*</span>
                             </label>
 
-                            <select [class.border-red-500]="clientsForm.get('ciudad')?.errors ?? false"
-                                class="w-full bg-white text-slate-700 text-sm border rounded-lg px-4 py-3 transition duration-300 ease 
-                                                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm cursor-pointer" formControlName="ciudad">
-                                <option value="">Selecciona una ciudad o municipio</option>
-                                @for (city of catalogsStore.municipalities(); track city.id) {
-                                    <option [ngValue]="city.id">{{ city.name }} - {{ city.department }}</option>
-                                }
-                            </select>
+                            <div class="relative">
+                                <app-list-group-dropdown 
+                                    title=""
+                                    [dataList]="catalogsStore.municipalities()" 
+                                    [labelKey]="['name', 'department']"
+                                    [valueInput]="getCityName()"
+                                    [searchable]="false"
+                                    (objectSelect)="onCitySelect($event)" />
+                            </div>
                             <form-error-label [errorType]="clientsForm.get('ciudad')!" />
                         </div>
 

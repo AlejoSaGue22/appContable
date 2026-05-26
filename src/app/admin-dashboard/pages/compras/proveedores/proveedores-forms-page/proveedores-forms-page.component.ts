@@ -13,10 +13,12 @@ import { ProveedoresService } from '../../services/proveedores.service';
 import { LoaderComponent } from "@utils/components/loader/loader.component";
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
 import { HelpersUtils } from '@utils/helpers.utils';
+import { ListGroupDropdownComponent } from "@shared/components/list-group-dropdown/list-group-dropdown.component";
+import { Municipality } from '@dashboard/interfaces/catalogs-interface';
 
 @Component({
   selector: 'app-proveedores-forms-page',
-  imports: [CommonModule, ReactiveFormsModule, HeaderTitlePageComponent, FormErrorLabelComponent, LoaderComponent],
+  imports: [CommonModule, ReactiveFormsModule, HeaderTitlePageComponent, FormErrorLabelComponent, LoaderComponent, ListGroupDropdownComponent],
   templateUrl: './proveedores-forms-page.component.html',
   standalone: true
 })
@@ -65,6 +67,17 @@ export class ProveedoresFormsPageComponent implements OnInit {
     observaciones: [''],
     // estado: ['A']
   });
+
+  getCityName() {
+    const id = this.formProveedor.get('ciudad')?.value;
+    if (!id) return '';
+    const city = this.catalogsStore.municipalities().find((m: Municipality) => m.id == id);
+    return city ? `${city.name} - ${city.department}` : '';
+  }
+
+  onCitySelect(city: Municipality) {
+    this.formProveedor.patchValue({ ciudad: city.id });
+  }
 
   ngOnInit(): void {
     if (this.proveedorId() && this.proveedorId() !== 'new-Item') {

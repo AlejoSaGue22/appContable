@@ -13,11 +13,12 @@ import { NotificationService } from '@shared/services/notification.service';
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
 import { Municipality } from '@dashboard/interfaces/catalogs-interface';
 import { HelpersUtils } from '@utils/helpers.utils';
+import { ListGroupDropdownComponent } from "@shared/components/list-group-dropdown/list-group-dropdown.component";
 
 
 @Component({
     selector: 'app-clients-form-page',
-    imports: [HeaderTitlePageComponent, FormErrorLabelComponent, ReactiveFormsModule, LoaderComponent, ErrorPageComponent],
+    imports: [HeaderTitlePageComponent, FormErrorLabelComponent, ReactiveFormsModule, LoaderComponent, ErrorPageComponent, ListGroupDropdownComponent],
     templateUrl: './clients-form-page.component.html',
 })
 export class ClientsFormPageComponent implements OnInit {
@@ -58,7 +59,17 @@ export class ClientsFormPageComponent implements OnInit {
         dv: [''],
     })
 
-    
+    getCityName() {
+        const id = this.clientsForm.get('ciudad')?.value;
+        if (!id) return '';
+        const city = this.catalogsStore.municipalities().find(m => m.id == id);
+        return city ? `${city.name} - ${city.department}` : '';
+    }
+
+    onCitySelect(city: Municipality) {
+        this.clientsForm.patchValue({ ciudad: city.id });
+    }
+
 
     clienteIdResource = rxResource({
         request: () => {
