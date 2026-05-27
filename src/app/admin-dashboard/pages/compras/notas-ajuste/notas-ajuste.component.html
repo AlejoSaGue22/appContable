@@ -1,0 +1,66 @@
+<div class="px-2 sm:px-4 py-4 min-h-screen">
+    <header-title-page [titleHead]="headTitle" class="mb-6 block" />
+
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200">
+        <div class="p-4 sm:p-6 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h2 class="text-lg font-semibold text-slate-800">Listado de Notas de Crédito (Compras)</h2>
+                <p class="text-sm text-slate-500 mt-1">Gestiona las notas de crédito aplicadas a proveedores</p>
+            </div>
+            
+            <button routerLink="/panel/compras/notas-ajuste/new-Item" 
+                class="inline-flex items-center justify-center px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded-md transition-colors w-full sm:w-auto focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-800 shadow-sm">
+                <i class="fa-solid fa-plus mr-2"></i>
+                Nueva Nota
+            </button>
+        </div>
+
+        <div class="p-4 sm:p-6">
+            @if (notasResource.isLoading()) {
+                <div class="py-12 flex justify-center items-center">
+                    <app-loader />
+                </div>
+            } @else if (notasResource.error()) {
+                <div class="py-8">
+                    <app-error-pages />
+                </div>
+            } @else {
+                <app-table-notas-compras
+                    [notas]="notasResource.value()?.data || []"
+                    (filterChange)="onFilterChange($event)"
+                    (pageChange)="onPageChange($event)"
+                    (delete)="confirmDelete($event)"
+                    (registrarBorrador)="onRegistrarBorrador($event)"
+                    (reintentarAsiento)="onReintentarAsiento($event)">
+                </app-table-notas-compras>
+            }
+        </div>
+    </div>
+</div>
+
+<app-modal [(visible)]="isDeleteModalVisible">
+    <div class="p-6">
+        <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+            <i class="fa-solid fa-exclamation-triangle text-xl text-red-600"></i>
+        </div>
+        
+        <h3 class="text-lg font-semibold text-slate-800 text-center mb-2">
+            ¿Eliminar borrador?
+        </h3>
+        
+        <p class="text-slate-600 text-center text-sm mb-6">
+            Esta acción no se puede deshacer. ¿Estás seguro de que deseas eliminar este borrador de nota de crédito?
+        </p>
+        
+        <div class="flex gap-3 justify-center">
+            <button (click)="isDeleteModalVisible.set(false)" 
+                class="px-4 py-2 bg-white border border-slate-300 rounded-md text-slate-700 text-sm font-medium hover:bg-slate-50 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500">
+                Cancelar
+            </button>
+            <button (click)="onDelete()" 
+                class="px-4 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-600">
+                Eliminar
+            </button>
+        </div>
+    </div>
+</app-modal>

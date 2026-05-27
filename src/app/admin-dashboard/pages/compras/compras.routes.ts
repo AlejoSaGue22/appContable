@@ -8,6 +8,9 @@ import { FacturaCompraFormsPageComponent } from "./factura-compra/factura-compra
 import { CompraDetailsComponent } from "./factura-compra/components/compra-details/compra-details.component";
 import { ProductosCompraComponent } from "./productos-compra/productos-compra.component";
 import { ProductosCompraFormsComponent } from "./productos-compra/productos-compra-forms/productos-compra-forms.component";
+import { NotasAjusteComprasComponent } from "./notas-ajuste/notas-ajuste.component";
+import { NotasAjusteComprasFormPageComponent } from "./notas-ajuste/notas-ajuste-form-page/notas-ajuste-form-page.component";
+import { NotasAjusteComprasDetailsComponent } from "./notas-ajuste/components/notas-ajuste-details/notas-ajuste-details.component";
 
 export const comprasRoutes: Routes = [
 
@@ -45,6 +48,19 @@ export const comprasRoutes: Routes = [
     {
         path: 'purchases/:id/details',
         component: CompraDetailsComponent
+    },
+    // Notas de Ajuste Compras Routes
+    {
+        path: 'notas-ajuste',
+        component: NotasAjusteComprasComponent
+    },
+    {
+        path: 'notas-ajuste/:id',
+        component: NotasAjusteComprasFormPageComponent
+    },
+    {
+        path: 'notas-ajuste/:id/details',
+        component: NotasAjusteComprasDetailsComponent
     },
     {
         path: '**',
