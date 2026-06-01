@@ -64,6 +64,7 @@ export interface NotaAjusteItem {
   descripcion: string;
   articuloId: string;
   articulo?: GetProductosDetalle;
+  impuestoId?: string;
   cantidad: number;
   valorUnitario: number;
   porcentajeIVA: number;

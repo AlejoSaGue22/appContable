@@ -198,6 +198,7 @@ export class NotasAjusteFormPageComponent implements OnInit {
                 articuloId: item.articuloId,
                 descripcion: item.articulo?.nombre || '',
                 descuento: item.descuento,
+                impuestoId: item.impuestoId,
                 subtotal: gross,
                 total: afterDiscount + ivaVal,
                 cantidad: item.cantidad,
@@ -249,6 +250,7 @@ export class NotasAjusteFormPageComponent implements OnInit {
       return {
         descripcion: item.articulo.nombre,
         articuloId: item.articuloId,
+        impuestoId: (item as any).impuestoId || undefined,
         cantidad: item.quantity,
         valorUnitario: item.unitPrice,
         porcentajeIVA: item.iva,
@@ -296,6 +298,28 @@ export class NotasAjusteFormPageComponent implements OnInit {
 
   updateItemQuantity(index: number, quantity: number) {
     this.updateItemField(index, 'cantidad', quantity);
+  }
+
+  onImpuestoChange(index: number, impuestoId: string) {
+    const impuesto = this.catalogsStore.impuestos().find(i => i.id === impuestoId);
+    if (impuesto) {
+      this.itemsSeleccionados.update(items => {
+        const newItems = [...items];
+        newItems[index] = { 
+          ...newItems[index], 
+          impuestoId: impuesto.id,
+          porcentajeIVA: impuesto.tarifa,
+        };
+        const item = newItems[index];
+        const gross = item.cantidad * item.valorUnitario;
+        const discount = gross * ((item.descuento || 0) / 100);
+        const afterDiscount = gross - discount;
+        const iva = afterDiscount * (item.porcentajeIVA / 100);
+        newItems[index].subtotal = gross;
+        newItems[index].total = afterDiscount + iva;
+        return newItems;
+      });
+    }
   }
 
   onSubmit(isDraft: boolean) { 

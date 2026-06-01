@@ -44,7 +44,7 @@ export class ComprasNotasAjusteService {
   }
 
   createNotaCredito(data: any): Observable<ResponseResult> {
-    return this.http.post<any>(`${baseUrl}/notas-ajuste-compras`, data).pipe(
+    return this.http.post<any>(`${baseUrl}/notas-ajuste-compras/credito`, data).pipe(
       map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
       catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
     );

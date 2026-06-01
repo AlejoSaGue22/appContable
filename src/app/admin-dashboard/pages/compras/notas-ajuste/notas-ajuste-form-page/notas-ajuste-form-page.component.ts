@@ -182,6 +182,7 @@ export class NotasAjusteComprasFormPageComponent implements OnInit {
                 articuloId: item.articuloId,
                 descripcion: item.articulo?.nombre || '',
                 descuento: item.descuento,
+                impuestoId: item.impuestoId,
                 subtotal: gross,
                 total: afterDiscount + ivaVal,
                 cantidad: item.cantidad,
@@ -223,17 +224,18 @@ export class NotasAjusteComprasFormPageComponent implements OnInit {
     // Auto-load items from invoice
     const items: NotaAjusteCompraItem[] = f.items.map((item: any) => {
       const gross = item.quantity * item.unitPrice;
-      const discountVal = gross * ((item.discount || 0) / 100);
+      const discountVal = gross * ((item.descuento || 0) / 100);
       const afterDiscount = gross - discountVal;
-      const ivaVal = afterDiscount * (item.iva / 100);
+      const ivaVal = afterDiscount * (item.porcentajeIva / 100);
 
       return {
         descripcion: item.articulo.nombre,
         articuloId: item.articuloId,
+        impuestoId: item.impuestoId || undefined,
         cantidad: item.quantity,
         valorUnitario: item.unitPrice,
-        porcentajeIVA: item.iva,
-        descuento: item.discount || 0,
+        porcentajeIVA: item.porcentajeIva,
+        descuento: item.descuento || 0,
         subtotal: gross,
         total: afterDiscount + ivaVal
       };
@@ -277,6 +279,28 @@ export class NotasAjusteComprasFormPageComponent implements OnInit {
 
   updateItemQuantity(index: number, quantity: number) {
     this.updateItemField(index, 'cantidad', quantity);
+  }
+
+  onImpuestoChange(index: number, impuestoId: string) {
+    const impuesto = this.catalogsStore.impuestos().find(i => i.id === impuestoId);
+    if (impuesto) {
+      this.itemsSeleccionados.update(items => {
+        const newItems = [...items];
+        newItems[index] = { 
+          ...newItems[index], 
+          impuestoId: impuesto.id,
+          porcentajeIVA: impuesto.tarifa,
+        };
+        const item = newItems[index];
+        const gross = item.cantidad * item.valorUnitario;
+        const discount = gross * ((item.descuento || 0) / 100);
+        const afterDiscount = gross - discount;
+        const iva = afterDiscount * (item.porcentajeIVA / 100);
+        newItems[index].subtotal = gross;
+        newItems[index].total = afterDiscount + iva;
+        return newItems;
+      });
+    }
   }
 
   onSubmit(isDraft: boolean) { 

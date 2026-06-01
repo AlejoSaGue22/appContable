@@ -150,8 +150,13 @@
                                             class="w-full px-2 py-1 bg-white border border-gray-300 rounded text-right text-xs focus:ring-1 focus:ring-slate-500 focus:border-slate-500 dark:bg-gray-900 dark:border-gray-600 dark:text-white" />
                                     </td>
                                     <td class="px-3 py-2">
-                                        <input type="number" [value]="item.porcentajeIVA" (input)="updateItemField($index, 'porcentajeIVA', $any($event.target).value)"
-                                            class="w-full px-2 py-1 bg-white border border-gray-300 rounded text-right text-xs focus:ring-1 focus:ring-slate-500 focus:border-slate-500 dark:bg-gray-900 dark:border-gray-600 dark:text-white" />
+                                        <select [value]="item.impuestoId || ''" (change)="onImpuestoChange($index, $any($event.target).value)"
+                                            class="w-full px-1 py-1 bg-white border border-gray-300 rounded text-xs focus:ring-1 focus:ring-slate-500 focus:border-slate-500 dark:bg-gray-900 dark:border-gray-600 dark:text-white">
+                                            <option value="">0%</option>
+                                            @for (imp of catalogsStore.impuestos(); track imp.id) {
+                                                <option [value]="imp.id">{{ imp.nombre }} ({{ imp.tarifa }}%)</option>
+                                            }
+                                        </select>
                                     </td>
                                     <td class="px-3 py-2 text-right text-xs text-gray-600 dark:text-gray-400">
                                         {{ (item.cantidad * item.valorUnitario) | currency:'':'symbol':'1.0-0' }}
