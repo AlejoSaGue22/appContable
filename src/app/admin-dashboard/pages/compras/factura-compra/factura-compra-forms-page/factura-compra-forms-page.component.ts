@@ -165,7 +165,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         this.loaderService.show();
         forkJoin({
             proveedores: this.proveedoresServicios.getProveedores({ limit: 10, offset: 0 }),
-            productos: this.productoServicios.getProductos({ limit: 10, offset: 0, venta_compra: 'compra' })
+            productos: this.productoServicios.getProductos({ limit: 10, offset: 0, venta_compra: 'costo' })
         }).subscribe({
             next: ({ proveedores, productos }) => {
                 this.proveedoresList.set(proveedores.proveedores);

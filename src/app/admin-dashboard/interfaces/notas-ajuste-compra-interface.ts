@@ -1,6 +1,7 @@
 import { FacturaCompra } from "./factura-compra-interface";
 import { CreatedBy } from "./factura-compra-interface";
 import { GetProductosDetalle } from "./productos-interface";
+import { ProveedoresInterface } from "./proveedores-interface";
 
 export interface NotaAjusteCompraResponse {
   success: boolean;
@@ -29,6 +30,7 @@ export interface NotaAjusteCompra {
   facturaOriginalId: string;
   facturaOriginalNumero: string;
   facturaOriginal?: FacturaCompra;
+  proveedor?: ProveedoresInterface;
   items: NotaAjusteCompraItem[];
   formaPago?: string;
   metodoPago?: string;

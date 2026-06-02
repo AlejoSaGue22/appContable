@@ -12,7 +12,7 @@ import { TableProductosCompra } from "./components/table-productos-compra/table-
 import { PaginationComponent } from '@shared/components/pagination/pagination';
 import { HeaderTitlePageComponent, HeaderInput } from "@dashboard/components/header-title-page/header-title-page.component";
 import { GetProductosDetalle } from '@dashboard/interfaces/productos-interface';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 
 @Component({
    imports: [CommonModule, LoaderComponent, ModalComponents, RouterLink, TableProductosCompra,
@@ -23,11 +23,15 @@ import { RouterLink } from '@angular/router';
 export class ProductosCompraComponent {
 
    paginationService = inject(PaginationService);
+   router = inject(Router);
+   route = inject(ActivatedRoute);
    productoServicio = inject(ProductosService);
    notificacionService = inject(NotificationService);
    totalProducto = signal<GetProductosDetalle[]>([]);
    idProductoToModal = signal<string>('');
    isModalEdit = false;
+   searchTerm = signal<string>(this.route.snapshot.queryParams['search'] || '');
+   appliedSearchTerm = signal<string>(this.route.snapshot.queryParams['search'] || '');
 
    headTitle: HeaderInput = {
       title: 'Productos y Servicios',
@@ -35,9 +39,9 @@ export class ProductosCompraComponent {
    }
 
    productorxResource = rxResource({
-      request: () => ({ page: this.paginationService.currentPage() - 1, limit: 10 }),
+      request: () => ({ page: this.paginationService.currentPage() - 1, limit: 10, search: this.appliedSearchTerm() }),
       loader: ({ request }) => {
-         return this.productoServicio.getProductos({ offset: request.page * request.limit, limit: request.limit, venta_compra: 'compra' }).pipe(
+         return this.productoServicio.getProductos({ offset: request.page * request.limit, limit: request.limit, venta_compra: 'costo', search: request.search }).pipe(
             tap((p) => {
                this.totalProducto.set(p.articulos);
                const size = Math.ceil(p.count / request.limit);
@@ -87,7 +91,13 @@ export class ProductosCompraComponent {
    }
 
    onSearch(searchTerm: string) {
-      
+      this.searchTerm.set(searchTerm);
+   }
+
+   executeSearch() {
+      const term = this.searchTerm();
+      this.appliedSearchTerm.set(term);
+      this.router.navigate([], { queryParams: { search: term }, queryParamsHandling: 'merge' });
    }
 
 }

@@ -41,7 +41,7 @@ export class ProductosServiciosFormsComponent {
     nombre: ['', Validators.required],
     codigo: [''],
     unidadmedida: ['', Validators.required],
-    impuesto: [0, Validators.required],
+    impuesto: ['', Validators.required],
     isInventariable: [true],
     // retencion: ['', Validators.required],
 
@@ -101,6 +101,7 @@ export class ProductosServiciosFormsComponent {
   async onSubmit() {
     const valid = this.formProductos.valid;
     this.formProductos.markAllAsTouched();
+    console.log(this.formProductos.value)
 
     if (!valid) {
       this.notificacionService.error(
@@ -115,8 +116,6 @@ export class ProductosServiciosFormsComponent {
     const { precioventa, ...restValue } = rawValue;
     const formValue = {
       ...restValue,
-      impuesto: typeof rawValue.impuesto == 'string' ? 
-                parseFloat(rawValue.impuesto) : rawValue.impuesto,
       precio: precioventa?.precio1,
       precioventa2: precioventa?.precio2
     };

@@ -10,7 +10,7 @@ export interface ArticulosInterface {
     nombre: string,
     codigo: string,
     unidadmedida: string,
-    impuesto: number,
+    impuesto: string,
     tipoCodigo?: string,
     tipo?: string,
     // retencion: string,
@@ -40,15 +40,30 @@ export interface CuentasIvaRel {
     nombre: string;
 }
 
+export interface CategoriaArticuloRel {
+    codigo: string;
+    cuentaCostoId: string | null;
+    cuentaInventarioId: string | null;
+    cuentaPrincipalId: string | null;
+    descripcion: string;
+    id: string;
+    manejaInventario: boolean;
+    nombre: string;
+    state: boolean;
+    tipo: string;
+}
+
 export interface GetProductosDetalle {
     id: string;
     categoria: string;
-    fullNameTipo: string;
+    categoriaArticulo: CategoriaArticuloRel;
+    categoriaArticuloId: number;
     unidadmedida: number;
     unidadmedidaRel: UnidadMedidaRel;
     nombre: string;
     codigo: string;
     impuesto: string;
+    // impuestoRel: ImpuestoRel;
     retencion: string;
     precio: number;
     precioventa2: string;

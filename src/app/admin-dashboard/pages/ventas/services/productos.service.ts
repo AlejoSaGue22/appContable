@@ -14,7 +14,7 @@ const emptyProducto: ArticulosInterface = {
   nombre: '',
   codigo: '',
   unidadmedida: '',
-  impuesto: 0,
+  impuesto: '',
   precio: '',
   precioventa2: '',
   observacion: '',

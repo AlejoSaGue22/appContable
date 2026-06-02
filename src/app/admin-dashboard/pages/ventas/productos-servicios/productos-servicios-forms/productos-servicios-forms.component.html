@@ -112,14 +112,13 @@
                                                             pl-3 pr-8 py-2 transition duration-300 ease hover:border-slate-400 shadow-sm
                                                             cursor-pointer" formControlName="impuesto">
                                         <option value="">Selecciona un impuesto</option>
-                                        @for (impuesto of catalogsStore.impuestos(); track impuesto.id) {
-                                            <option [value]="impuesto.id">{{ impuesto.nombre }} ({{ impuesto.tarifa }}%)</option>
-                                        }
+                                    @for (impuesto of catalogsStore.impuestos(); track impuesto.id) {
+                                        <option [value]="impuesto.id">{{ impuesto.nombre }} ({{ impuesto.tarifa }}%)</option>
+                                    }
                                     </select>
                                 </div>
 
                                 <form-error-label [errorType]="formProductos.get('impuesto')!" />
-
                             </div>
 
                             <!-- Es Inventariable Toggle -->
@@ -155,7 +154,6 @@
 
                                 <form-error-label [errorType]="formProductos.get('retencion')!" />
                             </div> -->
-
                         </div>
 
 

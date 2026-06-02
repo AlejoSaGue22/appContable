@@ -40,7 +40,7 @@ export class ProductosCompraFormsComponent {
     nombre: ['', Validators.required],
     codigo: [''],
     unidadmedida: ['', Validators.required],
-    impuesto: [0, Validators.required],
+    impuesto: ['', Validators.required],
     isInventariable: [true],
     // retencion: ['', Validators.required],
     precio_referencial: ['', [Validators.pattern(/^\d+(\.\d{1,2})?$/)]],
@@ -80,6 +80,7 @@ export class ProductosCompraFormsComponent {
   async onSubmit() {
     const valid = this.formProductos.valid;
     this.formProductos.markAllAsTouched();
+    console.log(this.formProductos.value)
 
     if (!valid) {
       this.notificacionService.error(
@@ -94,8 +95,6 @@ export class ProductosCompraFormsComponent {
     const { precio_referencial, ...restValue } = rawValue;
     const formValue = {
       ...restValue,
-      impuesto: typeof rawValue.impuesto == 'string' ?
-        parseFloat(rawValue.impuesto) : rawValue.impuesto,
       precio: precio_referencial,
     };
     try {
@@ -105,7 +104,7 @@ export class ProductosCompraFormsComponent {
 
         if (product.success == false) {
           this.notificacionService.error(
-            `Hubo un error al guardar el producto ${product.error.message}`,
+            `Hubo un error al guardar el producto ${product.message}`,
             'Error',
             5000
           );
@@ -131,7 +130,7 @@ export class ProductosCompraFormsComponent {
 
         if (product.success == false) {
           this.notificacionService.error(
-            `Hubo un error al guardar este item ${product.error.message}`,
+            `Hubo un error al guardar este item ${product.message}`,
             'Error',
             5000
           );

@@ -39,7 +39,7 @@
                         {{ producto.codigo }}
                     </td>
                     <td class="px-6 py-4">{{ producto.nombre }}</td>
-                    <td class="px-6 py-4">{{ producto.fullNameTipo | titlecase }}</td>
+                    <td class="px-6 py-4">{{ producto.categoriaArticulo.nombre | titlecase }}</td>
                     <td class="px-6 py-4">{{ producto.precio | currency : '$'}}</td>
                     <td class="px-6 py-4">{{ producto.iva_percent }}</td>
                     <td class="px-6 py-4">{{ producto.unidadmedidaRel.nombre | titlecase }}</td>
