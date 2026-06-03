@@ -104,11 +104,13 @@
                   </svg>
                   Proveedor
                 </h3>
-                <p class="text-base font-bold text-gray-900">{{ nota()!.facturaOriginal?.proveedor?.razonSocial || '-' }}</p>
+                <p class="text-base font-bold text-gray-900">{{ nota()!.proveedor?.razonSocial || nota()!.proveedor?.nombre + ' ' + nota()!.proveedor?.apellido }}</p>
                 <p class="text-sm text-gray-600 mt-1">
                   <span class="font-medium">Identificación:</span>
-                  {{ nota()!.facturaOriginal?.proveedor?.identificacion || '-' }}
+                  {{ nota()!.proveedor?.identificacion || '-' }}
                 </p>
+                <p class="text-sm text-gray-600">{{ nota()!.proveedor?.telefono }}</p>
+                <p class="text-sm text-gray-600">{{ nota()!.proveedor?.direccion }}</p>
               </div>
 
               <!-- Info de la nota -->

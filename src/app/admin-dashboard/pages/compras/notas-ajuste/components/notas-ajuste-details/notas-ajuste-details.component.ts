@@ -105,7 +105,7 @@ export class NotasAjusteComprasDetailsComponent implements OnInit {
   printNota(): void {
     const n = this.nota();
     if (n) {
-      window.print();
+      this.printService.printAdjustmentNoteCompra(n);
     }
   }
 

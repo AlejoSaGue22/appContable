@@ -5,14 +5,23 @@ import { FormsModule } from '@angular/forms';
 import { HeaderInput, HeaderTitlePageComponent } from '@dashboard/components/header-title-page/header-title-page.component';
 import { NotificationService } from '@shared/services/notification.service';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { forkJoin, catchError, of } from 'rxjs';
+import { catchError, of } from 'rxjs';
 import { BalanceCuentasTableComponent } from './components/balance-cuentas-table/balance-cuentas-table.component';
+import { FacturasVentaTableComponent } from './components/facturas-venta-table/facturas-venta-table.component';
+import { FacturasCompraTableComponent } from './components/facturas-compra-table/facturas-compra-table.component';
+import { CuentasCobrarTableComponent } from './components/cuentas-cobrar-table/cuentas-cobrar-table.component';
+import { CuentasPagarTableComponent } from './components/cuentas-pagar-table/cuentas-pagar-table.component';
 import { CuentasContablesService } from '../../contabilidad/services/cuentas-contables.service';
 
 @Component({
   selector: 'app-reportes-general',
   standalone: true,
-  imports: [CommonModule, CurrencyPipe, DatePipe, FormsModule, HeaderTitlePageComponent, BalanceCuentasTableComponent],
+  imports: [
+    CommonModule, CurrencyPipe, DatePipe, FormsModule, HeaderTitlePageComponent,
+    BalanceCuentasTableComponent, FacturasVentaTableComponent,
+    FacturasCompraTableComponent, CuentasCobrarTableComponent,
+    CuentasPagarTableComponent
+  ],
   templateUrl: './reportes-general.component.html',
 })
 export class ReportesGeneralComponent {
@@ -20,13 +29,11 @@ export class ReportesGeneralComponent {
   private notificationService = inject(NotificationService);
   private cuentasService = inject(CuentasContablesService);
 
-  activeTab = signal<'facturacion' | 'dian' | 'recaudos' | 'impuestos' | 'balance'>('facturacion');
+  activeTab = signal<'facturacion' | 'facturas-venta' | 'facturas-compra' | 'cxc' | 'cxp' | 'balance'>('facturacion');
 
-  // Dates
   fechaInicio = signal<string>(this.getDefaultDates().firstDay);
   fechaFin = signal<string>(this.getDefaultDates().lastDay);
 
-  // Applied dates (to trigger resource reload)
   appliedDates = signal({
     inicio: this.fechaInicio(),
     fin: this.fechaFin()
@@ -36,7 +43,7 @@ export class ReportesGeneralComponent {
     title: 'Reportes Generales',
     slog: 'Análisis de rentabilidad del período'
   };
-  
+
   protected readonly Math = Math;
 
   private getDefaultDates() {
@@ -46,31 +53,20 @@ export class ReportesGeneralComponent {
     return { firstDay, lastDay };
   }
 
-  // ── Resources ─────────────────────────────────────────────────────
-
-  // General metrics resource
   reportesResource = rxResource({
     request: () => this.appliedDates(),
-    loader: ({ request }) => forkJoin({
-      facturacion: this.reportesService.getFacturacionDetallada(request.inicio, request.fin),
-      dian: this.reportesService.getConciliacionDIAN(request.inicio, request.fin),
-      recaudos: this.reportesService.getConciliacionRecaudos(request.inicio, request.fin),
-      impuestos: this.reportesService.getImpuestosDetallado(request.inicio, request.fin)
-    }).pipe(
+    loader: ({ request }) => this.reportesService.getFacturacionDetallada(request.inicio, request.fin).pipe(
       catchError((err) => {
-        this.notificationService.error('Error al generar los reportes avanzados', err.error?.message || 'Error');
+        this.notificationService.error('Error al generar el reporte de facturación', err.error?.message || 'Error');
         return of(null);
       })
     )
   });
 
-  // Balance contable resource
   balanceResource = rxResource({
     request: () => ({ ...this.appliedDates(), activeTab: this.activeTab() }),
     loader: ({ request }) => {
-      // Only load if tab is balance
       if (request.activeTab !== 'balance') return of([]);
-      
       return this.cuentasService.getCuentasContables({
         fechaInicio: request.inicio,
         fechaFin: request.fin
@@ -83,12 +79,8 @@ export class ReportesGeneralComponent {
     }
   });
 
-  // Computed properties for easy access in template
-  facturacion = computed(() => this.reportesResource.value()?.facturacion);
-  conciliacionDIAN = computed(() => this.reportesResource.value()?.dian);
-  conciliacionRecaudos = computed(() => this.reportesResource.value()?.recaudos);
-  impuestos = computed(() => this.reportesResource.value()?.impuestos);
-  
+  facturacion = computed(() => this.reportesResource.value());
+
   cuentasContables = computed(() => {
     const data = this.balanceResource.value() || [];
     return [...data].sort((a, b) => a.codigo.localeCompare(b.codigo));
@@ -97,8 +89,6 @@ export class ReportesGeneralComponent {
   loading = computed(() => this.reportesResource.isLoading());
   loadingCuentas = computed(() => this.balanceResource.isLoading());
 
-  // ── Actions ───────────────────────────────────────────────────────
-
   generarReporte(): void {
     this.appliedDates.set({
       inicio: this.fechaInicio(),
@@ -106,15 +96,15 @@ export class ReportesGeneralComponent {
     });
   }
 
-  exportarPDF(): void {
-    this.notificationService.info('Función de exportar a PDF próximamente', 'Próximamente');
-  }
-
-  exportarExcel(): void {
-    this.notificationService.info('Función de exportar a Excel próximamente', 'Próximamente');
-  }
-
-  onTabChange(tab: 'facturacion' | 'dian' | 'recaudos' | 'impuestos' | 'balance'): void {
+  onTabChange(tab: 'facturacion' | 'facturas-venta' | 'facturas-compra' | 'cxc' | 'cxp' | 'balance'): void {
     this.activeTab.set(tab);
+  }
+
+  limpiarTabla(): void {
+    const defaults = this.getDefaultDates();
+    this.fechaInicio.set(defaults.firstDay);
+    this.fechaFin.set(defaults.lastDay);
+    this.appliedDates.set({ inicio: '', fin: '' });
+    this.activeTab.set('facturacion');
   }
 }

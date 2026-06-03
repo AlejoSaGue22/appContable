@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { environment } from "src/app/environments/environment";
-import { ReporteConciliacionDIAN, ReporteConciliacionRecaudos, ReporteFacturacionAvanzada, ReporteImpuestos } from "../../../interfaces/reportes-avanzados.interface";
+import { ReporteFacturacionAvanzada } from "../../../interfaces/reportes-avanzados.interface";
 
 export interface EstadoResultados {
     periodo: { inicio: string; fin: string };
@@ -34,7 +34,6 @@ export class ReportesService {
         const params = new HttpParams()
             .set('fechaInicio', fechaInicio)
             .set('fechaFin', fechaFin);
-
         return this.http.get<EstadoResultados>(`${this.apiUrl}/estado-resultados`, { params });
     }
 
@@ -42,7 +41,6 @@ export class ReportesService {
         const params = new HttpParams()
             .set('fechaInicio', fechaInicio)
             .set('fechaFin', fechaFin);
-
         return this.http.get<FlujoCaja>(`${this.apiUrl}/flujo-caja`, { params });
     }
 
@@ -54,20 +52,5 @@ export class ReportesService {
     getFacturacionDetallada(fechaInicio: string, fechaFin: string): Observable<ReporteFacturacionAvanzada> {
         const params = new HttpParams().set('fechaInicio', fechaInicio).set('fechaFin', fechaFin);
         return this.http.get<ReporteFacturacionAvanzada>(`${this.apiUrl}/facturacion-detallada`, { params });
-    }
-
-    getConciliacionDIAN(fechaInicio: string, fechaFin: string): Observable<ReporteConciliacionDIAN> {
-        const params = new HttpParams().set('fechaInicio', fechaInicio).set('fechaFin', fechaFin);
-        return this.http.get<ReporteConciliacionDIAN>(`${this.apiUrl}/conciliacion-dian`, { params });
-    }
-
-    getConciliacionRecaudos(fechaInicio: string, fechaFin: string): Observable<ReporteConciliacionRecaudos> {
-        const params = new HttpParams().set('fechaInicio', fechaInicio).set('fechaFin', fechaFin);
-        return this.http.get<ReporteConciliacionRecaudos>(`${this.apiUrl}/conciliacion-recaudos`, { params });
-    }
-
-    getImpuestosDetallado(fechaInicio: string, fechaFin: string): Observable<ReporteImpuestos> {
-        const params = new HttpParams().set('fechaInicio', fechaInicio).set('fechaFin', fechaFin);
-        return this.http.get<ReporteImpuestos>(`${this.apiUrl}/impuestos-detallado`, { params });
     }
 }

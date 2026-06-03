@@ -3,7 +3,7 @@
 <div class="w-full px-4 sm:px-6 lg:px-8 py-6 animate-fade-in">
     <div class="max-w-7xl mx-auto space-y-8">
 
-        <!-- Filtros de Período (Glassmorphism) -->
+        <!-- Filtros de Período -->
         <div class="bg-white/70 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100/50 p-6 transition-all duration-300">
             <div class="flex flex-col md:flex-row md:items-end gap-6">
                 <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -12,53 +12,66 @@
                         <input type="date" [ngModel]="fechaInicio()" (ngModelChange)="fechaInicio.set($event)"
                             class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all">
                     </div>
-
                     <div class="space-y-2">
                         <label class="font-medium text-gray-400 ml-1">Fecha Fin</label>
                         <input type="date" [ngModel]="fechaFin()" (ngModelChange)="fechaFin.set($event)"
                             class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all">
                     </div>
                 </div>
-
-                <button (click)="generarReporte()"
-                    [disabled]="loading()"
-                    class="h-[36px] px-4 bg-slate-900 hover:bg-slate-700 cursor-pointer text-white text-sm font-bold rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[160px]">
-                    @if (loading()) {
-                        <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                    } @else {
+                <div class="flex items-center gap-2">
+                    <button (click)="generarReporte()"
+                        [disabled]="loading()"
+                        class="h-[36px] px-4 bg-slate-900 hover:bg-slate-700 cursor-pointer text-white text-sm font-bold rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[160px]">
+                        @if (loading()) {
+                            <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        } @else {
+                            <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                        }
+                        {{ loading() ? 'Sincronizando...' : 'Actualizar' }}
+                    </button>
+                    <button (click)="limpiarTabla()"
+                        [disabled]="loading()"
+                        class="h-[36px] px-4 bg-slate-100 hover:bg-slate-200 cursor-pointer text-slate-900 text-sm font-bold rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center">
                         <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
-                    }
-                    {{ loading() ? 'Sincronizando...' : 'Actualizar' }}
-                </button>
+                        Limpiar
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- Tabs Navigation (Premium Design) -->
-        <div class="flex items-center p-1 bg-gray-100/50 backdrop-blur-md rounded-2xl w-fit">
+        <!-- Tabs Navigation -->
+        <div class="flex items-center p-1 bg-gray-100/50 backdrop-blur-md rounded-2xl w-fit flex-wrap gap-1">
             <button (click)="onTabChange('facturacion')"
                 [class]="activeTab() === 'facturacion' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
                 class="px-6 py-2.5 rounded-xl text-md font-bold transition-all duration-300 cursor-pointer">
-                Facturación
+                Dashboard Facturación
             </button>
-            <button (click)="onTabChange('dian')"
-                [class]="activeTab() === 'dian' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
+            <button (click)="onTabChange('facturas-venta')"
+                [class]="activeTab() === 'facturas-venta' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
                 class="px-6 py-2.5 rounded-xl text-md font-bold transition-all duration-300 cursor-pointer">
-                Conciliación DIAN
+                Ventas
             </button>
-            <button (click)="onTabChange('recaudos')"
-                [class]="activeTab() === 'recaudos' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
+            <button (click)="onTabChange('facturas-compra')"
+                [class]="activeTab() === 'facturas-compra' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
                 class="px-6 py-2.5 rounded-xl text-md font-bold transition-all duration-300 cursor-pointer">
-                Recaudos
+                Compras
             </button>
-            <button (click)="onTabChange('impuestos')"
-                [class]="activeTab() === 'impuestos' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
+            <button (click)="onTabChange('cxc')"
+                [class]="activeTab() === 'cxc' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
                 class="px-6 py-2.5 rounded-xl text-md font-bold transition-all duration-300 cursor-pointer">
-                Impuestos
+                Cuentas por Cobrar
+            </button>
+            <button (click)="onTabChange('cxp')"
+                [class]="activeTab() === 'cxp' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
+                class="px-6 py-2.5 rounded-xl text-md font-bold transition-all duration-300 cursor-pointer">
+                Cuentas por Pagar
             </button>
             <button (click)="onTabChange('balance')"
                 [class]="activeTab() === 'balance' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
@@ -69,518 +82,154 @@
 
         <!-- Content Area -->
         <div class="min-h-[400px]">
-            <!-- loading() Indicator -->
-            @if (loading()) {
-                <div class="flex flex-col items-center justify-center py-32 bg-white/50 backdrop-blur-xl rounded-3xl border border-gray-100 shadow-sm">
-                    <div class="relative w-20 h-20">
-                        <div class="absolute inset-0 rounded-full border-4 border-blue-50"></div>
-                        <div class="absolute inset-0 rounded-full border-4 border-t-blue-600 animate-spin"></div>
+
+            <!-- ====== DASHBOARD FACTURACIÓN ====== -->
+            @if (activeTab() === 'facturacion') {
+                @if (loading()) {
+                    <div class="flex flex-col items-center justify-center py-32 bg-white/50 backdrop-blur-xl rounded-3xl border border-gray-100 shadow-sm">
+                        <div class="relative w-20 h-20">
+                            <div class="absolute inset-0 rounded-full border-4 border-blue-50"></div>
+                            <div class="absolute inset-0 rounded-full border-4 border-t-blue-600 animate-spin"></div>
+                        </div>
+                        <p class="mt-6 text-sm font-bold text-gray-900">Analizando registros contables...</p>
+                        <p class="text-xs text-gray-400 mt-1">Esto puede tomar unos segundos</p>
                     </div>
-                    <p class="mt-6 text-sm font-bold text-gray-900">Analizando registros contables...</p>
-                    <p class="text-xs text-gray-400 mt-1">Esto puede tomar unos segundos</p>
-                </div>
-            }
-
-            <!-- Empty State -->
-            @if (!loading() && !facturacion()) {
-                <div class="flex flex-col items-center justify-center py-32 bg-white/50 backdrop-blur-xl rounded-3xl border border-gray-100 shadow-sm">
-                    <div class="w-24 h-24 bg-gray-50 rounded-3xl flex items-center justify-center mb-6">
-                        <svg class="h-12 w-12 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                        </svg>
+                } @else if (!loading() && !facturacion()) {
+                    <div class="flex flex-col items-center justify-center py-32 bg-white/50 backdrop-blur-xl rounded-3xl border border-gray-100 shadow-sm">
+                        <div class="w-24 h-24 bg-gray-50 rounded-3xl flex items-center justify-center mb-6">
+                            <svg class="h-12 w-12 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900">Reporte Vacío</h3>
+                        <p class="text-sm text-gray-400 mt-2 max-w-xs text-center">Selecciona un período válido para generar las métricas de este módulo.</p>
                     </div>
-                    <h3 class="text-lg font-bold text-gray-900">Reporte Vacío</h3>
-                    <p class="text-sm text-gray-400 mt-2 max-w-xs text-center">Selecciona un período válido para generar las métricas de este módulo.</p>
-                </div>
-            }
-                   <!-- Facturación Detallada Content -->
-            @if (!loading() && activeTab() === 'facturacion' && facturacion(); as f) {
-                <div class="animate-slide-up space-y-8">    
-                    <!-- Summary Cards (Premium) -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <!-- Card 1: Total Transacciones -->
-                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 group">
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                </div>
-                                <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg uppercase">Volumen</span>
-                            </div>
-                            <p class="text-[11px] font-bold text-gray-400 uppercase">Total Facturas</p>
-                            <h4 class="text-3xl font-bold text-gray-900 mt-1">{{ f.resumen.totalFacturas }}</h4>
-                            <div class="mt-6 flex items-center gap-2">
-                                <div class="flex-1 space-y-1">
-                                    <div class="flex justify-between text-[9px] font-bold uppercase">
-                                        <span class="text-blue-600">Electrónicas</span>
-                                        <span class="text-gray-400">{{ f.resumen.totalElectronicas }}</span>
+                } @else {
+                    @if (facturacion(); as f) {
+                    <div class="animate-slide-up space-y-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 group">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                     </div>
-                                    <div class="h-1 bg-gray-100 rounded-full overflow-hidden">
-                                        <div class="h-full bg-blue-600" [style.width.%]="(f.resumen.totalElectronicas / (f.resumen.totalFacturas || 1)) * 100"></div>
-                                    </div>
+                                    <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg uppercase">Volumen</span>
                                 </div>
-                                <div class="flex-1 space-y-1">
-                                    <div class="flex justify-between text-[9px] font-bold uppercase">
-                                        <span class="text-gray-600">Estándar</span>
-                                        <span class="text-gray-400">{{ f.resumen.totalStandard }}</span>
-                                    </div>
-                                    <div class="h-1 bg-gray-100 rounded-full overflow-hidden">
-                                        <div class="h-full bg-gray-400" [style.width.%]="(f.resumen.totalStandard / (f.resumen.totalFacturas || 1)) * 100"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Card 2: Valor Operativo -->
-                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300">
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="w-10 h-10 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                </div>
-                                <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg uppercase">Bruto</span>
-                            </div>
-                            <p class="text-[11px] font-bold text-gray-400 uppercase">Monto Total</p>
-                            <h4 class="text-3xl font-bold text-gray-900 mt-1">{{ f.resumen.montoTotal | currency:'':'$':'1.0-0' }}</h4>
-                            <div class="mt-6 flex items-center gap-2">
-                                <div class="flex-1">
-                                    <div class="flex justify-between text-[9px] font-bold uppercase mb-1">
-                                        <span class="text-emerald-600">Elec: {{ (f.resumen.montoElectronicas / (f.resumen.montoTotal || 1) * 100).toFixed(0) }}%</span>
-                                    </div>
-                                    <div class="h-1 bg-gray-100 rounded-full overflow-hidden">
-                                        <div class="h-full bg-emerald-500" [style.width.%]="(f.resumen.montoElectronicas / (f.resumen.montoTotal || 1)) * 100"></div>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-[9px] font-bold text-gray-400 uppercase">IVA</p>
-                                    <p class="text-[11px] font-bold text-emerald-600">{{ f.resumen.ivaTotal | currency:'':'$':'1.0-0' }}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Card 3: Cumplimiento Fiscal -->
-                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300">
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                                </div>
-                                <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg uppercase">DIAN</span>
-                            </div>
-                            <p class="text-[11px] font-bold text-gray-400 uppercase">Tasa Aceptación</p>
-                            <h4 class="text-3xl font-bold text-gray-900 mt-1">{{ f.electronicas.tasaAceptacion }}%</h4>
-                            <div class="mt-6 flex items-center justify-between">
-                                <div class="text-center">
-                                    <p class="text-xs font-bold text-gray-400">Aceptadas</p>
-                                    <p class="text-sm font-bold text-gray-700">{{ f.electronicas.aceptadas }}</p>
-                                </div>
-                                <div class="w-px h-6 bg-gray-100"></div>
-                                <div class="text-center">
-                                    <p class="text-xs font-bold text-red-500">Rechazadas</p>
-                                    <p class="text-sm font-bold text-gray-700">{{ f.electronicas.rechazadas }}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Card 4: Rentabilidad Unitaria -->
-                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300">
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-                                </div>
-                                <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg uppercase">Promedios</span>
-                            </div>
-                            <p class="text-[11px] font-bold text-gray-400 uppercase">Ticket Medio</p>
-                            <h4 class="text-3xl font-bold text-gray-900 mt-1">{{ (f.resumen.montoTotal / (f.resumen.totalFacturas || 1)) | currency:'':'$':'1.0-0' }}</h4>
-                            <div class="mt-6 flex flex-col gap-1">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-[9px] font-bold text-blue-500 uppercase">Prom. Electrónica:</span>
-                                    <span class="text-[11px] font-bold text-gray-700">{{ f.electronicas.montoPromedio | currency:'':'$':'1.0-0' }}</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-[9px] font-bold text-gray-400 uppercase">Prom. Estándar:</span>
-                                    <span class="text-[11px] font-bold text-gray-700">{{ f.standard.montoPromedio | currency:'':'$':'1.0-0' }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Comparison Section -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <!-- Electronic (DIAN) Details Card -->
-                        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden group">
-                            <div class="px-8 py-6 bg-blue-600 flex justify-between items-center relative overflow-hidden">
-                                <div class="relative z-10">
-                                    <h4 class="text-xs font-semibold text-blue-100 uppercase tracking-[0.2em]">Facturación</h4>
-                                    <p class="text-2xl font-bold text-white mt-1">Electrónica (DIAN)</p>
-                                </div>
-                                <div class="w-14 h-14 bg-white/20 rounded-2xl backdrop-blur-md flex items-center justify-center relative z-10">
-                                    <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V21a2 2 0 01-2 2H10a2 2 0 01-2-2v-7" />
-                                    </svg>
-                                </div>
-                                <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
-                            </div>
-                            <div class="p-8 space-y-6">
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                        <p class="text-xs font-bold text-gray-400 mb-1">Emitidas</p>
-                                        <p class="text-xl font-bold text-gray-900">{{ f.electronicas.emitidas }}</p>
-                                    </div>
-                                    <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                        <p class="text-xs font-bold text-gray-400 mb-1">Aceptadas</p>
-                                        <p class="text-xl font-bold text-gray-900">{{ f.electronicas.aceptadas }}</p>
-                                    </div>
-                                    <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                        <p class="text-xs font-bold text-gray-400 mb-1">Pendientes</p>
-                                        <p class="text-xl font-bold text-gray-900">{{ f.electronicas.pendientes }}</p>
-                                    </div>
-                                    <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                        <p class="text-xs font-bold text-gray-400 mb-1">Rechazadas</p>
-                                        <p class="text-xl font-bold text-gray-900">{{ f.electronicas.rechazadas }}</p>
-                                    </div>
-                                </div>
-                                <div class="p-5 bg-blue-50 rounded-2xl border border-blue-100 flex items-center justify-between">
-                                    <div>
-                                        <p class="text-[10px] font-bold text-blue-700 uppercase">Monto Total Elec.</p>
-                                        <p class="text-2xl font-bold text-blue-600">{{ f.resumen.montoElectronicas | currency:'':'$':'1.0-0' }}</p>
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="text-xs font-bold text-blue-400 uppercase">Tasa Aceptación</p>
-                                        <p class="text-lg font-bold text-blue-600">{{ f.electronicas.tasaAceptacion }}%</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Standard (Local) Details Card -->
-                        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden group">
-                            <div class="px-8 py-6 bg-slate-900 flex justify-between items-center relative overflow-hidden">
-                                <div class="relative z-10">
-                                    <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-[0.2em]">Facturación</h4>
-                                    <p class="text-2xl font-bold text-white mt-1">Estándar (Local)</p>
-                                </div>
-                                <div class="w-14 h-14 bg-white/10 rounded-2xl backdrop-blur-md flex items-center justify-center relative z-10">
-                                    <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                </div>
-                                <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl"></div>
-                            </div>
-                            <div class="p-8 space-y-6">
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Emitidas</p>
-                                        <p class="text-xl font-bold text-gray-900">{{ f.standard.emitidas }}</p>
-                                    </div>
-                                    <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Anuladas</p>
-                                        <p class="text-xl font-bold text-gray-900">{{ f.standard.anuladas }}</p>
-                                    </div>
-                                    <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Liquidado</p>
-                                        <p class="text-xl font-bold text-gray-900">{{ f.standard.totalPagado| currency:'':'$':'1.0-0' }}</p>
-                                    </div>
-                                </div>
-                                <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-between">
-                                    <div>
-                                        <p class="text-[10px] font-bold text-slate-500 uppercase">Monto Total</p>
-                                        <p class="text-2xl font-bold text-slate-900">{{ f.resumen.montoStandard | currency:'':'$':'1.0-0' }}</p>
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="text-[10px] font-bold text-slate-400 uppercase">Saldo en Cartera</p>
-                                        <p class="text-lg font-bold text-red-600">{{ f.standard.montoPromedio | currency:'':'$':'1.0-0' }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Top Clientes (Premium Table) -->
-                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                        <div class="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/30">
-                            <h4 class="text-xl font-bold text-gray-500">Ranking de Negocios</h4>
-                            <span class="px-4 py-1.5 bg-blue-600 text-white text-[10px] font-bold uppercase rounded-xl shadow-lg shadow-blue-200">Top 5 Clientes</span>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-sm">
-                                <thead class="bg-gray-50/50 text-[10px] text-gray-400 font-bold uppercase border-b border-gray-100">
-                                    <tr>
-                                        <th class="px-8 py-6">Cliente</th>
-                                        <th class="px-8 py-6 text-center">Transacciones</th>
-                                        <th class="px-8 py-6 text-right">Facturación Bruta</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-gray-50">
-                                    @for (c of f.topClientes; track c.clienteId) {
-                                        <tr class="hover:bg-blue-50/40 transition-all duration-300 group">
-                                            <td class="px-8 py-5">
-                                                <div class="flex items-center gap-4">
-                                                    <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center text-xs font-bold text-blue-600 border border-blue-100 group-hover:scale-110 transition-transform">
-                                                        {{ c.clienteNombre.substring(0, 2).toUpperCase() }}
-                                                    </div>
-                                                    <div>
-                                                        <span class="font-bold text-gray-900 block">{{ c.clienteNombre }}</span>
-                                                        <span class="text-[10px] text-gray-400 font-medium">ID: {{ c.clienteId }}</span>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="px-8 py-5 text-center">
-                                                <span class="px-3 py-1 bg-gray-100 rounded-lg text-xs font-bold text-gray-600">{{ c.cantidadFacturas }} doc.</span>
-                                            </td>
-                                            <td class="px-8 py-5 text-right">
-                                                <span class="text-sm font-bold text-blue-600">{{ c.montoTotal | currency:'':'$':'1.0-0' }}</span>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Ventas Diarias (Timeline Style) -->
-                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                        <div class="px-8 py-6 border-b border-gray-50 bg-gray-50/30 flex items-center justify-between">
-                            <h4 class="text-xl font-bold text-gray-400">Cronología de Ventas</h4>
-                            <div class="flex items-center gap-4 text-[10px] font-bold uppercase">
-                                <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-blue-500"></span> Electrónica</div>
-                                <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-gray-300"></span> Estándar</div>
-                            </div>
-                        </div>
-                        <div class="p-8">
-                            <div class="flex gap-4 overflow-x-auto pb-6 scrollbar-hide">
-                                @for (v of f.ventasPorDia; track v.fecha) {
-                                    <div class="flex-none w-36 p-5 bg-gray-50/50 rounded-3xl border border-gray-100 text-center hover:bg-white hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group">
-                                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-3">{{ v.fecha | date:'dd MMM' }}</p>
-                                        <p class="text-lg font-bold text-gray-900 mb-4">{{ v.montoTotal | currency:'':'$':'1.0-0' }}</p>
-                                        <div class="flex justify-center gap-1">
-                                            @for (i of [].constructor(Math.min(v.cantidadElectronicas, 4)); track $index) {
-                                                <span class="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-sm shadow-blue-200"></span>
-                                            }
-                                            @if (v.cantidadStandard > 0) {
-                                                <span class="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
-                                            }
+                                <p class="text-[11px] font-bold text-gray-400 uppercase">Total Facturas</p>
+                                <h4 class="text-3xl font-bold text-gray-900 mt-1">{{ f.resumen.totalFacturas }}</h4>
+                                <div class="mt-6 flex items-center gap-2">
+                                    <div class="flex-1 space-y-1">
+                                        <div class="flex justify-between text-[9px] font-bold uppercase">
+                                            <span class="text-blue-600">Electrónicas</span>
+                                            <span class="text-gray-400">{{ f.resumen.totalElectronicas }}</span>
                                         </div>
-                                        <p class="text-[9px] font-bold text-gray-400 mt-4 opacity-0 group-hover:opacity-100 transition-opacity uppercase">{{ v.cantidadElectronicas + v.cantidadStandard }} docs</p>
-                                    </div>
-                                }
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            }
-
-            <!-- Conciliación DIAN Content -->
-            @if (!loading() && activeTab() === 'dian' && conciliacionDIAN(); as d) {
-                <div class="animate-slide-up space-y-8">
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div class="lg:col-span-2 space-y-8">
-                            <!-- Comparison Grid -->
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-t-4 border-t-blue-500">
-                                    <p class="text-[10px] font-semibold uppercase text-gray-400 mb-1">Monto DIAN (Accepted)</p>
-                                    <h4 class="text-2xl font-semibold text-gray-900">{{ d.facturasElectronicas.montoAcceptedDIAN | currency:'':'$':'1.0-0' }}</h4>
-                                    <p class="text-[10px] text-blue-500 font-bold mt-4 flex items-center gap-1">
-                                        <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                        Validado vía API DIAN
-                                    </p>
-                                </div>
-                                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-t-4 border-t-indigo-500">
-                                    <p class="text-[10px] font-semibold uppercase text-gray-400 mb-1">Débito en Libros</p>
-                                    <h4 class="text-2xl font-semibold text-gray-900">{{ d.facturasElectronicas.montoDebito | currency:'':'$':'1.0-0' }}</h4>
-                                    <p class="text-[10px] text-gray-400 font-bold mt-4 uppercase tracking-tighter">Cuentas por Cobrar</p>
-                                </div>
-                                <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 border-t-4 border-t-purple-500">
-                                    <p class="text-[10px] font-semibold uppercase text-gray-400 mb-1">Saldo Cuentas 41XX</p>
-                                    <h4 class="text-2xl font-semibold text-gray-900">{{ d.contabilidad.saldoCuentasIngreso | currency:'':'$':'1.0-0' }}</h4>
-                                    <p class="text-[10px] text-gray-400 font-bold mt-4 uppercase tracking-tighter">Ingresos Operacionales</p>
-                                </div>
-                            </div>
-
-                            <!-- Detail Breakdown Table -->
-                            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                                <div class="px-8 py-6 border-b border-gray-50 bg-gray-50/30">
-                                    <h4 class="text-xs font-semibold text-gray-400 uppercase">Desglose de Ingresos Operacionales</h4>
-                                </div>
-                                <div class="divide-y divide-gray-50">
-                                    @for (item of d.contabilidad.detallePorCuenta; track item.codigo) {
-                                        <div class="px-8 py-5 flex justify-between items-center hover:bg-gray-50 transition-all group">
-                                            <div class="flex items-center gap-4">
-                                                <div class="px-3 py-1.5 bg-gray-100 rounded-xl font-mono text-xs font-semibold text-gray-500">
-                                                    {{ item.codigo }}
-                                                </div>
-                                                <span class="text-sm font-semibold text-gray-900">{{ item.nombre }}</span>
-                                            </div>
-                                            <div class="flex items-center gap-6">
-                                                <span class="text-sm font-semibold text-gray-900">{{ item.saldo | currency:'':'$':'1.0-0' }}</span>
-                                                <div class="w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                                                    <div class="h-full bg-blue-500/30 group-hover:bg-blue-500 transition-all" [style.width.%]="(item.saldo / (d.contabilidad.saldoCuentasIngreso || 1)) * 100"></div>
-                                                </div>
-                                            </div>
+                                        <div class="h-1 bg-gray-100 rounded-full overflow-hidden">
+                                            <div class="h-full bg-blue-600" [style.width.%]="(f.resumen.totalElectronicas / (f.resumen.totalFacturas || 1)) * 100"></div>
                                         </div>
-                                    }
+                                    </div>
+                                    <div class="flex-1 space-y-1">
+                                        <div class="flex justify-between text-[9px] font-bold uppercase">
+                                            <span class="text-gray-600">Estándar</span>
+                                            <span class="text-gray-400">{{ f.resumen.totalStandard }}</span>
+                                        </div>
+                                        <div class="h-1 bg-gray-100 rounded-full overflow-hidden">
+                                            <div class="h-full bg-gray-400" [style.width.%]="(f.resumen.totalStandard / (f.resumen.totalFacturas || 1)) * 100"></div>
+                                        </div>
+                                    </div>
                                 </div>
+                            </div>
+                            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="w-10 h-10 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    </div>
+                                    <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg uppercase">Bruto</span>
+                                </div>
+                                <p class="text-[11px] font-bold text-gray-400 uppercase">Monto Total</p>
+                                <h4 class="text-3xl font-bold text-gray-900 mt-1">{{ f.resumen.montoTotal | currency:'':'$':'1.0-0' }}</h4>
+                            </div>
+                            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                    </div>
+                                    <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg uppercase">DIAN</span>
+                                </div>
+                                <p class="text-[11px] font-bold text-gray-400 uppercase">Tasa Aceptación</p>
+                                <h4 class="text-3xl font-bold text-gray-900 mt-1">{{ f.electronicas.tasaAceptacion }}%</h4>
+                            </div>
+                            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                                    </div>
+                                    <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg uppercase">Promedios</span>
+                                </div>
+                                <p class="text-[11px] font-bold text-gray-400 uppercase">Ticket Medio</p>
+                                <h4 class="text-3xl font-bold text-gray-900 mt-1">{{ (f.resumen.montoTotal / (f.resumen.totalFacturas || 1)) | currency:'':'$':'1.0-0' }}</h4>
                             </div>
                         </div>
-
-                        <!-- Match Status Card -->
-                        <div class="space-y-8">
-                            <div [class]="d.cuadra ? 'bg-emerald-600 shadow-emerald-200' : 'bg-red-600 shadow-red-200'" 
-                                class="rounded-3xl p-10 text-white shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
-                                <div class="relative z-10">
-                                    <div class="w-20 h-20 bg-white/20 rounded-3xl backdrop-blur-md flex items-center justify-center text-4xl mb-6 mx-auto animate-bounce-slow">
-                                        {{ d.cuadra ? '✨' : '⚠️' }}
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden group">
+                                <div class="px-8 py-6 bg-blue-600 flex justify-between items-center relative overflow-hidden">
+                                    <div class="relative z-10">
+                                        <h4 class="text-xs font-semibold text-blue-100 uppercase tracking-[0.2em]">Facturación</h4>
+                                        <p class="text-2xl font-bold text-white mt-1">Electrónica (DIAN)</p>
                                     </div>
-                                    <h3 class="text-sm font-semibold uppercase opacity-80">Estado Global</h3>
-                                    <p class="text-xl font-semibold mt-2 uppercase">{{ d.cuadra ? 'Conciliado' : 'Requiere Ajuste' }}</p>
-                                    <div class="mt-8 py-4 px-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10">
-                                        <p class="text-4xl font-semibold">{{ (d.diferencia < 0 ? d.diferencia * -1 : d.diferencia) | currency:'':'$':'1.0-0' }}</p>
-                                        <p class="text-[10px] font-bold mt-1 opacity-60 uppercase">Diferencia Neta</p>
+                                    <div class="w-14 h-14 bg-white/20 rounded-2xl backdrop-blur-md flex items-center justify-center relative z-10">
+                                        <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V21a2 2 0 01-2 2H10a2 2 0 01-2-2v-7" />
+                                        </svg>
                                     </div>
                                 </div>
-                                <div class="absolute -right-10 -bottom-10 w-44 h-44 bg-white/10 rounded-full blur-3xl"></div>
+                                <div class="p-8 space-y-6">
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100"><p class="text-xs font-bold text-gray-400 mb-1">Emitidas</p><p class="text-xl font-bold text-gray-900">{{ f.electronicas.emitidas }}</p></div>
+                                        <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100"><p class="text-xs font-bold text-gray-400 mb-1">Aceptadas</p><p class="text-xl font-bold text-gray-900">{{ f.electronicas.aceptadas }}</p></div>
+                                    </div>
+                                </div>
                             </div>
-
-                            <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm relative group overflow-hidden">
-                                <div class="flex items-center gap-2 mb-4">
-                                    <span class="text-blue-500">📋</span>
-                                    <h4 class="text-[10px] font-semibold text-gray-400 uppercase">Memorándum del Período</h4>
+                            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden group">
+                                <div class="px-8 py-6 bg-slate-900 flex justify-between items-center relative overflow-hidden">
+                                    <div class="relative z-10">
+                                        <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-[0.2em]">Facturación</h4>
+                                        <p class="text-2xl font-bold text-white mt-1">Estándar (Local)</p>
+                                    </div>
                                 </div>
-                                <p class="text-sm text-gray-700 leading-relaxed italic border-l-4 border-blue-500/30 pl-4">
-                                    {{ d.explicacion || 'No se han registrado discrepancias manuales o ajustes para esta conciliación. El sistema asume integridad basándose en los registros existentes.' }}
-                                </p>
+                                <div class="p-8 space-y-6">
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100"><p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Emitidas</p><p class="text-xl font-bold text-gray-900">{{ f.standard.emitidas }}</p></div>
+                                        <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100"><p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Anuladas</p><p class="text-xl font-bold text-gray-900">{{ f.standard.anuladas }}</p></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                }
+            }
+        }
+
+            <!-- ====== FACTURAS VENTA ====== -->
+            @if (activeTab() === 'facturas-venta') {
+                <app-facturas-venta-table [fechaInicio]="appliedDates().inicio" [fechaFin]="appliedDates().fin" />
             }
 
-            <!-- Recaudos Content -->
-            @if (!loading() && activeTab() === 'recaudos' && conciliacionRecaudos(); as r) {
-                <div class="animate-slide-up space-y-8">
-                    <div class="bg-gray-900 rounded-3xl p-12 text-white shadow-2xl relative overflow-hidden">
-                        <div class="relative z-10 flex flex-col md:flex-row items-center gap-12">
-                            <div class="text-center md:text-left flex-1">
-                                <p class="text-xs font-semibold text-gray-400 uppercase mb-4">Eficiencia en Recaudos</p>
-                                <div class="flex items-baseline gap-4">
-                                    <h3 class="text-5xl font-semibold">{{ (r.totalPagosRegistrados / (r.totalMovimientosBancos || 1) * 100).toFixed(1) }}%</h3>
-                                    <span class="text-xl font-semibold text-emerald-400">Tasa de Cruce</span>
-                                </div>
-                            </div>
-                            <div class="flex gap-8">
-                                <div class="text-center">
-                                    <p class="text-[10px] text-gray-500 font-bold uppercase mb-1">Registros</p>
-                                    <p class="text-xl font-semibold">{{ r.totalPagosRegistrados | currency:'':'$':'1.0-0' }}</p>
-                                </div>
-                                <div class="w-px h-12 bg-gray-800"></div>
-                                <div class="text-center">
-                                    <p class="text-[10px] text-gray-500 font-bold uppercase mb-1">Banco (1110)</p>
-                                    <p class="text-xl font-semibold text-blue-400">{{ r.totalMovimientosBancos | currency:'':'$':'1.0-0' }}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="absolute -right-20 -top-20 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl"></div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        @for (m of r.detallePorMedio; track m.medio) {
-                            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm group hover:border-blue-500/30 transition-all duration-300">
-                                <div class="flex items-center gap-4 mb-4">
-                                    <div class="w-12 h-12 rounded-2xl bg-gray-50 group-hover:bg-blue-50 transition-colors flex items-center justify-center text-2xl">
-                                        @if (m.medio === 'transferencia') { 💼 }
-                                        @else if (m.medio === 'banco') { 🏦 }
-                                        @else if (m.medio === 'caja') { 💵 }
-                                        @else { 🧾 }
-                                    </div>
-                                    <div class="flex-1 overflow-hidden">
-                                        <p class="text-[10px] font-semibold text-gray-400 uppercase truncate">{{ m.medio }}</p>
-                                        <p class="text-lg font-semibold text-gray-900">{{ m.monto | currency:'':'$':'1.0-0' }}</p>
-                                    </div>
-                                </div>
-                                <div class="h-1 bg-gray-50 rounded-full overflow-hidden">
-                                    <div class="h-full bg-blue-500 transition-all" [style.width.%]="(m.monto / (r.totalPagosRegistrados || 1)) * 100"></div>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                </div>
+            <!-- ====== FACTURAS COMPRA ====== -->
+            @if (activeTab() === 'facturas-compra') {
+                <app-facturas-compra-table [fechaInicio]="appliedDates().inicio" [fechaFin]="appliedDates().fin" />
             }
 
-            <!-- Impuestos Content -->
-            @if (!loading() && activeTab() === 'impuestos' && impuestos(); as i) {
-                <div class="animate-slide-up space-y-8">
-                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                        <div class="grid grid-cols-1 lg:grid-cols-2">
-                            <div class="p-12 bg-indigo-950 text-white flex flex-col justify-center">
-                                <p class="text-xs font-semibold text-indigo-400 uppercase mb-4">Obligación Tributaria</p>
-                                <h3 class="text-5xl font-semibold mb-2">IVA Generado</h3>
-                                <p class="text-6xl font-semibold text-indigo-300">{{ i.totalIVAGenerado | currency:'':'$':'1.0-0' }}</p>
-                                <p class="mt-8 text-sm text-indigo-400 leading-relaxed font-medium">IVA acumulado en el período seleccionado basado en facturación electrónica y estándar consolidada.</p>
-                            </div>
-                            <div class="p-12 space-y-10">
-                                <div class="space-y-4">
-                                    <div class="flex justify-between items-center text-xs font-semibold uppercase text-gray-400">
-                                        <span>Iva Fact. Electrónica</span>
-                                        <span class="text-gray-900">{{ i.porTipoFactura.electronicas.iva | currency:'':'$':'1.0-0' }}</span>
-                                    </div>
-                                    <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
-                                        <div class="h-full bg-indigo-600 rounded-full" [style.width.%]="(i.porTipoFactura.electronicas.iva / (i.totalIVAGenerado || 1)) * 100"></div>
-                                    </div>
-                                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">Base: {{ i.porTipoFactura.electronicas.base | currency:'':'$':'1.0-0' }}</p>
-                                </div>
-
-                                <div class="space-y-4">
-                                    <div class="flex justify-between items-center text-xs font-semibold uppercase text-gray-400">
-                                        <span>Iva Fact. Estándar</span>
-                                        <span class="text-gray-900">{{ i.porTipoFactura.standard.iva | currency:'':'$':'1.0-0' }}</span>
-                                    </div>
-                                    <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
-                                        <div class="h-full bg-indigo-400 rounded-full" [style.width.%]="(i.porTipoFactura.standard.iva / (i.totalIVAGenerado || 1)) * 100"></div>
-                                    </div>
-                                    <p class="text-[10px] text-gray-400 font-bold uppercase">Base: {{ i.porTipoFactura.standard.base | currency:'':'$':'1.0-0' }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-                        <div class="px-8 py-6 border-b border-gray-50 bg-gray-50/30">
-                            <h4 class="text-xs font-black text-gray-400 uppercase">Liquidación por Tarifas</h4>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-sm">
-                                <thead class="bg-gray-50/50 text-[11px] uppercase text-gray-400 border-b border-gray-100">
-                                    <tr>
-                                        <th class="px-8 py-5">Tarifa Impositiva</th>
-                                        <th class="px-8 py-5 text-right">Base Imponible</th>
-                                        <th class="px-8 py-5 text-right">IVA Liquidado</th>
-                                        <th class="px-8 py-5 text-center">Registros</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-gray-50">
-                                    @for (t of i.desglosePorTarifa; track t.tarifa) {
-                                        <tr class="hover:bg-indigo-50/30 transition-all duration-200">
-                                            <td class="px-8 py-4">
-                                                <span class="px-3 py-1.5 bg-indigo-100 text-indigo-700 text-[10px] font-semibold uppercase rounded-lg">
-                                                    {{ t.tarifa }}% - IVA
-                                                </span>
-                                            </td>
-                                            <td class="px-8 py-4 text-right font-semibold text-gray-600">
-                                                {{ t.base | currency:'':'$':'1.0-0' }}
-                                            </td>
-                                            <td class="px-8 py-4 text-right font-semibold text-gray-900">
-                                                {{ t.iva | currency:'':'$':'1.0-0' }}
-                                            </td>
-                                            <td class="px-8 py-4 text-center">
-                                                <span class="text-[10px] font-semibold text-gray-400">{{ t.cantidadItems }} op.</span>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+            <!-- ====== CUENTAS POR COBRAR ====== -->
+            @if (activeTab() === 'cxc') {
+                <app-cuentas-cobrar-table [fechaInicio]="appliedDates().inicio" [fechaFin]="appliedDates().fin" />
             }
 
-            <!-- ═══ BALANCE CONTABLE TAB ═══ -->
+            <!-- ====== CUENTAS POR PAGAR ====== -->
+            @if (activeTab() === 'cxp') {
+                <app-cuentas-pagar-table [fechaInicio]="appliedDates().inicio" [fechaFin]="appliedDates().fin" />
+            }
+
+            <!-- ====== BALANCE CONTABLE ====== -->
             @if (activeTab() === 'balance') {
                 @if (loadingCuentas()) {
                     <div class="flex flex-col items-center justify-center py-32 bg-white/50 backdrop-blur-xl rounded-3xl border border-gray-100 shadow-sm">
@@ -589,28 +238,34 @@
                             <div class="absolute inset-0 rounded-full border-4 border-t-blue-600 animate-spin"></div>
                         </div>
                         <p class="mt-6 text-sm font-bold text-gray-900">Cargando balance contable...</p>
-                        <p class="text-xs text-gray-400 mt-1">Consultando saldos del período</p>
                     </div>
                 } @else if (cuentasContables().length > 0) {
                     <div class="animate-slide-up">
                         <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-                            <!-- Header -->
-                            <div class="px-8 py-5 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
+                            <div class="px-8 py-5 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between flex-wrap gap-3">
                                 <div>
                                     <h3 class="text-sm font-bold text-gray-900">Plan Único de Cuentas (PUC)</h3>
-                                    <p class="text-xs text-gray-400 mt-0.5">Balance de saldos por cuenta del período {{ fechaInicio() }} al {{ fechaFin() }}</p>
+                                    <p class="text-xs text-gray-400 mt-0.5">Balance de saldos por cuenta del {{ fechaInicio() }} al {{ fechaFin() }}</p>
                                 </div>
-                                <button (click)="balanceResource.reload()" 
-                                    class="px-4 py-2 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors cursor-pointer flex items-center gap-1.5">
-                                    <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                    </svg>
-                                    Actualizar
-                                </button>
+                                <div class="flex items-center gap-2">
+                                    <button (click)="balanceTable.exportarExcel()"
+                                        class="px-4 py-2 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-colors cursor-pointer flex items-center gap-1.5">
+                                        <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                        </svg>
+                                        Excel
+                                    </button>
+                                    <button (click)="balanceResource.reload()"
+                                        class="px-4 py-2 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors cursor-pointer flex items-center gap-1.5">
+                                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                        </svg>
+                                        Actualizar
+                                    </button>
+                                </div>
                             </div>
-                            <!-- Table -->
                             <div class="overflow-x-auto">
-                                <app-balance-cuentas-table [cuentas]="cuentasContables()" />
+                                <app-balance-cuentas-table #balanceTable [cuentas]="cuentasContables()" />
                             </div>
                         </div>
                     </div>
@@ -634,35 +289,15 @@
     .animate-fade-in {
         animation: fadeIn 0.4s ease-out forwards;
     }
-
     .animate-slide-up {
         animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
-
-    .animate-bounce-slow {
-        animation: bounce 3s infinite;
-    }
-
     @keyframes fadeIn {
         from { opacity: 0; transform: scale(0.98); }
         to { opacity: 1; transform: scale(1); }
     }
-
     @keyframes slideUp {
         from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes bounce {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-10px); }
-    }
-
-    .scrollbar-hide::-webkit-scrollbar {
-        display: none;
-    }
-    .scrollbar-hide {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
     }
 </style>

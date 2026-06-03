@@ -1,6 +1,9 @@
 import { Component, computed, input, signal } from '@angular/core';
 import { GetCuentasContables } from '@dashboard/interfaces/catalogs-interface';
 import { CurrencyPipe, CommonModule } from '@angular/common';
+import { NotificationService } from '@shared/services/notification.service';
+import { inject } from '@angular/core';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-balance-cuentas-table',
@@ -13,6 +16,7 @@ export class BalanceCuentasTableComponent {
   cuentas = input<GetCuentasContables[]>([]);
 
   expandedIds = signal<Set<string>>(new Set<string>());
+  private notification = inject(NotificationService);
 
   allCuentasSorted = computed(() => {
     return [...(this.cuentas() || [])].sort((a, b) => a.codigo.localeCompare(b.codigo));
@@ -71,5 +75,26 @@ export class BalanceCuentasTableComponent {
 
   hasChildren(cuenta: GetCuentasContables): boolean {
     return !cuenta.aceptaMovimiento;
+  }
+
+  exportarExcel(): void {
+    const cuentas = this.cuentas();
+    if (!cuentas.length) {
+      this.notification.info('Sin datos para exportar', 'Información');
+      return;
+    }
+    const data = cuentas.map((c) => ({
+      Código: c.codigo,
+      Nombre: c.nombre,
+      Naturaleza: c.naturaleza,
+      Débitos: c.totalDebito,
+      Créditos: c.totalCredito,
+      Saldo: c.saldo,
+      Estado: c.isActive ? 'Activa' : 'Inactiva',
+    }));
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Balance Contable');
+    XLSX.writeFile(wb, `BalanceContable.xlsx`);
   }
 }

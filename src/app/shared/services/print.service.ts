@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { GetFacturaRequest } from '@dashboard/interfaces/documento-venta-interface';
 import { FacturaCompraResponse } from '@dashboard/interfaces/factura-compra-interface';
 import { NotaAjuste } from '@dashboard/interfaces/notas-ajuste-interface';
+import { NotaAjusteCompra } from '@dashboard/interfaces/notas-ajuste-compra-interface';
 import { HelpersUtils } from '@utils/helpers.utils';
 
 export interface EmpresaInfo {
@@ -67,6 +68,15 @@ export class PrintService {
     this.openPrintWindow(html, `${title} ${nota.prefijo}${nota.numero}`);
   }
 
+  // ──────────────────────────────────────────────────────────────────────
+  //  IMPRIMIR NOTA DE AJUSTE COMPRA (CRÉDITO/DÉBITO)
+  // ──────────────────────────────────────────────────────────────────────
+  printAdjustmentNoteCompra(nota: NotaAjusteCompra): void {
+    const html = this.buildAdjustmentNoteCompraHtml(nota);
+    const title = nota.tipo === 'credito' ? 'Nota Crédito Compra' : 'Nota Débito Compra';
+    this.openPrintWindow(html, `${title} ${nota.prefijo || ''}${nota.numeroCompleto || nota.id}`);
+  }
+
   // ══════════════════════════════════════════════════════════════════════
   //  PRIVATE — Abrir ventana de impresión
   // ══════════════════════════════════════════════════════════════════════
@@ -83,7 +93,7 @@ export class PrintService {
         printWindow.focus();
         printWindow.print();
         printWindow.close();
-      }, 350);
+      }, 800);
     };
   }
 
@@ -779,11 +789,13 @@ export class PrintService {
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
     * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:'Inter',sans-serif; font-size:11px; color:#1e293b; background:#fff; }
+    body { font-family:system-ui,-apple-system,'Segoe UI',sans-serif; font-size:11px; color:#1e293b; background:#fff; }
 
     @media print {
       @page { margin:0; size:A4; }
       body { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+      table { page-break-inside:avoid; }
+      thead { display:table-header-group; }
     }
   </style>
 </head>
@@ -810,6 +822,7 @@ export class PrintService {
           ${this.empresa.email}<br/>
           ${this.empresa.direccion}<br/>
           ${this.empresa.ciudad}
+          ${this.empresa.textoAdicional ? '<br/>' + this.empresa.textoAdicional : ''}
         </div>
       </td>
       ${qrBlock}
@@ -891,7 +904,7 @@ export class PrintService {
       <tr>
         <td style="vertical-align:top;padding-right:16px;width:55%;">
           <div style="border:1px solid #cbd5e1;border-radius:4px;padding:10px;min-height:80px;">
-            <div style="font-size:10px;font-weight:6  00;color:#334155;margin-bottom:4px;">Observaciones</div>
+            <div style="font-size:10px;font-weight:600;color:#334155;margin-bottom:4px;">Observaciones</div>
             <div style="font-size:10px;color:#64748b;line-height:1.5;">${n.observaciones || ''}</div>
           </div>
         </td>
@@ -906,6 +919,10 @@ export class PrintService {
               <td style="padding:6px 12px;font-size:10px;color:#475569;border-bottom:1px solid #f1f5f9;">IVA</td>
               <td style="padding:6px 12px;font-size:10px;color:#1e293b;text-align:right;border-bottom:1px solid #f1f5f9;">${this.fmt(n.iva)}</td>
             </tr>
+            ${n.descuento > 0 ? `<tr>
+              <td style="padding:6px 12px;font-size:10px;color:#475569;border-bottom:1px solid #f1f5f9;">Descuento</td>
+              <td style="padding:6px 12px;font-size:10px;color:#dc2626;text-align:right;border-bottom:1px solid #f1f5f9;">-${this.fmt(n.descuento)}</td>
+            </tr>` : ''}
             <tr>
               <td style="padding:8px 12px;font-size:11px;font-weight:500;color:#000000;background:#efefef;">Total Ajuste</td>
               <td style="padding:8px 12px;font-size:12px;color:#000000;text-align:right;background:#efefef;font-weight:500;">${this.fmt(n.total)}</td>
@@ -922,6 +939,196 @@ export class PrintService {
   <td style="width:22px;position:relative;">
     <div style="position:absolute;top:50%;left:99%;transform:translate(-50%,-50%) rotate(90deg);color:#000000;font-size:10px;letter-spacing:1px;font-weight:600;white-space:nowrap;opacity:0.3;">
       Documento electrónico generado con Factus Software Contable
+    </div>
+  </td>
+</tr>
+</table>
+
+</body>
+</html>`;
+  }
+
+  // ══════════════════════════════════════════════════════════════════════
+  //  PRIVATE — Construir HTML de Nota de Ajuste Compra
+  // ══════════════════════════════════════════════════════════════════════
+  private buildAdjustmentNoteCompraHtml(n: NotaAjusteCompra): string {
+    const tipoLabel = n.tipo === 'credito' ? 'NOTA CRÉDITO COMPRA' : 'NOTA DÉBITO COMPRA';
+    const proveedorNombre = n.proveedor?.razonSocial?.trim() || n.proveedor?.nombre?.trim() || '—';
+    const proveedorNit = n.proveedor?.identificacion || '—';
+    const fechaGen = this.formatDateTimePrint(n.createdAt);
+    const facturaRef = n.facturaOriginal?.numeroFacturaProveedor || n.facturaOriginalNumero || '—';
+
+    const itemsRows = n.items.map((item, i) => `
+      <tr>
+        <td style="text-align:center;padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#64748b;">${i + 1}</td>
+        <td style="padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:9px;font-family:'Courier New',monospace;color:#475569;">${item.articulo?.codigo || ''}</td>
+        <td style="padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#334155;">${item.descripcion || item.articulo?.nombre || ''}</td>
+        <td style="text-align:right;padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#334155;">${this.fmt(item.valorUnitario)}</td>
+        <td style="text-align:center;padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#334155;">${item.cantidad}</td>
+        <td style="text-align:center;padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#334155;">${item.descuento || 0}</td>
+        <td style="text-align:center;padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#334155;">${item.porcentajeIVA || 0}%</td>
+        <td style="text-align:right;padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#1e293b;font-weight:600;">${this.fmt(item.total || 0)}</td>
+      </tr>
+    `).join('');
+
+    return `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <title>${tipoLabel} ${n.prefijo || ''}${n.numeroCompleto || n.id}</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:system-ui,-apple-system,'Segoe UI',sans-serif; font-size:11px; color:#1e293b; background:#fff; }
+
+    @media print {
+      @page { margin:0; size:A4; }
+      body { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+      table { page-break-inside:avoid; }
+      thead { display:table-header-group; }
+    }
+  </style>
+</head>
+<body>
+
+<table cellpadding="0" cellspacing="0" style="width:210mm;min-height:297mm;margin:0 auto;border-collapse:collapse;">
+<tr>
+  <td style="vertical-align:top;padding:28px 36px 20px 20px;">
+
+    <!-- ═══════ HEADER ═══════ -->
+    <table cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:16px;">
+    <tr>
+      <td style="width:140px;vertical-align:top;padding-right:16px;">
+        <img src="${this.logoApp}" alt="Logo" style="width:100px;height:100px;"/>
+      </td>
+
+      <td style="vertical-align:top;text-align:center;">
+        <div style="font-size:13px;font-weight:800;color:#000000;text-transform:uppercase;letter-spacing:0.5px;">${tipoLabel}</div>
+        <div style="font-size:12px;font-weight:700;color:#000000;margin-top:2px;">NÚMERO ${n.prefijo || ''}${n.numeroCompleto || n.id}</div>
+        <div style="margin-top:6px;line-height:1.5;color:#475569;font-size:9.5px;">
+          <strong style="color:#334155;">${this.empresa.sucursal}</strong><br/>
+          NIT: ${this.empresa.nit}<br/>
+          ${this.empresa.telefono}<br/>
+          ${this.empresa.email}<br/>
+          ${this.empresa.direccion}<br/>
+          ${this.empresa.ciudad}
+          ${this.empresa.textoAdicional ? '<br/>' + this.empresa.textoAdicional : ''}
+        </div>
+      </td>
+    </tr>
+    </table>
+
+    <!-- ═══════ PROVEEDOR + REF INFO ═══════ -->
+    <table cellpadding="0" cellspacing="0" style="width:100%;border:1.5px solid #cbd5e1;border-radius:4px;margin-bottom:16px;border-collapse:separate;overflow:hidden;">
+    <tr>
+      <td style="vertical-align:top;padding:10px 14px;width:55%;">
+        <table cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;">
+          <tr>
+            <td style="padding:3px 0;font-size:10px;font-weight:600;color:#000000;width:90px;">NIT:</td>
+            <td style="padding:3px 0;font-size:10px;color:#334155;">${proveedorNit}</td>
+          </tr>
+          <tr>
+            <td style="padding:3px 0;font-size:10px;font-weight:600;color:#000000;">Proveedor:</td>
+            <td style="padding:3px 0;font-size:10px;color:#334155;font-weight:500;">${proveedorNombre}</td>
+          </tr>
+          <tr>
+            <td style="padding:3px 0;font-size:10px;font-weight:600;color:#000000;">Dirección:</td>
+            <td style="padding:3px 0;font-size:10px;color:#334155;">${n.proveedor?.direccion || '—'}</td>
+          </tr>
+          <tr>
+            <td style="padding:3px 0;font-size:10px;font-weight:600;color:#000000;">Teléfono:</td>
+            <td style="padding:3px 0;font-size:10px;color:#334155;">${n.proveedor?.telefono || '—'}</td>
+          </tr>
+          <tr>
+            <td style="padding:3px 0;font-size:10px;font-weight:600;color:#000000;">Email:</td>
+            <td style="padding:3px 0;font-size:10px;color:#334155;">${n.proveedor?.email || '—'}</td>
+          </tr>
+        </table>
+      </td>
+
+      <td style="vertical-align:top;padding:10px 14px;width:45%;border-left:1.5px solid #cbd5e1;background:#f8fafc;">
+        <table cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;">
+          <tr>
+            <td style="padding:3px 0;font-size:10px;font-weight:600;color:#64748b;">Fecha generación:</td>
+            <td style="padding:3px 0;font-size:10px;font-weight:500;color:#334155;text-align:right;">${fechaGen}</td>
+          </tr>
+          <tr>
+            <td style="padding:3px 0;font-size:10px;font-weight:600;color:#64748b;">Fecha nota:</td>
+            <td style="padding:3px 0;font-size:10px;font-weight:500;color:#334155;text-align:right;">${this.formatDatePrint(n.fecha)}</td>
+          </tr>
+          <tr>
+            <td style="padding:3px 0;font-size:10px;font-weight:600;color:#000000;text-transform:uppercase;letter-spacing:1px;padding-top:8px;">FACTURA REF:</td>
+          </tr>
+          <tr>
+            <td colspan="2" style="padding:2px 0;font-size:10px;color:#1e293b;font-weight:600;">${facturaRef}</td>
+          </tr>
+          <tr>
+            <td style="padding:3px 0;font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:1px;padding-top:4px;">Motivo:</td>
+          </tr>
+          <tr>
+            <td colspan="2" style="padding:2px 0;font-size:10px;color:#475569;font-weight:500;">${n.motivo || '—'}</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    </table>
+
+    <!-- ═══════ ITEMS TABLE ═══════ -->
+    <table cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;margin-bottom:16px;">
+      <thead>
+        <tr style="background:#efefef;">
+          <th style="padding:8px 5px;font-size:9px;font-weight:600;color:#000000;text-transform:uppercase;text-align:center;width:30px;">#</th>
+          <th style="padding:8px 5px;font-size:9px;font-weight:600;color:#000000;text-transform:uppercase;text-align:left;">Código</th>
+          <th style="padding:8px 5px;font-size:9px;font-weight:600;color:#000000;text-transform:uppercase;text-align:left;">Descripción</th>
+          <th style="padding:8px 5px;font-size:9px;font-weight:600;color:#000000;text-transform:uppercase;text-align:right;">Val. Unit</th>
+          <th style="padding:8px 5px;font-size:9px;font-weight:600;color:#000000;text-transform:uppercase;text-align:center;">Cant</th>
+          <th style="padding:8px 5px;font-size:9px;font-weight:600;color:#000000;text-transform:uppercase;text-align:center;">Desc</th>
+          <th style="padding:8px 5px;font-size:9px;font-weight:600;color:#000000;text-transform:uppercase;text-align:center;">IVA</th>
+          <th style="padding:8px 5px;font-size:9px;font-weight:600;color:#000000;text-transform:uppercase;text-align:right;">Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${itemsRows}
+      </tbody>
+    </table>
+
+    <!-- ═══════ OBSERVACIONES + TOTALES ═══════ -->
+    <table cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:30px;">
+      <tr>
+        <td style="vertical-align:top;padding-right:16px;width:55%;">
+          <div style="border:1px solid #cbd5e1;border-radius:4px;padding:10px;min-height:80px;">
+            <div style="font-size:10px;font-weight:600;color:#334155;margin-bottom:4px;">Observaciones</div>
+            <div style="font-size:10px;color:#64748b;line-height:1.5;">${n.observaciones || ''}</div>
+          </div>
+        </td>
+
+        <td style="vertical-align:top;width:45%;">
+          <table cellpadding="0" cellspacing="0" style="width:100%;border:1px solid #cbd5e1;border-radius:4px;border-collapse:separate;overflow:hidden;">
+            <tr>
+              <td style="padding:6px 12px;font-size:10px;color:#475569;border-bottom:1px solid #f1f5f9;">Subtotal</td>
+              <td style="padding:6px 12px;font-size:10px;color:#1e293b;text-align:right;border-bottom:1px solid #f1f5f9;">${this.fmt(n.subtotal)}</td>
+            </tr>
+            <tr>
+              <td style="padding:6px 12px;font-size:10px;color:#475569;border-bottom:1px solid #f1f5f9;">IVA</td>
+              <td style="padding:6px 12px;font-size:10px;color:#1e293b;text-align:right;border-bottom:1px solid #f1f5f9;">${this.fmt(n.iva)}</td>
+            </tr>
+            ${n.descuento > 0 ? `<tr>
+              <td style="padding:6px 12px;font-size:10px;color:#475569;border-bottom:1px solid #f1f5f9;">Descuento</td>
+              <td style="padding:6px 12px;font-size:10px;color:#dc2626;text-align:right;border-bottom:1px solid #f1f5f9;">-${this.fmt(n.descuento)}</td>
+            </tr>` : ''}
+            <tr>
+              <td style="padding:8px 12px;font-size:11px;font-weight:500;color:#000000;background:#efefef;">Total Ajuste</td>
+              <td style="padding:8px 12px;font-size:12px;color:#000000;text-align:right;background:#efefef;font-weight:500;">${this.fmt(n.total)}</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+  </td>
+  <td style="width:22px;position:relative;">
+    <div style="position:absolute;top:50%;left:99%;transform:translate(-50%,-50%) rotate(90deg);color:#000000;font-size:10px;letter-spacing:1px;font-weight:600;white-space:nowrap;opacity:0.3;">
+      Documento generado con software contable propio
     </div>
   </td>
 </tr>

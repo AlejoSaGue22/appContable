@@ -1,0 +1,78 @@
+<div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden animate-slide-up">
+  <div class="px-8 py-5 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between flex-wrap gap-3">
+    <div>
+      <h3 class="text-sm font-bold text-gray-900">Cuentas por Pagar</h3>
+      <p class="text-xs text-gray-400 mt-0.5">Antigüedad de deuda por proveedor del {{ fechaInicio() }} al {{ fechaFin() }}</p>
+    </div>
+    <button (click)="exportarExcel()"
+      class="px-4 py-2 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-colors cursor-pointer flex items-center gap-1.5">
+      <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
+      </svg>
+      Excel
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="flex items-center justify-center py-20">
+      <div class="flex flex-col items-center gap-3">
+        <svg class="animate-spin h-8 w-8 text-blue-500" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+        </svg>
+        <p class="text-sm text-gray-400">Cargando cuentas por pagar...</p>
+      </div>
+    </div>
+  } @else if (error()) {
+    <div class="flex flex-col items-center justify-center py-20 text-gray-400 gap-2">
+      <p class="text-sm text-red-500">{{ error() }}</p>
+    </div>
+  } @else {
+    @if (data()?.totales; as t) {
+      <div class="grid grid-cols-3 gap-4 px-8 py-5 bg-gray-50/30 border-b border-gray-100">
+        <div class="text-center">
+          <p class="text-[10px] font-bold text-gray-400 uppercase">Deuda Total</p>
+          <p class="text-lg font-bold text-red-600">{{ t.totalDeuda | currency:'':'$':'1.0-0' }}</p>
+        </div>
+        <div class="text-center">
+          <p class="text-[10px] font-bold text-gray-400 uppercase">Saldo a Favor</p>
+          <p class="text-lg font-bold text-emerald-600">{{ t.totalSaldoFavor | currency:'':'$':'1.0-0' }}</p>
+        </div>
+        <div class="text-center">
+          <p class="text-[10px] font-bold text-gray-400 uppercase">Cartera Neta</p>
+          <p class="text-lg font-bold text-blue-700">{{ t.totalCartera | currency:'':'$':'1.0-0' }}</p>
+        </div>
+      </div>
+    }
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead class="bg-gray-50/50 text-[11px] uppercase text-gray-400 border-b border-gray-100">
+          <tr>
+            <th class="px-5 py-4">NIT/ID</th>
+            <th class="px-5 py-4">Proveedor</th>
+            <th class="px-5 py-4 text-right">Deuda</th>
+            <th class="px-5 py-4 text-right">Saldo a Favor</th>
+            <th class="px-5 py-4 text-right">Saldo Cartera</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          @for (item of data()?.items; track item.identificacion) {
+            <tr class="hover:bg-blue-50/30 transition-colors">
+              <td class="px-5 py-3.5 text-xs font-mono text-gray-500">{{ item.identificacion }}</td>
+              <td class="px-5 py-3.5 text-xs font-medium text-gray-800">{{ item.nombre }}</td>
+              <td class="px-5 py-3.5 text-xs text-right font-semibold text-red-600">{{ item.deuda | currency:'':'$':'1.0-0' }}</td>
+              <td class="px-5 py-3.5 text-xs text-right text-emerald-600">{{ item.saldoFavor | currency:'':'$':'1.0-0' }}</td>
+              <td class="px-5 py-3.5 text-xs text-right font-semibold text-blue-700">{{ item.saldoCartera | currency:'':'$':'1.0-0' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    @if ((data()?.meta?.total || 0) > 0) {
+      <div class="px-5 py-4 border-t border-gray-100">
+        <app-pagination [length]="data()!.meta!.total" />
+      </div>
+    }
+  }
+</div>
