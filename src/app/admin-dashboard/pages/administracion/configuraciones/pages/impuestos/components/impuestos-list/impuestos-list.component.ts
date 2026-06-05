@@ -7,12 +7,11 @@ import { ModalComponent } from '@shared/components/modal/modal.component';
 import { ImpuestosService } from '../../services/impuestos.service';
 import { NotificationService } from '@shared/services/notification.service';
 import { LoaderService } from '@utils/services/loader.service';
-import { PaginationComponent } from "@shared/components/pagination/pagination";
 
 @Component({
   selector: 'app-impuestos-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, ModalComponent, PaginationComponent],
+  imports: [CommonModule, FormsModule, ModalComponent],
   templateUrl: './impuestos-list.component.html',
 })
 export class ImpuestosListComponent {

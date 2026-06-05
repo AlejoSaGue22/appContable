@@ -4,7 +4,7 @@ import { CommonModule, CurrencyPipe, TitleCasePipe } from '@angular/common';
 import { PaginationComponent } from '@shared/components/pagination/pagination';
 import { FormsModule } from '@angular/forms';
 import { UserAuth } from 'src/app/auth/interfaces/user-auth.interface';
-import { InvoiceCompraStatus } from '@dashboard/interfaces/factura-compra-interface';
+import { FacturaCompra, InvoiceCompraStatus } from '@dashboard/interfaces/factura-compra-interface';
 
 export interface PurchaseInvoiceFilters {
   estado?: string;
@@ -24,7 +24,7 @@ export interface PurchaseInvoiceFilters {
   standalone: true
 })
 export class TableComprasComponent {
-  compraData = input<any[]>([]);
+  compraData = input<FacturaCompra[]>([]);
 
   activeFilters = input<PurchaseInvoiceFilters>({});
   userAuth = input<UserAuth | null>(null);

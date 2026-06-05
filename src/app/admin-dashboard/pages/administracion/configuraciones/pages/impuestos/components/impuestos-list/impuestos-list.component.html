@@ -17,8 +17,8 @@
     </div>
 
     <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm text-gray-500">
-            <thead class="text-[10px] text-gray-400 uppercase bg-gray-50/50 border-b border-gray-100">
+        <table class="w-full text-left text-sm">
+            <thead class="text-[10px] uppercase text-gray-700">
                 <tr>
                     <th scope="col" class="px-8 py-5">Impuesto</th>
                     <th scope="col" class="px-8 py-5">Tipo</th>
@@ -31,26 +31,26 @@
             <tbody class="divide-y divide-gray-100">
                 @for (impuesto of filteredImpuestos(); track impuesto.id) {
                     <tr class="transition-all duration-200 group hover:bg-slate-50/50">
-                        <td class="px-8 py-6">
+                        <td class="px-4 py-2">
                             <div class="flex flex-col gap-1.5">
                                 <span class="text-gray-900">{{ impuesto.nombre }}</span>
                             </div>
                         </td>
-                        <td class="px-8 py-6">
+                        <td class="px-4 py-2">
                             <span class="px-2 py-0.5 bg-slate-50 text-slate-600 text-[10px] rounded uppercase border border-slate-100">
                                 {{ impuesto.tipo }}
                             </span>
                         </td>
-                        <td class="px-8 py-6">
+                        <td class="px-4 py-2">
                             <div class="flex items-center gap-1">
                                 <span class="text-sm text-slate-900">{{ impuesto.tarifa }}</span>
                                 <span class="text-[10px] text-gray-400">%</span>
                             </div>
                         </td>
-                        <td class="px-8 py-6">
+                        <td class="px-4 py-2">
                                 <p class="text-sm text-gray-500 line-clamp-2">{{ impuesto.descripcion }}</p>
                         </td>
-                        <td class="px-8 py-6">
+                        <td class="px-4 py-2">
                             @if (impuesto.activo) {
                                 <div class="flex items-center gap-1.5">
                                     <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
@@ -64,7 +64,7 @@
                             }
                         </td>
                         
-                        <td class="px-8 py-6">
+                        <td class="px-4 py-2">
                             <div class="flex items-center justify-end gap-2">
                                 <button (click)="onEdit(impuesto)" 
                                         class="flex items-center justify-center w-9 h-9 rounded-xl cursor-pointer text-slate-600 hover:bg-slate-900 hover:text-white transition-all duration-300" 

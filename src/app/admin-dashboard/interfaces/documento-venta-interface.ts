@@ -28,6 +28,7 @@ export interface ItemFactura {
   description: string;
   unitPrice: number;
   iva: number;
+  impuestoId?: string;
   valor_iva?: number;
   discount: number;
   valor_discount?: number;
@@ -122,6 +123,7 @@ interface GetFacturaItemRequest {
   description: string;
   unitPrice: number;
   iva: number;
+  impuestoId?: string;
   valor_iva: number;
   discount: number;
   valor_discount: number;

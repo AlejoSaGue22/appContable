@@ -27,7 +27,7 @@ export interface FacturaCompra {
     proveedorId: string;
     numero: string;
     numeroFacturaProveedor: string;
-    status: InvoiceCompraStatus;
+    estado: InvoiceCompraStatus;        
     fecha: string;
     fechaVencimiento?: string;  
     formaPago: string;
@@ -39,7 +39,7 @@ export interface FacturaCompra {
     items: ItemFactura[];
     iva: number;
     descuento: number;
-    proveedor?: ProveedoresInterface;
+    proveedor: ProveedoresInterface;
     subtotal: number;
     total: number;
     createdBy?: CreatedBy;
@@ -54,6 +54,7 @@ export interface ItemFactura {
     descripcion?: string;
     unitPrice: number;
     iva: number;
+    impuestoId?: string;
     valor_iva?: number;
     discount?: number;
     valor_discount?: number;
@@ -100,6 +101,7 @@ export interface ItemFacturaResponse {
     descripcion?: string;
     unitPrice: number;
     porcentajeIva: number;
+    impuestoId?: string;
     valorIva?: number;
     descuento?: number;
     valorDescuento?: number;

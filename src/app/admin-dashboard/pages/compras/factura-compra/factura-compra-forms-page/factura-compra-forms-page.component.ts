@@ -145,7 +145,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
             if (prod) {
                 this.productosItemsForm.patchValue({
                     unitPrice: prod.precio,
-                    iva: prod.impuesto,
+                    iva: prod.impuestoId,
                     quantity: 1,
                     discount: 0,
                     descripcion: prod.descripcion
@@ -198,6 +198,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                             cantidad: item.quantity,
                             precioUnitario: item.unitPrice,
                             iva: item.porcentajeIva,
+                            impuestoId: item.impuestoId || '',
                             descuento: item.descuento,
                             subtotal: item.valorSubtotal,
                             total: item.itemTotal,
@@ -234,13 +235,19 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         });
     }
 
+    getIvaTarifa(ivaValue: any): number {
+        if (!ivaValue) return 0;
+        if (typeof ivaValue === 'number') return ivaValue;
+        const impuesto = this.catalogsStore.impuestos().find(i => i.id == ivaValue);
+        return impuesto?.tarifa ?? 0;
+    }
+
     calculateItemTotal() {
         const val = this.productosItemsForm.value;
-        console.log("Calculate Total: ",val);
         const subtotal = (val.quantity || 0) * (val.unitPrice || 0);
         const discountAmount = subtotal * ((val.discount || 0) / 100);
-        const rawIva = typeof val.iva === 'string' ? parseFloat(val.iva) : (val.iva || 0);
-        const taxAmount = (subtotal - discountAmount) * (rawIva / 100);
+        const tarifa = this.getIvaTarifa(val.iva);
+        const taxAmount = (subtotal - discountAmount) * (tarifa / 100);
         const total = subtotal - discountAmount + taxAmount;
 
         this.productosItemsForm.patchValue({ total: total }, { emitEvent: false });
@@ -255,17 +262,15 @@ export class FacturaCompraFormsPageComponent implements OnInit {
 
         const itemVal = this.productosItemsForm.value;
         const subtotal = (itemVal.quantity || 0) * (itemVal.unitPrice || 0);
-        const rawIva = typeof itemVal.iva === 'string' ? parseFloat(itemVal.iva) : (itemVal.iva || 0);
-
-        console.log("Item Value: ", itemVal);
-        console.log("rawIva", rawIva)
+        const tarifa = this.getIvaTarifa(itemVal.iva);
 
         const newItem = this.fb.group({
             productoId: [itemVal.producto?.id],
             productoNombre: [itemVal.producto?.nombre],
             cantidad: [itemVal.quantity],
             precioUnitario: [itemVal.unitPrice],
-            iva: [rawIva],
+            iva: [tarifa],
+            impuestoId: [itemVal.iva],
             descuento: [itemVal.discount],
             subtotal: [subtotal],
             total: [itemVal.total]
@@ -294,8 +299,8 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         items.forEach((item: any) => {
             const itemSubtotal = item.cantidad * item.precioUnitario;
             const itemDesc = itemSubtotal * (item.descuento / 100);
-            const rawIva = typeof item.iva === 'string' ? parseFloat(item.iva) : (item.iva || 0);
-            const itemTax = (itemSubtotal - itemDesc) * (rawIva / 100);
+            const tarifa = item.iva || 0;
+            const itemTax = (itemSubtotal - itemDesc) * (tarifa / 100);
 
             this.totales.subtotal += itemSubtotal;
             this.totales.descuentoTotal += itemDesc;
@@ -315,8 +320,8 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         items.forEach((item: any) => {
             const itemSubtotal = item.cantidad * item.precioUnitario;
             const itemDesc = itemSubtotal * (item.descuento / 100);
-            const rawIva = typeof item.iva === 'string' ? parseFloat(item.iva) : (item.iva || 0);
-            const itemTax = (itemSubtotal - itemDesc) * (rawIva / 100);
+            const tarifa = item.iva || 0;
+            const itemTax = (itemSubtotal - itemDesc) * (tarifa / 100);
 
             subtotal += itemSubtotal;
             descuentos += itemDesc;
@@ -371,6 +376,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                 quantity: item.cantidad,
                 unitPrice: item.precioUnitario,
                 iva: item.iva,
+                impuestoId: item.impuestoId,
                 discount: item.descuento,
                 descripcion: item.descripcion || ''
             })),

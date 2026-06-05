@@ -273,19 +273,17 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     const valores = this.productosItemsForm.value as ItemFactura;
     const valorItemTotal = this.calcularItemTotal();
     const valorItemImporte = this.calcularDescuentoImporte();
-    let impuestoIva = this.productosItemsForm.value.iva ?? 0;
+    const tarifa = this.getIvaTarifa(valores.iva);
 
-    if (typeof impuestoIva === 'string') {
-      impuestoIva = parseInt(impuestoIva);
-    }
     const nuevoItemConId = {
       ...valores,
       id: crypto.randomUUID(),
       subtotal: this.productosItemsForm.value.quantity! * this.productosItemsForm.value.unitPrice!,
       importe: valorItemImporte,
-      iva: impuestoIva,
+      iva: tarifa,
+      impuestoId: typeof valores.iva === 'string' ? valores.iva : '',
       valor_iva: ((this.productosItemsForm.value.quantity! * this.productosItemsForm.value.unitPrice!) *
-        (impuestoIva / 100)),
+        (tarifa / 100)),
       discount: valores.discount ?? 0,
       valor_discount: valores.discount ? ((this.productosItemsForm.value.quantity! * this.productosItemsForm.value.unitPrice!) *
         (valores.discount! / 100)) : 0,
@@ -298,13 +296,20 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
 
   }
 
+  getIvaTarifa(ivaValue: any): number {
+    if (!ivaValue) return 0;
+    if (typeof ivaValue === 'number') return ivaValue;
+    const impuesto = this.catalogsStore.impuestos().find(i => i.id == ivaValue);
+    return impuesto?.tarifa ?? 0;
+  }
+
   calcularItemTotal(): number {
-    const impuesto = this.productosItemsForm.value.iva ?? 0;
+    const tarifa = this.getIvaTarifa(this.productosItemsForm.value.iva);
 
     const valorNeto = this.productosItemsForm.value.quantity! * this.productosItemsForm.value.unitPrice!;
     const descuentoAplicado = valorNeto * (this.productosItemsForm.value.discount! / 100);
     const valorDescontado = valorNeto - descuentoAplicado;
-    const impuestoAplicado = valorDescontado * (impuesto / 100);
+    const impuestoAplicado = valorDescontado * (tarifa / 100);
 
     return valorDescontado + impuestoAplicado;
   }
@@ -352,7 +357,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   onProductoSeleccionado(producto: Partial<GetProductosDetalle>) {
     this.productosItemsForm.patchValue({
       unitPrice: producto.precio,
-      iva: parseInt(producto.impuesto!),
+      iva: (producto.impuestoId ?? 0) as any,
       articuloId: producto.id
     })
   }
@@ -415,6 +420,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
         unitPrice: item.unitPrice,
         quantity: item.quantity,
         iva: item.iva,
+        impuestoId: item.impuestoId,
         discount: item.discount,
         importe: item.importe,
       })),
@@ -429,6 +435,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       this.ventaServices.createInvoice(invoiceData).subscribe((response) => {
         this.loaderservice.hide();
         if (response.success == false) {
+          this.loading.set(false);
           this.notificacionService.error(
             `Ocurrio un problema al crear la factura ${HelpersUtils.getMessageError(response.message)}`,
             'Error',

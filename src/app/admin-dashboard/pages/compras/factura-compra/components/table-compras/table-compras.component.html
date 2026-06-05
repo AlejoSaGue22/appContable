@@ -113,6 +113,7 @@
           <tr>
             <th scope="col" class="px-6 py-3">Fecha Emisión</th>
             <th scope="col" class="px-6 py-3">N° Comprobante</th>
+            <th scope="col" class="px-6 py-3">Forma Pago</th>
             <th scope="col" class="px-6 py-3">Proveedor</th>
             <th scope="col" class="px-6 py-3 text-right">Monto Total</th>
             <th scope="col" class="px-6 py-3 text-right">Saldo Pendiente</th>
@@ -146,6 +147,9 @@
                 <span class="font-mono text-xs text-gray-900">{{ compra.numero }}</span>
               </td>
               <td class="px-6 py-4">
+                <span class="font-mono text-xs text-gray-900">{{ compra.formaPago }}</span>
+              </td>
+              <td class="px-6 py-4">
                 <span class="text-gray-900">{{ compra.proveedor.razonSocial || (compra.proveedor.nombre + ' ' + compra.proveedor.apellido) }}</span>
               </td>
               <td class="px-6 py-4 text-right">
@@ -165,10 +169,10 @@
                   [class.bg-emerald-50]="compra.estado === 'registrado'"
                   [class.text-emerald-600]="compra.estado === 'registrado'"
                   [class.border-emerald-100]="compra.estado === 'registrado'"
-                  [class.bg-red-50]="compra.estado === 'anulado' || compra.estado === 'error_contable'"
-                  [class.text-red-500]="compra.estado === 'anulado' || compra.estado === 'error_contable'"
-                  [class.border-red-100]="compra.estado === 'anulado' || compra.estado === 'error_contable'">
-                  {{ compra.estado === 'error_contable' ? 'Error Registro' : (compra.estado | titlecase) }}
+                  [class.bg-red-50]="compra.estado === 'anulado' || compra.estado === 'error_asiento'"
+                  [class.text-red-500]="compra.estado === 'anulado' || compra.estado === 'error_asiento'"
+                  [class.border-red-100]="compra.estado === 'anulado' || compra.estado === 'error_asiento'">
+                  {{ compra.estado === 'error_asiento' ? 'Error Registro' : (compra.estado | titlecase) }}
                 </span>
               </td>
               <td class="px-6 py-4 text-right">
