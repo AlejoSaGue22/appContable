@@ -207,11 +207,8 @@ export class ProveedoresFormsPageComponent implements OnInit {
     try {
       const formValue = {
         ...this.formProveedor.value,
-        // isActive: this.formProveedor.get("estado")?.value === 'A' ? true : false,
         telefono: this.formProveedor.get("telefono")?.value?.toString()
       }
-
-      // delete formValue.estado;
 
       if (this.proveedorId() == 'new-Item' || this.isModal()) {
         const client = await firstValueFrom(this.proveedoresService.createProveedor(formValue as Partial<ProveedoresInterface>));

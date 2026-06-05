@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, signal, computed, inject } from '@angular/core';
-import { ArticulosInterface, ArticulosResponse } from '@dashboard/interfaces/productos-interface';
+import { ArticulosInterface, ArticulosResponse, GetProductosDetalle } from '@dashboard/interfaces/productos-interface';
 import { Options, ResponseResult } from '@shared/interfaces/services.interfaces';
 import { catchError, delay, map, Observable, of } from 'rxjs';
 import { environment } from 'src/app/environments/environment';
@@ -53,8 +53,23 @@ export class ProductosService {
       return of(emptyProducto)
     }
 
-    return this.http.get<ArticulosInterface>(`${baseUrl}/articulos/${id}`).pipe(
-      delay(500)
+    return this.http.get<GetProductosDetalle>(`${baseUrl}/articulos/${id}`).pipe(
+      delay(500),
+      map((art): ArticulosInterface => ({
+        id: art.id,
+        categoria: art.categoriaArticuloId.toString(),
+        nombre: art.nombre,
+        codigo: art.codigo,
+        unidadmedida: art.unidadmedida.toString(), 
+        impuesto: art.impuestoId,
+        tipoCodigo: art.tipoCodigo,
+        tipo: art.tipo,
+        precio: String(art.precio),
+        precioventa2: art.precioventa2,
+        observacion: art.observacion,
+        isInventariable: art.isInventariable,
+        afectaInventario: art.afectaInventario,
+    }))
     )
   }
 

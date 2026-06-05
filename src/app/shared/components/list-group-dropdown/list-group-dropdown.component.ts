@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, forwardRef, HostListener, input, signal, effect, computed, output, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, ElementRef, forwardRef, HostListener, input, signal, effect, computed, output } from '@angular/core';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
@@ -15,7 +15,7 @@ import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/f
     }
   ]
 })
-export class ListGroupDropdownComponent<T extends Record<string, any>> implements ControlValueAccessor, OnChanges {
+export class ListGroupDropdownComponent<T extends Record<string, any>> implements ControlValueAccessor {
 
   title = input.required<string>();
 
@@ -28,8 +28,10 @@ export class ListGroupDropdownComponent<T extends Record<string, any>> implement
   showDropdown = signal<boolean>(false);
   searchable = input<boolean>(true);
 
-  ngOnChanges(changes: SimpleChanges): void {
-    this.searchOption.set(this.valueInput());
+  constructor(private elementRef: ElementRef) {
+    effect(() => {
+      this.searchOption.set(this.valueInput());
+    });
   }
 
   filteredOptions = computed(() => {
@@ -50,8 +52,6 @@ export class ListGroupDropdownComponent<T extends Record<string, any>> implement
       .filter(Boolean)
       .join(' - ');
   }
-
-  constructor(private elementRef: ElementRef) { }
 
   // ------- CONTROL VALUE ACCESSOR ------- //
   private _value: T | null = null;

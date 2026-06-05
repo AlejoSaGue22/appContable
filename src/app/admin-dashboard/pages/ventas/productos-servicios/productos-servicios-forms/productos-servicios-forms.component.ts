@@ -86,7 +86,6 @@ export class ProductosServiciosFormsComponent {
       return this.productoServicios.getProductoByID(request.id).pipe(
         tap((p) => {
           this.formProductos.reset(p);
-          this.formProductos.get('categoria')?.setValue(p.tipoCodigo!);
           this.formProductos.get('precioventa')?.setValue({
             precio1: p.precio,
             precio2: p.precioventa2

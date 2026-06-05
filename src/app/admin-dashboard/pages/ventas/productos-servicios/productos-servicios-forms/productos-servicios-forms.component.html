@@ -64,7 +64,7 @@
                                                         pl-3 pr-8 py-2 transition duration-300 ease hover:border-slate-400 shadow-sm cursor-pointer" formControlName="categoria">
                                         <option value="">Selecciona una categoría</option>
                                         @for (categoria of categorias; track $index) {
-                                        <option [value]="categoria.codigo">{{categoria.nombre}}</option>
+                                        <option [value]="categoria.id">{{categoria.nombre}}</option>
                                         }
                                     </select>
                                 </div>

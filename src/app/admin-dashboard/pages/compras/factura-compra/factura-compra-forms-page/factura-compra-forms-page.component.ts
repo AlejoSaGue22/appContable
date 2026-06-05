@@ -36,7 +36,6 @@ import { LoaderComponent } from "@utils/components/loader/loader.component";
     ModalComponent,
     ProveedoresFormsPageComponent,
     ProductosServiciosFormsComponent,
-    LoaderComponent
 ],
     providers: [
         DecimalPipe
@@ -138,15 +137,15 @@ export class FacturaCompraFormsPageComponent implements OnInit {
             this.loadFactura(this.facturaId());
         }
 
-
         this.getProveedoresAndProductos();
 
         // React to product selection to auto-fill price and tax
         this.productosItemsForm.get('producto')?.valueChanges.subscribe((prod: GetProductosDetalle | any) => {
+            console.log("Product: ", prod);
             if (prod) {
                 this.productosItemsForm.patchValue({
                     unitPrice: prod.precio,
-                    iva: prod.impuesto ? parseFloat(prod.impuesto) : 0,
+                    iva: prod.impuesto,
                     quantity: 1,
                     discount: 0,
                     descripcion: prod.descripcion
@@ -237,6 +236,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
 
     calculateItemTotal() {
         const val = this.productosItemsForm.value;
+        console.log("Calculate Total: ",val);
         const subtotal = (val.quantity || 0) * (val.unitPrice || 0);
         const discountAmount = subtotal * ((val.discount || 0) / 100);
         const rawIva = typeof val.iva === 'string' ? parseFloat(val.iva) : (val.iva || 0);
@@ -256,6 +256,9 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         const itemVal = this.productosItemsForm.value;
         const subtotal = (itemVal.quantity || 0) * (itemVal.unitPrice || 0);
         const rawIva = typeof itemVal.iva === 'string' ? parseFloat(itemVal.iva) : (itemVal.iva || 0);
+
+        console.log("Item Value: ", itemVal);
+        console.log("rawIva", rawIva)
 
         const newItem = this.fb.group({
             productoId: [itemVal.producto?.id],

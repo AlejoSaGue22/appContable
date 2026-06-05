@@ -1,3 +1,5 @@
+import { Impuesto } from "@dashboard/pages/administracion/configuraciones/pages/impuestos/interfaces/impuesto.interface";
+
 export interface ArticulosResponse {
     count: number;
     pages: number;
@@ -63,7 +65,8 @@ export interface GetProductosDetalle {
     nombre: string;
     codigo: string;
     impuesto: string;
-    // impuestoRel: ImpuestoRel;
+    impuestoId: string;
+    impuestoRel: Impuesto;
     retencion: string;
     precio: number;
     precioventa2: string;

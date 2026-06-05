@@ -69,7 +69,6 @@ export class ProductosCompraFormsComponent {
     loader: ({ request }) => this.productoServicios.getProductoByID(request.id).pipe(
       tap((p) => {
         this.formProductos.reset(p);
-        this.formProductos.get('categoria')?.setValue(p.tipoCodigo!)
         this.formProductos.get('precio_referencial')?.setValue(p.precio);
         const isInv = p.isInventariable !== undefined ? p.isInventariable : (p.afectaInventario !== undefined ? p.afectaInventario : true);
         this.formProductos.get('isInventariable')?.setValue(isInv);
@@ -83,11 +82,7 @@ export class ProductosCompraFormsComponent {
     console.log(this.formProductos.value)
 
     if (!valid) {
-      this.notificacionService.error(
-        `Formulario incompleto`,
-        'Error',
-        5000
-      );
+      this.notificacionService.error(`Formulario incompleto`,'Error', 5000);
       return
     }
 

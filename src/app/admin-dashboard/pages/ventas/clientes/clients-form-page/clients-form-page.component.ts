@@ -97,7 +97,6 @@ export class ClientsFormPageComponent implements OnInit {
 
         this.clientsForm.get('tipoDocumento')?.valueChanges.subscribe(value => {
             this.handleTipoDocumentoChange(value);
-            console.log('tipoDocumento',value);
         });
 
         this.clientsForm.get('numeroDocumento')?.valueChanges.subscribe(value => {

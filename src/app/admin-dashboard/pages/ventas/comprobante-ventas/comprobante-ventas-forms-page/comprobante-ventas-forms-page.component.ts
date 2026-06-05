@@ -94,7 +94,6 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     this.getAllClientes.update(list => [...list, newClient]);
     this.onClienteSeleccionado(newClient);
     this.closeClientModal();
-    this.notificacionService.success('Cliente creado y seleccionado', 'Éxito');
   }
 
   // --- Product Modal Methods ---
@@ -343,7 +342,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   onClienteSeleccionado(cliente: Partial<ClientesInterfaceResponse>) {
     this.formVentas.patchValue({
       cliente: cliente.id,
-      clienteSearch: cliente.razonSocial ? cliente.razonSocial : `${cliente.nombre} ${cliente.apellido}`,
+      clienteSearch: cliente.razonSocial?.trim() ? cliente.razonSocial : `${cliente.nombre} ${cliente.apellido}`,
       tipoDocumento: cliente.tipoDocumento,
       contacto: cliente.email,
       identificacion: `${cliente.tipoDocumentoRel?.abreviatura} - ${cliente.numeroDocumento}`,
