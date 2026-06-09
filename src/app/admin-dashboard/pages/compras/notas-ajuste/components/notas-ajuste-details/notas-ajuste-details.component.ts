@@ -53,7 +53,7 @@ export class NotasAjusteComprasDetailsComponent implements OnInit {
     if (!n) return;
 
     this.loadingAsientos = true;
-    const referencia = `${n.prefijo || ''}${n.numeroCompleto || n.id}`;
+    const referencia = `${n.prefijo || ''}-${n.numero}`;
     
     this.asientosService.getByReferencia(referencia).subscribe({
       next: (a) => {

@@ -55,7 +55,7 @@ export class ClientsFormPageComponent implements OnInit {
         email: [''],
         observacion: [''],
         tributo: ['', Validators.required],
-        responsableFiscal: ['', Validators.required],
+        // responsableFiscal: [''],
         dv: [''],
     })
 

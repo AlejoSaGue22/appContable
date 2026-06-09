@@ -23,7 +23,7 @@ export interface ComprobanteCompraResponse {
 
 export interface FacturaCompra {
     id: string;
-    isDraft: string;
+    isDraft: boolean;
     proveedorId: string;
     numero: string;
     numeroFacturaProveedor: string;

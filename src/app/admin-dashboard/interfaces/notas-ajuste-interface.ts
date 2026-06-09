@@ -41,6 +41,7 @@ export interface NotaAjuste {
   fechaAceptacionDIAN?: Date;
   fechaEnvioDIAN?: Date;
   numero: string;
+  numeroCompleto?: string;
   prefijo: string;
   cufe?: string;
   cude?: string;

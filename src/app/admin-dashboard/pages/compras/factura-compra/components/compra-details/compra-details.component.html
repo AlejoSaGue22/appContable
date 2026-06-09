@@ -112,7 +112,7 @@
                 </svg>
                 Proveedor
               </h3>
-              <p class="text-base font-bold text-gray-900">{{ compra()!.proveedor.nombre.trim() || compra()!.proveedor.razonSocial.trim() }}</p>
+              <p class="text-base font-bold text-gray-900">{{ compra()!.proveedor.razonSocial || compra()!.proveedor.nombre + ' ' + compra()!.proveedor.apellido }}</p>
               @if (compra()!.proveedor.identificacion) {
                 <p class="text-sm text-gray-600 mt-1">
                   <span class="font-medium">NIT:</span> {{ compra()!.proveedor.identificacion }}

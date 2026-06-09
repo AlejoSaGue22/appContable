@@ -32,6 +32,14 @@ export interface CreateCuentaBancariaDto {
   tipoCuenta: TipoCuentaBancaria;
   observaciones?: string;
   saldoInicial?: number;
+  cuentaContrapartidaCodigo?: string;
+}
+
+export interface CreateTransferenciaDto {
+  cuentaOrigenId: string;
+  cuentaDestinoId: string;
+  monto: number;
+  observaciones?: string;
 }
 
 export interface ResponseCuentasBancarias {

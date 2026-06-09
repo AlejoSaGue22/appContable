@@ -8,7 +8,8 @@ import {
   UpdateCuentaBancariaDto, 
   Banco, 
   ResponseCuentasBancarias,
-  ResponseBancos
+  ResponseBancos,
+  CreateTransferenciaDto
 } from '../interfaces/cuenta-bancaria.interface';
 import { Options } from '@shared/interfaces/services.interfaces';
 
@@ -56,4 +57,9 @@ export class CuentasBancariasService {
   toggleStatus(id: string): Observable<CuentaBancaria> {
     return this.http.patch<CuentaBancaria>(`${this.base}/toggle-status/${id}`, {});
   }
+
+  transferir(dto: CreateTransferenciaDto): Observable<any> {
+    return this.http.post<any>(`${this.base}/transferir`, dto);
+  }
 }
+

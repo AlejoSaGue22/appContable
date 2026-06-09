@@ -34,6 +34,7 @@
           <tr>
             <th class="px-5 py-4">Fecha</th>
             <th class="px-5 py-4">N° Comprobante</th>
+            <th class="px-5 py-4">Forma Pago</th>
             <th class="px-5 py-4">Ref. Proveedor</th>
             <th class="px-5 py-4">Proveedor</th>
             <th class="px-5 py-4 text-right">Total</th>
@@ -46,14 +47,15 @@
             <tr class="hover:bg-blue-50/30 transition-colors">
               <td class="px-5 py-3.5 text-xs text-gray-600 whitespace-nowrap">{{ f.fecha | date:'dd/MM/yyyy' }}</td>
               <td class="px-5 py-3.5 text-xs font-mono text-blue-700 font-medium">{{ f.numero }}</td>
+              <td class="px-5 py-3.5 text-xs font-mono text-blue-700 font-medium">{{ f.formaPago }}</td>
               <td class="px-5 py-3.5 text-xs text-gray-500">{{ f.numeroFacturaProveedor || '—' }}</td>
-              <td class="px-5 py-3.5 text-xs text-gray-800">{{ f.proveedor?.razonSocial || f.proveedor?.nombre || '—' }}</td>
+              <td class="px-5 py-3.5 text-xs text-gray-800">{{ f.proveedor.razonSocial || f.proveedor.nombre + ' ' + f.proveedor.apellido }}</td>
               <td class="px-5 py-3.5 text-xs text-right font-semibold text-gray-900">{{ f.total | currency:'':'$':'1.0-0' }}</td>
               <td class="px-5 py-3.5 text-xs text-right" [class.text-red-500]="f.saldoPendiente > 0">{{ f.saldoPendiente | currency:'':'$':'1.0-0' }}</td>
               <td class="px-5 py-3.5 text-center">
-                <span [class]="f.status === 'registrado' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600'"
+                <span [class]="f.estado === 'registrado' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600'"
                   class="px-2 py-0.5 rounded-lg text-[10px] font-semibold capitalize">
-                  {{ f.status }}
+                  {{ f.estado }}
                 </span>
               </td>
             </tr>

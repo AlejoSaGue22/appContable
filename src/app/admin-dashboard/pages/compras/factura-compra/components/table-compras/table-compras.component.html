@@ -176,10 +176,10 @@
                 </span>
               </td>
               <td class="px-6 py-4 text-right">
-                <div class="flex items-center justify-center gap-2 text-primary">
+                <div class="flex justify-center gap-2">
                   @if(compra.estado !== 'borrador'){
                     <a [routerLink]="['/panel/compras/purchases/', compra.id, 'details']"
-                      class="inline-flex items-center rounded-lg p-2 text-sm text-blue-600 hover:bg-blue-50 dark:text-blue-500 dark:hover:bg-gray-700"
+                      class="inline-flex items-center rounded-lg text-sm text-blue-600 hover:text-blue-900 cursor-pointer"
                       title="Ver Comprobante">
                       <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                           <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
@@ -192,21 +192,23 @@
 
                   @if (compra.estado == 'error_asiento' && (userAuth()?.role === 'Contador' || userAuth()?.role === 'Super Admin')) {
                     <button (click)="onRetryAsiento(compra.id)"
-                      class="text-green-600 hover:text-green-900 cursor-pointer"
+                      class="inline-flex items-center rounded-lg text-sm text-yellow-600 hover:text-yellow-900 cursor-pointer"
                       title="Reintentar Asiento">
-                      <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2.99988C16.9706 2.99988 21 7.02931 21 11.9999C21 16.9704 16.9706 20.9999 12 20.9999C7.02944 20.9999 3 16.9704 3 11.9999C3 9.17261 4.30367 6.64983 6.34267 4.99988" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4.49988H7V8.49988" stroke="#292929" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+                      <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2.99988C16.9706 2.99988 21 7.02931 21 11.9999C21 16.9704 16.9706 20.9999 12 20.9999C7.02944 20.9999 3 16.9704 3 11.9999C3 9.17261 4.30367 6.64983 6.34267 4.99988" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4.49988H7V8.49988" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
                     </button>
                   }
 
-
                   @if (compra.estado === 'borrador') {
                     <a [routerLink]="['/panel/compras/purchases/', compra.id]"
-                      class="text-blue-600 hover:text-blue-900" title="Editar">
-                      <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                      class="inline-flex items-center rounded-lg text-sm text-green-600 hover:text-green-900 cursor-pointer"
+                      title="Editar">
+                      <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                      </svg>
                     </a>
 
                     <button (click)="onRegister(compra.id)"
-                      class="text-green-600 hover:text-green-900 cursor-pointer"
+                      class="inline-flex items-center rounded-lg text-sm text-purple-600 hover:text-purple-900 cursor-pointer"
                       title="Registrar Factura">
                       <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -214,9 +216,9 @@
                     </button>
 
                     <button (click)="onDelete(compra.id)"
-                        class="inline-flex items-center text-sm text-gray-600 hover:text-red-100 cursor-pointer"
+                        class="inline-flex items-center rounded-lg text-sm text-gray-600 hover:text-gray-900 cursor-pointer"
                         title="Eliminar Factura">
-                        <svg class="h-5 w-5 text-red-600 hover:text-red-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="h-5 w-5 text-red-600 dark:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
                       </button>
@@ -224,7 +226,7 @@
 
                   @if (compra.estado === 'registrado') {
                     <button (click)="onAnular(compra.id)"
-                      class="inline-flex items-center text-sm text-red-600 hover:text-red-900 cursor-pointer"
+                      class="inline-flex items-center rounded-lg text-sm text-gray-600 hover:text-gray-900 cursor-pointer"
                       title="Anular Transacción">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

@@ -5,16 +5,20 @@ import { CuentasBancariasService } from '../../../services/cuentas-bancarias.ser
 import { Banco, CuentaBancaria, TipoCuentaBancaria } from '../../../interfaces/cuenta-bancaria.interface';
 import { NotificationService } from '@shared/services/notification.service';
 import { LoaderService } from '@utils/services/loader.service';
+import { CuentasContablesService } from '../../../services/cuentas-contables.service';
+import { ListGroupDropdownComponent } from '@shared/components/list-group-dropdown/list-group-dropdown.component';
+import { GetCuentasContables } from '@dashboard/interfaces/catalogs-interface';
 
 @Component({
   selector: 'app-cuenta-form-modal',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ListGroupDropdownComponent],
   templateUrl: './cuenta-form-modal.component.html'
 })
 export class CuentaFormModalComponent implements OnInit {
   private fb = inject(FormBuilder);
   private cuentasService = inject(CuentasBancariasService);
+  private cuentasContablesService = inject(CuentasContablesService);
   private notificationService = inject(NotificationService);
   private loaderService = inject(LoaderService);
 
@@ -28,27 +32,31 @@ export class CuentaFormModalComponent implements OnInit {
     bancoId: ['', [Validators.required]],
     tipoCuenta: [TipoCuentaBancaria.AHORROS, [Validators.required]],
     numeroCuenta: ['', [Validators.maxLength(30)]],
-    // saldoInicial: [0, [Validators.required, Validators.min(0)]],
+    saldoInicial: [0, [Validators.required, Validators.min(0)]],
+    cuentaContrapartidaCodigo: [''],
     observaciones: ['', [Validators.maxLength(500)]]
   });
 
   bancos = signal<Banco[]>([]);
+  cuentasContables = signal<GetCuentasContables[]>([]);
   tiposCuenta = Object.values(TipoCuentaBancaria);
   isSubmitting = signal(false);
 
   ngOnInit() {
     this.loadBancos();
+    this.loadCuentasContables();
     if (this.account) {
       this.form.patchValue({
         nombre: this.account.nombre,
         bancoId: this.account.banco.id,
         tipoCuenta: this.account.tipoCuenta,
         numeroCuenta: this.account.numeroCuenta,
-        // saldoInicial: this.account.saldoInicial,
+        saldoInicial: this.account.saldoInicial,
         observaciones: this.account.observaciones
       });
       // Saldo inicial might be disabled if editing (depends on backend logic)
-      // this.form.get('saldoInicial')?.disable();
+      this.form.get('saldoInicial')?.disable();
+      this.form.get('cuentaContrapartidaCodigo')?.disable();
     }
   }
 
@@ -59,6 +67,21 @@ export class CuentaFormModalComponent implements OnInit {
         this.notificationService.error('Error al cargar los bancos', err);
       }
     });
+  }
+
+  loadCuentasContables() {
+    this.cuentasContablesService.getCuentasContables({ limit: 1000 }).subscribe({
+      next: (res) => {
+        // Filtrar solo las cuentas que aceptan movimientos (cuentas de detalle)
+        const cuentasMovimiento = res.filter(c => c.aceptaMovimiento);
+        this.cuentasContables.set(cuentasMovimiento);
+      },
+      error: (err) => console.error('Error cargando cuentas contables', err)
+    });
+  }
+
+  onCuentaSeleccionada(cuenta: GetCuentasContables) {
+    this.form.patchValue({ cuentaContrapartidaCodigo: cuenta.codigo });
   }
 
   onSubmit() {

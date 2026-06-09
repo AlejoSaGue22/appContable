@@ -8,6 +8,7 @@ import { HeaderInput, HeaderTitlePageComponent } from '@dashboard/components/hea
 import { CuentaBancaria } from '../interfaces/cuenta-bancaria.interface';
 
 import { CuentaFormModalComponent } from './components/cuenta-form-modal/cuenta-form-modal.component';
+import { TransferenciaModalComponent } from './components/transferencia-modal/transferencia-modal.component';
 import { ModalComponent } from '@shared/components/modal/modal.component';
 import { PaginationService } from '@shared/components/pagination/pagination.service';
 import { tap } from 'rxjs';
@@ -19,7 +20,7 @@ import { TableBancoComponent } from "./components/table-banco/table-banco.compon
 @Component({
   selector: 'app-cuentas-bancarias',
   standalone: true,
-  imports: [CommonModule, LoaderComponent, CurrencyPipe, CuentaFormModalComponent, HeaderTitlePageComponent, ModalComponent, PaginationComponent, TableBancoComponent],
+  imports: [CommonModule, LoaderComponent, CurrencyPipe, CuentaFormModalComponent, TransferenciaModalComponent, HeaderTitlePageComponent, ModalComponent, PaginationComponent, TableBancoComponent],
   templateUrl: './cuentas-bancarias.component.html'
 })
 export default class CuentasBancariasComponent {
@@ -34,6 +35,7 @@ export default class CuentasBancariasComponent {
   }
 
   isModalOpen = signal(false);
+  isTransferenciaModalOpen = signal(false);
   selectedAccount = signal<CuentaBancaria | null>(null);
   isDeleteModalVisible = signal(false);
   idToDelete = signal<string | null>(null);
@@ -71,6 +73,19 @@ export default class CuentasBancariasComponent {
 
   onFormSubmit() {
     this.closeModal();
+    this.cuentasResource.reload();
+  }
+
+  openTransferenciaModal() {
+    this.isTransferenciaModalOpen.set(true);
+  }
+
+  closeTransferenciaModal() {
+    this.isTransferenciaModalOpen.set(false);
+  }
+
+  onTransferenciaSubmit() {
+    this.closeTransferenciaModal();
     this.cuentasResource.reload();
   }
 

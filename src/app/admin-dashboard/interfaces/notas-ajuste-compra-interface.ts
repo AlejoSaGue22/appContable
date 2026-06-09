@@ -38,6 +38,7 @@ export interface NotaAjusteCompra {
   observaciones?: string;
   estado: NotaAjusteCompraStatus;
   numeroCompleto?: string;
+  numero?: string;
   prefijo?: string;
   descuento: number;
   total: number;

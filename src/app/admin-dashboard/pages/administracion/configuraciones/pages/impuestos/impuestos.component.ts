@@ -53,7 +53,7 @@ export class ImpuestosComponent implements OnInit {
     tarifa: [0, [Validators.required, Validators.min(0)]],
     descripcion: [''],
     activo: [true],
-    isAcreditable: [false],
+    // isAcreditable: [false],
     cuentaVentasId: [null],
     cuentaComprasId: [null],
     cuentaDevVentasId: [null],

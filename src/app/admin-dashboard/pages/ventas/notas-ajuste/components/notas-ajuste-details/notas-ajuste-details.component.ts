@@ -57,9 +57,10 @@ export class NotasAjusteDetailsComponent {
 
     this.loadingAsientos = true;
     // Usamos el número completo (prefijo + numero) para buscar los asientos
-    const referencia = `${n.prefijo}${n.numero}`;
+    console.log("Nota: ", n);
+    const referencia = `${n.prefijo}-${n.numero}`;
     
-    this.asientosService.getByReferencia(referencia).subscribe({
+    this.asientosService.getByReferencia(n.numeroCompleto || '').subscribe({
       next: (a) => {
         this.asientos = a;
         this.loadingAsientos = false;

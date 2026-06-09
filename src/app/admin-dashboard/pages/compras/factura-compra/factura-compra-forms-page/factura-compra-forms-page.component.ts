@@ -9,7 +9,7 @@ import { NotificationService } from '@shared/services/notification.service';
 import { LoaderService } from '@utils/services/loader.service';
 import { ModalComponent } from '@shared/components/modal/modal.component';
 import { ProveedoresFormsPageComponent } from '../../proveedores/proveedores-forms-page/proveedores-forms-page.component';
-import { ProductosServiciosFormsComponent } from '@dashboard/pages/ventas/productos-servicios/productos-servicios-forms/productos-servicios-forms.component';
+import { ProductosCompraFormsComponent } from '../../productos-compra/productos-compra-forms/productos-compra-forms.component';
 import { forkJoin, map } from 'rxjs';
 import { ProveedoresService } from '../../services/proveedores.service';
 import { ProductosService } from '@dashboard/pages/ventas/services/productos.service';
@@ -35,7 +35,7 @@ import { LoaderComponent } from "@utils/components/loader/loader.component";
     ListGroupDropdownComponent,
     ModalComponent,
     ProveedoresFormsPageComponent,
-    ProductosServiciosFormsComponent,
+    ProductosCompraFormsComponent,
 ],
     providers: [
         DecimalPipe
@@ -90,7 +90,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         telefono: [''],
         fechaEmision: [new Date().toISOString().substring(0, 10), Validators.required],
         fechaVencimiento: [''],
-        formaPago: [FormaPago.CONTADO, Validators.required],
+        formaPago: ['', Validators.required],
         metodoPago: [''],
         referencia: ['', Validators.required],
         observaciones: [''],
@@ -98,7 +98,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     });
 
     setupPaymentLogic() {
-        this.formCompra.get('formaPago')?.valueChanges.subscribe(value => {
+        const applyValidation = (value: string | null) => {
             const metodoPagoControl = this.formCompra.get('metodoPago');
             const fechaVencimientoControl = this.formCompra.get('fechaVencimiento');
             if (value === FormaPago.CONTADO) {
@@ -112,7 +112,11 @@ export class FacturaCompraFormsPageComponent implements OnInit {
             }
             metodoPagoControl?.updateValueAndValidity();
             fechaVencimientoControl?.updateValueAndValidity();
-        });
+        };
+
+        this.formCompra.get('formaPago')?.valueChanges.subscribe(applyValidation);
+
+        applyValidation(this.formCompra.get('formaPago')?.value || FormaPago.CONTADO);
     }
 
 
@@ -141,7 +145,6 @@ export class FacturaCompraFormsPageComponent implements OnInit {
 
         // React to product selection to auto-fill price and tax
         this.productosItemsForm.get('producto')?.valueChanges.subscribe((prod: GetProductosDetalle | any) => {
-            console.log("Product: ", prod);
             if (prod) {
                 this.productosItemsForm.patchValue({
                     unitPrice: prod.precio,
@@ -337,7 +340,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     });
 
 
-    onSubmit(type: string) {
+    onSubmit(isDraft: boolean) {
         this.formCompra.markAllAsTouched();
         if (this.formCompra.invalid) {
             this.notificationService.error(
@@ -363,7 +366,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         const items = this.formCompra.controls.items.value;
 
         const invoiceData: Partial<FacturaCompra> = {
-            isDraft: type,
+            isDraft,
             proveedorId: factura.proveedor!,
             fecha: factura.fechaEmision!,
             numeroFacturaProveedor: factura.referencia || '',
@@ -457,11 +460,14 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     onProviderSaved(newProvider: any) {
         this.proveedoresList.update(list => [...list, newProvider]);
 
+        const nombreDisplay = newProvider.nombre?.trim() || newProvider.razonSocial?.trim() || '';
+        const abreviatura = newProvider.tipoDocumentoRel?.abreviatura || '';
+
         this.formCompra.patchValue({
             proveedor: newProvider.id,
-            proveedorSearch: newProvider.nombre.trim() || newProvider.razonSocial.trim(),
-            numeroIdentificacion: newProvider.tipoDocumentoRel.abreviatura + ' - ' + newProvider.identificacion,
-            tipoIdentificacion: newProvider.tipoDocumentoRel.abreviatura,
+            proveedorSearch: nombreDisplay,
+            numeroIdentificacion: abreviatura ? `${abreviatura} - ${newProvider.identificacion}` : newProvider.identificacion,
+            tipoIdentificacion: abreviatura,
             telefono: newProvider.telefono,
             email: newProvider.email,
         });

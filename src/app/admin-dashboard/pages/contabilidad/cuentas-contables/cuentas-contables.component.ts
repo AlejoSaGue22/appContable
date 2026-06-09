@@ -2,7 +2,6 @@ import { Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-
 import { CuentasContablesService } from '../services/cuentas-contables.service';
 import { LoaderComponent } from '@utils/components/loader/loader.component';
 

@@ -22,6 +22,7 @@ export class TableInvoices {
   // Output events
   filterChange = output<InvoiceFilters>();
   emitir = output<string>();
+  emitirEstandar = output<string>();
   anular = output<string>();
   retry = output<string>();
   delete = output<string>();
@@ -184,6 +185,10 @@ export class TableInvoices {
 
   onEmitir(id: string): void {
     this.emitir.emit(id);
+  }
+
+  onEmitirEstandar(id: string): void {
+    this.emitirEstandar.emit(id);
   }
 
   onRetry(id: string): void {

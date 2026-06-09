@@ -63,6 +63,13 @@ export class ComprobantesVentasService {
     );  
   }
 
+  emitirEstandarInvoice(id: string) {
+    return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/emitir-estandar`, {}).pipe(
+      map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+    );
+  }
+
   anularInvoice(id: string, motivo: string) {
     return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/anular`, { motivo }).pipe(
       map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),

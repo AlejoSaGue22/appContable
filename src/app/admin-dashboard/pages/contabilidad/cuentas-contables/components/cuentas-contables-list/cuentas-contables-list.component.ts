@@ -79,11 +79,23 @@ export class CuentasContablesList {
   }
 
   onSelect(cuenta: GetCuentasContables): void {
+    const current = new Set(this.expandedIds());
+    if (!current.has(cuenta.id)) {
+      current.add(cuenta.id);
+      this.expandedIds.set(current);
+    }
     this.selectAccount.emit(cuenta);
   }
 
   onAdd(event: Event, cuenta: GetCuentasContables): void {
     event.stopPropagation();
+    
+    const current = new Set(this.expandedIds());
+    if (!current.has(cuenta.id)) {
+      current.add(cuenta.id);
+      this.expandedIds.set(current);
+    }
+
     this.addSubAccount.emit(cuenta);
   }
 }

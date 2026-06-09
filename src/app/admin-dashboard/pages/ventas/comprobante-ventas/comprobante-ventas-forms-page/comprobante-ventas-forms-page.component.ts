@@ -155,12 +155,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
 
     this.ventaServices.getInvoiceById(id).subscribe({
       next: (response) => {
-
         const invoice = response.data[0];
-
-        // while (this.productSeleccionados().length > 0) {
-        //   this.productSeleccionados().splice(0, 1);
-        // }<
 
         this.formVentas.patchValue({
           cliente: invoice.clientId,
@@ -200,7 +195,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     metodoPago: [''], // Added field
     fechaVencimiento: [''],
     fecha: ['', Validators.required],
-    canal: [0, Validators.required],
+    canal: ['1', Validators.required],
     tipoFactura: [TipoFactura.STANDARD, Validators.required],
     productos: [[]]
   })
@@ -345,12 +340,17 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   }
 
   onClienteSeleccionado(cliente: Partial<ClientesInterfaceResponse>) {
+    const nombreDisplay = cliente.razonSocial?.trim() 
+        ? cliente.razonSocial 
+        : `${cliente.nombre || ''} ${cliente.apellido || ''}`.trim();
+    const abreviatura = cliente.tipoDocumentoRel?.abreviatura || '';
+    
     this.formVentas.patchValue({
-      cliente: cliente.id,
-      clienteSearch: cliente.razonSocial?.trim() ? cliente.razonSocial : `${cliente.nombre} ${cliente.apellido}`,
-      tipoDocumento: cliente.tipoDocumento,
-      contacto: cliente.email,
-      identificacion: `${cliente.tipoDocumentoRel?.abreviatura} - ${cliente.numeroDocumento}`,
+        cliente: cliente.id,
+        clienteSearch: nombreDisplay,
+        tipoDocumento: cliente.tipoDocumento,
+        contacto: cliente.email,
+        identificacion: abreviatura ? `${abreviatura} - ${cliente.numeroDocumento}` : cliente.numeroDocumento,
     })
   }
 
@@ -374,7 +374,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
 
   }
 
-  async onSubmit() {
+  async onSubmit(saveAsDraft?: boolean) {
 
     const validFactura = this.formVentas.valid;
     const validProduct = this.productosItemsForm.valid;
@@ -427,7 +427,8 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       subtotal: this.totales.subtotal,
       iva: this.totales.totalIVA,
       descuento: this.totales.descuentoTotal,
-      total: this.totales.facturaTotal
+      total: this.totales.facturaTotal,
+      saveAsDraft: saveAsDraft
     }
 
     if (this.invoiceID() == 'new-Item') {
@@ -444,7 +445,8 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
           return;
         }
 
-        this.notificacionService.success('Factura creada con exito', 'Accion Completada', 5000);
+        const msg = saveAsDraft ? 'Factura guardada como borrador' : 'Factura creada con exito';
+        this.notificacionService.success(msg, 'Accion Completada', 5000);
 
         setTimeout(() => {
           this.loading.set(false);
@@ -453,7 +455,6 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       })
 
     } else {
-      // Verificar si la factura está en borrador antes de actualizar
       const currentInvoice = this.factura();
       if (currentInvoice && currentInvoice.status !== InvoiceStatus.DRAFT) {
         this.loading.set(false);
@@ -490,6 +491,35 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       });
     }
 
+  }
+
+  onEmitirFromDraft() {
+    const currentInvoice = this.factura();
+    if (!currentInvoice || currentInvoice.status !== InvoiceStatus.DRAFT) {
+      this.notificacionService.error('Solo se pueden emitir facturas en estado borrador.', 'Acción denegada', 5000);
+      return;
+    }
+
+    this.loaderservice.show('Emitiendo factura...');
+    this.loading.set(true);
+
+    this.ventaServices.emitirEstandarInvoice(currentInvoice.id).subscribe((response) => {
+      this.loading.set(false);
+      this.loaderservice.hide();
+      if (response.success == false) {
+        this.notificacionService.error(
+          `Ocurrio un problema al emitir la factura ${HelpersUtils.getMessageError(response.message)}`,
+          'Error',
+          5000
+        );
+        return;
+      }
+
+      this.notificacionService.success('Factura emitida con exito', 'Accion Completada', 5000);
+      setTimeout(() => {
+        this.router.navigateByUrl('/panel/ventas/comprobantes');
+      }, 800);
+    });
   }
 
 }

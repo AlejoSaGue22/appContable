@@ -238,6 +238,17 @@
                       </button>
                   }
 
+                  <!-- Botón Emitir (Solo Estándar en Borrador) -->
+                  @if (invoice.tipoFactura === 'ESTANDAR' && invoice.status === 'draft') {
+                      <button (click)="onEmitirEstandar(invoice.id)"
+                        class="inline-flex items-center rounded-lg text-sm text-green-600 hover:text-green-900 cursor-pointer"
+                        title="Emitir Factura">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </button>
+                  }
+
                   @if (invoice.status === 'rejected') {
                       <button (click)="onRetry(invoice.id)"
                         class="inline-flex items-center rounded-lg text-sm text-yellow-600 hover:text-yellow-900 cursor-pointer"

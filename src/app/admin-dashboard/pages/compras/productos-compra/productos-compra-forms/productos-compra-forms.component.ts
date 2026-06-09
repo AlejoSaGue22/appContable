@@ -1,8 +1,8 @@
-import { Component, inject, input, output } from '@angular/core';
+import { Component, inject, input, output, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HeaderInput, HeaderTitlePageComponent } from "@dashboard/components/header-title-page/header-title-page.component";
-import { firstValueFrom, map, tap } from 'rxjs';
+import { firstValueFrom, map, of, tap } from 'rxjs';
 import { ArticulosInterface } from '@dashboard/interfaces/productos-interface';
 import { FormErrorLabelComponent } from "src/app/utils/components/form-error-label/form-error-label.component";
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
@@ -16,7 +16,7 @@ import { CatalogsStore } from '@dashboard/services/catalogs.store';
   imports: [HeaderTitlePageComponent, ReactiveFormsModule, FormErrorLabelComponent, LoaderComponent],
   templateUrl: './productos-compra-forms.component.html',
 })
-export class ProductosCompraFormsComponent {
+export class ProductosCompraFormsComponent implements OnInit {
 
   headTitle: HeaderInput = {
     title: 'Registra un articulo de compra',
@@ -33,6 +33,7 @@ export class ProductosCompraFormsComponent {
   isModal = input<boolean>(false);
   saveSuccess = output<any>();
   cancel = output<void>();
+  
   categorias = inject(ProductosService).categorias().filter((c) => c.tipo == 'costo' || c.tipo == 'gasto');
 
   formProductos = this.fb.group({
@@ -60,20 +61,35 @@ export class ProductosCompraFormsComponent {
     });
   }
 
+  ngOnInit(): void {
+    if (this.isModal()) {
+      this.formProductos.reset();
+    }
+  }
+
   productosID = toSignal(
     this.activateRoute.params.pipe(map((param) => param['id']))
   );
 
   productoIdRxResourse = rxResource({
-    request: () => ({ id: this.productosID() }),
-    loader: ({ request }) => this.productoServicios.getProductoByID(request.id).pipe(
-      tap((p) => {
-        this.formProductos.reset(p);
-        this.formProductos.get('precio_referencial')?.setValue(p.precio);
-        const isInv = p.isInventariable !== undefined ? p.isInventariable : (p.afectaInventario !== undefined ? p.afectaInventario : true);
-        this.formProductos.get('isInventariable')?.setValue(isInv);
-      })
-    )
+    request: () => {
+      if (this.isModal()) return null;
+      return { id: this.productosID() };
+    },
+    loader: ({ request }) => {
+      if (!request) {
+        this.formProductos.reset();
+        return of(null);
+      }
+      return this.productoServicios.getProductoByID(request.id).pipe(
+        tap((p) => {
+          this.formProductos.reset(p);
+          this.formProductos.get('precio_referencial')?.setValue(p.precio);
+          const isInv = p.isInventariable !== undefined ? p.isInventariable : (p.afectaInventario !== undefined ? p.afectaInventario : true);
+          this.formProductos.get('isInventariable')?.setValue(isInv);
+        })
+      )
+    }
   });
 
   async onSubmit() {
@@ -94,7 +110,7 @@ export class ProductosCompraFormsComponent {
     };
     try {
 
-      if (this.productosID() == 'new-Item') {
+      if (this.productosID() == 'new-Item' || this.isModal()) {
         const product = await firstValueFrom(this.productoServicios.agregarProducto(formValue as Partial<ArticulosInterface>));
 
         if (product.success == false) {

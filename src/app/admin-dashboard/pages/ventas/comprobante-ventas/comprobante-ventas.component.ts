@@ -114,14 +114,28 @@ export class ComprobanteVentasComponent {
       this.comprobantesVentasService.emitirInvoice(id).subscribe((res: ResponseResult) => {
          this.loaderService.hide();
          if (res.success) {
-            this.notificacionService.success('Factura emitida con éxito', 'Éxito');
-            this.comprobanteVentasResource.reload();
-         } else {
-            const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
-            this.notificacionService.error(message || 'Error desconocido', 'Error al emitir factura');
-         }
-      }, () => this.loaderService.hide());
-   }
+             this.notificacionService.success('Factura emitida con éxito', 'Éxito');
+             this.comprobanteVentasResource.reload();
+          } else {
+             const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
+             this.notificacionService.error(message || 'Error desconocido', 'Error al emitir factura');
+          }
+       }, () => this.loaderService.hide());
+    }
+
+   onEmitirEstandar(id: string): void {
+      this.loaderService.show('Emitiendo factura estándar...');
+      this.comprobantesVentasService.emitirEstandarInvoice(id).subscribe((res: ResponseResult) => {
+         this.loaderService.hide();
+         if (res.success) {
+             this.notificacionService.success('Factura estándar emitida con éxito', 'Éxito');
+             this.comprobanteVentasResource.reload();
+          } else {
+             const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
+             this.notificacionService.error(message || 'Error desconocido', 'Error al emitir factura estándar');
+          }
+       }, () => this.loaderService.hide());
+    }
 
    onAnular(): void {
       const motivo = 'Anulación solicitada por el usuario';

@@ -248,14 +248,14 @@
                                 class="w-full bg-white text-slate-700 text-sm border rounded-lg px-4 py-3 transition duration-300 ease 
                                                     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm cursor-pointer" formControlName="tributo">
                                 <option value="" disabled>Selecciona un tributo</option>
-                                <option value="18">IVA</option>
-                                <option value="21">No aplica</option>
+                                <option value="S">IVA</option>
+                                <option value="N">No aplica</option>
                             </select>
 
                             <form-error-label [errorType]="clientsForm.get('tributo')!" />
                         </div>
 
-                        <div class="relative">
+                        <!-- <div class="relative">
                             <label class="block mb-2 text-sm font-medium text-slate-600">
                                 Responsabilidades fiscales <span class="text-red-500">*</span>
                             </label>
@@ -272,7 +272,7 @@
                             </select>
 
                             <form-error-label [errorType]="clientsForm.get('responsableFiscal')!" />
-                        </div>
+                        </div> -->
                     </div>
 
                 </div>

@@ -12,7 +12,7 @@ export class CuentasContablesService {
 
   constructor(private http: HttpClient) {}
 
-  getCuentasContables(params?: { search?: string, tipo?: string, fechaInicio?: string, fechaFin?: string }): Observable<GetCuentasContables[]> {
+  getCuentasContables(params?: { search?: string, tipo?: string, fechaInicio?: string, fechaFin?: string, limit?: number }): Observable<GetCuentasContables[]> {
     let httpParams = new HttpParams();
     if (params?.search) httpParams = httpParams.set('search', params.search);
     if (params?.tipo) httpParams = httpParams.set('tipo', params.tipo);

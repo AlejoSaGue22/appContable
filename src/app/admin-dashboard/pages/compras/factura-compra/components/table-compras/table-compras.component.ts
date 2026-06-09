@@ -156,10 +156,10 @@ export class TableComprasComponent {
 
   getStatusClass(status: string): string {
     const classes: Record<string, string> = {
-      [InvoiceCompraStatus.REGISTRADO]: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-      [InvoiceCompraStatus.PAGADO]: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-      [InvoiceCompraStatus.ERROR_ASIENTO]: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-      [InvoiceCompraStatus.ANULADO]: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+      [InvoiceCompraStatus.REGISTRADO]: 'bg-green-50 text-green-500 dark:bg-green-500 dark:text-green-50',
+      [InvoiceCompraStatus.PAGADO]: 'bg-yellow-50 text-yellow-500 dark:bg-yellow-500 dark:text-yellow-50',
+      [InvoiceCompraStatus.ERROR_ASIENTO]: 'bg-red-50 text-red-500 dark:bg-red-500 dark:text-red-50',
+      [InvoiceCompraStatus.ANULADO]: 'bg-red-50 text-red-500 dark:bg-red-500 dark:text-red-50'
     };
     return classes[status] || 'bg-gray-100 text-gray-800';
   }

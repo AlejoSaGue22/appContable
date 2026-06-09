@@ -1,0 +1,99 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm transition-all duration-300" *ngIf="isOpen">
+  <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden transform transition-all animate-scale-in">
+    
+    <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between text-slate-700">
+      <div class="flex items-center gap-3">
+        <div class="p-2 bg-blue-50 text-blue-600 rounded-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold">Transferencia entre Cuentas</h3>
+          <p class="text-[10px] font-semibold uppercase text-slate-500">Módulo de Tesorería General</p>
+        </div>
+      </div>
+      <button (click)="onClose()" class="w-8 h-8 rounded-full cursor-pointer bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-all group">
+        <svg class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-6 space-y-5">
+      
+      <div class="grid grid-cols-1 gap-4">
+        <div>
+          <label class="block mb-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
+            Cuenta Origen <span class="text-red-500">*</span>
+          </label>
+          <select formControlName="cuentaOrigenId" 
+            class="w-full bg-slate-50 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2.5 transition duration-300 focus:outline-none focus:border-blue-400 focus:bg-white hover:border-slate-300 shadow-sm">
+            <option value="" disabled>Seleccionar Cuenta Origen...</option>
+            @for (cuenta of cuentas; track cuenta.id) {
+              <option [value]="cuenta.id">{{ cuenta.banco.nombre }} - {{ cuenta.nombre }} (Saldo: {{ cuenta.saldoActual | currency }})</option>
+            }
+          </select>
+        </div>
+
+        <div>
+          <label class="block mb-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
+            Cuenta Destino <span class="text-red-500">*</span>
+          </label>
+          <select formControlName="cuentaDestinoId" 
+            class="w-full bg-slate-50 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2.5 transition duration-300 focus:outline-none focus:border-blue-400 focus:bg-white hover:border-slate-300 shadow-sm">
+            <option value="" disabled>Seleccionar Cuenta Destino...</option>
+            @for (cuenta of cuentas; track cuenta.id) {
+              <option [value]="cuenta.id">{{ cuenta.banco.nombre }} - {{ cuenta.nombre }}</option>
+            }
+          </select>
+          @if (form.errors?.['mismasCuentas'] && (form.get('cuentaOrigenId')?.touched || form.get('cuentaDestinoId')?.touched)) {
+            <p class="text-xs text-red-500 mt-1 font-semibold">La cuenta de origen y destino deben ser diferentes.</p>
+          }
+        </div>
+
+        <div>
+          <label class="block mb-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
+            Monto a Transferir <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <input type="number" formControlName="monto" placeholder="0.00" min="0.01" step="0.01"
+              class="w-full bg-slate-50 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2.5 font-mono font-bold transition duration-300 focus:outline-none focus:border-blue-400 focus:bg-white hover:border-slate-300 shadow-sm" />
+            <div class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block mb-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
+            Notas y Observaciones
+          </label>
+          <textarea formControlName="observaciones" rows="2" placeholder="Información adicional..." 
+            class="w-full bg-slate-50 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2.5 transition duration-300 focus:outline-none focus:border-blue-400 focus:bg-white hover:border-slate-300 shadow-sm resize-none"></textarea>
+        </div>
+      </div>
+
+      <div class="flex gap-3 pt-6 border-t border-slate-100">
+        <button type="button" (click)="onClose()" 
+          class="flex-1 px-4 py-2.5 rounded-xl border cursor-pointer border-slate-200 text-slate-600 text-sm font-bold hover:bg-slate-50 transition-all active:scale-95">
+          Cancelar
+        </button>
+        <button type="submit" [disabled]="form.invalid || isSubmitting()" 
+          class="flex-1 px-4 py-2.5 rounded-xl border cursor-pointer bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 disabled:opacity-50 disabled:shadow-none transition-all active:scale-95 flex items-center justify-center gap-2">
+          @if (isSubmitting()) {
+            <svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Procesando...
+          } @else {
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+            </svg>
+            Transferir Fondos
+          }
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

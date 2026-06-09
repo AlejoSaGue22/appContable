@@ -115,6 +115,30 @@
           <textarea formControlName="observaciones" rows="2" placeholder="Información adicional..." 
             class="w-full bg-slate-50 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2.5 transition duration-300 focus:outline-none focus:border-blue-400 focus:bg-white hover:border-slate-300 shadow-sm resize-none"></textarea>
         </div>
+
+        @if (!account) {
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block mb-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                Saldo Inicial
+              </label>
+              <div class="relative">
+                <input type="number" formControlName="saldoInicial" placeholder="0.00" min="0" step="0.01"
+                  class="w-full bg-slate-50 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2.5 font-mono font-bold transition duration-300 focus:outline-none focus:border-blue-400 focus:bg-white hover:border-slate-300 shadow-sm" />
+                <div class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</div>
+              </div>
+            </div>
+
+            @if (form.get('saldoInicial')?.value > 0) {
+              <div class="relative">
+                <app-list-group-dropdown title="Cuenta Contrapartida *" [dataList]="cuentasContables()"
+                  [labelKey]="['codigo', 'nombre']"
+                  (objectSelect)="onCuentaSeleccionada($event)"
+                  [valueInput]="form.get('cuentaContrapartidaCodigo')?.value ?? ''" />
+              </div>
+            }
+          </div>
+        }
       </div>
 
       <!-- Acciones Premium -->

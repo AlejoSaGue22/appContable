@@ -10,7 +10,7 @@ export class AsientosHttpService {
   constructor(private http: HttpClient) {}
  
   getByReferencia(referencia: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.base}/por-referencia/${encodeURIComponent(referencia)}`);
+    return this.http.get<any[]>(`${this.base}/por-referencia/${referencia}`);
   }
  
   reintentarAsientoFactura(facturaId: string): Observable<any> {

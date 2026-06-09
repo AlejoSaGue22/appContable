@@ -1,6 +1,6 @@
 export class HelpersUtils {
 
-  static readonly nameApp = 'ALVA';
+  static readonly nameApp = 'Sistema Contable';
   static readonly logoApp = 'assets/images/logo_app.png';
 
   static getMessageError(error: string[]): string {

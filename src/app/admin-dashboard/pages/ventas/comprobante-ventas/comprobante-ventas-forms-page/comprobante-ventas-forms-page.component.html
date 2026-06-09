@@ -41,6 +41,17 @@
                             <form-error-label [errorType]="formVentas.get('tipoFactura')!" />
                         </div>
 
+                        <div>
+                            <label class="block mb-2 text-sm text-slate-600">
+                                Fecha <span class="text-red-500">*</span>
+                            </label>
+                            <input class="w-full bg-transparent text-slate-700 text-sm border 
+                                        rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 
+                                        shadow-sm focus:shadow" formControlName="fecha" type="date" />
+
+                            <form-error-label [errorType]="formVentas.get('fecha')!" />
+                        </div>
+
                         <div class="relative">
                             <app-list-group-dropdown title="Cliente" [dataList]="getAllClientes()"
                                 [labelKey]="['fullName', 'numeroDocumento']"
@@ -61,6 +72,9 @@
                             <form-error-label [errorType]="formVentas.get('identificacion')!" />
                         </div>
 
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                         <div>
                             <label class="block mb-2 text-sm text-slate-600">
                                 Contacto
@@ -72,29 +86,12 @@
 
                             <form-error-label [errorType]="formVentas.get('contacto')!" />
                         </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-
-
-                        <!-- <div class="relative">
-                                        <label class="block mb-2 text-sm text-slate-600">
-                                            Comprobante
-                                        </label>
-                                        <input class="w-full bg-transparent text-slate-700 text-sm border rounded-md px-3 py-2 transition 
-                                        duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 
-                                        shadow-sm focus:shadow" 
-                                        placeholder="N° Comprobante" 
-                                        type="number"
-                                        formControlName="numero"
-                                        min="1" />
-
-                                        <form-error-label [errorType]="formVentas.get('numero')!" />
-                                    </div> -->
 
                         <div>
                             <label class="block mb-2 text-sm text-slate-600">
                                 Vendedor
+
+                                    
                             </label>
                             <input class="w-full bg-transparent text-slate-700 text-sm border 
                                         rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 
@@ -150,18 +147,7 @@
 
                                 <form-error-label [errorType]="formVentas.get('fechaVencimiento')!" />
                             </div>
-                        }
-
-                        <div>
-                            <label class="block mb-2 text-sm text-slate-600">
-                                Fecha <span class="text-red-500">*</span>
-                            </label>
-                            <input class="w-full bg-transparent text-slate-700 text-sm border 
-                                        rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 
-                                        shadow-sm focus:shadow" formControlName="fecha" type="date" />
-
-                            <form-error-label [errorType]="formVentas.get('fecha')!" />
-                        </div>
+                        }                        
 
                         <div>
                             <label class="block mb-2 text-sm text-slate-600">
@@ -403,27 +389,82 @@
         </div>
     </div>
 
-    <div class="row flex w-1/2 px-4">
-        <button routerLink="/panel/ventas/comprobantes" class="rounded-md w-full rounded-r-none bg-red-600 py-2 px-4 border border-transparent cursor-pointer
+    <div class="row flex w-1/2 px-4 gap-2">
+        <button routerLink="/panel/ventas/comprobantes" class="rounded-md w-full bg-red-600 py-2 px-4 border border-transparent cursor-pointer
                 text-center text-sm text-white transition-all shadow-md hover:shadow-lg hover:bg-red-400"
             type="button">
             Cancelar
         </button>
-        <button type="submit" class="rounded-none w-full bg-blue-500 py-2 px-4 border-l border-r border-blue-400 cursor-pointer
-                text-center text-sm text-white transition-all shadow-md hover:shadow-lg hover:bg-blue-400"
-            (click)="onSubmit()">
-            @if (loading()) {
-            <svg class="inline h-5 w-5 animate-spin text-white" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                </path>
-            </svg>
-            Creando...
-            } @else {
-            Guardar Factura
+
+        @if (invoiceID() === 'new-Item') {
+            @if (tipoFacturaSignal() == 'ESTANDAR') {
+                <button type="button" class="rounded-md w-full bg-gray-500 py-2 px-4 border border-transparent cursor-pointer
+                        text-center text-sm text-white transition-all shadow-md hover:shadow-lg hover:bg-gray-400"
+                    (click)="onSubmit(true)">
+                    @if (loading()) {
+                    <svg class="inline h-5 w-5 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                </svg>
+                Guardando...
+                } @else {
+                Guardar Borrador
+                }
+            </button>
             }
-        </button>
+
+            <button type="submit" class="rounded-md w-full bg-blue-500 py-2 px-4 border border-transparent cursor-pointer
+                    text-center text-sm text-white transition-all shadow-md hover:shadow-lg hover:bg-blue-400"
+                (click)="onSubmit(false)">
+                @if (loading()) {
+                <svg class="inline h-5 w-5 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                </svg>
+                Emitiendo...
+                } @else {
+                Guardar y Emitir
+                }
+            </button>
+        } @else {
+            <button type="submit" class="rounded-md w-full bg-blue-500 py-2 px-4 border border-transparent cursor-pointer
+                    text-center text-sm text-white transition-all shadow-md hover:shadow-lg hover:bg-blue-400"
+                (click)="onSubmit()">
+                @if (loading()) {
+                <svg class="inline h-5 w-5 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                </svg>
+                Guardando...
+                } @else {
+                Guardar Cambios
+                }
+            </button>
+
+            @if (factura()?.tipoFactura === 'ESTANDAR' && factura()?.status === 'draft') {
+                <button type="button" class="rounded-md w-full bg-green-600 py-2 px-4 border border-transparent cursor-pointer
+                        text-center text-sm text-white transition-all shadow-md hover:shadow-lg hover:bg-green-500"
+                    (click)="onEmitirFromDraft()">
+                    @if (loading()) {
+                    <svg class="inline h-5 w-5 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                        </path>
+                    </svg>
+                    Emitiendo...
+                    } @else {
+                    Emitir Factura
+                    }
+                </button>
+            }
+        }
 
     </div>
 </div>
