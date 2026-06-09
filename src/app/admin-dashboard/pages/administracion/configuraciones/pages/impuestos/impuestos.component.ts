@@ -10,6 +10,7 @@ import { CuentasContablesService } from '@dashboard/pages/contabilidad/services/
 import { firstValueFrom } from 'rxjs';
 import { PaginationComponent } from "@shared/components/pagination/pagination";
 import { PaginationService } from '@shared/components/pagination/pagination.service';
+import { NotificationService } from '@shared/services/notification.service';
 
 @Component({
   selector: 'app-config-impuestos',
@@ -22,6 +23,7 @@ export class ImpuestosComponent implements OnInit {
   private impuestosService = inject(ImpuestosService);
   private cuentasService = inject(CuentasContablesService);
   private paginationService = inject(PaginationService);
+  private notificationService = inject(NotificationService);
 
   headTitle = signal<HeaderInput>({
     title: 'Impuestos',
@@ -53,7 +55,6 @@ export class ImpuestosComponent implements OnInit {
     tarifa: [0, [Validators.required, Validators.min(0)]],
     descripcion: [''],
     activo: [true],
-    // isAcreditable: [false],
     cuentaVentasId: [null],
     cuentaComprasId: [null],
     cuentaDevVentasId: [null],
@@ -65,16 +66,15 @@ export class ImpuestosComponent implements OnInit {
     this.loadCuentas();
   }
 
-  async loadData() {
+  async loadData(page: number = 1, limit: number = 10) {
     this.loading.set(true);
     try {
-      const data = await firstValueFrom(this.impuestosService.getAll());
-      this.impuestos.set(data);
-      this.paginationService.totalItems.set(data.length);
-      const pageSize = data.length > 0 ? Math.ceil(data.length / 10) : 1; // Default page size of 10
-      this.paginationService.pageSize.set(pageSize);
+      const response = await firstValueFrom(this.impuestosService.getAll(page, limit));
+      this.impuestos.set(response.data);
+      this.paginationService.totalItems.set(response.meta.total);
+      this.paginationService.pageSize.set(response.meta.limit);
     } catch (error) {
-      console.error('Error loading taxes', error);
+      this.notificationService.error('Error al cargar los impuestos', 'Error');
     } finally {
       this.loading.set(false);
     }
@@ -110,10 +110,13 @@ export class ImpuestosComponent implements OnInit {
     this.selectedId.set(id);
     try {
       const data = await firstValueFrom(this.impuestosService.getById(id));
-      this.taxForm.patchValue(data);
+      this.taxForm.patchValue({
+        ...data,
+        tarifa: parseInt(data.tarifa)
+      });
       this.modalVisible.set(true);
     } catch (error) {
-      console.error('Error fetching tax details', error);
+      this.notificationService.error('Error al cargar el impuesto', 'Error');
     }
   }
 
@@ -123,14 +126,16 @@ export class ImpuestosComponent implements OnInit {
     const data = this.taxForm.value;
     try {
       if (this.isEditing() && this.selectedId()) {
-        await firstValueFrom(this.impuestosService.update(this.selectedId()!, data));
+        const response = await firstValueFrom(this.impuestosService.update(this.selectedId()!, data));
+        this.notificationService.success(response.message, 'Éxito');
       } else {
-        await firstValueFrom(this.impuestosService.create(data));
+        const response = await firstValueFrom(this.impuestosService.create(data));
+        this.notificationService.success(response.message, 'Éxito');
       }
       this.modalVisible.set(false);
       this.loadData();
-    } catch (error) {
-      console.error('Error saving tax', error);
+    } catch (error: any) {
+      this.notificationService.error(error?.error?.message || 'Error al guardar el impuesto', 'Error');
     }
   }
 

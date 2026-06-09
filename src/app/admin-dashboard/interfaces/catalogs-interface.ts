@@ -57,6 +57,15 @@ export interface Municipality {
     department: string;
 }
 
+export interface Vendedor {
+    id: string;
+    nombre: string;
+    apellido: string;
+    identificacion: string;
+    telefono?: string;
+    activo: boolean;
+}
+
 import { Impuesto } from '../pages/administracion/configuraciones/pages/impuestos/interfaces/impuesto.interface';
 
 export interface CatalogsState {
@@ -68,6 +77,7 @@ export interface CatalogsState {
     categoriesArticles: CategoryArticle[];
     conceptsNotes: ConceptNote[];
     impuestos: Impuesto[];
+    vendedores: Vendedor[];
     loading: boolean;
     error: string | null;
 }

@@ -90,12 +90,17 @@
                         <div>
                             <label class="block mb-2 text-sm text-slate-600">
                                 Vendedor
-
-                                    
                             </label>
-                            <input class="w-full bg-transparent text-slate-700 text-sm border 
-                                        rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 
-                                        shadow-sm focus:shadow" formControlName="vendedor" type="text" />
+                            <div class="relative">
+                                <select class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded 
+                                                pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm
+                                                focus:shadow-md cursor-pointer" formControlName="vendedor">
+                                    <option value="">Selecciona un vendedor</option>
+                                    @for (vendedor of catalogsStore.vendedores(); track vendedor.id) {
+                                        <option [value]="vendedor.id">{{ vendedor.nombre }} {{ vendedor.apellido }}</option>
+                                    }
+                                </select>
+                            </div>
 
                             <form-error-label [errorType]="formVentas.get('vendedor')!" />
                         </div>
@@ -151,7 +156,7 @@
 
                         <div>
                             <label class="block mb-2 text-sm text-slate-600">
-                                Canal de venta <span class="text-red-500">*</span>
+                                Medio de venta <span class="text-red-500">*</span>
                             </label>
                             <div class="relative">
                                 <select class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded 

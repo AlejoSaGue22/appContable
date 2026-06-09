@@ -308,7 +308,7 @@ export class NotasAjusteFormPageComponent implements OnInit {
         newItems[index] = { 
           ...newItems[index], 
           impuestoId: impuesto.id,
-          porcentajeIVA: impuesto.tarifa,
+          porcentajeIVA: impuesto?.tarifa ? parseInt(impuesto.tarifa) : 0,
         };
         const item = newItems[index];
         const gross = item.cantidad * item.valorUnitario;

@@ -295,7 +295,8 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     if (!ivaValue) return 0;
     if (typeof ivaValue === 'number') return ivaValue;
     const impuesto = this.catalogsStore.impuestos().find(i => i.id == ivaValue);
-    return impuesto?.tarifa ?? 0;
+    const tarifa = impuesto?.tarifa ? parseInt(impuesto.tarifa) : 0
+    return tarifa;
   }
 
   calcularItemTotal(): number {

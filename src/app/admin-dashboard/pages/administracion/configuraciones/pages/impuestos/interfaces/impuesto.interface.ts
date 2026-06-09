@@ -2,7 +2,7 @@ export interface Impuesto {
   id?: string;
   nombre: string;
   tipo: string;
-  tarifa: number;
+  tarifa: string;
   descripcion?: string;
   activo: boolean;
   isAcreditable: boolean;

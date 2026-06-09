@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from 'src/app/environments/environment';
-import { CategoryArticle, CategoryArticleResponse, ConceptNote, DocumentType, PaymentMethod, SalesChannel, UnitMeasure } from '../interfaces/catalogs-interface';
+import { CategoryArticle, CategoryArticleResponse, ConceptNote, DocumentType, PaymentMethod, SalesChannel, UnitMeasure, Vendedor } from '../interfaces/catalogs-interface';
 import { Impuesto } from '../pages/administracion/configuraciones/pages/impuestos/interfaces/impuesto.interface';
 
 @Injectable({
@@ -13,7 +13,15 @@ export class CatalogsService {
   private baseUrl = environment.baseUrl;
 
   findAllImpuestos(): Observable<Impuesto[]> {
-    return this.http.get<Impuesto[]>(`${this.baseUrl}/settings/impuestos`);
+    return this.http.get<{ data: Impuesto[], meta: any }>(`${this.baseUrl}/settings/impuestos`, {
+      params: { limit: 1000 }
+    }).pipe(map(res => res.data));
+  }
+
+  findAllVendedores(): Observable<Vendedor[]> {
+    return this.http.get<{ data: Vendedor[], meta: any }>(`${this.baseUrl}/settings/vendedores`, {
+      params: { limit: 1000 }
+    }).pipe(map(res => res.data));
   }
 
   findAllDocumentTypes(): Observable<DocumentType[]> {

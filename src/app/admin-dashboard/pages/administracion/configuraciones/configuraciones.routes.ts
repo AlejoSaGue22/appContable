@@ -2,6 +2,7 @@ import { Routes } from "@angular/router";
 import { ConfiguracionMenuComponent } from "./configuracion-menu/configuracion-menu.component";
 import { EmpresaComponent } from "./pages/empresa/empresa.component";
 import { ImpuestosComponent } from "./pages/impuestos/impuestos.component";
+import { VendedoresComponent } from "./pages/vendedores/vendedores.component";
 
 const configuracionesRoutes: Routes = [
     {
@@ -15,6 +16,10 @@ const configuracionesRoutes: Routes = [
     {
         path: 'impuestos',
         component: ImpuestosComponent
+    },
+    {
+        path: 'vendedores',
+        component: VendedoresComponent
     },
     {
         path: '**',
