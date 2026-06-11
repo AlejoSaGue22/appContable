@@ -1,6 +1,6 @@
 export enum TipoCuentaBancaria {
   BANCO = 'Banco',
-  EFECTIVO = 'Efectivo',
+  CAJA = 'Caja',
 }
 
 export interface Banco {

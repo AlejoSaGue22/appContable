@@ -25,7 +25,7 @@ export class CuentaFormModalComponent implements OnInit {
   @Input() isOpen = false;
   @Input() account: CuentaBancaria | null = null;
   @Output() close = new EventEmitter<void>();
-  @Output() submit = new EventEmitter<void>();
+  @Output() submit = new EventEmitter<'create' | 'update'>();
 
   form: FormGroup = this.fb.group({
     nombre: ['', [Validators.required, Validators.maxLength(120)]],
@@ -72,6 +72,7 @@ export class CuentaFormModalComponent implements OnInit {
       });
       this.form.get('saldoInicial')?.disable();
       this.form.get('cuentaContrapartidaCodigo')?.disable();
+      this.form.get('tipoCuenta')?.disable();
     }
   }
 
@@ -112,7 +113,7 @@ export class CuentaFormModalComponent implements OnInit {
     if (this.account) {
       this.cuentasService.updateCuenta(this.account.id, dto).subscribe({
         next: () => {
-          this.submit.emit();
+          this.submit.emit('update');
           this.isSubmitting.set(false);
         },
         error: (err) => {
@@ -126,7 +127,7 @@ export class CuentaFormModalComponent implements OnInit {
     } else {
       this.cuentasService.createCuenta(dto).subscribe({
         next: () => {
-          this.submit.emit();
+          this.submit.emit('create');
           this.isSubmitting.set(false);
         },
         error: (err) => {

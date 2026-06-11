@@ -21,7 +21,7 @@ export class CuentasBancariasService {
   private readonly base = `${environment.baseUrl}/cuentas-bancarias`;
   private readonly banksUrl = `${environment.baseUrl}/bancos`;
 
-  getCuentas(options: Options): Observable<ResponseCuentasBancarias> {
+  getCuentasBancos(options: Options): Observable<ResponseCuentasBancarias> {
     const { offset = 0, limit = 10, search = '' } = options;
     
     return this.http.get<ResponseCuentasBancarias>(this.base, { 

@@ -42,10 +42,10 @@ export default class CuentasBancariasComponent {
 
   cuentasResource = rxResource({
     request: () => ({
-      offset: this.paginationService.currentPage() - 1,
+      offset: this.paginationService.currentPage(),
       limit: 10,
     }),
-    loader: ({ request }) => this.cuentasService.getCuentas(request).pipe(
+    loader: ({ request }) => this.cuentasService.getCuentasBancos(request).pipe(
       tap((res) => {
         const size = Math.ceil(res.count / request.limit);
         this.paginationService.totalItems.set(res.count);
@@ -71,8 +71,10 @@ export default class CuentasBancariasComponent {
     this.selectedAccount.set(null);
   }
 
-  onFormSubmit() {
+  onFormSubmit(action: 'create' | 'update') {
     this.closeModal();
+    const message = action === 'create' ? 'Cuenta creada correctamente' : 'Cuenta actualizada correctamente';
+    this.notificationService.success(message);
     this.cuentasResource.reload();
   }
 
@@ -86,6 +88,7 @@ export default class CuentasBancariasComponent {
 
   onTransferenciaSubmit() {
     this.closeTransferenciaModal();
+    this.notificationService.success('Transferencia realizada correctamente');
     this.cuentasResource.reload();
   }
 
@@ -106,6 +109,7 @@ export default class CuentasBancariasComponent {
         this.cuentasResource.reload();
         this.isDeleteModalVisible.set(false);
         this.idToDelete.set(null);
+        this.notificationService.success('Cuenta eliminada correctamente');
       },
       error: (err) => {
         this.notificationService.error('Error al eliminar la cuenta', err);

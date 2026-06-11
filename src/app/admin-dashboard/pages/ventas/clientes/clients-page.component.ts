@@ -45,7 +45,7 @@ export class ClientsPageComponent {
 
     clientesResource = rxResource({
         request: () => ({ 
-            page: this.paginationService.currentPage() - 1, 
+            page: this.paginationService.currentPage(), 
             limit: 10,
             search: this.appliedSearchTerm()
         }),

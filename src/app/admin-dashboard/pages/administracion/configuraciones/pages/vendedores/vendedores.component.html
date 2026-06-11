@@ -18,7 +18,9 @@
                 (deleted)="loadData()"
             />
 
-            <app-pagination [length]="vendedores().length" />
+            @if(vendedores().length > 0) {
+              <app-pagination [length]="vendedores().length" />
+            }
         </div>
     </div>
 </div>

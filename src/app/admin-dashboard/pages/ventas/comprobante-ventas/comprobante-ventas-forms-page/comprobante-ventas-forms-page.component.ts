@@ -134,7 +134,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   }
 
   loadCuentasBancarias() {
-    this.cuentasBancariasService.getCuentas({ offset: 0, limit: 100 }).subscribe({
+    this.cuentasBancariasService.getCuentasBancos({ offset: 0, limit: 100 }).subscribe({
       next: (res) => this.cuentasBancarias.set(res.cuentas),
       error: (err) => this.notificacionService.error('Error al cargar cuentas bancarias', err)
     });

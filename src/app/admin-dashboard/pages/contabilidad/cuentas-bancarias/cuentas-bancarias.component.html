@@ -45,7 +45,7 @@
     [isOpen]="isModalOpen()"
     [account]="selectedAccount()"
     (close)="closeModal()"
-    (submit)="onFormSubmit()"
+    (submit)="onFormSubmit($event)"
   ></app-cuenta-form-modal>
 }
 

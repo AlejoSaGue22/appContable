@@ -197,14 +197,17 @@
               <app-aging-report [reporte]="reporte!" 
                                 [loadingActual]="loadingActual" 
                                 [vistaActiva]="vistaActiva"/>
-
-                <app-pagination [length]="reporte?.items?.length || 0"/>
+              @if(reporte?.meta?.total! > 0) {
+                <app-pagination [length]="reporte?.meta?.total || 0"/>
+              }
             }
 
             <!-- ══ VISTA: HISTORIAL DE PAGOS ═══════════════════════════════ -->
             @if (vistaActiva === 'historial') {
               <app-historial-pagos [historial]="historial!" [loadingActual]="loadingHistorial"/>
-              <app-pagination [length]="historial?.meta?.total || 0"/>
+              @if(historial?.meta?.total! > 0) {
+                <app-pagination [length]="historial?.meta?.total || 0"/>
+              }
             }
           </div>
         </div>

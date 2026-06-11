@@ -49,7 +49,7 @@ export class FacturaCompraComponent {
 
    facturasCompraResource = rxResource({
       request: () => ({
-         page: this.paginationService.currentPage() - 1,
+         page: this.paginationService.currentPage(),
          limit: 10,
          filters: this.filters()
       }),

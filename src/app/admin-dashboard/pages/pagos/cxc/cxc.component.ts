@@ -109,7 +109,7 @@ export class CxcComponent implements OnInit {
     this.loading.set(true);
     const estado = this.filtroEstado.value || undefined;
 
-    this.svc.getCxc({ paymentStatus: estado, page: this.paginationService.currentPage() - 1, limit: 10 }).subscribe({
+    this.svc.getCxc({ paymentStatus: estado, page: this.paginationService.currentPage(), limit: 10 }).subscribe({
       next: res => {
         this.todosLosItems.set(res.items);
         this.resumen.set(res.resumen);

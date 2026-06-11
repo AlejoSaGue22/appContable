@@ -132,7 +132,7 @@
 
             @if (form.get('saldoInicial')?.value > 0) {
               <div class="relative">
-                <app-list-group-dropdown title="Cuenta Contrapartida *" [dataList]="cuentasContables()"
+                <app-list-group-dropdown title="Cuenta Contrapartida" [dataList]="cuentasContables()"
                   [labelKey]="['codigo', 'nombre']"
                   (objectSelect)="onCuentaSeleccionada($event)"
                   [valueInput]="form.get('cuentaContrapartidaCodigo')?.value ?? ''" />

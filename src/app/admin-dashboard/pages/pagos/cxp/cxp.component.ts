@@ -97,7 +97,7 @@ export class CxpComponent {
   cargar(): void {
     this.loading.set(true);
     const currentEstado = this.filtroEstado.value || undefined;
-    this.svc.getCxp({ paymentStatus: currentEstado, page: this.paginationService.currentPage() - 1, limit: 10 }).subscribe({
+    this.svc.getCxp({ paymentStatus: currentEstado, page: this.paginationService.currentPage(), limit: 10 }).subscribe({
       next: res => {
         this.rawData.set({ items: res.items, resumen: res.resumen });
         this.loading.set(false);

@@ -175,7 +175,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     }
 
     getCuentasBancarias() {
-        this.cuentasBancariasService.getCuentasBancarias({ limit: 1000 }).subscribe({
+        this.cuentasBancariasService.getCuentasBancos({ limit: 1000 }).subscribe({
             next: (res) => {
                 this.cuentasBancarias.set(res.cuentas);
             },

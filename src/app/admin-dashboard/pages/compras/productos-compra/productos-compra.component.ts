@@ -39,7 +39,7 @@ export class ProductosCompraComponent {
    }
 
    productorxResource = rxResource({
-      request: () => ({ page: this.paginationService.currentPage() - 1, limit: 10, search: this.appliedSearchTerm() }),
+      request: () => ({ page: this.paginationService.currentPage(), limit: 10, search: this.appliedSearchTerm() }),
       loader: ({ request }) => {
          return this.productoServicio.getProductos({ offset: request.page * request.limit, limit: request.limit, venta_compra: 'costo', search: request.search }).pipe(
             tap((p) => {

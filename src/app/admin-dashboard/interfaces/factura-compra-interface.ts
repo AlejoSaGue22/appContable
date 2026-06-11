@@ -1,5 +1,5 @@
 import { PaymentMethod } from "./catalogs-interface";
-import { PaymentStatus } from "./pagos-interface";
+import { CuentaBancaria, PaymentStatus } from "./pagos-interface";
 import { ArticulosInterface } from "./productos-interface";
 import { ProveedoresInterface } from "./proveedores-interface";
 
@@ -32,6 +32,8 @@ export interface FacturaCompra {
     fechaVencimiento?: string;  
     formaPago: string;
     metodoPago?: string;
+    cuentaBancariaId?: string;
+    cuentaBancaria?: CuentaBancaria;
     observaciones?: string;
     totalPagado: number;
     saldoPendiente: number;

@@ -50,7 +50,7 @@ export class ProveedoresComponent {
    proveedoresList = signal<ProveedoresRequest[]>([]);
 
    proveedoresResource = rxResource({
-      request: () => ({ page: this.paginationService.currentPage() - 1, limit: 10 }),
+      request: () => ({ page: this.paginationService.currentPage(), limit: 10 }),
       loader: ({ request }) => this.proveedoresService.getProveedores({ offset: request.page * request.limit, limit: request.limit }).pipe(
          tap((response) => {
             this.proveedoresList.set(response.proveedores); // TODO: Agregar el tipo de dato correcto
