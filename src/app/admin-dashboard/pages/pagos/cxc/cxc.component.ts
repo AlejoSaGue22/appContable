@@ -1,10 +1,9 @@
-// cxc.component.ts
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, map, startWith } from 'rxjs/operators';
 import { RegistrarPagoModalComponent, RegistrarPagoModalData } from '../components/modal-registrarpago/modal-registrarpago.component';
-import { CxcItem, CxcResumen, PagoHistorial, PaymentStatus } from '@dashboard/interfaces/pagos-interface';
+import { CxcItem, CxcResumen, PagoHistorial, PaymentStatus, MovimientoItem, MovimientosResponse } from '@dashboard/interfaces/pagos-interface';
 import { PagosHttpService } from '../services/pagos.service';
 import { ModalComponent } from "@shared/components/modal/modal.component";
 import { HeaderInput, HeaderTitlePageComponent } from "@dashboard/components/header-title-page/header-title-page.component";
@@ -13,6 +12,9 @@ import { TarjetasResumenPagos } from "../components/tarjetas-resumen-pagos/tarje
 import { PaginationComponent } from "@shared/components/pagination/pagination";
 import { PaginationService } from '@shared/components/pagination/pagination.service';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { ModalAsientoContableComponent } from '../components/modal-asiento-contable/modal-asiento-contable.component';
+import { VolantePagoComponent } from '../components/volante-pago/volante-pago.component';
+import { EstadoCuentaComponent } from '../components/estado-cuenta/estado-cuenta.component';
 
 @Component({
   selector: 'app-cxc',
@@ -25,7 +27,10 @@ import { toSignal } from '@angular/core/rxjs-interop';
     HeaderTitlePageComponent,
     ModalHistorialpagoComponent,
     TarjetasResumenPagos,
-    PaginationComponent
+    PaginationComponent,
+    ModalAsientoContableComponent,
+    VolantePagoComponent,
+    EstadoCuentaComponent,
 ],
   templateUrl: './cxc.component.html',
 })
@@ -34,19 +39,19 @@ export class CxcComponent implements OnInit {
   private paginationService = inject(PaginationService);
   headTitle = signal<HeaderInput>({ title: 'Cuentas por Cobrar', slog: 'Facturas de venta a crédito pendientes de pago' });
 
-  // Estado
+  activeTab = signal<'facturas' | 'cobros' | 'estado-cuenta'>('facturas');
+
+  // ── Tab Facturas ─────────────────────────────────────────────────────
   private todosLosItems = signal<CxcItem[]>([]);
   resumen = signal<CxcResumen>({ totalCartera: 0, porVencer: 0, vencida: 0, cantidadPorVencer: 0, cantidadVencida: 0 });
-  loading = signal(false);  
+  loading = signal(false);
 
-  // Filtros
   filtroTexto  = new FormControl('');
   filtroEstado = new FormControl<PaymentStatus | ''>('');
 
   textoSignal = toSignal(this.filtroTexto.valueChanges.pipe(startWith(''), map(v => v?.toLowerCase().trim() ?? '')));
   estadoSignal = toSignal(this.filtroEstado.valueChanges.pipe(startWith('')));
 
-  // Items filtrados en el template (calculado al vuelo)
   itemsFiltrados = computed(() => {
     const texto  = this.textoSignal();
     const estado = this.estadoSignal();
@@ -56,7 +61,6 @@ export class CxcComponent implements OnInit {
       const pasaEstado = !estado || item.paymentStatus === estado;
       return pasaTexto && pasaEstado;
     });
-  
   });
 
   // Modal cobro
@@ -69,14 +73,36 @@ export class CxcComponent implements OnInit {
   historialItem: CxcItem | null = null;
   historialPagos: PagoHistorial[] = [];
 
+  // ── Tab Cobros ───────────────────────────────────────────────────────
+  cobrosData = signal<MovimientosResponse>({
+    items: [], resumen: { totalCobros: 0, totalPagos: 0, neto: 0 }, meta: { page: 1, limit: 20, total: 0, totalPages: 1 },
+  });
+  cobrosLoading = signal(false);
+  cobrosFiltroTexto = new FormControl('');
+
+  // ── Modal Asiento ────────────────────────────────────────────────────
+  asientoVisible = false;
+  asientoPagoId = signal<string | null>(null);
+
+  // ── Volante ──────────────────────────────────────────────────────────
+  volanteVisible = false;
+  volanteItem = signal<MovimientoItem | null>(null);
+
   constructor(private svc: PagosHttpService) {}
 
   ngOnInit(): void {
     this.cargar();
-    this.filtroEstado.valueChanges.subscribe(() => {}); // fuerza re-render
+    this.filtroEstado.valueChanges.subscribe(() => {});
     this.filtroTexto.valueChanges
       .pipe(debounceTime(250), distinctUntilChanged())
       .subscribe(() => {});
+  }
+
+  cambiarTab(tab: 'facturas' | 'cobros' | 'estado-cuenta'): void {
+    this.activeTab.set(tab);
+    if (tab === 'cobros' && this.cobrosData().items.length === 0) {
+      this.cargarCobros();
+    }
   }
 
   cargar(): void {
@@ -92,6 +118,19 @@ export class CxcComponent implements OnInit {
         this.paginationService.pageSize.set(res.meta.totalPages);
       },
       error: () => { this.loading.set(false); },
+    });
+  }
+
+  cargarCobros(): void {
+    this.cobrosLoading.set(true);
+    this.svc.getMovimientos({
+      tipo: 'cobro',
+      busqueda: this.cobrosFiltroTexto.value?.trim() || undefined,
+      page: 1,
+      limit: 50,
+    }).subscribe({
+      next: res => { this.cobrosData.set(res); this.cobrosLoading.set(false); },
+      error: () => this.cobrosLoading.set(false),
     });
   }
 
@@ -121,7 +160,18 @@ export class CxcComponent implements OnInit {
   onCobroExitoso(_result: any): void {
     this.modalVisible = false;
     this.modalData    = null;
-    this.cargar(); // refresca la lista
+    this.cargar();
+    if (this.activeTab() === 'cobros') this.cargarCobros();
+  }
+
+  verAsiento(pagoId: string): void {
+    this.asientoPagoId.set(pagoId);
+    this.asientoVisible = true;
+  }
+
+  imprimirVolante(item: MovimientoItem): void {
+    this.volanteItem.set(item);
+    this.volanteVisible = true;
   }
 
   etiquetaEstado(status: PaymentStatus): string {
@@ -130,5 +180,10 @@ export class CxcComponent implements OnInit {
       pagado: 'Pagado', vencido: 'Vencido',
     };
     return map[status] ?? status;
+  }
+
+  etiquetaMedio(medio: string): string {
+    const labels: Record<string, string> = { caja: 'Caja', banco: 'Banco', transferencia: 'Transferencia', cheque: 'Cheque' };
+    return labels[medio] ?? medio;
   }
 }

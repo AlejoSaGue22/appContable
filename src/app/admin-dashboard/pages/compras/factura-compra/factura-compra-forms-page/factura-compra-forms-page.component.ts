@@ -22,6 +22,8 @@ import { CatalogsStore } from '@dashboard/services/catalogs.store';
 import { HelpersUtils } from '@utils/helpers.utils';
 import { FormaPago } from '@dashboard/interfaces/documento-venta-interface';
 import { LoaderComponent } from "@utils/components/loader/loader.component";
+import { CuentasBancariasService } from '@dashboard/pages/contabilidad/services/cuentas-bancarias.service';
+import { CuentaBancaria } from '@dashboard/pages/contabilidad/interfaces/cuenta-bancaria.interface';
 
 @Component({
     selector: 'app-factura-compra-forms-page',
@@ -58,6 +60,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     router = inject(Router);
     activatedRoute = inject(ActivatedRoute);
     catalogsStore = inject(CatalogsStore);
+    cuentasBancariasService = inject(CuentasBancariasService);
 
     // Modal State
     isProviderModalVisible = signal<boolean>(false);
@@ -80,6 +83,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     // Mock Data Signals
     proveedoresList = signal<ProveedoresRequest[]>([]);
     productosList = signal<GetProductosDetalle[]>([]);
+    cuentasBancarias = signal<CuentaBancaria[]>([]);
 
     formCompra = this.fb.group({
         proveedor: ['', Validators.required],
@@ -92,6 +96,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         fechaVencimiento: [''],
         formaPago: ['', Validators.required],
         metodoPago: [''],
+        cuentaBancariaId: [''],
         referencia: ['', Validators.required],
         observaciones: [''],
         items: this.fb.array([])
@@ -100,17 +105,22 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     setupPaymentLogic() {
         const applyValidation = (value: string | null) => {
             const metodoPagoControl = this.formCompra.get('metodoPago');
+            const cuentaBancariaControl = this.formCompra.get('cuentaBancariaId');
             const fechaVencimientoControl = this.formCompra.get('fechaVencimiento');
             if (value === FormaPago.CONTADO) {
                 metodoPagoControl?.setValidators([Validators.required]);
+                cuentaBancariaControl?.setValidators([Validators.required]);
                 fechaVencimientoControl?.clearValidators();
                 fechaVencimientoControl?.setValue('');
             } else {
                 fechaVencimientoControl?.setValidators([Validators.required]);
                 metodoPagoControl?.clearValidators();
                 metodoPagoControl?.setValue('');
+                cuentaBancariaControl?.clearValidators();
+                cuentaBancariaControl?.setValue('');
             }
             metodoPagoControl?.updateValueAndValidity();
+            cuentaBancariaControl?.updateValueAndValidity();
             fechaVencimientoControl?.updateValueAndValidity();
         };
 
@@ -142,6 +152,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         }
 
         this.getProveedoresAndProductos();
+        this.getCuentasBancarias();
 
         // React to product selection to auto-fill price and tax
         this.productosItemsForm.get('producto')?.valueChanges.subscribe((prod: GetProductosDetalle | any) => {
@@ -160,6 +171,15 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         // React to changes in quantity, price, discount to update item total
         this.productosItemsForm.valueChanges.subscribe(() => {
             this.calculateItemTotal();
+        });
+    }
+
+    getCuentasBancarias() {
+        this.cuentasBancariasService.getCuentasBancarias({ limit: 1000 }).subscribe({
+            next: (res) => {
+                this.cuentasBancarias.set(res.cuentas);
+            },
+            error: (err) => console.error('Error cargando cuentas bancarias', err)
         });
     }
 
@@ -219,6 +239,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                         fechaVencimiento: invoice.fechaVencimiento,
                         formaPago: invoice.formaPago,
                         metodoPago: invoice.metodoPago, // Assuming it exists in backend
+                        cuentaBancariaId: invoice.cuentaBancariaId,
                         referencia: invoice.numeroFacturaProveedor,
                         observaciones: invoice.observaciones,
                     });
@@ -375,6 +396,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
             fechaVencimiento: factura.fechaVencimiento || '',
             formaPago: factura.formaPago!,
             metodoPago: factura.metodoPago || '',
+            cuentaBancariaId: factura.cuentaBancariaId || '',
             items: items.map((item: any) => ({
                 articuloId: item.productoId,
                 quantity: item.cantidad,

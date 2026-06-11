@@ -36,7 +36,7 @@
               Cuenta Actual
             </p>
             <p class="text-sm font-bold text-slate-700 truncate">
-              {{ account.banco.nombre }} · {{ account.numeroCuenta }}
+              {{ account.banco?.nombre || 'Caja' }} · {{ account.numeroCuenta || account.nombre }}
             </p>
           </div>
           <div class="text-right flex-shrink-0">
@@ -48,8 +48,21 @@
         </div>
       }
 
-      <!-- Sección Institucional -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <!-- Tipo de Cuenta -->
+      <div>
+        <label class="block mb-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
+          Tipo de Cuenta <span class="text-red-500">*</span>
+        </label>
+        <select formControlName="tipoCuenta" 
+          class="w-full bg-slate-50 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2.5 transition duration-300 focus:outline-none focus:border-blue-400 focus:bg-white hover:border-slate-300 shadow-sm">
+          @for (tipo of tiposCuenta; track tipo) {
+            <option [value]="tipo">{{ tipo }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Sección Institucional (solo para tipo Banco) -->
+      @if (esBanco) {
         <div>
           <label class="block mb-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
             Entidad Financiera <span class="text-red-500">*</span>
@@ -62,19 +75,7 @@
             }
           </select>
         </div>
-
-        <div>
-          <label class="block mb-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
-            Tipo de Producto <span class="text-red-500">*</span>
-          </label>
-          <select formControlName="tipoCuenta" 
-            class="w-full bg-slate-50 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2.5 transition duration-300 focus:outline-none focus:border-blue-400 focus:bg-white hover:border-slate-300 shadow-sm">
-            @for (tipo of tiposCuenta; track tipo) {
-              <option [value]="tipo">{{ tipo | titlecase }}</option>
-            }
-          </select>
-        </div>
-      </div>
+      }
 
       <!-- Detalles de la Cuenta -->
       <div class="space-y-4 pt-2">

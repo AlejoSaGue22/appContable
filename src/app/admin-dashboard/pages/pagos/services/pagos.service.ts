@@ -7,7 +7,13 @@ import { environment } from 'src/app/environments/environment';
 import { AgingReporte, CuentaBancaria, CxcResponse, CxpResponse, HistorialPagosResponse, PagoHistorial, 
          PagoResponseDto, PaymentStatus, RegistrarCobroDto, RegistrarPagoDto, ResumenCartera, CxFiltros,
          PagoHistorialResponse, ReporteAgingFlat,
-         ReporteAgingFlatAgrupado
+         ReporteAgingFlatAgrupado,
+         MovimientosResponse,
+         MovimientosFiltros,
+         AsientoPagoResponse,
+         ResumenFinancieroResponse,
+         EstadoCuentaClienteResponse,
+         EstadoCuentaProveedorResponse
 } from '@dashboard/interfaces/pagos-interface';
 
 
@@ -127,6 +133,51 @@ export class PagosHttpService {
   getCuentasBancarias(): Observable<CuentaBancaria[]> {
     return this.http
       .get<PagoResponseDto<CuentaBancaria[]>>(`${this.base}/pagos/cuentas-bancarias`)
+      .pipe(map(r => r.data));
+  }
+
+  // ── Movimientos (listado global de cobros y pagos) ────────────────────
+  getMovimientos(filtros: MovimientosFiltros): Observable<MovimientosResponse> {
+    let params = new HttpParams();
+    if (filtros.tipo) params = params.set('tipo', filtros.tipo);
+    if (filtros.fechaInicio) params = params.set('fechaInicio', filtros.fechaInicio);
+    if (filtros.fechaFin) params = params.set('fechaFin', filtros.fechaFin);
+    if (filtros.medioPago) params = params.set('medioPago', filtros.medioPago);
+    if (filtros.clienteId) params = params.set('clienteId', filtros.clienteId);
+    if (filtros.proveedorId) params = params.set('proveedorId', filtros.proveedorId);
+    if (filtros.busqueda) params = params.set('busqueda', filtros.busqueda);
+    params = params.set('page', (filtros.page ?? 1).toString());
+    params = params.set('limit', (filtros.limit ?? 20).toString());
+    return this.http
+      .get<PagoResponseDto<MovimientosResponse>>(`${this.base}/pagos/movimientos`, { params })
+      .pipe(map(r => r.data));
+  }
+
+  // ── Asiento contable de un pago ───────────────────────────────────────
+  getAsientoDePago(pagoId: string): Observable<AsientoPagoResponse> {
+    return this.http
+      .get<PagoResponseDto<AsientoPagoResponse>>(`${this.base}/pagos/${pagoId}/asiento`)
+      .pipe(map(r => r.data));
+  }
+
+  // ── Resumen Financiero (Dashboard unificado) ─────────────────────────
+  getResumenFinanciero(): Observable<ResumenFinancieroResponse> {
+    return this.http
+      .get<PagoResponseDto<ResumenFinancieroResponse>>(`${this.base}/pagos/resumen`)
+      .pipe(map(r => r.data));
+  }
+
+  // ── Estado de Cuenta por Cliente ─────────────────────────────────────
+  getEstadoCuentaCliente(clienteId: string): Observable<EstadoCuentaClienteResponse> {
+    return this.http
+      .get<PagoResponseDto<EstadoCuentaClienteResponse>>(`${this.base}/pagos/estado-cuenta/cliente/${clienteId}`)
+      .pipe(map(r => r.data));
+  }
+
+  // ── Estado de Cuenta por Proveedor ───────────────────────────────────
+  getEstadoCuentaProveedor(proveedorId: string): Observable<EstadoCuentaProveedorResponse> {
+    return this.http
+      .get<PagoResponseDto<EstadoCuentaProveedorResponse>>(`${this.base}/pagos/estado-cuenta/proveedor/${proveedorId}`)
       .pipe(map(r => r.data));
   }
 }

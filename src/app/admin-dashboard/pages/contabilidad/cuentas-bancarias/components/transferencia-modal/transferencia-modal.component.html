@@ -31,7 +31,7 @@
             class="w-full bg-slate-50 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2.5 transition duration-300 focus:outline-none focus:border-blue-400 focus:bg-white hover:border-slate-300 shadow-sm">
             <option value="" disabled>Seleccionar Cuenta Origen...</option>
             @for (cuenta of cuentas; track cuenta.id) {
-              <option [value]="cuenta.id">{{ cuenta.banco.nombre }} - {{ cuenta.nombre }} (Saldo: {{ cuenta.saldoActual | currency }})</option>
+              <option [value]="cuenta.id">{{ cuenta.tipoCuenta }} - {{ cuenta.banco?.nombre || cuenta.nombre }} (Saldo: {{ cuenta.saldoActual | currency }})</option>
             }
           </select>
         </div>
@@ -44,7 +44,7 @@
             class="w-full bg-slate-50 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2.5 transition duration-300 focus:outline-none focus:border-blue-400 focus:bg-white hover:border-slate-300 shadow-sm">
             <option value="" disabled>Seleccionar Cuenta Destino...</option>
             @for (cuenta of cuentas; track cuenta.id) {
-              <option [value]="cuenta.id">{{ cuenta.banco.nombre }} - {{ cuenta.nombre }}</option>
+              <option [value]="cuenta.id">{{ cuenta.tipoCuenta }} - {{ cuenta.banco?.nombre || cuenta.nombre }}</option>
             }
           </select>
           @if (form.errors?.['mismasCuentas'] && (form.get('cuentaOrigenId')?.touched || form.get('cuentaDestinoId')?.touched)) {

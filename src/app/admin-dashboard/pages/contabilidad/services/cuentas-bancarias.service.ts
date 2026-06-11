@@ -32,7 +32,7 @@ export class CuentasBancariasService {
       } 
     }).pipe(
       map((response) => {
-        response.cuentas.sort((a, b) => a.banco.nombre.localeCompare(b.banco.nombre));
+        response.cuentas.sort((a, b) => (a.banco?.nombre || a.nombre).localeCompare(b.banco?.nombre || b.nombre));
         return response;
       })
     );

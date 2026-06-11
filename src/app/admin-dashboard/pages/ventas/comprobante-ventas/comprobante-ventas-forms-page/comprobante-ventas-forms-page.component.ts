@@ -20,6 +20,8 @@ import { ClientsFormPageComponent } from '../../clientes/clients-form-page/clien
 import { ProductosServiciosFormsComponent } from '../../productos-servicios/productos-servicios-forms/productos-servicios-forms.component';
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
 import { HelpersUtils } from '@utils/helpers.utils';
+import { CuentasBancariasService } from '@dashboard/pages/contabilidad/services/cuentas-bancarias.service';
+import { CuentaBancaria } from '@dashboard/pages/contabilidad/interfaces/cuenta-bancaria.interface';
 
 @Component({
   selector: 'app-comprobante-ventas-forms-page',
@@ -64,10 +66,12 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   loaderservice = inject(LoaderService);
   router = inject(Router);
   catalogsStore = inject(CatalogsStore);
+  cuentasBancariasService = inject(CuentasBancariasService);
   factura = signal<FacturaVenta | null>(null);
   productSeleccionados = signal<ItemFactura[]>([]);
   getAllProductos = signal<GetProductosDetalle[]>([]);
   getAllClientes = signal<ClientesInterfaceResponse[]>([]);
+  cuentasBancarias = signal<CuentaBancaria[]>([]);
   loading = signal<boolean>(false);
   minDate = signal<string>(new Date().toISOString().substring(0, 10));
 
@@ -118,15 +122,22 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     this.loaderservice.show();
 
     this.getClientesAndProductos();
+    this.loadCuentasBancarias();
     if (this.invoiceID() == 'new-Item') {
       this.loaderservice.hide();
       return;
     }
 
-    // Para modo edición, primero cargar clientes y productos, luego la factura
     this.headTitle.title = 'Editar Factura de Venta';
     this.headTitle.slog = 'Se edita factura de venta del sistema';
     this.loadInvoice(this.invoiceID());
+  }
+
+  loadCuentasBancarias() {
+    this.cuentasBancariasService.getCuentas({ offset: 0, limit: 100 }).subscribe({
+      next: (res) => this.cuentasBancarias.set(res.cuentas),
+      error: (err) => this.notificacionService.error('Error al cargar cuentas bancarias', err)
+    });
   }
 
   getClientesAndProductos() {
@@ -169,6 +180,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
           fecha: invoice.fecha,
           formaPago: invoice.formaPago,
           metodoPago: invoice.metodoPago,
+          cuentaBancariaId: (invoice as any).cuentaBancariaId || '',
           fechaVencimiento: invoice.fechaVencimiento
         });
 
@@ -192,7 +204,8 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     contacto: [''],
     vendedor: [''],
     formaPago: [FormaPago.CONTADO, Validators.required],
-    metodoPago: [''], // Added field
+    metodoPago: [''],
+    cuentaBancariaId: [''],
     fechaVencimiento: [''],
     fecha: ['', Validators.required],
     canal: ['1', Validators.required],
@@ -211,19 +224,24 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   );
 
   paymentLogic = effect(() => {
-    const formaPago = this.formaPagoSignal(); // Trigger effect on change
+    const formaPago = this.formaPagoSignal();
     const metodoPagoControl = this.formVentas.get('metodoPago');
+    const cuentaBancariaControl = this.formVentas.get('cuentaBancariaId');
     const fechaVencimientoControl = this.formVentas.get('fechaVencimiento');
 
-    if (formaPago === FormaPago.CONTADO) { // Contado
+    if (formaPago === FormaPago.CONTADO) {
       metodoPagoControl?.setValidators([Validators.required]);
+      cuentaBancariaControl?.setValidators([Validators.required]);
       fechaVencimientoControl?.clearValidators();
     } else {
       metodoPagoControl?.clearValidators();
       metodoPagoControl?.setValue('');
+      cuentaBancariaControl?.clearValidators();
+      cuentaBancariaControl?.setValue('');
       fechaVencimientoControl?.setValidators([Validators.required]);
     }
     metodoPagoControl?.updateValueAndValidity();
+    cuentaBancariaControl?.updateValueAndValidity();
     fechaVencimientoControl?.updateValueAndValidity();
   });
 
@@ -413,6 +431,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       fecha: valueFormFactura.fecha!,
       formaPago: valueFormFactura.formaPago!,
       metodoPago: valueFormFactura.metodoPago!,
+      cuentaBancariaId: valueFormFactura.cuentaBancariaId || undefined,
       fechaVencimiento: valueFormFactura.fechaVencimiento!,
       tipoFactura: valueFormFactura.tipoFactura!,
       items: productos.map((item) => ({

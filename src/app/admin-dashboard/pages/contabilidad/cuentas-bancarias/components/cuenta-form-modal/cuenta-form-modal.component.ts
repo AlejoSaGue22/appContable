@@ -29,8 +29,8 @@ export class CuentaFormModalComponent implements OnInit {
 
   form: FormGroup = this.fb.group({
     nombre: ['', [Validators.required, Validators.maxLength(120)]],
-    bancoId: ['', [Validators.required]],
-    tipoCuenta: [TipoCuentaBancaria.AHORROS, [Validators.required]],
+    bancoId: [''],
+    tipoCuenta: [TipoCuentaBancaria.BANCO, [Validators.required]],
     numeroCuenta: ['', [Validators.maxLength(30)]],
     saldoInicial: [0, [Validators.required, Validators.min(0)]],
     cuentaContrapartidaCodigo: [''],
@@ -42,19 +42,34 @@ export class CuentaFormModalComponent implements OnInit {
   tiposCuenta = Object.values(TipoCuentaBancaria);
   isSubmitting = signal(false);
 
+  get esBanco(): boolean {
+    return this.form.get('tipoCuenta')?.value === TipoCuentaBancaria.BANCO;
+  }
+
   ngOnInit() {
     this.loadBancos();
     this.loadCuentasContables();
+
+    this.form.get('tipoCuenta')?.valueChanges.subscribe(tipo => {
+      const bancoControl = this.form.get('bancoId');
+      if (tipo === TipoCuentaBancaria.BANCO) {
+        bancoControl?.setValidators([Validators.required]);
+      } else {
+        bancoControl?.clearValidators();
+        bancoControl?.setValue('');
+      }
+      bancoControl?.updateValueAndValidity();
+    });
+
     if (this.account) {
       this.form.patchValue({
         nombre: this.account.nombre,
-        bancoId: this.account.banco.id,
+        bancoId: this.account.banco?.id || '',
         tipoCuenta: this.account.tipoCuenta,
         numeroCuenta: this.account.numeroCuenta,
         saldoInicial: this.account.saldoInicial,
         observaciones: this.account.observaciones
       });
-      // Saldo inicial might be disabled if editing (depends on backend logic)
       this.form.get('saldoInicial')?.disable();
       this.form.get('cuentaContrapartidaCodigo')?.disable();
     }
@@ -72,7 +87,6 @@ export class CuentaFormModalComponent implements OnInit {
   loadCuentasContables() {
     this.cuentasContablesService.getCuentasContables({ limit: 1000 }).subscribe({
       next: (res) => {
-        // Filtrar solo las cuentas que aceptan movimientos (cuentas de detalle)
         const cuentasMovimiento = res.filter(c => c.aceptaMovimiento);
         this.cuentasContables.set(cuentasMovimiento);
       },

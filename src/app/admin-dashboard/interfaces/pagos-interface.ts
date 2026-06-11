@@ -280,3 +280,190 @@ export interface ReporteAgingFlatAgrupado {
     totalPages: number;
   };
 }
+
+// ── Movimientos (listado global de cobros y pagos) ─────────────────────────
+
+export interface MovimientoItem {
+  id: string;
+  tipo: TipoPago;
+  fecha: string;
+  monto: number;
+  medioPago: MedioPago;
+  referencia: string | null;
+  notas: string | null;
+  asientoId: string | null;
+  numeroFactura: string;
+  facturaId: string | null;
+  contraparteId: string | null;
+  contraparteNombre: string;
+  cuentaBancaria: {
+    id: string;
+    nombre: string;
+    numeroCuenta: string;
+    banco: { id: string; nombre: string } | null;
+  } | null;
+  creadoPor: string;
+  createdAt: string;
+}
+
+export interface MovimientosResponse {
+  items: MovimientoItem[];
+  resumen: {
+    totalCobros: number;
+    totalPagos: number;
+    neto: number;
+  };
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+}
+
+export interface MovimientosFiltros {
+  tipo?: TipoPago;
+  fechaInicio?: string;
+  fechaFin?: string;
+  medioPago?: MedioPago;
+  clienteId?: string;
+  proveedorId?: string;
+  busqueda?: string;
+  page?: number;
+  limit?: number;
+}
+
+// ── Asiento contable de un pago ────────────────────────────────────────────
+
+export interface AsientoPagoResponse {
+  pago: {
+    id: string;
+    tipo: TipoPago;
+    fecha: string;
+    monto: number;
+    medioPago: MedioPago;
+    referencia: string | null;
+    numeroFactura: string;
+  };
+  asiento: {
+    id: string;
+    numero: string;
+    fecha: string;
+    tipo: string;
+    referencia: string | null;
+    descripcion: string | null;
+    totalDebito: number;
+    totalCredito: number;
+  } | null;
+  detalles: Array<{
+    id: string;
+    cuentaCodigo: string;
+    cuentaNombre: string;
+    debito: number;
+    credito: number;
+    descripcion: string | null;
+  }>;
+}
+
+// ── Resumen Financiero (Dashboard unificado) ───────────────────────────────
+
+export interface ResumenFinancieroResponse {
+  cxc: {
+    totalPendiente: number;
+    totalVencido: number;
+    totalPorVencer: number;
+    totalFacturas: number;
+  };
+  cxp: {
+    totalPendiente: number;
+    totalVencido: number;
+    totalPorVencer: number;
+    totalFacturas: number;
+  };
+  posicionNeta: number;
+  ultimosMovimientos: Array<{
+    id: string;
+    tipo: TipoPago;
+    fecha: string;
+    monto: number;
+    numeroFactura: string;
+    contraparteNombre: string;
+  }>;
+  proximosVencimientos: Array<{
+    facturaId: string;
+    numeroFactura: string;
+    clienteNombre: string;
+    saldoPendiente: number;
+    fechaVencimiento: string;
+  }>;
+}
+
+// ── Estado de Cuenta por Cliente ───────────────────────────────────────────
+
+export interface EstadoCuentaClienteResponse {
+  clienteId: string;
+  resumen: {
+    totalFacturado: number;
+    totalPagado: number;
+    saldoPendiente: number;
+    totalFacturas: number;
+    totalCobros: number;
+  };
+  facturas: Array<{
+    facturaId: string;
+    numeroFactura: string;
+    fecha: string;
+    fechaVencimiento: string | null;
+    total: number;
+    totalPagado: number;
+    saldoPendiente: number;
+    paymentStatus: PaymentStatus;
+  }>;
+  movimientos: Array<{
+    id: string;
+    fecha: string;
+    monto: number;
+    medioPago: MedioPago;
+    numeroFactura: string;
+    referencia: string | null;
+    cuentaBancaria: {
+      nombre: string;
+      banco: string | null;
+    } | null;
+  }>;
+}
+
+// ── Estado de Cuenta por Proveedor ─────────────────────────────────────────
+
+export interface EstadoCuentaProveedorResponse {
+  proveedorId: string;
+  resumen: {
+    totalFacturado: number;
+    totalPagado: number;
+    saldoPendiente: number;
+    totalFacturas: number;
+    totalPagos: number;
+  };
+  facturas: Array<{
+    facturaId: string;
+    numeroFactura: string;
+    fecha: string;
+    fechaVencimiento: string | null;
+    total: number;
+    totalPagado: number;
+    saldoPendiente: number;
+    paymentStatus: PaymentStatus;
+  }>;
+  movimientos: Array<{
+    id: string;
+    fecha: string;
+    monto: number;
+    medioPago: MedioPago;
+    numeroFactura: string;
+    referencia: string | null;
+    cuentaBancaria: {
+      nombre: string;
+      banco: string | null;
+    } | null;
+  }>;
+}

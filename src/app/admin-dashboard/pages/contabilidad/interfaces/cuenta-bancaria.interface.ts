@@ -1,6 +1,6 @@
 export enum TipoCuentaBancaria {
-  AHORROS = 'ahorro',
-  CORRIENTE = 'corriente',
+  BANCO = 'Banco',
+  EFECTIVO = 'Efectivo',
 }
 
 export interface Banco {
@@ -13,7 +13,7 @@ export interface Banco {
 export interface CuentaBancaria {
   id: string;
   nombre: string;
-  banco: Banco;
+  banco: Banco | null;
   tipoCuenta: TipoCuentaBancaria;
   numeroCuenta: string;
   codigoCuentaContable: string;
@@ -27,7 +27,7 @@ export interface CuentaBancaria {
 
 export interface CreateCuentaBancariaDto {
   nombre: string;
-  bancoId: string;
+  bancoId?: string;
   numeroCuenta?: string;
   tipoCuenta: TipoCuentaBancaria;
   observaciones?: string;

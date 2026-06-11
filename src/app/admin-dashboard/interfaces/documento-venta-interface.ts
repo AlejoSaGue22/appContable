@@ -50,6 +50,7 @@ export interface FacturaVenta {
   tipoFactura: TipoFactura;
   formaPago: FormaPago;
   metodoPago?: string;
+  cuentaBancariaId?: string;
   fechaVencimiento?: string;
   items: ItemFactura[];
   iva: number;
@@ -87,6 +88,7 @@ export interface GetFacturaRequest {
   formaPago: FormaPago;
   metodoPago: string | null;
   metodoPagoRel: CatalogsItems;
+  cuentaBancariaId: string | null;
   fecha: string; // ISO date (YYYY-MM-DD)
   fechaVencimiento: string | null;
   asientoError: string | null;

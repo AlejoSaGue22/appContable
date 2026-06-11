@@ -139,6 +139,24 @@
 
                                 <form-error-label [errorType]="formVentas.get('metodoPago')!" />
                             </div>
+
+                            <div>
+                                <label class="block mb-2 text-sm text-slate-600">
+                                    Banco / Caja <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <select class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded 
+                                                        pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm
+                                                        focus:shadow-md cursor-pointer" formControlName="cuentaBancariaId">
+                                        <option value="">Seleccionar Banco o Caja</option>
+                                        @for (cuenta of cuentasBancarias(); track cuenta.id) {
+                                            <option [value]="cuenta.id">{{ cuenta.tipoCuenta }} - {{ cuenta.banco?.nombre || cuenta.nombre }} - {{ cuenta.nombre }}</option>
+                                        }
+                                    </select>
+                                </div>
+
+                                <form-error-label [errorType]="formVentas.get('cuentaBancariaId')!" />
+                            </div>
                         }
 
                         @if (formVentas.get('formaPago')?.value === 'CREDITO') {
