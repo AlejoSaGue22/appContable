@@ -113,10 +113,15 @@ export class CxpComponent {
     this.svc.getMovimientos({
       tipo: 'pago',
       busqueda: this.pagosFiltroTexto.value?.trim() || undefined,
-      page: 1,
-      limit: 50,
+      page: this.paginationService.currentPage(),
+      limit: 10,
     }).subscribe({
-      next: res => { this.pagosData.set(res); this.pagosLoading.set(false); },
+      next: res => {
+        this.pagosData.set(res); 
+        this.pagosLoading.set(false); 
+        this.paginationService.totalItems.set(res.meta.total);
+        this.paginationService.pageSize.set(res.meta.totalPages);
+      },
       error: () => this.pagosLoading.set(false),
     });
   }

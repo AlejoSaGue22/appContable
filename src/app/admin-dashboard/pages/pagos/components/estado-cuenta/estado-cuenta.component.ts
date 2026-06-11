@@ -27,16 +27,24 @@ export class EstadoCuentaComponent {
     this.cargar();
   }
 
+  limpiar(): void {
+    this.inputId = '';
+    this.terceroId.set(null);
+    this.data.set(null);
+    this.loading.set(false);
+    this.error.set(false);
+  }
+
   cargar(): void {
-    const id = this.terceroId();
-    if (!id) return;
+    const documento = this.terceroId();
+    if (!documento) return;
 
     this.loading.set(true);
     this.error.set(false);
     this.data.set(null);
 
     if (this.tipo() === 'cliente') {
-      this.svc.getEstadoCuentaCliente(id).subscribe({
+      this.svc.getEstadoCuentaClientePorDocumento(documento).subscribe({
         next: (res: any) => {
           this.data.set(res);
           this.loading.set(false);
@@ -47,7 +55,7 @@ export class EstadoCuentaComponent {
         },
       });
     } else {
-      this.svc.getEstadoCuentaProveedor(id).subscribe({
+      this.svc.getEstadoCuentaProveedorPorDocumento(documento).subscribe({
         next: (res: any) => {
           this.data.set(res);
           this.loading.set(false);

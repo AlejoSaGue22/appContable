@@ -41,7 +41,7 @@ export class ProductosCompraComponent {
    productorxResource = rxResource({
       request: () => ({ page: this.paginationService.currentPage(), limit: 10, search: this.appliedSearchTerm() }),
       loader: ({ request }) => {
-         return this.productoServicio.getProductos({ offset: request.page * request.limit, limit: request.limit, venta_compra: 'costo', search: request.search }).pipe(
+         return this.productoServicio.getProductos({ offset: this.paginationService.currentPage(), limit: request.limit, venta_compra: 'costo', search: request.search }).pipe(
             tap((p) => {
                this.totalProducto.set(p.articulos);
                const size = Math.ceil(p.count / request.limit);

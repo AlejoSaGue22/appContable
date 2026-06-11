@@ -51,9 +51,9 @@ export class ProveedoresComponent {
 
    proveedoresResource = rxResource({
       request: () => ({ page: this.paginationService.currentPage(), limit: 10 }),
-      loader: ({ request }) => this.proveedoresService.getProveedores({ offset: request.page * request.limit, limit: request.limit }).pipe(
+      loader: ({ request }) => this.proveedoresService.getProveedores({ offset: this.paginationService.currentPage(), limit: request.limit }).pipe(
          tap((response) => {
-            this.proveedoresList.set(response.proveedores); // TODO: Agregar el tipo de dato correcto
+            this.proveedoresList.set(response.proveedores);
             this.totalProveedores.set(response.count ?? 0);
             const size = Math.ceil(response.count / request.limit);
             this.paginationService.totalItems.set(response.count ?? 0);

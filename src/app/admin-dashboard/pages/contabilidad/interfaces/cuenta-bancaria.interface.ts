@@ -30,6 +30,7 @@ export interface CreateCuentaBancariaDto {
   bancoId?: string;
   numeroCuenta?: string;
   tipoCuenta: TipoCuentaBancaria;
+  codigoCuentaContable: string;
   observaciones?: string;
   saldoInicial?: number;
   cuentaContrapartidaCodigo?: string;

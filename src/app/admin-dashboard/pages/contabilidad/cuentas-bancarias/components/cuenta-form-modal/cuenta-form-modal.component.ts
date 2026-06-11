@@ -32,6 +32,7 @@ export class CuentaFormModalComponent implements OnInit {
     bancoId: [''],
     tipoCuenta: [TipoCuentaBancaria.BANCO, [Validators.required]],
     numeroCuenta: ['', [Validators.maxLength(30)]],
+    codigoCuentaContable: ['', [Validators.required]],
     saldoInicial: [0, [Validators.required, Validators.min(0)]],
     cuentaContrapartidaCodigo: [''],
     observaciones: ['', [Validators.maxLength(500)]]
@@ -67,10 +68,12 @@ export class CuentaFormModalComponent implements OnInit {
         bancoId: this.account.banco?.id || '',
         tipoCuenta: this.account.tipoCuenta,
         numeroCuenta: this.account.numeroCuenta,
+        codigoCuentaContable: this.account.codigoCuentaContable,
         saldoInicial: this.account.saldoInicial,
         observaciones: this.account.observaciones
       });
       this.form.get('saldoInicial')?.disable();
+      this.form.get('codigoCuentaContable')?.disable();
       this.form.get('cuentaContrapartidaCodigo')?.disable();
       this.form.get('tipoCuenta')?.disable();
     }
@@ -97,6 +100,10 @@ export class CuentaFormModalComponent implements OnInit {
 
   onCuentaSeleccionada(cuenta: GetCuentasContables) {
     this.form.patchValue({ cuentaContrapartidaCodigo: cuenta.codigo });
+  }
+
+  onSelectCuentaContable(cuenta: GetCuentasContables) {
+    this.form.patchValue({ codigoCuentaContable: cuenta.codigo });
   }
 
   onSubmit() {

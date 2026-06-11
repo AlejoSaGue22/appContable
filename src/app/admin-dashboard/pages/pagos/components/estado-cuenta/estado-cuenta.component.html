@@ -12,7 +12,7 @@
       <input [(ngModel)]="inputId"
              (keyup.enter)="buscar()"
              class="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-md focus:outline-none focus:border-slate-400 shadow-sm"
-             [placeholder]="tipo() === 'cliente' ? 'ID del cliente...' : 'ID del proveedor...'" />
+             [placeholder]="tipo() === 'cliente' ? 'Nº documento del cliente...' : 'Nº documento del proveedor...'" />
     </div>
     <button (click)="buscar()" [disabled]="loading() || !inputId.trim()"
             class="px-4 py-2 text-sm font-semibold rounded-md cursor-pointer transition-colors shadow-sm disabled:opacity-50"
@@ -34,6 +34,9 @@
         Buscar
       }
     </button>
+    <button (click)="limpiar()" [disabled]="loading() || !inputId.trim()" class="px-4 py-2 text-sm font-semibold rounded-md cursor-pointer transition-colors shadow-sm disabled:opacity-50 bg-slate-600 hover:bg-slate-700 text-white">
+      Limpiar
+    </button>
   </div>
 
   @if (error()) {
@@ -44,7 +47,7 @@
         <line x1="9" y1="9" x2="15" y2="15"></line>
       </svg>
       <p class="text-sm font-medium">Error al cargar el estado de cuenta</p>
-      <p class="text-xs mt-1 text-slate-400">Verifica que el ID sea correcto.</p>
+      <p class="text-xs mt-1 text-slate-400">Verifica que el número de documento sea correcto.</p>
     </div>
   }
 
@@ -182,7 +185,7 @@
         <circle cx="11" cy="11" r="8"></circle>
         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
       </svg>
-      <p class="text-sm font-medium">Ingresa el ID del {{ tipo() }} para consultar su estado de cuenta</p>
+      <p class="text-sm font-medium">Ingresa el número de documento del {{ tipo() }} para consultar su estado de cuenta</p>
     </div>
   }
 

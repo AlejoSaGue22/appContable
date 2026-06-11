@@ -50,7 +50,7 @@ export class ClientsPageComponent {
             search: this.appliedSearchTerm()
         }),
         loader: ({ request }) => this.clienteServices.getClientes({ 
-            offset: request.page * request.limit, 
+            offset: this.paginationService.currentPage(), 
             limit: request.limit,
             search: request.search 
         }).pipe(

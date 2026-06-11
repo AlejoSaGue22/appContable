@@ -126,10 +126,15 @@ export class CxcComponent implements OnInit {
     this.svc.getMovimientos({
       tipo: 'cobro',
       busqueda: this.cobrosFiltroTexto.value?.trim() || undefined,
-      page: 1,
-      limit: 50,
+      page: this.paginationService.currentPage(),
+      limit: 10,
     }).subscribe({
-      next: res => { this.cobrosData.set(res); this.cobrosLoading.set(false); },
+      next: res => {
+        this.cobrosData.set(res); 
+        this.cobrosLoading.set(false); 
+        this.paginationService.totalItems.set(res.meta.total);
+        this.paginationService.pageSize.set(res.meta.totalPages);
+      },
       error: () => this.cobrosLoading.set(false),
     });
   }

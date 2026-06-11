@@ -54,13 +54,16 @@ export class ReportesGeneralComponent {
   }
 
   reportesResource = rxResource({
-    request: () => this.appliedDates(),
-    loader: ({ request }) => this.reportesService.getFacturacionDetallada(request.inicio, request.fin).pipe(
-      catchError((err) => {
-        this.notificationService.error('Error al generar el reporte de facturación', err.error?.message || 'Error');
-        return of(null);
-      })
-    )
+    request: () => ({ ...this.appliedDates(), activeTab: this.activeTab() }),
+    loader: ({ request }) => {
+      if (request.activeTab !== 'facturacion') return of(null);
+      return this.reportesService.getFacturacionDetallada(request.inicio, request.fin).pipe(
+        catchError((err) => {
+          this.notificationService.error('Error al generar el reporte de facturación', err.error?.message || 'Error');
+          return of(null);
+        })
+      );
+    }
   });
 
   balanceResource = rxResource({

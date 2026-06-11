@@ -174,10 +174,24 @@ export class PagosHttpService {
       .pipe(map(r => r.data));
   }
 
+  getEstadoCuentaClientePorDocumento(documento: string): Observable<EstadoCuentaClienteResponse> {
+    const params = new HttpParams().set('documento', documento);
+    return this.http
+      .get<PagoResponseDto<EstadoCuentaClienteResponse>>(`${this.base}/pagos/estado-cuenta/cliente-por-documento`, { params })
+      .pipe(map(r => r.data));
+  }
+
   // ── Estado de Cuenta por Proveedor ───────────────────────────────────
   getEstadoCuentaProveedor(proveedorId: string): Observable<EstadoCuentaProveedorResponse> {
     return this.http
       .get<PagoResponseDto<EstadoCuentaProveedorResponse>>(`${this.base}/pagos/estado-cuenta/proveedor/${proveedorId}`)
+      .pipe(map(r => r.data));
+  }
+
+  getEstadoCuentaProveedorPorDocumento(documento: string): Observable<EstadoCuentaProveedorResponse> {
+    const params = new HttpParams().set('documento', documento);
+    return this.http
+      .get<PagoResponseDto<EstadoCuentaProveedorResponse>>(`${this.base}/pagos/estado-cuenta/proveedor-por-documento`, { params })
       .pipe(map(r => r.data));
   }
 }
