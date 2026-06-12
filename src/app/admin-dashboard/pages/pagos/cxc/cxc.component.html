@@ -242,6 +242,7 @@
           <table class="w-full text-left table-auto shadow-sm rounded-xl">
             <thead>
               <tr class="bg-slate-50 border-b border-gray-200">
+                <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider">N° Comprobante</th>
                 <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider">Fecha</th>
                 <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider">Factura</th>
                 <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider">Cliente</th>
@@ -254,6 +255,7 @@
             <tbody class="divide-y divide-gray-100">
               @for (item of cobrosData().items; track item.id) {
                 <tr class="hover:bg-slate-50/80 transition-colors">
+                  <td class="p-4 text-xs font-mono font-semibold text-slate-700">{{ item.numero }}</td>
                   <td class="p-4 text-sm text-slate-600">{{ item.fecha | date:'dd/MM/yyyy' }}</td>
                   <td class="p-4"><span class="font-mono text-sm font-semibold">{{ item.numeroFactura }}</span></td>
                   <td class="p-4 text-sm text-slate-700">{{ item.contraparteNombre }}</td>
@@ -286,7 +288,7 @@
 
               @if (cobrosData().items.length === 0 && !cobrosLoading()) {
                 <tr>
-                  <td colspan="7" class="p-12 text-center">
+                  <td colspan="8" class="p-12 text-center">
                     <div class="flex flex-col items-center justify-center text-slate-400">
                       <p class="text-sm font-medium">No hay cobros registrados</p>
                     </div>

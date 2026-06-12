@@ -120,6 +120,7 @@
         <table class="w-full text-left table-auto shadow-sm rounded-xl">
           <thead>
             <tr class="bg-slate-50 border-b border-gray-200">
+              <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider">N° Comprobante</th>
               <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider">Tipo</th>
               <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider">Fecha</th>
               <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 tracking-wider">Factura</th>
@@ -134,6 +135,7 @@
 
             @for (item of rawData().items; track item.id) {
               <tr class="hover:bg-slate-50/80 transition-colors group">
+                <td class="p-4 text-xs font-mono font-semibold text-slate-700">{{ item.numero }}</td>
                 <td class="p-4">
                   <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold"
                         [ngClass]="item.tipo === 'cobro'
@@ -187,7 +189,7 @@
 
             @if (rawData().items.length === 0 && !loading()) {
               <tr>
-                <td colspan="8" class="p-12 text-center">
+                <td colspan="9" class="p-12 text-center">
                   <div class="flex flex-col items-center justify-center text-slate-400">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2 opacity-20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
                       <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>

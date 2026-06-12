@@ -152,6 +152,7 @@ export interface PagoHistorialResponse {
 
 export interface PagoHistorial {
   id:              string;
+  numero:          string;
   tipo:            TipoPago;
   fecha:           string;
   monto:           number;
@@ -285,6 +286,7 @@ export interface ReporteAgingFlatAgrupado {
 
 export interface MovimientoItem {
   id: string;
+  numero: string;
   tipo: TipoPago;
   fecha: string;
   monto: number;
@@ -338,6 +340,7 @@ export interface MovimientosFiltros {
 export interface AsientoPagoResponse {
   pago: {
     id: string;
+    numero: string;
     tipo: TipoPago;
     fecha: string;
     monto: number;
@@ -383,6 +386,7 @@ export interface ResumenFinancieroResponse {
   posicionNeta: number;
   ultimosMovimientos: Array<{
     id: string;
+    numero: string;
     tipo: TipoPago;
     fecha: string;
     monto: number;

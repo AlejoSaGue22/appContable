@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, inject, signal } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CuentasBancariasService } from '../../../services/cuentas-bancarias.service';
@@ -42,6 +42,11 @@ export class CuentaFormModalComponent implements OnInit {
   cuentasContables = signal<GetCuentasContables[]>([]);
   tiposCuenta = Object.values(TipoCuentaBancaria);
   isSubmitting = signal(false);
+
+  cuentasContableActivos = computed(() => {
+    const cuentasContables = this.cuentasContables();
+    return cuentasContables.filter(c => c.aceptaMovimiento && c.codigo.startsWith('11'));
+  });
 
   get esBanco(): boolean {
     return this.form.get('tipoCuenta')?.value === TipoCuentaBancaria.BANCO;

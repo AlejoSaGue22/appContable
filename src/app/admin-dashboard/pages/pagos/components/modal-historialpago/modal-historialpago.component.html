@@ -59,6 +59,7 @@
     <table class="w-full text-sm text-left">
       <thead class="bg-slate-50 border-b border-slate-200">
         <tr>
+          <th class="px-4 py-2 text-xs font-bold uppercase text-slate-500">N° Comprobante</th>
           <th class="px-4 py-2 text-xs font-bold uppercase text-slate-500">Fecha</th>
           <th class="px-4 py-2 text-xs font-bold uppercase text-slate-500 text-right">Monto</th>
           <th class="px-4 py-2 text-xs font-bold uppercase text-slate-500">Medio de pago</th>
@@ -69,6 +70,7 @@
       <tbody class="divide-y divide-slate-100">
         @for (pago of historialPagos(); track pago.id) {
           <tr class="hover:bg-slate-50 transition-colors">
+            <td class="px-4 py-3 text-slate-600 font-mono font-semibold text-xs">{{ pago.numero }}</td>
             <td class="px-4 py-3 text-slate-600">{{ pago.fecha | date:'dd/MM/yyyy' }}</td>
             <td class="px-4 py-3 text-right font-semibold"
                 [ngClass]="tipo() === 'cobro' ? 'text-green-700' : 'text-gray-900'">

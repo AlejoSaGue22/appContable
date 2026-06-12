@@ -91,6 +91,10 @@ export class VolantePagoComponent {
     <p>Fecha: ${fecha}</p>
   </div>
   <div class="field">
+    <label>N° Comprobante</label>
+    <div class="value" style="font-family: monospace;">${m.numero}</div>
+  </div>
+  <div class="field">
     <label>${labelContraparte}</label>
     <div class="value">${m.contraparteNombre}</div>
   </div>
