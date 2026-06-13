@@ -36,6 +36,10 @@ export const routes: Routes = [
                 loadChildren: () => import('./contabilidad/contabilidad.routes')
             },
             {
+                path: 'nomina',
+                loadChildren: () => import('./nomina/nomina.routes')
+            },
+            {
                 path: '**',
                 redirectTo: 'dashboard'
             }
