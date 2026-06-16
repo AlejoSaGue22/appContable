@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/app/environments/environment';
-import { ApiResponse, CreateRoleDto, Role, UpdateRoleDto } from '../interfaces/roles.interface';
+import { ApiResponse, CreateRoleDto, Role, UpdateRoleDto, PermissionEntity } from '../interfaces/roles.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -42,6 +42,10 @@ export class RolesService {
 
   removePermissionFromRole(id: string, permission: string): Observable<ApiResponse<Role>> {
     return this.http.delete<ApiResponse<Role>>(`${this.baseUrl}/${id}/permissions/${permission}`);
+  }
+
+  getAvailablePermissions(): Observable<ApiResponse<PermissionEntity[]>> {
+    return this.http.get<ApiResponse<PermissionEntity[]>>(`${this.baseUrl}/permissions/available`);
   }
 
   seedRoles(): Observable<ApiResponse<void>> {

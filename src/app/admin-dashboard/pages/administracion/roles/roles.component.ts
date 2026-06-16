@@ -5,7 +5,6 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { firstValueFrom, tap } from 'rxjs';
 
 import { RolesService } from '../../../services/roles.service';
-import { Permission } from '../../../interfaces/permission-interface';
 import { Role, CreateRoleDto, UpdateRoleDto } from '../../../interfaces/roles.interface';
 import { NotificationService } from '@shared/services/notification.service';
 import { LoaderService } from '@utils/services/loader.service';
@@ -40,9 +39,6 @@ export class RolesComponent {
   isEditing = signal(false);
   activeTab = signal<'roles' | 'permissions'>('roles');
 
-  // Permissions list (from enum)
-  allPermissions = Object.values(Permission);
-
   // Form
   roleForm = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
@@ -51,9 +47,13 @@ export class RolesComponent {
     isActive: [true]
   });
 
-  // Data Resource
+  // Data Resources
   rolesResource = rxResource({
     loader: () => this.rolesService.getRoles()
+  });
+
+  permissionsResource = rxResource({
+    loader: () => this.rolesService.getAvailablePermissions()
   });
 
   openCreateModal() {
@@ -127,13 +127,22 @@ export class RolesComponent {
 
     this.loaderService.show();
     try {
-      const formValue = this.roleForm.value;
+      const rawPermissions = this.roleForm.get('permissions')?.value || [];
+      const permissions = (rawPermissions as any[]).map((p: any) =>
+        typeof p === 'string' ? p : p.name || p
+      );
+      const dto = {
+        name: this.roleForm.get('name')?.value,
+        description: this.roleForm.get('description')?.value,
+        permissions,
+        isActive: this.roleForm.get('isActive')?.value,
+      };
       let result;
 
       if (this.isEditing() && this.selectedRoleId()) {
-        result = await firstValueFrom(this.rolesService.updateRole(this.selectedRoleId()!, formValue as UpdateRoleDto));
+        result = await firstValueFrom(this.rolesService.updateRole(this.selectedRoleId()!, dto as UpdateRoleDto));
       } else {
-        result = await firstValueFrom(this.rolesService.createRole(formValue as CreateRoleDto));
+        result = await firstValueFrom(this.rolesService.createRole(dto as CreateRoleDto));
       }
 
       if (result.success) {

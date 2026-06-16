@@ -71,7 +71,7 @@
                                                transition duration-300 ease focus:outline-none focus:border-slate-400
                                                hover:border-slate-400 shadow-sm focus:shadow-md cursor-pointer">
                                     <option value="">— Seleccionar —</option>
-                                    @for (cuenta of cuentasList; track cuenta.id) {
+                                    @for (cuenta of cuentaPrincipal(); track cuenta.id) {
                                         <option [value]="cuenta.id">{{ cuenta.codigo }} · {{ cuenta.nombre }}</option>
                                     }
                                 </select>
@@ -91,7 +91,7 @@
                                                transition duration-300 ease focus:outline-none focus:border-slate-400
                                                hover:border-slate-400 shadow-sm focus:shadow-md cursor-pointer">
                                     <option value="">— Ninguna —</option>
-                                    @for (cuenta of cuentasList; track cuenta.id) {
+                                    @for (cuenta of cuentaCosto(); track cuenta.id) {
                                         <option [value]="cuenta.id">{{ cuenta.codigo }} · {{ cuenta.nombre }}</option>
                                     }
                                 </select>
@@ -106,7 +106,7 @@
                                                transition duration-300 ease focus:outline-none focus:border-slate-400
                                                hover:border-slate-400 shadow-sm focus:shadow-md cursor-pointer">
                                     <option value="">— Ninguna —</option>
-                                    @for (cuenta of cuentasList; track cuenta.id) {
+                                    @for (cuenta of cuentaInventario(); track cuenta.id) {
                                         <option [value]="cuenta.id">{{ cuenta.codigo }} · {{ cuenta.nombre }}</option>
                                     }
                                 </select>

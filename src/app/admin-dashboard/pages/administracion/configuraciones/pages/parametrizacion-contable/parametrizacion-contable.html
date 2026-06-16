@@ -1,0 +1,108 @@
+<header-title-page [titleHead]="titleHead" />
+
+<div class="w-full px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <div class="max-w-4xl mx-auto">
+        
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="p-6 md:p-8">
+                <div class="mb-8 border-b border-gray-100 pb-6">
+                    <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                        Clientes y proveedores
+                        <svg class="w-4 h-4 text-gray-400 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24" title="Configura las cuentas contables por defecto para clientes y proveedores">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </h2>
+                    <p class="text-sm text-gray-500 mt-1">
+                        Selecciona la cuenta que recibirá el movimiento de tus transacciones con clientes y proveedores.
+                    </p>
+                </div>
+
+                <form [formGroup]="paramForm" (ngSubmit)="save()" class="space-y-6">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        
+                        <!-- Cuentas de Clientes -->
+                        <div class="space-y-6">
+                            <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4">Clientes</h3>
+                            
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-2">Cuenta por cobrar clientes</label>
+                                <select formControlName="cuentaCobrarClientesId" 
+                                        class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all appearance-none cursor-pointer">
+                                    <option [ngValue]="null">Seleccionar cuenta...</option>
+                                    @for(c of cuentasFiltradasClientes(); track c.id) {
+                                        <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-2">Devoluciones de clientes</label>
+                                <select formControlName="cuentaDevolucionesClientesId" 
+                                        class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all appearance-none cursor-pointer">
+                                    <option [ngValue]="null">Seleccionar cuenta...</option>
+                                    @for(c of cuentasFiltradasClientes(); track c.id) {
+                                        <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Cuentas de Proveedores -->
+                        <div class="space-y-6">
+                            <h3 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4">Proveedores</h3>
+                            
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-2">Cuentas de proveedores</label>
+                                <select formControlName="cuentaPagarProveedoresId" 
+                                        class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all appearance-none cursor-pointer">
+                                    <option [ngValue]="null">Seleccionar cuenta...</option>
+                                    @for(c of cuentasFiltradasProveedores(); track c.id) {
+                                        <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-2">Devoluciones de proveedores</label>
+                                <select formControlName="cuentaDevolucionesProveedoresId" 
+                                        class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all appearance-none cursor-pointer">
+                                    <option [ngValue]="null">Seleccionar cuenta...</option>
+                                    @for(c of cuentasFiltradasProveedores(); track c.id) {
+                                        <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
+                                    }
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-2">Devolución del IVA en compras</label>
+                                <select formControlName="cuentaDevolucionIvaComprasId" 
+                                        class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all appearance-none cursor-pointer">
+                                    <option [ngValue]="null">Seleccionar cuenta...</option>
+                                    @for(c of cuentasFiltradasIva(); track c.id) {
+                                        <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="flex justify-end pt-8 border-t border-gray-100 mt-8">
+                        <button type="submit" [disabled]="isSaving()"
+                            class="inline-flex items-center px-8 py-3 bg-slate-900 text-white rounded-xl text-sm font-bold cursor-pointer hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-slate-200">
+                            @if(isSaving()) {
+                                <svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                Guardando...
+                            } @else {
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                Guardar Configuración
+                            }
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

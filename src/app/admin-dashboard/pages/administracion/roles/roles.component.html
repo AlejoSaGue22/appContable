@@ -132,19 +132,27 @@
             <div class="p-6">
                 <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Catálogo de Permisos</h3>
                 <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Lista de todos los niveles de acceso definidos en el sistema.</p>
-                
+
+                @if (permissionsResource.isLoading()) {
+                    <div class="flex justify-center items-center h-32">
+                        <app-loader />
+                    </div>
+                }
+
+                @if (permissionsResource.hasValue()) {
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    @for (perm of allPermissions; track perm) {
+                    @for (perm of permissionsResource.value().data; track perm.id) {
                     <div class="flex items-center p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-100 dark:border-gray-600">
                         <div class="h-8 w-8 rounded bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 mr-3">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                             </svg>
                         </div>
-                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ perm | titlecase }}</span>
+                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ perm.name | titlecase }}</span>
                     </div>
                     }
                 </div>
+                }
             </div>
         </div>
     }
@@ -181,15 +189,22 @@
             <!-- Permissions Selection -->
             <div>
                 <label class="block mb-3 text-sm font-medium text-gray-900 dark:text-white">Asignar Permisos</label>
+                @if (permissionsResource.isLoading()) {
+                    <div class="flex justify-center items-center h-32 border border-gray-100 dark:border-gray-700 rounded-lg">
+                        <app-loader />
+                    </div>
+                }
+                @if (permissionsResource.hasValue()) {
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 p-1 border border-gray-100 dark:border-gray-700 rounded-lg">
-                    @for (perm of allPermissions; track perm) {
-                    <button type="button" (click)="togglePermission(perm)"
-                        [class]="isPermissionSelected(perm) ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600'"
+                    @for (perm of permissionsResource.value().data; track perm.id) {
+                    <button type="button" (click)="togglePermission(perm.name)"
+                        [class]="isPermissionSelected(perm.name) ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-50 text-gray-600 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600'"
                         class="px-2 py-2 text-[10px] cursor-pointer font-medium border rounded-md text-left transition-all hover:ring-2 hover:ring-blue-300">
-                        {{ perm | titlecase }}
+                        {{ perm.name | titlecase }}
                     </button>
                     }
                 </div>
+                }
                 <form-error-label [errorType]="roleForm.get('permissions')!" />
             </div>
 

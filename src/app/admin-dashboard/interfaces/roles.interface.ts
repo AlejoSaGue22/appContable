@@ -17,6 +17,16 @@ export interface CreateRoleDto {
 
 export interface UpdateRoleDto extends Partial<CreateRoleDto> {}
 
+export interface PermissionEntity {
+  id: string;
+  name: string;
+  description?: string;
+  isActive: boolean;
+  isSystem: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   data: T;

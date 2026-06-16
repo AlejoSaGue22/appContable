@@ -68,7 +68,7 @@ export class ProductosServiciosFormsComponent {
   productosID = toSignal(
     this.activateRoute.params.pipe(map((param) => param['id']))
   );
-  categorias = inject(ProductosService).categorias().filter((c) => c.tipo == 'venta');
+  categorias = inject(ProductosService).categorias().filter((c) => c.tipo == 'venta' || c.tipo == 'servicio' );
 
   productoIdRxResourse = rxResource({
     request: () => {

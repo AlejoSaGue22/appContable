@@ -48,7 +48,7 @@ export default class EmpleadosPageComponent {
         this.loader.show();
         this.nominaService.getEmpleados({ limit: 1000 }).subscribe({
             next: (res) => this.empleados.set(res.data),
-            error: (err) => this.notification.error('Error al cargar empleados', err),
+            error: (err) => this.notification.error(err.message, 'Error al cargar empleados'),
             complete: () => this.loader.hide(),
         });
     }

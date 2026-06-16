@@ -27,6 +27,7 @@ export enum Permission {
   USER_MANAGE = 'user:manage',
   ROLE_MANAGE = 'role:manage',
   SETTINGS_MANAGE = 'settings:manage'
+  
 }
 
 

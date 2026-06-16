@@ -33,14 +33,11 @@ export class CategoriaFormModalComponent implements OnInit {
 
   isSubmitting = signal(false);
   cuentaPrincipal = computed(() => this.cuentasList.filter((cuenta) => 
-    cuenta.aceptaMovimiento &&
-    (cuenta.codigo.startsWith('41') || cuenta.codigo.startsWith('42') || cuenta.codigo.startsWith('43'))));
+    cuenta.aceptaMovimiento ));
   cuentaCosto = computed(() => this.cuentasList.filter((cuenta) => 
-    cuenta.aceptaMovimiento &&
-    (cuenta.codigo.startsWith('51') || cuenta.codigo.startsWith('52') || cuenta.codigo.startsWith('53'))));
+    cuenta.aceptaMovimiento ));
   cuentaInventario = computed(() => this.cuentasList.filter((cuenta) => 
-    cuenta.aceptaMovimiento &&
-    (cuenta.codigo.startsWith('1435') || cuenta.codigo.startsWith('1436'))));
+    cuenta.aceptaMovimiento ));
 
   ngOnInit() {
     if (this.category) {

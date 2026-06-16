@@ -172,7 +172,7 @@ export default class PeriodosPageComponent {
         this.loader.show();
         this.nominaService.getPeriodos({ limit: 1000 }).subscribe({
             next: (res) => this.periodos.set(res.data),
-            error: (err) => this.notification.error('Error al cargar períodos', err),
+            error: (err) => this.notification.error(err, 'Error al cargar períodos'),
             complete: () => this.loader.hide(),
         });
     }

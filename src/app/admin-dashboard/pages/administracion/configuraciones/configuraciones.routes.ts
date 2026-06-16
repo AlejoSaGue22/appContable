@@ -3,6 +3,7 @@ import { ConfiguracionMenuComponent } from "./configuracion-menu/configuracion-m
 import { EmpresaComponent } from "./pages/empresa/empresa.component";
 import { ImpuestosComponent } from "./pages/impuestos/impuestos.component";
 import { VendedoresComponent } from "./pages/vendedores/vendedores.component";
+import { ParametrizacionContable } from "./pages/parametrizacion-contable/parametrizacion-contable";
 
 const configuracionesRoutes: Routes = [
     {
@@ -20,6 +21,10 @@ const configuracionesRoutes: Routes = [
     {
         path: 'vendedores',
         component: VendedoresComponent
+    },
+    {
+        path: 'parametrizacion-contable',
+        component: ParametrizacionContable
     },
     {
         path: '**',

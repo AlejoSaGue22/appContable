@@ -7,6 +7,9 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './cuentas-contables-list.component.html',
+  host: {
+    class: 'flex flex-col h-full overflow-hidden'
+  }
 })
 export class CuentasContablesList {
 
@@ -75,6 +78,7 @@ export class CuentasContablesList {
   }
 
   hasChildren(cuenta: GetCuentasContables): boolean {
+    
     return !cuenta.aceptaMovimiento;
   }
 
