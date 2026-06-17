@@ -18,105 +18,105 @@ import { LoaderService } from '@utils/services/loader.service';
 import { TableBancoComponent } from "./components/table-banco/table-banco.component";
 
 @Component({
-  selector: 'app-cuentas-bancarias',
-  standalone: true,
-  imports: [CommonModule, LoaderComponent, CurrencyPipe, CuentaFormModalComponent, TransferenciaModalComponent, HeaderTitlePageComponent, ModalComponent, PaginationComponent, TableBancoComponent],
-  templateUrl: './cuentas-bancarias.component.html'
+ selector: 'app-cuentas-bancarias',
+ standalone: true,
+ imports: [CommonModule, LoaderComponent, CurrencyPipe, CuentaFormModalComponent, TransferenciaModalComponent, HeaderTitlePageComponent, ModalComponent, PaginationComponent, TableBancoComponent],
+ templateUrl: './cuentas-bancarias.component.html'
 })
 export default class CuentasBancariasComponent {
-  private cuentasService = inject(CuentasBancariasService);
-  private paginationService = inject(PaginationService);
-  private notificationService = inject(NotificationService);
-  private loaderService = inject(LoaderService);
+ private cuentasService = inject(CuentasBancariasService);
+ private paginationService = inject(PaginationService);
+ private notificationService = inject(NotificationService);
+ private loaderService = inject(LoaderService);
 
-  headTitle: HeaderInput = {
-    title: 'Cuentas Bancarias',
-    slog: 'Gestión centralizada de recursos financieros'
-  }
+ headTitle: HeaderInput = {
+ title: 'Cuentas Bancarias',
+ slog: 'Gestión centralizada de recursos financieros'
+ }
 
-  isModalOpen = signal(false);
-  isTransferenciaModalOpen = signal(false);
-  selectedAccount = signal<CuentaBancaria | null>(null);
-  isDeleteModalVisible = signal(false);
-  idToDelete = signal<string | null>(null);
+ isModalOpen = signal(false);
+ isTransferenciaModalOpen = signal(false);
+ selectedAccount = signal<CuentaBancaria | null>(null);
+ isDeleteModalVisible = signal(false);
+ idToDelete = signal<string | null>(null);
 
-  cuentasResource = rxResource({
-    request: () => ({
-      offset: this.paginationService.currentPage(),
-      limit: 10,
-    }),
-    loader: ({ request }) => this.cuentasService.getCuentasBancos(request).pipe(
-      tap((res) => {
-        const size = Math.ceil(res.count / request.limit);
-        this.paginationService.totalItems.set(res.count);
-        this.paginationService.pageSize.set(size);
-      })
-    )
-  });
+ cuentasResource = rxResource({
+ request: () => ({
+ offset: this.paginationService.currentPage(),
+ limit: 10,
+ }),
+ loader: ({ request }) => this.cuentasService.getCuentasBancos(request).pipe(
+ tap((res) => {
+ const size = Math.ceil(res.count / request.limit);
+ this.paginationService.totalItems.set(res.count);
+ this.paginationService.pageSize.set(size);
+ })
+ )
+ });
 
-  cuentas = computed(() => this.cuentasResource.value()?.cuentas ?? []);
+ cuentas = computed(() => this.cuentasResource.value()?.cuentas ?? []);
 
-  openCreateModal() {
-    this.selectedAccount.set(null);
-    this.isModalOpen.set(true);
-  }
+ openCreateModal() {
+ this.selectedAccount.set(null);
+ this.isModalOpen.set(true);
+ }
 
-  openEditModal(cuenta: CuentaBancaria) {
-    this.selectedAccount.set(cuenta);
-    this.isModalOpen.set(true);
-  }
+ openEditModal(cuenta: CuentaBancaria) {
+ this.selectedAccount.set(cuenta);
+ this.isModalOpen.set(true);
+ }
 
-  closeModal() {
-    this.isModalOpen.set(false);
-    this.selectedAccount.set(null);
-  }
+ closeModal() {
+ this.isModalOpen.set(false);
+ this.selectedAccount.set(null);
+ }
 
-  onFormSubmit(action: 'create' | 'update') {
-    this.closeModal();
-    const message = action === 'create' ? 'Cuenta creada correctamente' : 'Cuenta actualizada correctamente';
-    this.notificationService.success(message);
-    this.cuentasResource.reload();
-  }
+ onFormSubmit(action: 'create' | 'update') {
+ this.closeModal();
+ const message = action === 'create' ? 'Cuenta creada correctamente' : 'Cuenta actualizada correctamente';
+ this.notificationService.success(message);
+ this.cuentasResource.reload();
+ }
 
-  openTransferenciaModal() {
-    this.isTransferenciaModalOpen.set(true);
-  }
+ openTransferenciaModal() {
+ this.isTransferenciaModalOpen.set(true);
+ }
 
-  closeTransferenciaModal() {
-    this.isTransferenciaModalOpen.set(false);
-  }
+ closeTransferenciaModal() {
+ this.isTransferenciaModalOpen.set(false);
+ }
 
-  onTransferenciaSubmit() {
-    this.closeTransferenciaModal();
-    this.notificationService.success('Transferencia realizada correctamente');
-    this.cuentasResource.reload();
-  }
+ onTransferenciaSubmit() {
+ this.closeTransferenciaModal();
+ this.notificationService.success('Transferencia realizada correctamente');
+ this.cuentasResource.reload();
+ }
 
 
-  deleteCuenta(id: string) {
-    this.idToDelete.set(id);
-    this.isDeleteModalVisible.set(true);
-  }
+ deleteCuenta(id: string) {
+ this.idToDelete.set(id);
+ this.isDeleteModalVisible.set(true);
+ }
 
-  confirmDelete() {
-    const id = this.idToDelete();
-    if (!id) return;
+ confirmDelete() {
+ const id = this.idToDelete();
+ if (!id) return;
 
-    this.loaderService.show();
+ this.loaderService.show();
 
-    this.cuentasService.deleteCuenta(id).subscribe({
-      next: () => {
-        this.cuentasResource.reload();
-        this.isDeleteModalVisible.set(false);
-        this.idToDelete.set(null);
-        this.notificationService.success('Cuenta eliminada correctamente');
-      },
-      error: (err) => {
-        this.notificationService.error('Error al eliminar la cuenta', err);
-      },
-      complete: () => {
-        this.loaderService.hide();
-      }
-    });
-  }
+ this.cuentasService.deleteCuenta(id).subscribe({
+ next: () => {
+ this.cuentasResource.reload();
+ this.isDeleteModalVisible.set(false);
+ this.idToDelete.set(null);
+ this.notificationService.success('Cuenta eliminada correctamente');
+ },
+ error: (err) => {
+ this.notificationService.error('Error al eliminar la cuenta', err);
+ },
+ complete: () => {
+ this.loaderService.hide();
+ }
+ });
+ }
 }

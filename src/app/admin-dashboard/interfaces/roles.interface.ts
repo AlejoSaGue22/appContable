@@ -1,34 +1,34 @@
 export interface Role {
-  id: string;
-  name: string;
-  description: string;
-  permissions: string[];
-  isSystem: boolean;
-  isActive: boolean;
-  users?: any[];
+ id: string;
+ name: string;
+ description: string;
+ permissions: string[];
+ isSystem: boolean;
+ isActive: boolean;
+ users?: any[];
 }
 
 export interface CreateRoleDto {
-  name: string;
-  description: string;
-  permissions: string[];
-  isActive?: boolean;
+ name: string;
+ description: string;
+ permissions: string[];
+ isActive?: boolean;
 }
 
 export interface UpdateRoleDto extends Partial<CreateRoleDto> {}
 
 export interface PermissionEntity {
-  id: string;
-  name: string;
-  description?: string;
-  isActive: boolean;
-  isSystem: boolean;
-  createdAt?: string;
-  updatedAt?: string;
+ id: string;
+ name: string;
+ description?: string;
+ isActive: boolean;
+ isSystem: boolean;
+ createdAt?: string;
+ updatedAt?: string;
 }
 
 export interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  message: string;
+ success: boolean;
+ data: T;
+ message: string;
 }

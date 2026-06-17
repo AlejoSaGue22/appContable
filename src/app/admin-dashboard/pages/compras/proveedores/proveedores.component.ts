@@ -20,104 +20,104 @@ import { HeaderTitleProveedoresComponent } from './components/header-title-prove
 import { RouterLink } from '@angular/router';
 
 @Component({
-   imports: [LoaderComponent, RouterLink, ErrorPages, HeaderTitleProveedoresComponent, TableProveedoresComponent, ModalComponent, 
-            PaginationComponent, HeaderTitlePageComponent],
-   templateUrl: './proveedores.component.html',
-   standalone: true
+ imports: [LoaderComponent, RouterLink, ErrorPages, HeaderTitleProveedoresComponent, TableProveedoresComponent, ModalComponent, 
+ PaginationComponent, HeaderTitlePageComponent],
+ templateUrl: './proveedores.component.html',
+ standalone: true
 })
 export class ProveedoresComponent {
 
-   headTitle: HeaderInput = {
-      title: 'Gestión de Proveedores',
-      slog: 'Administra la información de tus proveedores'
-   }
+ headTitle: HeaderInput = {
+ title: 'Gestión de Proveedores',
+ slog: 'Administra la información de tus proveedores'
+ }
 
-   // Paginación
-   currentPage = signal(1);
-   totalPages = signal(1);
-   totalItems = signal(0);
-   pageSize = signal(10);
+ // Paginación
+ currentPage = signal(1);
+ totalPages = signal(1);
+ totalItems = signal(0);
+ pageSize = signal(10);
 
-   isModalEdit = signal<boolean>(false);
-   idProveedorToModal = signal<string>('');
+ isModalEdit = signal<boolean>(false);
+ idProveedorToModal = signal<string>('');
 
-   paginationService = inject(PaginationService);
-   proveedoresService = inject(ProveedoresService);
-   notificacionService = inject(NotificationService);
-   totalProveedores = signal<number>(0);
-   cardsTotales = signal<CardsTotales[]>([]);
+ paginationService = inject(PaginationService);
+ proveedoresService = inject(ProveedoresService);
+ notificacionService = inject(NotificationService);
+ totalProveedores = signal<number>(0);
+ cardsTotales = signal<CardsTotales[]>([]);
 
-   proveedoresList = signal<ProveedoresRequest[]>([]);
+ proveedoresList = signal<ProveedoresRequest[]>([]);
 
-   proveedoresResource = rxResource({
-      request: () => ({ page: this.paginationService.currentPage(), limit: 10 }),
-      loader: ({ request }) => this.proveedoresService.getProveedores({ offset: this.paginationService.currentPage(), limit: request.limit }).pipe(
-         tap((response) => {
-            this.proveedoresList.set(response.proveedores);
-            this.totalProveedores.set(response.count ?? 0);
-            const size = Math.ceil(response.count / request.limit);
-            this.paginationService.totalItems.set(response.count ?? 0);
-            this.paginationService.pageSize.set(size);
-         })
-      )
-   })
+ proveedoresResource = rxResource({
+ request: () => ({ page: this.paginationService.currentPage(), limit: 10 }),
+ loader: ({ request }) => this.proveedoresService.getProveedores({ offset: this.paginationService.currentPage(), limit: request.limit }).pipe(
+ tap((response) => {
+ this.proveedoresList.set(response.proveedores);
+ this.totalProveedores.set(response.count ?? 0);
+ const size = Math.ceil(response.count / request.limit);
+ this.paginationService.totalItems.set(response.count ?? 0);
+ this.paginationService.pageSize.set(size);
+ })
+ )
+ })
 
-   get columnsTable() {
-      return [
-         { key: 'fecha', header: 'Fecha Registro' },
-         { key: 'identificacion', header: 'Identificación' },
-         { key: 'nombre', header: 'Nombre/Razón Social' },
-         { key: 'telefono', header: 'Teléfono' },
-         { key: 'email', header: 'Email' },
-         { key: 'estado', header: 'Estado' },
-      ]
-   }
+ get columnsTable() {
+ return [
+ { key: 'fecha', header: 'Fecha Registro' },
+ { key: 'identificacion', header: 'Identificación' },
+ { key: 'nombre', header: 'Nombre/Razón Social' },
+ { key: 'telefono', header: 'Teléfono' },
+ { key: 'email', header: 'Email' },
+ { key: 'estado', header: 'Estado' },
+ ]
+ }
 
-   onSearch(searchTerm: string) {
-      const proveedores = this.proveedoresList();
-      if (searchTerm.length > 0) {
-         const proveedoresFiltrados = proveedores.filter((proveedor) => proveedor.nombre.toLowerCase().includes(searchTerm.toLowerCase()));
-         this.proveedoresList.set(proveedoresFiltrados);
-      } else {
-         this.proveedoresList.set(proveedores);
-      }
-   }
+ onSearch(searchTerm: string) {
+ const proveedores = this.proveedoresList();
+ if (searchTerm.length > 0) {
+ const proveedoresFiltrados = proveedores.filter((proveedor) => proveedor.nombre.toLowerCase().includes(searchTerm.toLowerCase()));
+ this.proveedoresList.set(proveedoresFiltrados);
+ } else {
+ this.proveedoresList.set(proveedores);
+ }
+ }
 
-   openModal(event: any) {
-      this.isModalEdit.set(event.open);
-      this.idProveedorToModal.set(event.id);
-   }
+ openModal(event: any) {
+ this.isModalEdit.set(event.open);
+ this.idProveedorToModal.set(event.id);
+ }
 
-   async onDelete() {
-      const ID = this.idProveedorToModal();
-      if (!ID) {
-         this.notificacionService.error(
-            `No se obtuvo el ID del proveedor`,
-            'Error',
-            5000
-         );
-         return;
-      }
+ async onDelete() {
+ const ID = this.idProveedorToModal();
+ if (!ID) {
+ this.notificacionService.error(
+ `No se obtuvo el ID del proveedor`,
+ 'Error',
+ 5000
+ );
+ return;
+ }
 
-      const client = await firstValueFrom(this.proveedoresService.deleteProveedor(ID));
-      this.isModalEdit.set(false);
-      if (client.success == false) {
-         this.isModalEdit.set(false);
-         this.notificacionService.error(
-            `Hubo un error al guardar el proveedor ${client.error.message}`,
-            'Error',
-            5000
-         );
-         return;
-      }
+ const client = await firstValueFrom(this.proveedoresService.deleteProveedor(ID));
+ this.isModalEdit.set(false);
+ if (client.success == false) {
+ this.isModalEdit.set(false);
+ this.notificacionService.error(
+ `Hubo un error al guardar el proveedor ${client.error.message}`,
+ 'Error',
+ 5000
+ );
+ return;
+ }
 
-      this.notificacionService.success(
-         'Proveedor eliminado correctamente',
-         'Completado!',
-         3000
-      );
-      setTimeout(() => {
-         this.proveedoresResource.reload();
-      }, 300);
-   }
+ this.notificacionService.success(
+ 'Proveedor eliminado correctamente',
+ 'Completado!',
+ 3000
+ );
+ setTimeout(() => {
+ this.proveedoresResource.reload();
+ }, 300);
+ }
 }

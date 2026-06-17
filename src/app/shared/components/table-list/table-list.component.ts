@@ -6,74 +6,74 @@ import { PaginationService } from '../pagination/pagination.service';
 import { CurrencyPipe, TitleCasePipe } from '@angular/common';
 
 export interface Column {
-  key: string;
-  header: string;
-  type?: string;
+ key: string;
+ header: string;
+ type?: string;
 }
 
 @Component({
-  selector: 'app-table-list',
-  imports: [RouterLink, PaginationComponent, TitleCasePipe, CurrencyPipe],
-  templateUrl: './table-list.component.html',
+ selector: 'app-table-list',
+ imports: [RouterLink, PaginationComponent, TitleCasePipe, CurrencyPipe],
+ templateUrl: './table-list.component.html',
 })
 
 export class TableListComponent implements OnInit {
 
-  columns = input.required<Column[]>();
-  dataTable = input<any[]>([]);
-  hasAction = input<boolean>(true);
-  pages = input<number>(1);
-  rutaLink = input.required<string>();
-  modalOpen = output<modalOpen>();
+ columns = input.required<Column[]>();
+ dataTable = input<any[]>([]);
+ hasAction = input<boolean>(true);
+ pages = input<number>(1);
+ rutaLink = input.required<string>();
+ modalOpen = output<modalOpen>();
 
-  inputValue = signal<string>('');
-  dataTableTemp = signal<any[]>([]);
-  paginationServices = inject(PaginationService);
-
-
-
-  debouncedTime = effect((onCleanup) => {
-    const value = this.inputValue();
-
-    const timeout = setTimeout(() => {
-      this.onSearch(value);
-    }, 700);
-
-    onCleanup(() => clearTimeout(timeout));
-  });
+ inputValue = signal<string>('');
+ dataTableTemp = signal<any[]>([]);
+ paginationServices = inject(PaginationService);
 
 
 
-  ngOnInit(): void {
-    this.dataTableTemp.set(this.dataTable());
-  }
+ debouncedTime = effect((onCleanup) => {
+ const value = this.inputValue();
+
+ const timeout = setTimeout(() => {
+ this.onSearch(value);
+ }, 700);
+
+ onCleanup(() => clearTimeout(timeout));
+ });
 
 
-  get messageHead() {
-    const pages = this.rutaLink().split('/')[3];
-    return pages;
-  }
 
-  onSearch(value: string) {
-    const filtered = this.dataTable().filter(item => {
-      return Object.keys(item).some(key => {
-        const propValue = item[key];
-        return typeof propValue === 'string' && propValue.toLowerCase().includes(value.toLowerCase());
-      });
-    });
-
-    this.dataTableTemp.set(filtered);
-  }
+ ngOnInit(): void {
+ this.dataTableTemp.set(this.dataTable());
+ }
 
 
-  dataDropdown(item: any, index: number) {
-    // let aux =  Object.entries(item);
+ get messageHead() {
+ const pages = this.rutaLink().split('/')[3];
+ return pages;
+ }
 
-    return 'down' + item + index;
-  }
+ onSearch(value: string) {
+ const filtered = this.dataTable().filter(item => {
+ return Object.keys(item).some(key => {
+ const propValue = item[key];
+ return typeof propValue === 'string' && propValue.toLowerCase().includes(value.toLowerCase());
+ });
+ });
 
-  openModal(id: string) {
-    this.modalOpen.emit({ open: true, id });
-  }
+ this.dataTableTemp.set(filtered);
+ }
+
+
+ dataDropdown(item: any, index: number) {
+ // let aux = Object.entries(item);
+
+ return 'down' + item + index;
+ }
+
+ openModal(id: string) {
+ this.modalOpen.emit({ open: true, id });
+ }
 
 }

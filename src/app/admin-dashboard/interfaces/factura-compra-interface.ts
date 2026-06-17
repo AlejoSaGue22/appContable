@@ -4,129 +4,129 @@ import { ArticulosInterface } from "./productos-interface";
 import { ProveedoresInterface } from "./proveedores-interface";
 
 export interface ComprobanteCompraResponseTemp {
-    count: number;
-    pages: number;
-    comprobantes: FacturaCompra[];
+ count: number;
+ pages: number;
+ comprobantes: FacturaCompra[];
 }
 
 export interface ComprobanteCompraResponse {
-    success: boolean;
-    data: FacturaCompra[];
-    message?: string;
-    meta?: {
-        page: number;
-        limit: number;
-        total: number;
-        totalPages: number;
-    };
+ success: boolean;
+ data: FacturaCompra[];
+ message?: string;
+ meta?: {
+ page: number;
+ limit: number;
+ total: number;
+ totalPages: number;
+ };
 }
 
 export interface FacturaCompra {
-    id: string;
-    isDraft: boolean;
-    proveedorId: string;
-    numero: string;
-    numeroFacturaProveedor: string;
-    estado: InvoiceCompraStatus;        
-    fecha: string;
-    fechaVencimiento?: string;  
-    formaPago: string;
-    metodoPago?: string;
-    cuentaBancariaId?: string;
-    cuentaBancaria?: CuentaBancaria;
-    observaciones?: string;
-    totalPagado: number;
-    saldoPendiente: number;
-    paymentStatus: PaymentStatus;
-    items: ItemFactura[];
-    iva: number;
-    descuento: number;
-    proveedor: ProveedoresInterface;
-    subtotal: number;
-    total: number;
-    createdBy?: CreatedBy;
-    createdById: string;
-    createdAt: Date;
+ id: string;
+ isDraft: boolean;
+ proveedorId: string;
+ numero: string;
+ numeroFacturaProveedor: string;
+ estado: InvoiceCompraStatus; 
+ fecha: string;
+ fechaVencimiento?: string; 
+ formaPago: string;
+ metodoPago?: string;
+ cuentaBancariaId?: string;
+ cuentaBancaria?: CuentaBancaria;
+ observaciones?: string;
+ totalPagado: number;
+ saldoPendiente: number;
+ paymentStatus: PaymentStatus;
+ items: ItemFactura[];
+ iva: number;
+ descuento: number;
+ proveedor: ProveedoresInterface;
+ subtotal: number;
+ total: number;
+ createdBy?: CreatedBy;
+ createdById: string;
+ createdAt: Date;
 }
 
 export interface ItemFactura {
-    id?: string;
-    articuloId: string;
-    articulo?: ArticulosInterface;
-    descripcion?: string;
-    unitPrice: number;
-    iva: number;
-    impuestoId?: string;
-    valor_iva?: number;
-    discount?: number;
-    valor_discount?: number;
-    quantity: number;
-    subtotal?: number;
-    importe?: number;
-    total?: number;
+ id?: string;
+ articuloId: string;
+ articulo?: ArticulosInterface;
+ descripcion?: string;
+ unitPrice: number;
+ iva: number;
+ impuestoId?: string;
+ valor_iva?: number;
+ discount?: number;
+ valor_discount?: number;
+ quantity: number;
+ subtotal?: number;
+ importe?: number;
+ total?: number;
 }
 
 export interface FacturaCompraResponse {
-    id: string;
-    isDraft: string;
-    proveedorId: string;
-    numero: string;
-    numeroFacturaProveedor: string;
-    estado: InvoiceCompraStatus;
-    descripcion: string;
-    fecha: string;
-    fechaVencimiento?: string;  
-    formaPago: string;
-    metodoPago?: string;
-    metodoPagoRel?: PaymentMethod;
-    observaciones?: string;
-    totalPagado: number;
-    saldoPendiente: number;
-    paymentStatus: PaymentStatus;
-    items: ItemFacturaResponse[];
-    asientoError?: string;  
-    iva: number;
-    descuento: number;
-    proveedor: ProveedoresInterface;
-    subtotal: number;
-    total: number;
-    createdBy?: CreatedBy;
-    createdById: string;
-    createdAt: Date;
+ id: string;
+ isDraft: string;
+ proveedorId: string;
+ numero: string;
+ numeroFacturaProveedor: string;
+ estado: InvoiceCompraStatus;
+ descripcion: string;
+ fecha: string;
+ fechaVencimiento?: string; 
+ formaPago: string;
+ metodoPago?: string;
+ metodoPagoRel?: PaymentMethod;
+ observaciones?: string;
+ totalPagado: number;
+ saldoPendiente: number;
+ paymentStatus: PaymentStatus;
+ items: ItemFacturaResponse[];
+ asientoError?: string; 
+ iva: number;
+ descuento: number;
+ proveedor: ProveedoresInterface;
+ subtotal: number;
+ total: number;
+ createdBy?: CreatedBy;
+ createdById: string;
+ createdAt: Date;
 }
 
 export interface ItemFacturaResponse {
-    id?: string;
-    articuloId: string;
-    articulo?: ArticulosInterface;
-    facturaCompraId: string;
-    descripcion?: string;
-    unitPrice: number;
-    porcentajeIva: number;
-    impuestoId?: string;
-    valorIva?: number;
-    descuento?: number;
-    valorDescuento?: number;
-    quantity: number;
-    valorSubtotal?: number;
-    itemTotal?: number;
-    createdAt: Date;
+ id?: string;
+ articuloId: string;
+ articulo?: ArticulosInterface;
+ facturaCompraId: string;
+ descripcion?: string;
+ unitPrice: number;
+ porcentajeIva: number;
+ impuestoId?: string;
+ valorIva?: number;
+ descuento?: number;
+ valorDescuento?: number;
+ quantity: number;
+ valorSubtotal?: number;
+ itemTotal?: number;
+ createdAt: Date;
 }
 
 export enum InvoiceCompraStatus {
-    BORRADOR = 'borrador',
-    ERROR_ASIENTO = 'error_asiento',
-    REGISTRADO = 'registrado',
-    PAGADO = 'pagado',
-    ANULADO = 'anulado'
+ BORRADOR = 'borrador',
+ ERROR_ASIENTO = 'error_asiento',
+ REGISTRADO = 'registrado',
+ PAGADO = 'pagado',
+ ANULADO = 'anulado'
 }
 
 
 export interface CreatedBy {
-    id: string,
-    email: string,
-    fullName: string,
-    isActive: boolean,
-    role: string,
-    deleteAt: Date | null
+ id: string,
+ email: string,
+ fullName: string,
+ isActive: boolean,
+ role: string,
+ deleteAt: Date | null
 }

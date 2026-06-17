@@ -5,13 +5,13 @@ import { NotificationContainer } from "@shared/components/notification-container
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
 
 @Component({
-  selector: 'app-root',
-  imports: [RouterOutlet, NotificationContainer],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+ selector: 'app-root',
+ imports: [RouterOutlet, NotificationContainer],
+ templateUrl: './app.component.html',
+ styleUrl: './app.component.css'
 })
 export class AppComponent {
-    title = 'contableSoft';
-    private catalogsStore = inject(CatalogsStore);
+ title = 'contableSoft';
+ private catalogsStore = inject(CatalogsStore);
 
 }

@@ -3,731 +3,731 @@ import { CxcResumen, CxpResumen } from '@dashboard/interfaces/pagos-interface';
 import { CurrencyPipe } from '@angular/common';
 
 @Component({
-  selector: 'app-tarjetas-resumen-pagos',
-  imports: [CurrencyPipe],
-  templateUrl: './tarjetas-resumen-pagos.component.html',
+ selector: 'app-tarjetas-resumen-pagos',
+ imports: [CurrencyPipe],
+ templateUrl: './tarjetas-resumen-pagos.component.html',
 })
 export class TarjetasResumenPagos {
 
-  resumen = input<CxcResumen | CxpResumen>(); 
-  
-  isCxc = computed(() => {
-    const r = this.resumen();
-    if (!r) return true;
-    return 'totalCartera' in r;
-  });
+ resumen = input<CxcResumen | CxpResumen>(); 
+ 
+ isCxc = computed(() => {
+ const r = this.resumen();
+ if (!r) return true;
+ return 'totalCartera' in r;
+ });
 
-  totalLabel = computed(() => this.isCxc() ? 'Total Cartera' : 'Total por Pagar');
-  vencidaLabel = computed(() => this.isCxc() ? 'Cartera Vencida' : 'Por Pagar Vencido');
-  totalValue = computed(() => {
-    const r = this.resumen();
-    if (!r) return 0;
-    return 'totalCartera' in r ? r.totalCartera : r.totalPorPagar;
-  });
+ totalLabel = computed(() => this.isCxc() ? 'Total Cartera' : 'Total por Pagar');
+ vencidaLabel = computed(() => this.isCxc() ? 'Cartera Vencida' : 'Por Pagar Vencido');
+ totalValue = computed(() => {
+ const r = this.resumen();
+ if (!r) return 0;
+ return 'totalCartera' in r ? r.totalCartera : r.totalPorPagar;
+ });
 
-  totalFacturas = computed(() => {
-    const r = this.resumen();
-    if (!r) return 0;
-    return (r.cantidadPorVencer || 0) + (r.cantidadVencida || 0);
-  });
+ totalFacturas = computed(() => {
+ const r = this.resumen();
+ if (!r) return 0;
+ return (r.cantidadPorVencer || 0) + (r.cantidadVencida || 0);
+ });
 }
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 
 
-  
+ 

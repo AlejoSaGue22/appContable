@@ -5,19 +5,19 @@ import { environment } from 'src/app/environments/environment';
  
 @Injectable({ providedIn: 'root' })
 export class AsientosHttpService {
-  private readonly base = `${environment.baseUrl}/asientos-contables`;
+ private readonly base = `${environment.baseUrl}/asientos-contables`;
  
-  constructor(private http: HttpClient) {}
+ constructor(private http: HttpClient) {}
  
-  getByReferencia(referencia: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.base}/por-referencia/${referencia}`);
-  }
+ getByReferencia(referencia: string): Observable<any[]> {
+ return this.http.get<any[]>(`${this.base}/por-referencia/${referencia}`);
+ }
  
-  reintentarAsientoFactura(facturaId: string): Observable<any> {
-    return this.http.post(`${environment.baseUrl}/facturas-ventas/${facturaId}/reintentar-asiento`, {});
-  }
+ reintentarAsientoFactura(facturaId: string): Observable<any> {
+ return this.http.post(`${environment.baseUrl}/facturas-ventas/${facturaId}/reintentar-asiento`, {});
+ }
  
-  reintentarAsientoCompra(compraId: string): Observable<any> {
-    return this.http.post(`${environment.baseUrl}/facturas-compras/${compraId}/reintentar-asiento`, {});
-  }
+ reintentarAsientoCompra(compraId: string): Observable<any> {
+ return this.http.post(`${environment.baseUrl}/facturas-compras/${compraId}/reintentar-asiento`, {});
+ }
 }

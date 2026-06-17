@@ -1,34 +1,57 @@
-<div class="fixed top-8 right-4 z-999999 w-full max-w-sm space-y-4">
-    @for (notification of notifications; track $index) {
-        <div [ngClass]="getNotificationClasses(notification.type)" role="alert">
-          
-          <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8"
-               [ngClass]="{
-                 'text-green-500 bg-green-100 dark:bg-green-800 dark:text-green-200': notification.type === 'success',
-                 'text-red-500 bg-red-100 dark:bg-red-800 dark:text-red-200': notification.type === 'error',
-                 'text-yellow-500 bg-yellow-100 dark:bg-yellow-800 dark:text-yellow-200': notification.type === 'warning',
-                 'text-blue-500 bg-blue-100 dark:bg-blue-800 dark:text-blue-200': notification.type === 'info'
-               }">
-            <span [innerHTML]="getNotificationIcon(notification.type)" >
-              
-            </span>
-            <span class="sr-only">{{ notification.type }} icon </span>
-          </div>
-          
-          <div class="ms-3 text-md font-normal">
-            <span class="font-semibold">{{ notification.title }} </span>
-            <div class="text-sm font-normal mt-1">{{ notification.message }}</div>
-          </div>
-          
-          <button type="button"
-                  class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700"
-                  (click)="closeNotification(notification.id)"
-                  aria-label="Close">
-            <span class="sr-only">Close</span>
-            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-            </svg>
-          </button>
-        </div>
-    }
+<div class="fixed top-4 right-4 z-[100] w-full max-w-sm space-y-3 pointer-events-none">
+ @for (notification of notifications(); track notification.id) {
+ <div class="relative pointer-events-auto bg-white/80 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-100 overflow-hidden animate-slide-in-right"
+ role="alert">
+ <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b rounded-l-2xl"
+ [class]="'from-' + (notification.type === 'success' ? 'green' : notification.type === 'error' ? 'red' : notification.type === 'warning' ? 'amber' : 'blue') + '-500 to-' + (notification.type === 'success' ? 'emerald' : notification.type === 'error' ? 'rose' : notification.type === 'warning' ? 'yellow' : 'indigo') + '-600'">
+ </div>
+
+ <div class="flex items-start gap-3 p-4">
+ <div class="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center"
+ [class.bg-green-100]="notification.type === 'success'"
+ [class.bg-red-100]="notification.type === 'error'"
+ [class.bg-amber-100]="notification.type === 'warning'"
+ [class.bg-blue-100]="notification.type === 'info'"
+ [class.text-green-600]="notification.type === 'success'"
+ [class.text-red-600]="notification.type === 'error'"
+ [class.text-amber-600]="notification.type === 'warning'"
+ [class.text-blue-600]="notification.type === 'info'">
+ <span [innerHTML]="getNotificationIcon(notification.type)"></span>
+ </div>
+
+ <div class="flex-1 min-w-0">
+ @if (notification.title) {
+ <p class="text-sm font-bold text-gray-900">{{ notification.title }}</p>
+ }
+ <p class="text-xs text-gray-500 leading-relaxed">{{ notification.message }}</p>
+ </div>
+
+ <button type="button"
+ (click)="closeNotification(notification.id)"
+ class="flex-shrink-0 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl p-1.5 transition-all cursor-pointer focus:outline-none"
+ aria-label="Close">
+ <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+ </svg>
+ </button>
+ </div>
+
+ @if (notification.duration && notification.duration > 0) {
+ <div class="h-0.5 w-full bg-gray-100">
+ <div class="h-full animate-shrink rounded-full"
+ [class.bg-gradient-to-r]="true"
+ [class.from-green-500]="notification.type === 'success'"
+ [class.to-emerald-500]="notification.type === 'success'"
+ [class.from-red-500]="notification.type === 'error'"
+ [class.to-rose-500]="notification.type === 'error'"
+ [class.from-amber-500]="notification.type === 'warning'"
+ [class.to-yellow-500]="notification.type === 'warning'"
+ [class.from-blue-500]="notification.type === 'info'"
+ [class.to-indigo-500]="notification.type === 'info'"
+ [style.animation-duration]="(notification.duration || 10000) + 'ms'">
+ </div>
+ </div>
+ }
+ </div>
+ }
 </div>

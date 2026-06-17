@@ -17,230 +17,230 @@ import { ListGroupDropdownComponent } from "@shared/components/list-group-dropdo
 
 
 @Component({
-    selector: 'app-clients-form-page',
-    imports: [HeaderTitlePageComponent, FormErrorLabelComponent, ReactiveFormsModule, LoaderComponent, ErrorPageComponent, ListGroupDropdownComponent],
-    templateUrl: './clients-form-page.component.html',
+ selector: 'app-clients-form-page',
+ imports: [HeaderTitlePageComponent, FormErrorLabelComponent, ReactiveFormsModule, LoaderComponent, ErrorPageComponent, ListGroupDropdownComponent],
+ templateUrl: './clients-form-page.component.html',
 })
 export class ClientsFormPageComponent implements OnInit {
 
-    isModal = input<boolean>(false);
-    saveSuccess = output<ClientesFormInterface>();
-    notificationService = inject(NotificationService);
-    cancel = output<void>();
+ isModal = input<boolean>(false);
+ saveSuccess = output<ClientesFormInterface>();
+ notificationService = inject(NotificationService);
+ cancel = output<void>();
 
-    private fb = inject(FormBuilder);
-    clienteService = inject(ClientesService);
-    router = inject(Router);
-    activateRoute = inject(ActivatedRoute);
-    catalogsStore = inject(CatalogsStore);
-    clienteID = toSignal(
-        this.activateRoute.params.pipe(map((params) => params['id']))
-    );
-    headTitleCliente: HeaderInput = { title: (this.clienteID() && this.clienteID() !== 'new-Item' ? 'Actualizar Cliente' :
-                                            'Guardar Cliente'),
-                                      slog: (this.clienteID() && this.clienteID() !== 'new-Item' ? 'Actualiza la información del cliente' :
-                                            'Registra un nuevo cliente al sistema') };
-    loading = signal<boolean>(false);
+ private fb = inject(FormBuilder);
+ clienteService = inject(ClientesService);
+ router = inject(Router);
+ activateRoute = inject(ActivatedRoute);
+ catalogsStore = inject(CatalogsStore);
+ clienteID = toSignal(
+ this.activateRoute.params.pipe(map((params) => params['id']))
+ );
+ headTitleCliente: HeaderInput = { title: (this.clienteID() && this.clienteID() !== 'new-Item' ? 'Actualizar Cliente' :
+ 'Guardar Cliente'),
+ slog: (this.clienteID() && this.clienteID() !== 'new-Item' ? 'Actualiza la información del cliente' :
+ 'Registra un nuevo cliente al sistema') };
+ loading = signal<boolean>(false);
 
-    clientsForm = this.fb.group({
-        nombre: ['', Validators.required],
-        apellido: ['', Validators.required],
-        tipoDocumento: ['', Validators.required],
-        numeroDocumento: ['', Validators.required],
-        tipoPersona: ['', Validators.required],
-        razonSocial: ['', Validators.required],
-        direccion: ['', Validators.required],
-        ciudad: ['', Validators.required],
-        telefono: [''],
-        email: [''],
-        observacion: [''],
-        tributo: ['', Validators.required],
-        // responsableFiscal: [''],
-        dv: [''],
-    })
+ clientsForm = this.fb.group({
+ nombre: ['', Validators.required],
+ apellido: ['', Validators.required],
+ tipoDocumento: ['', Validators.required],
+ numeroDocumento: ['', Validators.required],
+ tipoPersona: ['', Validators.required],
+ razonSocial: ['', Validators.required],
+ direccion: ['', Validators.required],
+ ciudad: ['', Validators.required],
+ telefono: [''],
+ email: [''],
+ observacion: [''],
+ tributo: ['', Validators.required],
+ // responsableFiscal: [''],
+ dv: [''],
+ })
 
-    getCityName() {
-        const id = this.clientsForm.get('ciudad')?.value;
-        if (!id) return '';
-        const city = this.catalogsStore.municipalities().find(m => m.id == id);
-        return city ? `${city.name} - ${city.department}` : '';
-    }
+ getCityName() {
+ const id = this.clientsForm.get('ciudad')?.value;
+ if (!id) return '';
+ const city = this.catalogsStore.municipalities().find(m => m.id == id);
+ return city ? `${city.name} - ${city.department}` : '';
+ }
 
-    onCitySelect(city: Municipality) {
-        this.clientsForm.patchValue({ ciudad: city.id });
-    }
-
-
-    clienteIdResource = rxResource({
-        request: () => {
-            if (this.isModal()) {
-                return null;
-            }
-            return { id: this.clienteID() };
-        },
-        loader: ({ request }) => {
-            if (!request) {
-                return this.clienteService.getClientesById('new-Item');
-            }
-
-            return this.clienteService.getClientesById(request.id).pipe(
-                tap((el) => this.clientsForm.reset(el))
-            );
-        }
-    })
-
-    ngOnInit() {
-        this.clientsForm.get('tipoPersona')?.valueChanges.subscribe(value => {
-            if (!value) return;
-            this.toggleValidations(value);
-        });
-
-        this.clientsForm.get('tipoDocumento')?.valueChanges.subscribe(value => {
-            this.handleTipoDocumentoChange(value);
-        });
-
-        this.clientsForm.get('numeroDocumento')?.valueChanges.subscribe(value => {
-            if (this.clientsForm.get('tipoDocumento')?.value == '6') {
-                this.updateDV(value);
-            }
-        });
-
-        if (this.isModal()) {
-            this.clientsForm.reset();
-            this.headTitleCliente.title = 'Crear Cliente';
-            this.headTitleCliente.slog = 'Registra un nuevo cliente al sistema';
-        }
-    }
-
-    toggleValidations(tipo: string) {
-        const nombreControl = this.clientsForm.get('nombre');
-        const apellidoControl = this.clientsForm.get('apellido');
-        const razonSocialControl = this.clientsForm.get('razonSocial');
-
-        if (tipo === 'PN') {
-            nombreControl?.setValidators([Validators.required]);
-            apellidoControl?.setValidators([Validators.required]);
-            razonSocialControl?.clearValidators();
-
-        } else if (tipo === 'PJ') {
-            // Si el tipo es 'juridica', se requiere 'razonSocial'
-            razonSocialControl?.setValidators([Validators.required]);
-            nombreControl?.clearValidators();
-            apellidoControl?.clearValidators();
-        }
-
-        nombreControl?.updateValueAndValidity();
-        apellidoControl?.updateValueAndValidity();
-        razonSocialControl?.updateValueAndValidity();
-    }
+ onCitySelect(city: Municipality) {
+ this.clientsForm.patchValue({ ciudad: city.id });
+ }
 
 
-    async onSubmit() {
-        const isValid = this.clientsForm.valid;
-        this.clientsForm.markAllAsTouched();
+ clienteIdResource = rxResource({
+ request: () => {
+ if (this.isModal()) {
+ return null;
+ }
+ return { id: this.clienteID() };
+ },
+ loader: ({ request }) => {
+ if (!request) {
+ return this.clienteService.getClientesById('new-Item');
+ }
 
-        if (!isValid) {
-            this.notificationService.error('Formulario incompleto', 'Error');
-            return;
-        }
+ return this.clienteService.getClientesById(request.id).pipe(
+ tap((el) => this.clientsForm.reset(el))
+ );
+ }
+ })
 
-        this.loading.set(true);
+ ngOnInit() {
+ this.clientsForm.get('tipoPersona')?.valueChanges.subscribe(value => {
+ if (!value) return;
+ this.toggleValidations(value);
+ });
 
-        try {
+ this.clientsForm.get('tipoDocumento')?.valueChanges.subscribe(value => {
+ this.handleTipoDocumentoChange(value);
+ });
 
-            const formValue = {
-                ...this.clientsForm.value,
-                telefono: this.clientsForm.get("telefono")?.value?.toString()
-            };
+ this.clientsForm.get('numeroDocumento')?.valueChanges.subscribe(value => {
+ if (this.clientsForm.get('tipoDocumento')?.value == '6') {
+ this.updateDV(value);
+ }
+ });
 
-            if (this.clienteID() == 'new-Item' || this.isModal()) {
-                const client = await firstValueFrom(this.clienteService.agregarCliente(formValue as Partial<ClientesFormInterface>));
+ if (this.isModal()) {
+ this.clientsForm.reset();
+ this.headTitleCliente.title = 'Crear Cliente';
+ this.headTitleCliente.slog = 'Registra un nuevo cliente al sistema';
+ }
+ }
 
-                if (client.success == false) {
+ toggleValidations(tipo: string) {
+ const nombreControl = this.clientsForm.get('nombre');
+ const apellidoControl = this.clientsForm.get('apellido');
+ const razonSocialControl = this.clientsForm.get('razonSocial');
 
-                    this.notificationService.error(`Hubo un error al guardar el cliente ${HelpersUtils.getMessageError(client.message)}`, 'Error');
-                    return;
-                }
+ if (tipo === 'PN') {
+ nombreControl?.setValidators([Validators.required]);
+ apellidoControl?.setValidators([Validators.required]);
+ razonSocialControl?.clearValidators();
 
-                this.notificationService.success("Cliente guardado exitosamente", 'Éxito');
+ } else if (tipo === 'PJ') {
+ // Si el tipo es 'juridica', se requiere 'razonSocial'
+ razonSocialControl?.setValidators([Validators.required]);
+ nombreControl?.clearValidators();
+ apellidoControl?.clearValidators();
+ }
 
-                if (this.isModal()) {
-                    this.saveSuccess.emit(client.data);
-                } else {
-                    await this.router.navigateByUrl('/panel/ventas/clients');
-                }
+ nombreControl?.updateValueAndValidity();
+ apellidoControl?.updateValueAndValidity();
+ razonSocialControl?.updateValueAndValidity();
+ }
 
-            } else {
-                const clientUpdate = await firstValueFrom(
-                    this.clienteService.actualizarClientes(this.clienteID(), formValue as Partial<ClientesFormInterface>)
-                );
 
-                if (clientUpdate.success == false) {
-                    this.notificationService.error(`Hubo un error al guardar el cliente ${HelpersUtils.getMessageError(clientUpdate.message)}`, 'Error');
-                    return;
-                }
+ async onSubmit() {
+ const isValid = this.clientsForm.valid;
+ this.clientsForm.markAllAsTouched();
 
-                this.notificationService.success("Cliente actualizado exitosamente", 'Éxito');
-                await this.router.navigateByUrl('/panel/ventas/clients');
-            }
+ if (!isValid) {
+ this.notificationService.error('Formulario incompleto', 'Error');
+ return;
+ }
 
-        } catch (error: any) {
-            this.notificationService.error(error.message, 'Error');
-        } finally {
-            this.loading.set(false);
-        }
+ this.loading.set(true);
 
-    }
+ try {
 
-    async onCancel() {
-        if (this.isModal()) {
-            this.cancel.emit();
-        } else {
-            await this.router.navigateByUrl('/panel/ventas/clients');
-        }
-        this.clientsForm.reset();
-    }
+ const formValue = {
+ ...this.clientsForm.value,
+ telefono: this.clientsForm.get("telefono")?.value?.toString()
+ };
 
-    private handleTipoDocumentoChange(tipo: string | null | undefined) {
-        const dvControl = this.clientsForm.get('dv');
-        if (tipo === '6') { // NIT
-            dvControl?.setValidators([Validators.required]);
-            this.updateDV(this.clientsForm.get('numeroDocumento')?.value);
-        } else {
-            dvControl?.clearValidators();
-            dvControl?.setValue('');
-        }
-        dvControl?.updateValueAndValidity();
-    }
+ if (this.clienteID() == 'new-Item' || this.isModal()) {
+ const client = await firstValueFrom(this.clienteService.agregarCliente(formValue as Partial<ClientesFormInterface>));
 
-    private updateDV(nit: string | null | undefined) {
-        if (!nit) {
-            this.clientsForm.get('dv')?.setValue('');
-            return;
-        }
-        const dv = this.calculateDV(nit);
-        console.log('dv',dv);
-        this.clientsForm.get('dv')?.setValue(dv);
-    }
+ if (client.success == false) {
 
-    private calculateDV(nit: string): string {
-        const cleanNit = nit.replace(/\D/g, ''); // Solo números
-        const vpri = [3, 7, 13, 17, 19, 23, 29, 37, 41, 43, 47, 53, 59, 67, 71];
-        const z = cleanNit.length;
-        let x = 0;
-        let y = 0;
+ this.notificationService.error(`Hubo un error al guardar el cliente ${HelpersUtils.getMessageError(client.message)}`, 'Error');
+ return;
+ }
 
-        for (let i = 0; i < z; i++) {
-            y = parseInt(cleanNit.substring(i, i + 1));
-            x += y * vpri[z - 1 - i];
-        }
+ this.notificationService.success("Cliente guardado exitosamente", 'Éxito');
 
-        y = x % 11;
-        if (y > 1) {
-            return (11 - y).toString();
-        } else {
-            return y.toString();
-        }
-    }
+ if (this.isModal()) {
+ this.saveSuccess.emit(client.data);
+ } else {
+ await this.router.navigateByUrl('/panel/ventas/clients');
+ }
+
+ } else {
+ const clientUpdate = await firstValueFrom(
+ this.clienteService.actualizarClientes(this.clienteID(), formValue as Partial<ClientesFormInterface>)
+ );
+
+ if (clientUpdate.success == false) {
+ this.notificationService.error(`Hubo un error al guardar el cliente ${HelpersUtils.getMessageError(clientUpdate.message)}`, 'Error');
+ return;
+ }
+
+ this.notificationService.success("Cliente actualizado exitosamente", 'Éxito');
+ await this.router.navigateByUrl('/panel/ventas/clients');
+ }
+
+ } catch (error: any) {
+ this.notificationService.error(error.message, 'Error');
+ } finally {
+ this.loading.set(false);
+ }
+
+ }
+
+ async onCancel() {
+ if (this.isModal()) {
+ this.cancel.emit();
+ } else {
+ await this.router.navigateByUrl('/panel/ventas/clients');
+ }
+ this.clientsForm.reset();
+ }
+
+ private handleTipoDocumentoChange(tipo: string | null | undefined) {
+ const dvControl = this.clientsForm.get('dv');
+ if (tipo === '6') { // NIT
+ dvControl?.setValidators([Validators.required]);
+ this.updateDV(this.clientsForm.get('numeroDocumento')?.value);
+ } else {
+ dvControl?.clearValidators();
+ dvControl?.setValue('');
+ }
+ dvControl?.updateValueAndValidity();
+ }
+
+ private updateDV(nit: string | null | undefined) {
+ if (!nit) {
+ this.clientsForm.get('dv')?.setValue('');
+ return;
+ }
+ const dv = this.calculateDV(nit);
+ console.log('dv',dv);
+ this.clientsForm.get('dv')?.setValue(dv);
+ }
+
+ private calculateDV(nit: string): string {
+ const cleanNit = nit.replace(/\D/g, ''); // Solo números
+ const vpri = [3, 7, 13, 17, 19, 23, 29, 37, 41, 43, 47, 53, 59, 67, 71];
+ const z = cleanNit.length;
+ let x = 0;
+ let y = 0;
+
+ for (let i = 0; i < z; i++) {
+ y = parseInt(cleanNit.substring(i, i + 1));
+ x += y * vpri[z - 1 - i];
+ }
+
+ y = x % 11;
+ if (y > 1) {
+ return (11 - y).toString();
+ } else {
+ return y.toString();
+ }
+ }
 
 }

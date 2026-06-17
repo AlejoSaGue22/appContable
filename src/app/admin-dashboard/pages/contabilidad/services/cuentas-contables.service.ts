@@ -5,28 +5,28 @@ import { environment } from 'src/app/environments/environment';
 import { GetCuentasContables } from '../interfaces/cuentas-contables.interface';
 
 @Injectable({
-  providedIn: 'root'
+ providedIn: 'root'
 })
 export class CuentasContablesService {
-  private readonly base = `${environment.baseUrl}/cuentas`;
+ private readonly base = `${environment.baseUrl}/cuentas`;
 
-  constructor(private http: HttpClient) {}
+ constructor(private http: HttpClient) {}
 
-  getCuentasContables(params?: { search?: string, tipo?: string, fechaInicio?: string, fechaFin?: string, limit?: number }): Observable<GetCuentasContables[]> {
-    let httpParams = new HttpParams();
-    if (params?.search) httpParams = httpParams.set('search', params.search);
-    if (params?.tipo) httpParams = httpParams.set('tipo', params.tipo);
-    if (params?.fechaInicio) httpParams = httpParams.set('fechaInicio', params.fechaInicio);
-    if (params?.fechaFin) httpParams = httpParams.set('fechaFin', params.fechaFin);
+ getCuentasContables(params?: { search?: string, tipo?: string, fechaInicio?: string, fechaFin?: string, limit?: number }): Observable<GetCuentasContables[]> {
+ let httpParams = new HttpParams();
+ if (params?.search) httpParams = httpParams.set('search', params.search);
+ if (params?.tipo) httpParams = httpParams.set('tipo', params.tipo);
+ if (params?.fechaInicio) httpParams = httpParams.set('fechaInicio', params.fechaInicio);
+ if (params?.fechaFin) httpParams = httpParams.set('fechaFin', params.fechaFin);
 
-    return this.http.get<GetCuentasContables[]>(this.base, { params: httpParams });
-  }
+ return this.http.get<GetCuentasContables[]>(this.base, { params: httpParams });
+ }
 
-  create(cuenta: any): Observable<GetCuentasContables> {
-    return this.http.post<GetCuentasContables>(this.base, cuenta);
-  }
+ create(cuenta: any): Observable<GetCuentasContables> {
+ return this.http.post<GetCuentasContables>(this.base, cuenta);
+ }
 
-  update(id: string, cuenta: any): Observable<GetCuentasContables> {
-    return this.http.patch<GetCuentasContables>(`${this.base}/${id}`, cuenta);
-  }
+ update(id: string, cuenta: any): Observable<GetCuentasContables> {
+ return this.http.patch<GetCuentasContables>(`${this.base}/${id}`, cuenta);
+ }
 }

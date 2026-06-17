@@ -1,46 +1,71 @@
-<form class="space-y-4 md:space-y-6" [formGroup]="registerForm">
-                  <div class="flex flex-col mb-6 space-y-6 md:flex-row md:space-y-0 md:space-x-6">
-                    <div class="w-full">
-                        <label for="nombre" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre</label>
-                        <input required="" placeholder="John" formControlName="fullname" name="nombre" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 
-                        sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 
-                        dark:placeholder:text-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value="">
-                    </div>
-                    <div class="w-full">
-                        <label for="Apellido" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Apellido</label>
-                        <input required="" placeholder="Doe" formControlName="lastname" name="Apellido" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 
-                        sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600
-                         dark:placeholder:text-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value="">
-                    </div>
-                 </div>
-                  <div>
-                      <label for="email" [class.border-red-500]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
-                      <input type="email" formControlName="email" name="email" id="email" class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="name@company.com" required="">
-                  </div>
-                  <div>
-                      <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
-                      <input type="password" formControlName="password" name="password" id="password" placeholder="••••••••" 
-                        class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block 
-                            w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500
-                            dark:focus:border-blue-500" required="">
-                  </div>
-                  <div class="flex items-center justify-between">
-                      <div class="flex items-start">
-                          <div class="flex items-center h-5"> 
-                            <input id="remember" aria-describedby="remember" type="checkbox" class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800" required="">
-                          </div>
-                          <div class="ml-3 text-sm">
-                            <label for="remember" class="text-gray-500 dark:text-gray-300">Recuerdame</label>
-                          </div>
-                      </div>
-                      <!-- <a href="#" class="text-sm font-medium text-blue-600 hover:underline dark:text-primary-500">Olvidé mi contraseña?</a> -->
-                  </div>
-                  <button type="submit" 
-                      (click)="onSubmit()"
-                      class="w-full text-white cursor-pointer bg-blue-600 hover:bg-blue-500 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
-                      Registrar
-                  </button>
-                  <p class="text-sm font-light text-gray-500 dark:text-gray-400" routerLink="/auth/login">
-                      ¿Deseas ingresar con una cuenta? <a href="#" class="font-medium text-blue-600 hover:underline dark:text-primary-500">Iniciar Sesion</a>
-                  </p>
+<form class="space-y-6" [formGroup]="registerForm">
+ <!-- Full Name Row -->
+ <div class="flex flex-col md:flex-row gap-4">
+ <div class="w-full space-y-2">
+ <label for="nombre" class="block text-sm font-semibold text-slate-700">Nombre</label>
+ <input
+ formControlName="fullname"
+ name="nombre"
+ id="nombre"
+ type="text"
+ placeholder="John"
+ [class.border-red-500]="registerForm.get('fullname')?.touched && registerForm.get('fullname')?.errors"
+ class="w-full px-5 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 outline-none placeholder:text-slate-400">
+ <form-error-label [errorType]="registerForm.get('fullname')!" />
+ </div>
+ <div class="w-full space-y-2">
+ <label for="lastname" class="block text-sm font-semibold text-slate-700">Apellido</label>
+ <input
+ formControlName="lastname"
+ name="lastname"
+ id="lastname"
+ type="text"
+ placeholder="Doe"
+ [class.border-red-500]="registerForm.get('lastname')?.touched && registerForm.get('lastname')?.errors"
+ class="w-full px-5 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 outline-none placeholder:text-slate-400">
+ <form-error-label [errorType]="registerForm.get('lastname')!" />
+ </div>
+ </div>
+
+ <!-- Email Field -->
+ <div class="space-y-2">
+ <label for="email" class="block text-sm font-semibold text-slate-700">Correo Electrónico</label>
+ <input
+ type="email"
+ formControlName="email"
+ name="email"
+ id="email"
+ placeholder="nombre@empresa.com"
+ [class.border-red-500]="registerForm.get('email')?.touched && registerForm.get('email')?.errors"
+ class="w-full px-5 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 outline-none placeholder:text-slate-400">
+ <form-error-label [errorType]="registerForm.get('email')!" />
+ </div>
+
+ <!-- Password Field -->
+ <div class="space-y-2">
+ <label for="password" class="block text-sm font-semibold text-slate-700">Contraseña</label>
+ <input
+ type="password"
+ formControlName="password"
+ name="password"
+ id="password"
+ placeholder="••••••••"
+ [class.border-red-500]="registerForm.get('password')?.touched && registerForm.get('password')?.errors"
+ class="w-full px-5 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 outline-none placeholder:text-slate-400">
+ <form-error-label [errorType]="registerForm.get('password')!" />
+ </div>
+
+ <!-- Submit Button -->
+ <button
+ type="submit"
+ (click)="onSubmit()"
+ class="w-full py-3.5 px-5 cursor-pointer bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 transform transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:shadow-inner focus:ring-2 focus:ring-blue-500/40 outline-none">
+ Crear Cuenta
+ </button>
+
+ <!-- Footer -->
+ <p class="text-center text-sm font-medium text-slate-500">
+ ¿Ya tienes una cuenta?
+ <a routerLink="/auth/login" class="text-blue-600 cursor-pointer font-bold hover:underline decoration-2 underline-offset-4">Iniciar Sesión</a>
+ </p>
 </form>

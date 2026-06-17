@@ -1,80 +1,80 @@
 <div class="p-4">
-  <!-- Vista previa del volante -->
-  <div class="border-2 border-slate-300 rounded-lg p-6 max-w-lg mx-auto bg-white">
-    <div class="text-center border-b-2 border-slate-700 pb-4 mb-5">
-      <h2 class="text-lg font-bold tracking-widest text-slate-800">{{ titulo }}</h2>
-      <p class="text-xs text-slate-500 mt-1">{{ movimiento().fecha | date:'dd \'de\' MMMM \'de\' yyyy' }}</p>
-    </div>
+ <!-- Vista previa del volante -->
+ <div class="border-2 border-slate-300 rounded-lg p-6 max-w-lg mx-auto bg-white">
+ <div class="text-center border-b-2 border-slate-700 pb-4 mb-5">
+ <h2 class="text-lg font-bold text-slate-800">{{ titulo }}</h2>
+ <p class="text-xs text-slate-500 mt-1">{{ movimiento().fecha | date:'dd \'de\' MMMM \'de\' yyyy' }}</p>
+ </div>
 
-    <div class="mb-3">
-      <p class="text-[10px] font-semibold uppercase text-slate-400">N° Comprobante</p>
-      <p class="text-sm font-mono font-semibold text-slate-800">{{ movimiento().numero }}</p>
-    </div>
+ <div class="mb-3">
+ <p class="text-[10px] font-semibold uppercase text-slate-400">N° Comprobante</p>
+ <p class="text-sm font-mono font-semibold text-slate-800">{{ movimiento().numero }}</p>
+ </div>
 
-    <div class="mb-3">
-      <p class="text-[10px] font-semibold uppercase text-slate-400">{{ labelContraparte }}</p>
-      <p class="text-sm font-semibold text-slate-800">{{ movimiento().contraparteNombre }}</p>
-    </div>
+ <div class="mb-3">
+ <p class="text-[10px] font-semibold uppercase text-slate-400">{{ labelContraparte }}</p>
+ <p class="text-sm font-semibold text-slate-800">{{ movimiento().contraparteNombre }}</p>
+ </div>
 
-    <div class="text-center my-5">
-      <p class="text-2xl font-bold text-blue-800">{{ movimiento().monto | currency:'':'symbol-narrow':'1.0-0' }}</p>
-    </div>
+ <div class="text-center my-5">
+ <p class="text-2xl font-bold text-blue-800">{{ movimiento().monto | currency:'':'symbol-narrow':'1.0-0' }}</p>
+ </div>
 
-    <div class="border-t border-dashed border-slate-300 my-4"></div>
+ <div class="border-t border-dashed border-slate-300 my-4"></div>
 
-    <div class="mb-3">
-      <p class="text-[10px] font-semibold uppercase text-slate-400">{{ labelConcepto }}</p>
-      <p class="text-sm font-medium text-slate-700">Factura {{ movimiento().numeroFactura }}</p>
-    </div>
+ <div class="mb-3">
+ <p class="text-[10px] font-semibold uppercase text-slate-400">{{ labelConcepto }}</p>
+ <p class="text-sm font-medium text-slate-700">Factura {{ movimiento().numeroFactura }}</p>
+ </div>
 
-    <div class="mb-3">
-      <p class="text-[10px] font-semibold uppercase text-slate-400">Medio de pago</p>
-      <p class="text-sm font-medium text-slate-700">{{ medioLabel }}</p>
-    </div>
+ <div class="mb-3">
+ <p class="text-[10px] font-semibold uppercase text-slate-400">Medio de pago</p>
+ <p class="text-sm font-medium text-slate-700">{{ medioLabel }}</p>
+ </div>
 
-    @if (cuentaInfo) {
-      <div class="mb-3">
-        <p class="text-[10px] font-semibold uppercase text-slate-400">Cuenta bancaria</p>
-        <p class="text-sm font-medium text-slate-700">{{ cuentaInfo }}</p>
-      </div>
-    }
+ @if (cuentaInfo) {
+ <div class="mb-3">
+ <p class="text-[10px] font-semibold uppercase text-slate-400">Cuenta bancaria</p>
+ <p class="text-sm font-medium text-slate-700">{{ cuentaInfo }}</p>
+ </div>
+ }
 
-    @if (movimiento().referencia) {
-      <div class="mb-3">
-        <p class="text-[10px] font-semibold uppercase text-slate-400">Referencia</p>
-        <p class="text-sm font-mono text-slate-600">{{ movimiento().referencia }}</p>
-      </div>
-    }
+ @if (movimiento().referencia) {
+ <div class="mb-3">
+ <p class="text-[10px] font-semibold uppercase text-slate-400">Referencia</p>
+ <p class="text-sm font-mono text-slate-600">{{ movimiento().referencia }}</p>
+ </div>
+ }
 
-    @if (movimiento().notas) {
-      <div class="mb-3">
-        <p class="text-[10px] font-semibold uppercase text-slate-400">Observaciones</p>
-        <p class="text-sm text-slate-600 italic">{{ movimiento().notas }}</p>
-      </div>
-    }
+ @if (movimiento().notas) {
+ <div class="mb-3">
+ <p class="text-[10px] font-semibold uppercase text-slate-400">Observaciones</p>
+ <p class="text-sm text-slate-600 italic">{{ movimiento().notas }}</p>
+ </div>
+ }
 
-    <div class="flex justify-between mt-10">
-      <div class="text-center w-2/5">
-        <div class="border-t border-slate-700 mb-1"></div>
-        <span class="text-[10px] text-slate-500">Recibe</span>
-      </div>
-      <div class="text-center w-2/5">
-        <div class="border-t border-slate-700 mb-1"></div>
-        <span class="text-[10px] text-slate-500">Entrega</span>
-      </div>
-    </div>
-  </div>
+ <div class="flex justify-between mt-10">
+ <div class="text-center w-2/5">
+ <div class="border-t border-slate-700 mb-1"></div>
+ <span class="text-[10px] text-slate-500">Recibe</span>
+ </div>
+ <div class="text-center w-2/5">
+ <div class="border-t border-slate-700 mb-1"></div>
+ <span class="text-[10px] text-slate-500">Entrega</span>
+ </div>
+ </div>
+ </div>
 
-  <!-- Boton imprimir -->
-  <div class="text-center mt-6">
-    <button (click)="imprimir()"
-      class="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg cursor-pointer transition-colors shadow-sm">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="6 9 6 2 18 2 18 9"></polyline>
-        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-        <rect x="6" y="14" width="12" height="8"></rect>
-      </svg>
-      Imprimir Volante
-    </button>
-  </div>
+ <!-- Boton imprimir -->
+ <div class="text-center mt-6">
+ <button (click)="imprimir()"
+ class="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg cursor-pointer transition-colors shadow-sm">
+ <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+ <polyline points="6 9 6 2 18 2 18 9"></polyline>
+ <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+ <rect x="6" y="14" width="12" height="8"></rect>
+ </svg>
+ Imprimir Volante
+ </button>
+ </div>
 </div>

@@ -1,190 +1,190 @@
 <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm transition-all duration-300">
-  <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg transform transition-all animate-scale-in">
-    
-    <!-- Cabecera Premium -->
-    <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between text-slate-700">
-      <div class="flex items-center gap-3">
-        <div class="p-2 bg-white/20 rounded-lg">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-          </svg>
-        </div>
-        <div>
-          <h3 class="text-xl font-bold">
-            {{ account ? 'Editar' : 'Apertura de' }} Cuenta
-          </h3>
-          <p class="text-[10px] font-semibold uppercase text-slate-500">
-            Módulo de Tesorería General
-          </p>
-        </div>
-      </div>
-      <button (click)="onClose()" class="w-8 h-8 rounded-full cursor-pointer bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all group">
-        <svg class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
-      </button>
-    </div>
+ <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-lg transform transition-all animate-scale-in">
+ 
+ <!-- Cabecera Premium -->
+ <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between text-slate-700">
+ <div class="flex items-center gap-3">
+ <div class="p-2 bg-white/20 rounded-lg">
+ <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+ </svg>
+ </div>
+ <div>
+ <h3 class="text-xl font-bold">
+ {{ account ? 'Editar' : 'Apertura de' }} Cuenta
+ </h3>
+ <p class="text-[10px] font-semibold uppercase text-slate-500">
+ Módulo de Tesorería General
+ </p>
+ </div>
+ </div>
+ <button (click)="onClose()" class="w-8 h-8 rounded-full cursor-pointer bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all group">
+ <svg class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+ </svg>
+ </button>
+ </div>
 
-    <!-- Contenido del Formulario -->
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-6 space-y-5">
-      
-      <!-- Resumen si es edición (Patrón Premium Historial) -->
-      @if (account) {
-        <div class="flex items-center gap-4 p-3 rounded-lg bg-blue-50 border border-blue-100 mb-2">
-          <div class="flex-1 min-w-0">
-            <p class="text-[10px] font-bold uppercase tracking-wider text-slate-500">
-              Cuenta Actual
-            </p>
-            <p class="text-sm font-bold text-slate-700 truncate">
-              {{ account.banco?.nombre || 'Caja' }} · {{ account.numeroCuenta || account.nombre }}
-            </p>
-          </div>
-          <div class="text-right flex-shrink-0">
-            <p class="text-[10px] text-slate-500 uppercase font-bold">Tipo</p>
-            <span class="text-xs font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full uppercase">
-              {{ account.tipoCuenta }}
-            </span>
-          </div>
-        </div>
-      }
+ <!-- Contenido del Formulario -->
+ <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-6 space-y-5">
+ 
+ <!-- Resumen si es edición (Patrón Premium Historial) -->
+ @if (account) {
+ <div class="flex items-center gap-4 p-3 rounded-lg bg-blue-50 border border-blue-100 mb-2">
+ <div class="flex-1 min-w-0">
+ <p class="text-[10px] font-bold uppercase text-slate-500">
+ Cuenta Actual
+ </p>
+ <p class="text-sm font-bold text-slate-700 truncate">
+ {{ account.banco?.nombre || 'Caja' }} · {{ account.numeroCuenta || account.nombre }}
+ </p>
+ </div>
+ <div class="text-right flex-shrink-0">
+ <p class="text-[10px] text-slate-500 uppercase font-bold">Tipo</p>
+ <span class="text-xs font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full uppercase">
+ {{ account.tipoCuenta }}
+ </span>
+ </div>
+ </div>
+ }
 
-      <!-- Tipo de Cuenta y Entidad Financiera -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label class="block mb-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
-            Tipo de Cuenta <span class="text-red-500">*</span>
-          </label>
-          <select formControlName="tipoCuenta" 
-            class="w-full bg-slate-50 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2.5 transition duration-300 focus:outline-none focus:border-blue-400 focus:bg-white hover:border-slate-300 shadow-sm">
-            @for (tipo of tiposCuenta; track tipo) {
-              <option [value]="tipo">{{ tipo }}</option>
-            }
-          </select>
-        </div>
+ <!-- Tipo de Cuenta y Entidad Financiera -->
+ <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+ <div>
+ <label class="block mb-1.5 text-xs font-bold text-slate-500 uppercase ">
+ Tipo de Cuenta <span class="text-red-500">*</span>
+ </label>
+ <select formControlName="tipoCuenta" 
+ class="w-full bg-slate-50 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2.5 transition duration-300 focus:outline-none focus:border-blue-400 focus:bg-white hover:border-slate-300 shadow-sm">
+ @for (tipo of tiposCuenta; track tipo) {
+ <option [value]="tipo">{{ tipo }}</option>
+ }
+ </select>
+ </div>
 
-        <!-- Sección Institucional (solo para tipo Banco) -->
-        @if (esBanco) {
-          <div>
-            <label class="block mb-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
-              Entidad Financiera <span class="text-red-500">*</span>
-            </label>
-            <select formControlName="bancoId" 
-              class="w-full bg-slate-50 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2.5 transition duration-300 focus:outline-none focus:border-blue-400 focus:bg-white hover:border-slate-300 shadow-sm">
-              <option value="" disabled>Seleccionar Banco...</option>
-              @for (banco of bancos(); track banco.id) {
-                <option [value]="banco.id">{{ banco.nombre }}</option>
-              }
-            </select>
-          </div>
-        }
-      </div>
+ <!-- Sección Institucional (solo para tipo Banco) -->
+ @if (esBanco) {
+ <div>
+ <label class="block mb-1.5 text-xs font-bold text-slate-500 uppercase ">
+ Entidad Financiera <span class="text-red-500">*</span>
+ </label>
+ <select formControlName="bancoId" 
+ class="w-full bg-slate-50 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2.5 transition duration-300 focus:outline-none focus:border-blue-400 focus:bg-white hover:border-slate-300 shadow-sm">
+ <option value="" disabled>Seleccionar Banco...</option>
+ @for (banco of bancos(); track banco.id) {
+ <option [value]="banco.id">{{ banco.nombre }}</option>
+ }
+ </select>
+ </div>
+ }
+ </div>
 
-      <!-- Detalles de la Cuenta -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-        <div>
-          <label class="mb-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider block">
-            Nombre de Referencia <span class="text-red-500">*</span>
-          </label>
-          <div class="relative">
-            <input type="text" formControlName="nombre" placeholder="Ej: Nómina Principal" 
-              class="w-full bg-slate-50 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2.5 transition duration-300 focus:outline-none focus:border-blue-400 focus:bg-white hover:border-slate-300 shadow-sm" />
-            <div class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-          </div>
-        </div>
+ <!-- Detalles de la Cuenta -->
+ <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+ <div>
+ <label class="mb-1.5 text-xs font-bold text-slate-500 uppercase block">
+ Nombre de Referencia <span class="text-red-500">*</span>
+ </label>
+ <div class="relative">
+ <input type="text" formControlName="nombre" placeholder="Ej: Nómina Principal" 
+ class="w-full bg-slate-50 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2.5 transition duration-300 focus:outline-none focus:border-blue-400 focus:bg-white hover:border-slate-300 shadow-sm" />
+ <div class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300">
+ <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+ </svg>
+ </div>
+ </div>
+ </div>
 
-        <div>
-          <label class="mb-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider block">
-            Número de Cuenta
-          </label>
-          <div class="relative">
-            <input type="text" formControlName="numeroCuenta" placeholder="000-000-000" 
-              class="w-full bg-slate-50 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2.5 font-mono font-bold transition duration-300 focus:outline-none focus:border-blue-400 focus:bg-white hover:border-slate-300 shadow-sm" />
-            <div class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
-            </div>
-          </div>
-        </div>
-      </div>
+ <div>
+ <label class="mb-1.5 text-xs font-bold text-slate-500 uppercase block">
+ Número de Cuenta
+ </label>
+ <div class="relative">
+ <input type="text" formControlName="numeroCuenta" placeholder="000-000-000" 
+ class="w-full bg-slate-50 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2.5 font-mono font-bold transition duration-300 focus:outline-none focus:border-blue-400 focus:bg-white hover:border-slate-300 shadow-sm" />
+ <div class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300">
+ <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+ </svg>
+ </div>
+ </div>
+ </div>
+ </div>
 
-        <div>
-          <label class="block mb-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
-            Notas y Observaciones
-          </label>
-          <textarea formControlName="observaciones" rows="2" placeholder="Información adicional..." 
-            class="w-full bg-slate-50 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2.5 transition duration-300 focus:outline-none focus:border-blue-400 focus:bg-white hover:border-slate-300 shadow-sm resize-none"></textarea>
-        </div>
+ <div>
+ <label class="block mb-1.5 text-xs font-bold text-slate-500 uppercase ">
+ Notas y Observaciones
+ </label>
+ <textarea formControlName="observaciones" rows="2" placeholder="Información adicional..." 
+ class="w-full bg-slate-50 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2.5 transition duration-300 focus:outline-none focus:border-blue-400 focus:bg-white hover:border-slate-300 shadow-sm resize-none"></textarea>
+ </div>
 
-        @if (!account) {
-          <div class="space-y-4 pt-2">            
-            <div class="relative">
-              <label class="block mb-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                Cuenta Contable Asociada <span class="text-red-500">*</span>
-              </label>
-              <app-list-group-dropdown title="" [dataList]="cuentasContableActivos()"
-                [labelKey]="['codigo', 'nombre']"
-                [searchable]="false"
-                (objectSelect)="onSelectCuentaContable($event)"
-                [valueInput]="form.get('codigoCuentaContable')?.value ?? ''" />
-            </div>
+ @if (!account) {
+ <div class="space-y-4 pt-2"> 
+ <div class="relative">
+ <label class="block mb-1.5 text-xs font-bold text-slate-500 uppercase ">
+ Cuenta Contable Asociada <span class="text-red-500">*</span>
+ </label>
+ <app-list-group-dropdown title="" [dataList]="cuentasContableActivos()"
+ [labelKey]="['codigo', 'nombre']"
+ [searchable]="false"
+ (objectSelect)="onSelectCuentaContable($event)"
+ [valueInput]="form.get('codigoCuentaContable')?.value ?? ''" />
+ </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                  <label class="block mb-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                    Saldo Inicial
-                  </label>
-                  <div class="relative">
-                    <input type="number" formControlName="saldoInicial" placeholder="0.00" min="0" step="0.01"
-                      class="w-full bg-slate-50 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2.5 font-mono font-bold transition duration-300 focus:outline-none focus:border-blue-400 focus:bg-white hover:border-slate-300 shadow-sm" />
-                    <div class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</div>
-                  </div>
-              </div>
+ <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+ <div>
+ <label class="block mb-1.5 text-xs font-bold text-slate-500 uppercase ">
+ Saldo Inicial
+ </label>
+ <div class="relative">
+ <input type="number" formControlName="saldoInicial" placeholder="0.00" min="0" step="0.01"
+ class="w-full bg-slate-50 text-slate-700 text-sm border border-slate-200 rounded-md px-3 py-2.5 font-mono font-bold transition duration-300 focus:outline-none focus:border-blue-400 focus:bg-white hover:border-slate-300 shadow-sm" />
+ <div class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold">$</div>
+ </div>
+ </div>
 
-              @if (form.get('saldoInicial')?.value > 0) {
-                <div class="relative">
-                  <label class="block mb-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                    Cuenta Contrapartida
-                  </label>
-                  <app-list-group-dropdown title="" [dataList]="cuentasContableActivos()"
-                    [labelKey]="['codigo', 'nombre']"
-                    [searchable]="false"
-                    (objectSelect)="onCuentaSeleccionada($event)"
-                    [valueInput]="form.get('cuentaContrapartidaCodigo')?.value ?? ''" />
-                </div>
-              }
-            </div>
-          </div>
-        }
+ @if (form.get('saldoInicial')?.value > 0) {
+ <div class="relative">
+ <label class="block mb-1.5 text-xs font-bold text-slate-500 uppercase ">
+ Cuenta Contrapartida
+ </label>
+ <app-list-group-dropdown title="" [dataList]="cuentasContableActivos()"
+ [labelKey]="['codigo', 'nombre']"
+ [searchable]="false"
+ (objectSelect)="onCuentaSeleccionada($event)"
+ [valueInput]="form.get('cuentaContrapartidaCodigo')?.value ?? ''" />
+ </div>
+ }
+ </div>
+ </div>
+ }
 
-      <!-- Acciones Premium -->
-      <div class="flex gap-3 pt-6 border-t border-slate-100">
-        <button type="button" (click)="onClose()" 
-          class="flex-1 px-4 py-2.5 rounded-xl border cursor-pointer border-slate-200 text-slate-600 text-sm font-bold hover:bg-slate-50 transition-all active:scale-95">
-          Cancelar
-        </button>
-        <button type="submit" [disabled]="form.invalid || isSubmitting()" 
-          class="flex-1 px-4 py-2.5 rounded-xl border cursor-pointer bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 disabled:opacity-50 disabled:shadow-none transition-all active:scale-95 flex items-center justify-center gap-2">
-          @if (isSubmitting()) {
-            <svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Procesando...
-          } @else {
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-            {{ account ? 'Actualizar Cuenta' : 'Confirmar Apertura' }}
-          }
-        </button>
-      </div>
+ <!-- Acciones Premium -->
+ <div class="flex gap-3 pt-6 border-t border-slate-100">
+ <button type="button" (click)="onClose()" 
+ class="flex-1 px-4 py-2.5 rounded-xl border cursor-pointer border-slate-200 text-slate-600 text-sm font-bold hover:bg-slate-50 transition-all active:scale-95">
+ Cancelar
+ </button>
+ <button type="submit" [disabled]="form.invalid || isSubmitting()" 
+ class="flex-1 px-4 py-2.5 rounded-xl border cursor-pointer bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 disabled:opacity-50 disabled:shadow-none transition-all active:scale-95 flex items-center justify-center gap-2">
+ @if (isSubmitting()) {
+ <svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+ <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+ <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+ </svg>
+ Procesando...
+ } @else {
+ <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+ </svg>
+ {{ account ? 'Actualizar Cuenta' : 'Confirmar Apertura' }}
+ }
+ </button>
+ </div>
 
-    </form>
-  </div>
+ </form>
+ </div>
 </div>
 

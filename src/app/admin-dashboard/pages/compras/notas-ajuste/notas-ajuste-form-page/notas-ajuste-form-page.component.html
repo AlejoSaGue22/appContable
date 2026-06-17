@@ -1,233 +1,233 @@
 <div class="p-2 sm:p-4">
-    <header-title-page [titleHead]="headTitle()" />
+ <header-title-page [titleHead]="headTitle()" />
 
-    <div class="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-4">
-        <!-- Columna Formulario Principal -->
-        <div class="lg:col-span-3 space-y-4">
-            <form [formGroup]="form" class="bg-white p-5 rounded-md shadow-sm border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-                <div class="border-b border-gray-200 pb-3 mb-4 flex items-center justify-between dark:border-gray-700">
-                    <h2 class="text-base font-semibold text-gray-800 dark:text-gray-200">Datos del Comprobante</h2>
-                    
-                    <!-- Tipo de Nota Toggle compacto -->
-                    <!-- <div class="flex items-center gap-2">
-                        <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Tipo:</span>
-                        <div class="flex p-0.5 bg-gray-100 rounded-md border border-gray-200 dark:bg-gray-900 dark:border-gray-700">
-                            <button type="button" (click)="tipoNota.set('credito')" 
-                                        [class]="tipoNota() === 'credito' ? 'bg-white text-gray-800 shadow-sm border-gray-200 dark:bg-gray-700 dark:text-white dark:border-gray-600' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
-                                        class="py-1 px-3 rounded text-xs font-semibold transition-all cursor-pointer border border-transparent">
-                                        NOTA CRÉDITO
-                            </button>
-                            <button type="button" (click)="tipoNota.set('debito')" 
-                                        [class]="tipoNota() === 'debito' ? 'bg-white text-gray-800 shadow-sm border-gray-200 dark:bg-gray-700 dark:text-white dark:border-gray-600' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
-                                        class="py-1 px-3 rounded text-xs font-semibold transition-all cursor-pointer border border-transparent">
-                                        NOTA DÉBITO
-                            </button>
-                        </div>
-                    </div> -->
-                </div>
+ <div class="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-4">
+ <!-- Columna Formulario Principal -->
+ <div class="lg:col-span-3 space-y-4">
+ <form [formGroup]="form" class="bg-white p-5 rounded-md shadow-sm border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+ <div class="border-b border-gray-200 pb-3 mb-4 flex items-center justify-between dark:border-gray-700">
+ <h2 class="text-base font-semibold text-gray-800 dark:text-gray-200">Datos del Comprobante</h2>
+ 
+ <!-- Tipo de Nota Toggle compacto -->
+ <!-- <div class="flex items-center gap-2">
+ <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Tipo:</span>
+ <div class="flex p-0.5 bg-gray-100 rounded-md border border-gray-200 dark:bg-gray-900 dark:border-gray-700">
+ <button type="button" (click)="tipoNota.set('credito')" 
+ [class]="tipoNota() === 'credito' ? 'bg-white text-gray-800 shadow-sm border-gray-200 dark:bg-gray-700 dark:text-white dark:border-gray-600' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
+ class="py-1 px-3 rounded text-xs font-semibold transition-all cursor-pointer border border-transparent">
+ NOTA CRÉDITO
+ </button>
+ <button type="button" (click)="tipoNota.set('debito')" 
+ [class]="tipoNota() === 'debito' ? 'bg-white text-gray-800 shadow-sm border-gray-200 dark:bg-gray-700 dark:text-white dark:border-gray-600' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
+ class="py-1 px-3 rounded text-xs font-semibold transition-all cursor-pointer border border-transparent">
+ NOTA DÉBITO
+ </button>
+ </div>
+ </div> -->
+ </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <!-- Factura Original -->
-                    <div class="relative md:col-span-2">
-                        <label class="block text-xs font-medium text-gray-600 mb-1 dark:text-gray-400">Factura Original</label>
-                        <app-list-group-dropdown 
-                            title=""
-                            [dataList]="facturasDisponibles()" 
-                            [labelKey]="['numeroFacturaProveedor', 'numero', 'proveedor.razonSocial']"
-                            [searchable]="false"
-                            [valueInput]="form.get('facturaSearch')?.value || ''"
-                            (objectSelect)="onFacturaSeleccionada($event)"
-                            class="block w-full">
-                        </app-list-group-dropdown>
-                        <form-error-label [errorType]="form.get('facturaOriginalId')!" />
-                    </div>
+ <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+ <!-- Factura Original -->
+ <div class="relative md:col-span-2">
+ <label class="block text-xs font-medium text-gray-600 mb-1 dark:text-gray-400">Factura Original</label>
+ <app-list-group-dropdown 
+ title=""
+ [dataList]="facturasDisponibles()" 
+ [labelKey]="['numeroFacturaProveedor', 'numero', 'proveedor.razonSocial']"
+ [searchable]="false"
+ [valueInput]="form.get('facturaSearch')?.value || ''"
+ (objectSelect)="onFacturaSeleccionada($event)"
+ class="block w-full">
+ </app-list-group-dropdown>
+ <form-error-label [errorType]="form.get('facturaOriginalId')!" />
+ </div>
 
-                    <!-- Fecha -->
-                    <div>
-                        <label class="block text-xs font-medium text-gray-600 mb-1 dark:text-gray-400">Fecha</label>
-                        <input type="date" formControlName="fecha" class="w-full px-3 py-1.5 bg-white border border-gray-300 rounded-md text-sm focus:ring-1 focus:ring-slate-500 focus:border-slate-500 dark:bg-gray-800 dark:border-gray-600" />
-                        <form-error-label [errorType]="form.get('fecha')!" />
-                    </div>
+ <!-- Fecha -->
+ <div>
+ <label class="block text-xs font-medium text-gray-600 mb-1 dark:text-gray-400">Fecha</label>
+ <input type="date" formControlName="fecha" class="w-full px-3 py-1.5 bg-white border border-gray-300 rounded-md text-sm focus:ring-1 focus:ring-slate-500 focus:border-slate-500 dark:bg-gray-800 dark:border-gray-600" />
+ <form-error-label [errorType]="form.get('fecha')!" />
+ </div>
 
-                    <!-- Motivo -->
-                    <div class="md:col-span-3">
-                        <label class="block text-xs font-medium text-gray-600 mb-1 dark:text-gray-400">Motivo (Razón de la nota)</label>
-                        <textarea formControlName="motivo" rows="2" class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm focus:ring-1 focus:ring-slate-500 focus:border-slate-500 dark:bg-gray-800 dark:border-gray-600" placeholder="Describe brevemente la razón de este ajuste..."></textarea>
-                        <form-error-label [errorType]="form.get('motivo')!" />
-                    </div>
-                </div>
+ <!-- Motivo -->
+ <div class="md:col-span-3">
+ <label class="block text-xs font-medium text-gray-600 mb-1 dark:text-gray-400">Motivo (Razón de la nota)</label>
+ <textarea formControlName="motivo" rows="2" class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm focus:ring-1 focus:ring-slate-500 focus:border-slate-500 dark:bg-gray-800 dark:border-gray-600" placeholder="Describe brevemente la razón de este ajuste..."></textarea>
+ <form-error-label [errorType]="form.get('motivo')!" />
+ </div>
+ </div>
 
-                <div class="border-t border-gray-200 pt-4 mt-2 dark:border-gray-700">
-                    <h2 class="text-sm font-semibold text-gray-800 mb-3 dark:text-gray-200">Condiciones de Pago</h2>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Forma de Pago -->
-                        <div>
-                            <label class="block text-xs font-medium text-gray-600 mb-1 dark:text-gray-400">Forma de Pago</label>
-                                <select formControlName="formaPago" class="w-full px-3 py-1.5 bg-gray-50 border border-gray-300 rounded-md text-sm focus:ring-1 focus:ring-slate-500 focus:border-slate-500 disabled:opacity-60 dark:bg-gray-700 dark:border-gray-600" [attr.disabled]="formaPagoBloqueada() ? true : null">
-                                    <option value="">Seleccione</option>
-                                    <option value="CONTADO">Contado</option>
-                                    <option value="CREDITO">Crédito</option>
-                                </select>
-                            @if (formaPagoBloqueada()) {
-                                <p class="text-[10px] text-gray-500 mt-1 dark:text-gray-400"><i class="fa-solid fa-lock mr-1"></i>Bloqueado por la factura original</p>
-                            }
-                            <form-error-label [errorType]="form.get('formaPago')!" />
-                        </div>
+ <div class="border-t border-gray-200 pt-4 mt-2 dark:border-gray-700">
+ <h2 class="text-sm font-semibold text-gray-800 mb-3 dark:text-gray-200">Condiciones de Pago</h2>
+ 
+ <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+ <!-- Forma de Pago -->
+ <div>
+ <label class="block text-xs font-medium text-gray-600 mb-1 dark:text-gray-400">Forma de Pago</label>
+ <select formControlName="formaPago" class="w-full px-3 py-1.5 bg-gray-50 border border-gray-300 rounded-md text-sm focus:ring-1 focus:ring-slate-500 focus:border-slate-500 disabled:opacity-60 dark:bg-gray-700 dark:border-gray-600" [attr.disabled]="formaPagoBloqueada() ? true : null">
+ <option value="">Seleccione</option>
+ <option value="CONTADO">Contado</option>
+ <option value="CREDITO">Crédito</option>
+ </select>
+ @if (formaPagoBloqueada()) {
+ <p class="text-[10px] text-gray-500 mt-1 dark:text-gray-400"><i class="fa-solid fa-lock mr-1"></i>Bloqueado por la factura original</p>
+ }
+ <form-error-label [errorType]="form.get('formaPago')!" />
+ </div>
 
-                        <!-- Método de Pago -->
-                        @if (form.get('formaPago')?.value === 'CONTADO') {
-                            <div>
-                                <label class="block text-xs font-medium text-gray-600 mb-1 dark:text-gray-400">Método de Pago</label>
-                                <select formControlName="metodoPago" class="w-full px-3 py-1.5 bg-gray-50 border border-gray-300 rounded-md text-sm focus:ring-1 focus:ring-slate-500 focus:border-slate-500 disabled:opacity-60 dark:bg-gray-700 dark:border-gray-600" [attr.disabled]="formaPagoBloqueada() ? true : null">
-                                    <option value="">Seleccione</option>
-                                    @for (metodo of catalogsStore.paymentMethods(); track metodo.codigo) {
-                                        <option [value]="metodo.codigo">{{ metodo.nombre }}</option>
-                                    }
-                                </select>
-                                <form-error-label [errorType]="form.get('metodoPago')!" />
-                            </div>
-                        }
-                    </div>
+ <!-- Método de Pago -->
+ @if (form.get('formaPago')?.value === 'CONTADO') {
+ <div>
+ <label class="block text-xs font-medium text-gray-600 mb-1 dark:text-gray-400">Método de Pago</label>
+ <select formControlName="metodoPago" class="w-full px-3 py-1.5 bg-gray-50 border border-gray-300 rounded-md text-sm focus:ring-1 focus:ring-slate-500 focus:border-slate-500 disabled:opacity-60 dark:bg-gray-700 dark:border-gray-600" [attr.disabled]="formaPagoBloqueada() ? true : null">
+ <option value="">Seleccione</option>
+ @for (metodo of catalogsStore.paymentMethods(); track metodo.codigo) {
+ <option [value]="metodo.codigo">{{ metodo.nombre }}</option>
+ }
+ </select>
+ <form-error-label [errorType]="form.get('metodoPago')!" />
+ </div>
+ }
+ </div>
 
-                    @if (form.get('formaPago')?.value === 'CONTADO' && facturaEsCredito() && facturaConAbonos()) {
-                        <div class="mt-3 bg-blue-50 border border-blue-100 p-3 rounded-md flex items-start gap-3 dark:bg-blue-900/30 dark:border-blue-800">
-                            <input type="checkbox" formControlName="esReembolsoAbono" id="reembolso" class="mt-0.5 rounded text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700">
-                            <div>
-                                <label for="reembolso" class="text-sm font-medium text-blue-800 cursor-pointer dark:text-blue-300">Es reembolso de un pago previo</label>
-                                <p class="text-xs text-blue-600 mt-0.5 dark:text-blue-400">Marca esta opción si esta nota de crédito de contado está reembolsando dinero de un abono que ya se había pagado a esta factura a crédito.</p>
-                            </div>
-                        </div>
-                    }
-                </div>
-            </form>
+ @if (form.get('formaPago')?.value === 'CONTADO' && facturaEsCredito() && facturaConAbonos()) {
+ <div class="mt-3 bg-blue-50 border border-blue-100 p-3 rounded-md flex items-start gap-3 dark:bg-blue-900/30 dark:border-blue-800">
+ <input type="checkbox" formControlName="esReembolsoAbono" id="reembolso" class="mt-0.5 rounded text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700">
+ <div>
+ <label for="reembolso" class="text-sm font-medium text-blue-800 cursor-pointer dark:text-blue-300">Es reembolso de un pago previo</label>
+ <p class="text-xs text-blue-600 mt-0.5 dark:text-blue-400">Marca esta opción si esta nota de crédito de contado está reembolsando dinero de un abono que ya se había pagado a esta factura a crédito.</p>
+ </div>
+ </div>
+ }
+ </div>
+ </form>
 
-            <!-- Tabla de Ítems (Compacta) -->
-            <div class="bg-white rounded-md shadow-sm border border-gray-200 overflow-hidden dark:bg-gray-800 dark:border-gray-700">
-                <div class="bg-gray-50 px-4 py-2 border-b border-gray-200 flex justify-between items-center dark:bg-gray-700 dark:border-gray-600">
-                    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">Ítems a Ajustar</h3>
-                    <span class="text-xs text-gray-500 bg-white px-2 py-1 rounded border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400">
-                        {{ itemsSeleccionados().length }} ítems
-                    </span>
-                </div>
-                
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-gray-600 dark:text-gray-400">
-                        <thead class="bg-gray-50 text-xs uppercase text-gray-500 border-b border-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400">
-                            <tr>
-                                <th class="px-4 py-2 font-medium">Descripción</th>
-                                <th class="px-4 py-2 font-medium w-24 text-center">Cant.</th>
-                                <th class="px-4 py-2 font-medium text-right">V. Unit.</th>
-                                <th class="px-4 py-2 font-medium w-20 text-center">IVA %</th>
-                                <th class="px-4 py-2 font-medium w-24 text-center">Desc %</th>
-                                <th class="px-4 py-2 font-medium text-right">Total</th>
-                                <th class="px-3 py-2 w-10"></th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
-                            @for (item of itemsSeleccionados(); track $index) {
-                                <tr class="hover:bg-gray-50/50 transition-colors dark:hover:bg-gray-700/50">
-                                    <td class="px-4 py-2">
-                                        <input type="text" [value]="item.descripcion" (change)="updateItemField($index, 'descripcion', $any($event.target).value)" 
-                                            class="w-full bg-transparent border-0 border-b border-dashed border-gray-300 focus:ring-0 focus:border-slate-500 px-0 py-1 text-sm dark:text-white dark:border-gray-600" />
-                                    </td>
-                                    <td class="px-4 py-2">
-                                        <input type="number" [value]="item.cantidad" (change)="updateItemQuantity($index, $any($event.target).value)" min="0.01" step="0.01" 
-                                            class="w-full text-center bg-gray-50 border border-gray-200 rounded px-2 py-1 text-sm focus:ring-1 focus:ring-slate-500 focus:bg-white dark:bg-gray-900 dark:border-gray-600 dark:text-white" />
-                                    </td>
-                                    <td class="px-4 py-2">
-                                        <input type="number" [value]="item.valorUnitario" (change)="updateItemField($index, 'valorUnitario', $any($event.target).value)" min="0" step="0.01" 
-                                            class="w-full text-right bg-transparent border-0 border-b border-dashed border-gray-300 focus:ring-0 focus:border-slate-500 px-0 py-1 text-sm dark:text-white dark:border-gray-600" />
-                                    </td>
-                                    <td class="px-4 py-2 text-center text-gray-500">{{ item.porcentajeIVA }}%</td>
-                                    <td class="px-4 py-2 text-center text-gray-500">{{ item.descuento || 0 }}%</td>
-                                    <td class="px-4 py-2 text-right font-medium text-gray-800 dark:text-gray-200">{{ item.total | currency: '' : 'symbol' : '0.0-0' }}</td>
-                                    <td class="px-3 py-2 text-center">
-                                        <button type="button" (click)="removeItem($index)" class="text-gray-400 hover:text-red-500 transition-colors cursor-pointer" title="Eliminar ítem">
-                                            <i class="fa-solid fa-times"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            }
-                            @if (itemsSeleccionados().length === 0) {
-                                <tr>
-                                    <td colspan="7" class="px-4 py-8 text-center text-gray-500">
-                                        <i class="fa-solid fa-receipt text-2xl mb-2 text-gray-300"></i>
-                                        <p class="text-sm">Selecciona una factura original para cargar sus ítems</p>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+ <!-- Tabla de Ítems (Compacta) -->
+ <div class="bg-white rounded-md shadow-sm border border-gray-200 overflow-hidden dark:bg-gray-800 dark:border-gray-700">
+ <div class="bg-gray-50 px-4 py-2 border-b border-gray-200 flex justify-between items-center dark:bg-gray-700 dark:border-gray-600">
+ <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-200">Ítems a Ajustar</h3>
+ <span class="text-xs text-gray-500 bg-white px-2 py-1 rounded border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400">
+ {{ itemsSeleccionados().length }} ítems
+ </span>
+ </div>
+ 
+ <div class="overflow-x-auto">
+ <table class="w-full text-left text-sm text-gray-600 dark:text-gray-400">
+ <thead class="bg-gray-50 text-xs uppercase text-gray-500 border-b border-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400">
+ <tr>
+ <th class="px-4 py-2 font-medium">Descripción</th>
+ <th class="px-4 py-2 font-medium w-24 text-center">Cant.</th>
+ <th class="px-4 py-2 font-medium text-right">V. Unit.</th>
+ <th class="px-4 py-2 font-medium w-20 text-center">IVA %</th>
+ <th class="px-4 py-2 font-medium w-24 text-center">Desc %</th>
+ <th class="px-4 py-2 font-medium text-right">Total</th>
+ <th class="px-3 py-2 w-10"></th>
+ </tr>
+ </thead>
+ <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
+ @for (item of itemsSeleccionados(); track $index) {
+ <tr class="hover:bg-gray-50/50 transition-colors dark:hover:bg-gray-700/50">
+ <td class="px-4 py-2">
+ <input type="text" [value]="item.descripcion" (change)="updateItemField($index, 'descripcion', $any($event.target).value)" 
+ class="w-full bg-transparent border-0 border-b border-dashed border-gray-300 focus:ring-0 focus:border-slate-500 px-0 py-1 text-sm dark:text-white dark:border-gray-600" />
+ </td>
+ <td class="px-4 py-2">
+ <input type="number" [value]="item.cantidad" (change)="updateItemQuantity($index, $any($event.target).value)" min="0.01" step="0.01" 
+ class="w-full text-center bg-gray-50 border border-gray-200 rounded px-2 py-1 text-sm focus:ring-1 focus:ring-slate-500 focus:bg-white dark:bg-gray-900 dark:border-gray-600 dark:text-white" />
+ </td>
+ <td class="px-4 py-2">
+ <input type="number" [value]="item.valorUnitario" (change)="updateItemField($index, 'valorUnitario', $any($event.target).value)" min="0" step="0.01" 
+ class="w-full text-right bg-transparent border-0 border-b border-dashed border-gray-300 focus:ring-0 focus:border-slate-500 px-0 py-1 text-sm dark:text-white dark:border-gray-600" />
+ </td>
+ <td class="px-4 py-2 text-center text-gray-500">{{ item.porcentajeIVA }}%</td>
+ <td class="px-4 py-2 text-center text-gray-500">{{ item.descuento || 0 }}%</td>
+ <td class="px-4 py-2 text-right font-medium text-gray-800 dark:text-gray-200">{{ item.total | currency: '' : 'symbol' : '0.0-0' }}</td>
+ <td class="px-3 py-2 text-center">
+ <button type="button" (click)="removeItem($index)" class="text-gray-400 hover:text-red-500 transition-colors cursor-pointer" title="Eliminar ítem">
+ <i class="fa-solid fa-times"></i>
+ </button>
+ </td>
+ </tr>
+ }
+ @if (itemsSeleccionados().length === 0) {
+ <tr>
+ <td colspan="7" class="px-4 py-8 text-center text-gray-500">
+ <i class="fa-solid fa-receipt text-2xl mb-2 text-gray-300"></i>
+ <p class="text-sm">Selecciona una factura original para cargar sus ítems</p>
+ </td>
+ </tr>
+ }
+ </tbody>
+ </table>
+ </div>
+ </div>
 
-            <!-- Observaciones -->
-            <div class="bg-white p-4 rounded-md shadow-sm border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-                <label class="block text-xs font-medium text-gray-600 mb-1 dark:text-gray-400">Notas / Observaciones Internas</label>
-                <textarea [formControl]="form.controls.observaciones" rows="2" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm focus:ring-1 focus:ring-slate-500 focus:bg-white dark:bg-gray-900 dark:border-gray-600 dark:text-white" placeholder="Observaciones adicionales (opcional)..."></textarea>
-            </div>
-        </div>
+ <!-- Observaciones -->
+ <div class="bg-white p-4 rounded-md shadow-sm border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+ <label class="block text-xs font-medium text-gray-600 mb-1 dark:text-gray-400">Notas / Observaciones Internas</label>
+ <textarea [formControl]="form.controls.observaciones" rows="2" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm focus:ring-1 focus:ring-slate-500 focus:bg-white dark:bg-gray-900 dark:border-gray-600 dark:text-white" placeholder="Observaciones adicionales (opcional)..."></textarea>
+ </div>
+ </div>
 
-        <!-- Columna Lateral: Resumen y Acciones -->
-        <div class="lg:col-span-1 space-y-4">
-            
-            <!-- Tarjeta de Resumen Financiero -->
-            <div class="bg-white rounded-md shadow-sm border border-gray-200 sticky top-4 dark:bg-gray-800 dark:border-gray-700">
-                <div class="bg-slate-800 text-white p-4 rounded-t-md">
-                    <h3 class="font-semibold text-sm">Resumen de Totales</h3>
-                </div>
-                <div class="p-4 space-y-3">
-                    <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400">
-                        <span>Subtotal:</span>
-                        <span class="font-medium">{{ totales().subtotal | currency: '' : 'symbol' : '0.0-0' }}</span>
-                    </div>
-                    @if (totales().descuento > 0) {
-                        <div class="flex justify-between text-sm text-red-500">
-                            <span>Descuento:</span>
-                            <span class="font-medium">-{{ totales().descuento | currency: '' : 'symbol' : '0.0-0' }}</span>
-                        </div>
-                    }
-                    <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400">
-                        <span>Impuestos (IVA):</span>
-                        <span class="font-medium">{{ totales().iva | currency: '' : 'symbol' : '0.0-0' }}</span>
-                    </div>
-                    <div class="pt-3 mt-3 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                        <span class="font-bold text-gray-800 dark:text-white">TOTAL:</span>
-                        <span class="text-xl font-bold text-blue-600 dark:text-blue-400">{{ totales().total | currency: '' : 'symbol' : '0.0-0' }}</span>
-                    </div>
-                </div>
+ <!-- Columna Lateral: Resumen y Acciones -->
+ <div class="lg:col-span-1 space-y-4">
+ 
+ <!-- Tarjeta de Resumen Financiero -->
+ <div class="bg-white rounded-md shadow-sm border border-gray-200 sticky top-4 dark:bg-gray-800 dark:border-gray-700">
+ <div class="bg-slate-800 text-white p-4 rounded-t-md">
+ <h3 class="font-semibold text-sm">Resumen de Totales</h3>
+ </div>
+ <div class="p-4 space-y-3">
+ <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+ <span>Subtotal:</span>
+ <span class="font-medium">{{ totales().subtotal | currency: '' : 'symbol' : '0.0-0' }}</span>
+ </div>
+ @if (totales().descuento > 0) {
+ <div class="flex justify-between text-sm text-red-500">
+ <span>Descuento:</span>
+ <span class="font-medium">-{{ totales().descuento | currency: '' : 'symbol' : '0.0-0' }}</span>
+ </div>
+ }
+ <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400">
+ <span>Impuestos (IVA):</span>
+ <span class="font-medium">{{ totales().iva | currency: '' : 'symbol' : '0.0-0' }}</span>
+ </div>
+ <div class="pt-3 mt-3 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
+ <span class="font-bold text-gray-800 dark:text-white">TOTAL:</span>
+ <span class="text-xl font-bold text-blue-600 dark:text-blue-400">{{ totales().total | currency: '' : 'symbol' : '0.0-0' }}</span>
+ </div>
+ </div>
 
-                <!-- Botones de Acción -->
-                <div class="p-4 bg-gray-50 border-t border-gray-200 rounded-b-md flex flex-col gap-2 dark:bg-gray-900/50 dark:border-gray-700">
-                    <button type="button" (click)="onSubmit(true)" class="w-full flex justify-center items-center py-2 px-4 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 transition-colors cursor-pointer dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700">
-                        <i class="fa-solid fa-save mr-2 text-slate-400"></i>
-                        Guardar Borrador
-                    </button>
-                    
-                    <button type="button" (click)="onSubmit(false)" class="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-slate-800 hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 transition-colors cursor-pointer">
-                        <i class="fa-solid fa-check-double mr-2"></i>
-                        Registrar Nota
-                    </button>
-                    
-                    <a routerLink="/panel/compras/notas-ajuste" class="mt-2 text-center text-sm text-slate-500 hover:text-slate-700 font-medium transition-colors cursor-pointer dark:hover:text-slate-300">
-                        Cancelar y volver
-                    </a>
-                </div>
-            </div>
+ <!-- Botones de Acción -->
+ <div class="p-4 bg-gray-50 border-t border-gray-200 rounded-b-md flex flex-col gap-2 dark:bg-gray-900/50 dark:border-gray-700">
+ <button type="button" (click)="onSubmit(true)" class="w-full flex justify-center items-center py-2 px-4 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 transition-colors cursor-pointer dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700">
+ <i class="fa-solid fa-save mr-2 text-slate-400"></i>
+ Guardar Borrador
+ </button>
+ 
+ <button type="button" (click)="onSubmit(false)" class="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-slate-800 hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 transition-colors cursor-pointer">
+ <i class="fa-solid fa-check-double mr-2"></i>
+ Registrar Nota
+ </button>
+ 
+ <a routerLink="/panel/compras/notas-ajuste" class="mt-2 text-center text-sm text-slate-500 hover:text-slate-700 font-medium transition-colors cursor-pointer dark:hover:text-slate-300">
+ Cancelar y volver
+ </a>
+ </div>
+ </div>
 
-            <!-- Información de Factura Vinculada (Si hay una seleccionada) -->
-            @if (facturaSeleccionada()) {
-                <div class="bg-blue-50 border border-blue-100 rounded-md p-4 text-sm dark:bg-blue-900/20 dark:border-blue-800">
-                    <h4 class="font-semibold text-blue-800 mb-2 flex items-center dark:text-blue-300"><i class="fa-solid fa-info-circle mr-1.5"></i>Factura Vinculada</h4>
-                    <div class="space-y-1.5 text-blue-700 dark:text-blue-400">
-                        <p class="flex justify-between"><span>Número:</span> <strong>{{ facturaSeleccionada()?.numeroFacturaProveedor || facturaSeleccionada()?.numero }}</strong></p>
-                        <p class="flex justify-between"><span>Proveedor:</span> <strong>{{ facturaSeleccionada()?.proveedor?.razonSocial }}</strong></p>
-                        <p class="flex justify-between"><span>Saldo Pendiente:</span> <strong>{{ facturaSeleccionada()?.saldoPendiente | currency: '' : 'symbol' : '0.0-0' }}</strong></p>
-                        <p class="flex justify-between"><span>Forma de Pago:</span> <strong class="uppercase">{{ facturaSeleccionada()?.formaPago }}</strong></p>
-                    </div>
-                </div>
-            }
-        </div>
-    </div>
+ <!-- Información de Factura Vinculada (Si hay una seleccionada) -->
+ @if (facturaSeleccionada()) {
+ <div class="bg-blue-50 border border-blue-100 rounded-md p-4 text-sm dark:bg-blue-900/20 dark:border-blue-800">
+ <h4 class="font-semibold text-blue-800 mb-2 flex items-center dark:text-blue-300"><i class="fa-solid fa-info-circle mr-1.5"></i>Factura Vinculada</h4>
+ <div class="space-y-1.5 text-blue-700 dark:text-blue-400">
+ <p class="flex justify-between"><span>Número:</span> <strong>{{ facturaSeleccionada()?.numeroFacturaProveedor || facturaSeleccionada()?.numero }}</strong></p>
+ <p class="flex justify-between"><span>Proveedor:</span> <strong>{{ facturaSeleccionada()?.proveedor?.razonSocial }}</strong></p>
+ <p class="flex justify-between"><span>Saldo Pendiente:</span> <strong>{{ facturaSeleccionada()?.saldoPendiente | currency: '' : 'symbol' : '0.0-0' }}</strong></p>
+ <p class="flex justify-between"><span>Forma de Pago:</span> <strong class="uppercase">{{ facturaSeleccionada()?.formaPago }}</strong></p>
+ </div>
+ </div>
+ }
+ </div>
+ </div>
 </div>

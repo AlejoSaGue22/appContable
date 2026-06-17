@@ -4,46 +4,46 @@ import { AuthService } from '../services/auth.service';
 import { catchError, switchMap, throwError } from 'rxjs';
 
 export function authInterceptor(
-  req: HttpRequest<unknown>,
-  next: HttpHandlerFn
+ req: HttpRequest<unknown>,
+ next: HttpHandlerFn
 ) {
-  const authService = inject(AuthService);
-  const token = authService.token();
+ const authService = inject(AuthService);
+ const token = authService.token();
 
-  let authReq = req;
-  if (token) {
-    authReq = req.clone({
-      headers: req.headers.append('Authorization', `Bearer ${token}`),
-    });
-  }
+ let authReq = req;
+ if (token) {
+ authReq = req.clone({
+ headers: req.headers.append('Authorization', `Bearer ${token}`),
+ });
+ }
 
-  return next(authReq).pipe(
-    catchError((error: HttpErrorResponse) => {
-      if (req.url.includes('/auth/refresh') || req.url.includes('/auth/check-status')) {
-        authService.logout();
-        return throwError(() => error);
-      }
+ return next(authReq).pipe(
+ catchError((error: HttpErrorResponse) => {
+ if (req.url.includes('/auth/refresh') || req.url.includes('/auth/check-status')) {
+ authService.logout();
+ return throwError(() => error);
+ }
 
-      if (error.status === 401 && token) {
-        return authService.refreshToken().pipe(
-          switchMap((success) => {
-            if (success) {
-              const newToken = authService.token();
-              const retryReq = req.clone({
-                headers: req.headers.set('Authorization', `Bearer ${newToken}`),
-              });
-              return next(retryReq);
-            }
-            authService.logout();
-            return throwError(() => error);
-          }),
-          catchError((refreshError) => {
-            authService.logout();
-            return throwError(() => refreshError);
-          })
-        );
-      }
-      return throwError(() => error);
-    })
-  );
+ if (error.status === 401 && token) {
+ return authService.refreshToken().pipe(
+ switchMap((success) => {
+ if (success) {
+ const newToken = authService.token();
+ const retryReq = req.clone({
+ headers: req.headers.set('Authorization', `Bearer ${newToken}`),
+ });
+ return next(retryReq);
+ }
+ authService.logout();
+ return throwError(() => error);
+ }),
+ catchError((refreshError) => {
+ authService.logout();
+ return throwError(() => refreshError);
+ })
+ );
+ }
+ return throwError(() => error);
+ })
+ );
 }

@@ -4,22 +4,22 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+ providedIn: 'root'
 })
 export class PaginationService {
 
-  private activateRoute = inject(ActivatedRoute);
+ private activateRoute = inject(ActivatedRoute);
 
-  currentPage = toSignal(
-      this.activateRoute.queryParamMap.pipe(
-        map((params) => params.get('page') ? +params.get('page')! : 1),
-        map((page) => (isNaN(page) ? 1 : page))
-      ),
-      {
-        initialValue: 1
-      }
-  )
+ currentPage = toSignal(
+ this.activateRoute.queryParamMap.pipe(
+ map((params) => params.get('page') ? +params.get('page')! : 1),
+ map((page) => (isNaN(page) ? 1 : page))
+ ),
+ {
+ initialValue: 1
+ }
+ )
 
-  totalItems = signal(0);
-  pageSize = signal(1);
+ totalItems = signal(0);
+ pageSize = signal(10);
 }

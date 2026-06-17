@@ -1,60 +1,60 @@
 <!-- Tree Sidebar Header -->
 <div class="px-5 py-4 border-b border-gray-100 bg-gray-50/50">
-  <h3 class="text-[11px] font-bold uppercase tracking-widest text-gray-400">Nombre</h3>
+ <h3 class="text-[11px] font-bold uppercase text-gray-400">Nombre</h3>
 </div>
 
 <!-- Tree List -->
 <div class="overflow-y-auto flex-1">
-  @for (cuenta of visibleCuentas(); track cuenta.id) {
-    <div
-      (click)="onSelect(cuenta)"
-      class="flex items-center gap-1 px-4 py-2.5 cursor-pointer border-b border-gray-50 transition-all duration-150 group select-none"
-      [class.bg-blue-50]="selectedId() === cuenta.id"
-      [class.border-l-2]="selectedId() === cuenta.id"
-      [class.border-l-blue-500]="selectedId() === cuenta.id"
-      [class.hover\:bg-gray-50]="selectedId() !== cuenta.id"
-      [style.padding-left.rem]="0.75 + (getDerivedLevel(cuenta.codigo) - 1) * 1.2"
-    >
-        <!-- Expand/Collapse Toggle -->
-        @if (hasChildren(cuenta)) {
-          <button (click)="toggleExpand($event, cuenta.id)" 
-            class="w-5 h-5 flex items-center cursor-pointer justify-center text-gray-400 hover:text-blue-600 transition-colors flex-shrink-0">
-            @if (isExpanded(cuenta.id)) {
-              <span class="text-sm font-bold">—</span>
-            } @else {
-              <span class="text-sm font-bold">+</span>
-            }
-          </button>
-        } @else {
-          <div class="w-5 h-5 flex items-center justify-center flex-shrink-0">
-            <span class="text-[10px] text-gray-300">•</span>
-          </div>
-        }
+ @for (cuenta of visibleCuentas(); track cuenta.id) {
+ <div
+ (click)="onSelect(cuenta)"
+ class="flex items-center gap-1 px-4 py-2.5 cursor-pointer border-b border-gray-50 transition-all duration-150 group select-none"
+ [class.bg-blue-50]="selectedId() === cuenta.id"
+ [class.border-l-2]="selectedId() === cuenta.id"
+ [class.border-l-blue-500]="selectedId() === cuenta.id"
+ [class.hover\:bg-gray-50]="selectedId() !== cuenta.id"
+ [style.padding-left.rem]="0.75 + (getDerivedLevel(cuenta.codigo) - 1) * 1.2"
+ >
+ <!-- Expand/Collapse Toggle -->
+ @if (hasChildren(cuenta)) {
+ <button (click)="toggleExpand($event, cuenta.id)" 
+ class="w-5 h-5 flex items-center cursor-pointer justify-center text-gray-400 hover:text-blue-600 transition-colors flex-shrink-0">
+ @if (isExpanded(cuenta.id)) {
+ <span class="text-sm font-bold">—</span>
+ } @else {
+ <span class="text-sm font-bold">+</span>
+ }
+ </button>
+ } @else {
+ <div class="w-5 h-5 flex items-center justify-center flex-shrink-0">
+ <span class="text-[10px] text-gray-300">•</span>
+ </div>
+ }
 
-        <!-- Code + Name -->
-        <span class="text-sm truncate flex-1 min-w-0 font-medium"
-          [class.text-gray-900]="getDerivedLevel(cuenta.codigo) <= 2"
-          [class.text-gray-700]="getDerivedLevel(cuenta.codigo) === 3"
-          [class.text-gray-500]="getDerivedLevel(cuenta.codigo) > 3"
-          [class.text-blue-700]="selectedId() === cuenta.id"
-        >
-          {{ cuenta.codigo }} - {{ cuenta.nombre }}
-        </span>
+ <!-- Code + Name -->
+ <span class="text-sm truncate flex-1 min-w-0 font-medium"
+ [class.text-gray-900]="getDerivedLevel(cuenta.codigo) <= 2"
+ [class.text-gray-700]="getDerivedLevel(cuenta.codigo) === 3"
+ [class.text-gray-500]="getDerivedLevel(cuenta.codigo) > 3"
+ [class.text-blue-700]="selectedId() === cuenta.id"
+ >
+ {{ cuenta.codigo }} - {{ cuenta.nombre }}
+ </span>
 
-        <!-- Add subcuenta button (on hover) -->
-        <button (click)="onAdd($event, cuenta)"
-          class="w-5 h-5 flex items-center justify-center text-gray-300 hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-all flex-shrink-0"
-          title="Agregar Subcuenta">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
-          </svg>
-        </button>
-    </div>
-  }
+ <!-- Add subcuenta button (on hover) -->
+ <button (click)="onAdd($event, cuenta)"
+ class="w-5 h-5 flex items-center justify-center text-gray-300 hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-all flex-shrink-0"
+ title="Agregar Subcuenta">
+ <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+ </svg>
+ </button>
+ </div>
+ }
 
-  @if (visibleCuentas().length === 0) {
-    <div class="px-5 py-12 text-center text-gray-400">
-      <p class="text-sm">No se encontraron cuentas</p>
-    </div>
-  }
+ @if (visibleCuentas().length === 0) {
+ <div class="px-5 py-12 text-center text-gray-400">
+ <p class="text-sm">No se encontraron cuentas</p>
+ </div>
+ }
 </div>

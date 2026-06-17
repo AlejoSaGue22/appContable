@@ -9,107 +9,107 @@ import { Municipality } from '@dashboard/interfaces/catalogs-interface';
 const baseUrl = environment.baseUrl;
 
 const emptyCliente: ClientesFormInterface = {
-  apellido: '',
-  ciudad: '',
-  direccion: '',
-  email: '',
-  id: '',
-  nombre: '',
-  numeroDocumento: '',
-  observacion: '',
-  razonSocial: '',
-  isActive: true,
-  responsableFiscal: '',
-  telefono: '',
-  tipoDocumento: '',
-  tipoPersona: '',
-  tributo: '',
-  dv: '',
-  
+ apellido: '',
+ ciudad: '',
+ direccion: '',
+ email: '',
+ id: '',
+ nombre: '',
+ numeroDocumento: '',
+ observacion: '',
+ razonSocial: '',
+ isActive: true,
+ responsableFiscal: '',
+ telefono: '',
+ tipoDocumento: '',
+ tipoPersona: '',
+ tributo: '',
+ dv: '',
+ 
 }
 
 @Injectable({
-  providedIn: 'root'
+ providedIn: 'root'
 })
 export class ClientesService {
 
-  private http = inject(HttpClient);
-  clienteRegistrados = signal<ClientesInterfaceResponse[]>([]);
-  private clientCache = new Map<string, ClientesResponse>();
-  private municipalitiesCache: Municipality[] | null = null;
+ private http = inject(HttpClient);
+ clienteRegistrados = signal<ClientesInterfaceResponse[]>([]);
+ private clientCache = new Map<string, ClientesResponse>();
+ private municipalitiesCache: Municipality[] | null = null;
 
-  getClientes(options: Options): Observable<ClientesResponse> {
-    const { limit = 10, offset = 0, search } = options;
+ getClientes(options: Options): Observable<ClientesResponse> {
+ const { limit = 10, offset = 0, search } = options;
 
-    const params: any = {
-      limit,
-      offset
-    };
+ const params: any = {
+ limit,
+ offset
+ };
 
-    if (search) {
-      params.search = search;
-    }
+ if (search) {
+ params.search = search;
+ }
 
-    return this.http.get<ClientesResponse>(`${baseUrl}/clientes`, {
-      params
-    }).pipe(
-      delay(100),
-    )
+ return this.http.get<ClientesResponse>(`${baseUrl}/clientes`, {
+ params
+ }).pipe(
+ delay(100),
+ )
 
-  }
+ }
 
 
-  getClientesById(id: string): Observable<ClientesFormInterface> {
+ getClientesById(id: string): Observable<ClientesFormInterface> {
 
-    if (id == 'new-Item') {
-      return of(emptyCliente);
-    }
+ if (id == 'new-Item') {
+ return of(emptyCliente);
+ }
 
-    return this.http.get<ClientesFormInterface>(`${baseUrl}/clientes/${id}`).pipe(
-      delay(300)
-    )
+ return this.http.get<ClientesFormInterface>(`${baseUrl}/clientes/${id}`).pipe(
+ delay(300)
+ )
 
-  }
+ }
 
-  actualizarClientes(id: string, cliente: Partial<ClientesFormInterface>) {
+ actualizarClientes(id: string, cliente: Partial<ClientesFormInterface>) {
 
-    const clienteUpdate = cliente as ClientesFormInterface;
+ const clienteUpdate = cliente as ClientesFormInterface;
 
-    return this.http.patch(`${baseUrl}/clientes/${id}`, clienteUpdate).pipe(
-      map((client): ResponseResult => ({ success: true, data: client })),
-      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
-    )
-  }
+ return this.http.patch(`${baseUrl}/clientes/${id}`, clienteUpdate).pipe(
+ map((client): ResponseResult => ({ success: true, data: client })),
+ catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+ )
+ }
 
-  agregarCliente(cliente: Partial<ClientesFormInterface>): Observable<ResponseResult> {
+ agregarCliente(cliente: Partial<ClientesFormInterface>): Observable<ResponseResult> {
 
-    return this.http.post<ClientesInterfaceResponse>(`${baseUrl}/clientes`, cliente).pipe(
-      map((client): ResponseResult => ({ success: true, data: client })),
-      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
-    )
-  }
+ return this.http.post<ClientesInterfaceResponse>(`${baseUrl}/clientes`, cliente).pipe(
+ map((client): ResponseResult => ({ success: true, data: client })),
+ catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+ )
+ }
 
-  deleteCliente(id: string) {
+ deleteCliente(id: string) {
 
-    return this.http.delete(`${baseUrl}/clientes/delete/${id}`).pipe(
-      map((client): ResponseResult => ({ success: true, data: client })),
-      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
-    )
+ return this.http.delete(`${baseUrl}/clientes/delete/${id}`).pipe(
+ map((client): ResponseResult => ({ success: true, data: client })),
+ catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+ )
 
-  }
+ }
 
-  getMunicipalities(): Observable<Municipality[]> {
-    if (this.municipalitiesCache) {
-      return of(this.municipalitiesCache);
-    }
+ getMunicipalities(): Observable<Municipality[]> {
+ if (this.municipalitiesCache) {
+ return of(this.municipalitiesCache);
+ }
 
-    return this.http.get<Municipality[]>(`${baseUrl}/municipalities`).pipe(
-      tap(municipalities => this.municipalitiesCache = municipalities),
-      catchError(error => {
-        console.error('Error fetching municipalities', error);
-        return of([]);
-      })
-    );
-  }
+ return this.http.get<Municipality[]>(`${baseUrl}/municipalities`).pipe(
+ tap(municipalities => this.municipalitiesCache = municipalities),
+ catchError(error => {
+ console.error('Error fetching municipalities', error);
+ return of([]);
+ })
+ );
+ }
 
 }

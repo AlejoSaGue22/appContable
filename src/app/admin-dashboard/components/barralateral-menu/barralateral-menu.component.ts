@@ -5,32 +5,32 @@ import { MenuOption } from '@dashboard/layouts/admin-layouts/admin-layouts.compo
 import { MenuItem } from '@utils/menu.config';
 
 @Component({
-  selector: 'app-barralateral-menu',
-  imports: [RouterLink, NgClass, RouterLinkActive],
-  templateUrl: './barralateral-menu.component.html',
+ selector: 'app-barralateral-menu',
+ imports: [RouterLink, NgClass, RouterLinkActive],
+ templateUrl: './barralateral-menu.component.html',
 })
 export class BarralateralMenuComponent {
 
-  title = input.required<string>();
-  menuSection = input<MenuItem>();
-  subItems = input.required<MenuItem[]>();
-  defaultOpen = input<boolean>(false);
-  activeMenu = input<string | null>(null);
-  isActive = input<boolean>(false);
-  menuId = input<string>();
-  menuToggled = output<string>();
+ title = input.required<string>();
+ menuSection = input<MenuItem>();
+ subItems = input.required<MenuItem[]>();
+ defaultOpen = input<boolean>(false);
+ activeMenu = input<string | null>(null);
+ isActive = input<boolean>(false);
+ menuId = input<string>();
+ menuToggled = output<string>();
 
-  children = computed(() => {
-    return this.menuSection()?.children ?? [];
-  });
+ children = computed(() => {
+ return this.menuSection()?.children ?? [];
+ });
 
-  get isOpen(): boolean {
-    return this.activeMenu() === this.menuId();
-  }
+ get isOpen(): boolean {
+ return this.activeMenu() === this.menuId();
+ }
 
-  toggleMenu() {
-    this.menuToggled.emit(this.menuId()!)
-  }
+ toggleMenu() {
+ this.menuToggled.emit(this.menuId()!)
+ }
 
 
 

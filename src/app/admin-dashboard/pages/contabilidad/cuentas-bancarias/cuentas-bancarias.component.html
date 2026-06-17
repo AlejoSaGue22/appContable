@@ -1,104 +1,95 @@
 <div class="space-y-6 animate-fade-in">
 
-  <header-title-page [titleHead]="headTitle">
-    <div actions class="flex gap-2">
-      <button (click)="cuentasResource.reload()"
-              class="inline-flex items-center justify-center cursor-pointer px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-bold rounded-xl transition-all active:scale-95 group">
-        <svg class="mr-2 h-4 w-4 transition-transform group-hover:rotate-180 duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-        </svg>
-        Actualizar
-      </button>
+ <header-title-page [titleHead]="headTitle">
+ <div actions class="flex gap-2">
+ <button (click)="cuentasResource.reload()"
+ class="inline-flex items-center justify-center cursor-pointer px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-bold rounded-xl transition-all active:scale-95 group">
+ <svg class="mr-2 h-4 w-4 transition-transform group-hover:rotate-180 duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+ </svg>
+ Actualizar
+ </button>
 
-      <button (click)="openTransferenciaModal()" 
-              class="inline-flex items-center justify-center cursor-pointer px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 group">
-        <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-        </svg>
-        Transferir
-      </button>
+ <button (click)="openTransferenciaModal()" 
+ class="inline-flex items-center justify-center cursor-pointer px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 group">
+ <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+ </svg>
+ Transferir
+ </button>
 
-      <button (click)="openCreateModal()" 
-              class="inline-flex items-center justify-center cursor-pointer px-6 py-2.5 bg-gray-900 hover:bg-black text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 group">
-        <svg class="mr-2 h-4 w-4 transition-transform group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
-        </svg>
-        Nueva Cuenta
-      </button>
-    </div>
-  </header-title-page>
+ <button (click)="openCreateModal()" 
+ class="inline-flex items-center justify-center cursor-pointer px-6 py-2.5 bg-gray-900 hover:bg-black text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 group">
+ <svg class="mr-2 h-4 w-4 transition-transform group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
+ </svg>
+ Nueva Cuenta
+ </button>
+ </div>
+ </header-title-page>
 
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-500">
-    @if (cuentasResource.isLoading()) {
-      <div class="flex flex-col justify-center items-center h-80 space-y-4">
-        <app-loader />
-        <p class="text-sm font-medium text-gray-400 animate-pulse">Sincronizando cuentas...</p>
-      </div>
-    }
+ <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-500">
+ @if (cuentasResource.isLoading()) {
+ <div class="flex flex-col justify-center items-center h-80 space-y-4">
+ <app-loader />
+ <p class="text-sm font-medium text-gray-400 animate-pulse">Sincronizando cuentas...</p>
+ </div>
+ }
 
-    @if (cuentasResource.hasValue()) {
-      <app-table-banco [cuentas]="cuentas()" 
-        (openEditModal)="openEditModal($event)"
-        (deleteCuenta)="deleteCuenta($event)"
-      />
+ @if (cuentasResource.hasValue()) {
+ <app-table-banco [cuentas]="cuentas()" 
+ (openEditModal)="openEditModal($event)"
+ (deleteCuenta)="deleteCuenta($event)"
+ />
 
-      <app-pagination [length]="cuentas().length"/>  
-    }
-  </div>
+ <app-pagination [length]="cuentas().length"/> 
+ }
+ </div>
 </div>
 
 <!-- Modal -->
 @if (isModalOpen()) {
-  <app-cuenta-form-modal 
-    [isOpen]="isModalOpen()"
-    [account]="selectedAccount()"
-    (close)="closeModal()"
-    (submit)="onFormSubmit($event)"
-  ></app-cuenta-form-modal>
+ <app-cuenta-form-modal 
+ [isOpen]="isModalOpen()"
+ [account]="selectedAccount()"
+ (close)="closeModal()"
+ (submit)="onFormSubmit($event)"
+ ></app-cuenta-form-modal>
 }
 
 <!-- Modal Transferencia -->
 @if (isTransferenciaModalOpen()) {
-  <app-transferencia-modal 
-    [isOpen]="isTransferenciaModalOpen()"
-    [cuentas]="cuentas()"
-    (close)="closeTransferenciaModal()"
-    (submit)="onTransferenciaSubmit()"
-  ></app-transferencia-modal>
+ <app-transferencia-modal 
+ [isOpen]="isTransferenciaModalOpen()"
+ [cuentas]="cuentas()"
+ (close)="closeTransferenciaModal()"
+ (submit)="onTransferenciaSubmit()"
+ ></app-transferencia-modal>
 }
 
 <!-- Modal de Eliminación -->
 <app-modal [(visible)]="isDeleteModalVisible">
-    <div class="p-6 text-center">
-        <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-        </div>
-        <h3 class="text-xl font-black text-gray-900 mb-2">¿Eliminar cuenta bancaria?</h3>
-        <p class="text-sm text-gray-500 mb-8 max-w-xs mx-auto">
-            Esta acción eliminará la cuenta bancaria permanentemente. ¿Deseas continuar?
-        </p>
+ <div class="p-6 text-center">
+ <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+ <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+ </svg>
+ </div>
+ <h3 class="text-xl font-black text-gray-900 mb-2">¿Eliminar cuenta bancaria?</h3>
+ <p class="text-sm text-gray-500 mb-8 max-w-xs mx-auto">
+ Esta acción eliminará la cuenta bancaria permanentemente. ¿Deseas continuar?
+ </p>
 
-        <div class="flex flex-col sm:flex-row gap-3">
-            <button (click)="isDeleteModalVisible.set(false)" 
-                class="flex-1 px-6 py-3 border border-gray-100 text-sm font-bold text-gray-500 rounded-xl hover:bg-gray-50 transition-all cursor-pointer">
-                Cancelar
-            </button>
-            <button (click)="confirmDelete()" 
-                class="flex-1 px-6 py-3 bg-red-600 text-white text-sm font-bold rounded-xl hover:bg-red-700 shadow-lg shadow-red-200 transition-all active:scale-95 cursor-pointer">
-                Confirmar
-            </button>
-        </div>
-    </div>
+ <div class="flex flex-col sm:flex-row gap-3">
+ <button (click)="isDeleteModalVisible.set(false)" 
+ class="flex-1 px-6 py-3 border border-gray-100 text-sm font-bold text-gray-500 rounded-xl hover:bg-gray-50 transition-all cursor-pointer">
+ Cancelar
+ </button>
+ <button (click)="confirmDelete()" 
+ class="flex-1 px-6 py-3 bg-red-600 text-white text-sm font-bold rounded-xl hover:bg-red-700 shadow-lg shadow-red-200 transition-all active:scale-95 cursor-pointer">
+ Confirmar
+ </button>
+ </div>
+ </div>
 </app-modal>
 
-<style>
-  .animate-fade-in {
-    animation: fadeIn 0.4s ease-out;
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-</style>

@@ -5,17 +5,17 @@ import { GetProductosDetalle } from '@dashboard/interfaces/productos-interface';
 import { modalOpen } from '@shared/interfaces/services.interfaces';
 
 @Component({
-  selector: 'app-table-productos',
-  imports: [CommonModule, RouterLink, CurrencyPipe, TitleCasePipe],
-  templateUrl: './table-productos.component.html',
-  standalone: true
+ selector: 'app-table-productos',
+ imports: [CommonModule, RouterLink, CurrencyPipe, TitleCasePipe],
+ templateUrl: './table-productos.component.html',
+ standalone: true
 })
 export class TableProductosComponent {
 
-  productosData = input<GetProductosDetalle[]>([]);
-  @Output() delete = new EventEmitter<modalOpen>();
+ productosData = input<GetProductosDetalle[]>([]);
+ @Output() delete = new EventEmitter<modalOpen>();
 
-  onDeleteProducto(id: string) {
-    this.delete.emit({ open: true, id });
-  }
+ onDeleteProducto(id: string) {
+ this.delete.emit({ open: true, id });
+ }
 }

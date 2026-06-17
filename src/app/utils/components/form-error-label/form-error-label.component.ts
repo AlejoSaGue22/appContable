@@ -3,17 +3,17 @@ import { AbstractControl, ValidationErrors } from '@angular/forms';
 import { FormUtils } from 'src/app/utils/form.utils';
 
 @Component({
-  selector: 'form-error-label',
-  imports: [],
-  templateUrl: './form-error-label.component.html',
+ selector: 'form-error-label',
+ imports: [],
+ templateUrl: './form-error-label.component.html',
 })
 export class FormErrorLabelComponent { 
 
-    errorType = input.required<AbstractControl>();
+ errorType = input.required<AbstractControl>();
 
-    get errorMessage() {
-      const errors: ValidationErrors = this.errorType()?.errors || {};
+ get errorMessage() {
+ const errors: ValidationErrors = this.errorType()?.errors || {};
 
-      return this.errorType()?.touched && Object.keys(errors).length > 0 ? FormUtils.getTextError(errors) : null;
-    }
+ return this.errorType()?.touched && Object.keys(errors).length > 0 ? FormUtils.getTextError(errors) : null;
+ }
 }

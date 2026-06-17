@@ -15,125 +15,132 @@ import { ModalComponents } from '@shared/components/modal.components/modal.compo
 import { PaginationComponent } from '@shared/components/pagination/pagination';
 import { HelpersUtils } from '@utils/helpers.utils';
 import { AuthService } from 'src/app/auth/services/auth.service';
+import { HeaderInput, HeaderTitlePageComponent } from '@dashboard/components/header-title-page/header-title-page.component';
 
 @Component({
-  selector: 'app-users',
-  imports: [
-    CommonModule,
-    RouterLink,
-    LoaderComponent,
-    ErrorPages,
-    ModalComponents,
-    PaginationComponent,
-    ReactiveFormsModule
-  ],
-  templateUrl: './users.component.html',
-  standalone: true
+ selector: 'app-users',
+ imports: [
+ CommonModule,
+ RouterLink,
+ LoaderComponent,
+ ErrorPages,
+ ModalComponents,
+ PaginationComponent,
+ ReactiveFormsModule,
+ HeaderTitlePageComponent
+ ],
+ templateUrl: './users.component.html',
+ standalone: true
 })
 export class UsersComponent {
-  usersService = inject(UsersService);
-  authService = inject(AuthService);
-  paginationService = inject(PaginationService);
-  notificationService = inject(NotificationService);
+ usersService = inject(UsersService);
+ authService = inject(AuthService);
+ paginationService = inject(PaginationService);
+ notificationService = inject(NotificationService);
 
-  searchTerm = signal<string>('');
-  isModalVisible = false;
-  isPasswordModalVisible = false;
-  userIdToDelete = signal<string>('');
-  userIdForPassword = signal<string>('');
+ headTitle: HeaderInput = {
+ title: 'Gestión de Usuarios',
+ slog: 'Administra los usuarios y sus permisos en el sistema'
+ };
 
-  passwordForm = new FormGroup({
-    password: new FormControl('', [Validators.required, Validators.minLength(6)]),
-    confirmPassword: new FormControl('', [Validators.required])
-  });
+ searchTerm = signal<string>('');
+ isModalVisible = false;
+ isPasswordModalVisible = false;
+ userIdToDelete = signal<string>('');
+ userIdForPassword = signal<string>('');
 
-  // Sincronizar búsqueda con delay (debounce)
-  searchEffect = effect((onCleanup) => {
-    const value = this.searchTerm();
-    const timeout = setTimeout(() => {
-      // La paginación se resetea vía URL si fuera necesario, 
-      // pero por ahora solo disparamos la búsqueda
-    }, 500);
-    onCleanup(() => clearTimeout(timeout));
-  });
+ passwordForm = new FormGroup({
+ password: new FormControl('', [Validators.required, Validators.minLength(6)]),
+ confirmPassword: new FormControl('', [Validators.required])
+ });
 
-  usersResource = rxResource({
-    request: () => ({
-      page: this.paginationService.currentPage(),
-      limit: 10,
-      search: this.searchTerm()
-    }),
-    loader: ({ request }) => this.usersService.getUsers(request).pipe(
-      tap((response) => {
-        this.paginationService.totalItems.set(response.meta?.total || 0);
-        this.paginationService.pageSize.set(response.meta?.totalPages || 10);
-      })
-    )
-  });
+ // Sincronizar búsqueda con delay (debounce)
+ searchEffect = effect((onCleanup) => {
+ const value = this.searchTerm();
+ const timeout = setTimeout(() => {
+ // La paginación se resetea vía URL si fuera necesario, 
+ // pero por ahora solo disparamos la búsqueda
+ }, 500);
+ onCleanup(() => clearTimeout(timeout));
+ });
 
-  openDeleteModal(event: modalOpen) {
-    this.isModalVisible = event.open;
-    this.userIdToDelete.set(event.id);
-  }
+ usersResource = rxResource({
+ request: () => ({
+ page: this.paginationService.currentPage(),
+ limit: 10,
+ search: this.searchTerm()
+ }),
+ loader: ({ request }) => this.usersService.getUsers(request).pipe(
+ tap((response) => {
+ this.paginationService.totalItems.set(response.meta?.total || 0);
+ this.paginationService.pageSize.set(response.meta?.totalPages || 10);
+ })
+ )
+ });
 
-  async onDeleteUser() {
-    const id = this.userIdToDelete();
-    if (!id) return;
+ openDeleteModal(event: modalOpen) {
+ this.isModalVisible = event.open;
+ this.userIdToDelete.set(event.id);
+ }
 
-    const result = await firstValueFrom(this.usersService.deleteUser(id));
-    this.isModalVisible = false;
+ async onDeleteUser() {
+ const id = this.userIdToDelete();
+ if (!id) return;
 
-    if (!result.success) {
-        this.notificationService.error(
-          `Error al eliminar usuario: ${HelpersUtils.getMessageError(result.message)}`,
-          'Error',
-          5000
-        );
-        return;
-    }
+ const result = await firstValueFrom(this.usersService.deleteUser(id));
+ this.isModalVisible = false;
 
-    this.notificationService.success(
-      'Usuario eliminado correctamente',
-      'Completado',
-      3000
-    );
+ if (!result.success) {
+ this.notificationService.error(
+ `Error al eliminar usuario: ${HelpersUtils.getMessageError(result.message)}`,
+ 'Error',
+ 5000
+ );
+ return;
+ }
 
-    // Recargar recurso
-    this.usersResource.reload();
-  }
+ this.notificationService.success(
+ 'Usuario eliminado correctamente',
+ 'Completado',
+ 3000
+ );
 
-  onSearch(value: string) {
-    this.searchTerm.set(value);
-  }
+ // Recargar recurso
+ this.usersResource.reload();
+ }
 
-  openPasswordModal(id: string) {
-    this.userIdForPassword.set(id);
-    this.passwordForm.reset();
-    this.isPasswordModalVisible = true;
-  }
+ onSearch(value: string) {
+ this.searchTerm.set(value);
+ }
 
-  async onChangePassword() {
-    if (this.passwordForm.invalid) return;
-    
-    const { password, confirmPassword } = this.passwordForm.value;
-    if (password !== confirmPassword) {
-      this.notificationService.error('Las contraseñas no coinciden', 'Error');
-      return;
-    }
+ openPasswordModal(id: string) {
+ this.userIdForPassword.set(id);
+ this.passwordForm.reset();
+ this.isPasswordModalVisible = true;
+ }
 
-    const id = this.userIdForPassword();
-    const result = await firstValueFrom(this.authService.changePassword(id, password!));
-    this.isPasswordModalVisible = false;
+ async onChangePassword() {
+ if (this.passwordForm.invalid) return;
+ 
+ const { password, confirmPassword } = this.passwordForm.value;
+ if (password !== confirmPassword) {
+ this.notificationService.error('Las contraseñas no coinciden', 'Error');
+ return;
+ }
 
-    if (!result.success) {
-      this.notificationService.error(
-        `Error al cambiar contraseña: ${HelpersUtils.getMessageError(result.message)}`,
-        'Error'
-      );
-      return;
-    }
+ const id = this.userIdForPassword();
+ const result = await firstValueFrom(this.authService.changePassword(id, password!));
+ this.isPasswordModalVisible = false;
 
-    this.notificationService.success(result.message || 'Contraseña actualizada correctamente', 'Completado');
-    this.usersResource.reload();
-  }
+ if (!result.success) {
+ this.notificationService.error(
+ `Error al cambiar contraseña: ${HelpersUtils.getMessageError(result.message)}`,
+ 'Error'
+ );
+ return;
+ }
+
+ this.notificationService.success(result.message || 'Contraseña actualizada correctamente', 'Completado');
+ this.usersResource.reload();
+ }
 }

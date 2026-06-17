@@ -5,22 +5,22 @@ import { ClientesInterfaceResponse } from '@dashboard/interfaces/clientes-interf
 import { modalOpen } from '@shared/interfaces/services.interfaces';
 
 @Component({
-  selector: 'app-table-clients',
-  imports: [CommonModule, RouterLink],
-  templateUrl: './table-clients.component.html',
-  standalone: true
+ selector: 'app-table-clients',
+ imports: [CommonModule, RouterLink],
+ templateUrl: './table-clients.component.html',
+ standalone: true
 })
 export class TableClientsComponent {
 
-  clientesData = input<ClientesInterfaceResponse[]>([]);
-  @Output() delete = new EventEmitter<modalOpen>();
-  @Output() view = new EventEmitter<ClientesInterfaceResponse>();
+ clientesData = input<ClientesInterfaceResponse[]>([]);
+ @Output() delete = new EventEmitter<modalOpen>();
+ @Output() view = new EventEmitter<ClientesInterfaceResponse>();
 
-  onDeleteCliente(id: string) {
-    this.delete.emit({ open: true, id });
-  }
+ onDeleteCliente(id: string) {
+ this.delete.emit({ open: true, id });
+ }
 
-  onViewCliente(cliente: ClientesInterfaceResponse) {
-    this.view.emit(cliente);
-  }
+ onViewCliente(cliente: ClientesInterfaceResponse) {
+ this.view.emit(cliente);
+ }
 }

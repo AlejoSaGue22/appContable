@@ -5,30 +5,30 @@ import { UserFormsPageComponent } from "./users/users-forms-page/user-forms-page
 import { RolesComponent } from "./roles/roles.component";
 
 export const administracionRoutes: Routes = [
-    {
-        path: 'users',
-        component: UsersComponent
-    },
-    {
-        path: 'users/:id',
-        component: UserFormsPageComponent
-    },
-    {
-        path: 'menu',
-        loadChildren: () => import('./menu/menu.routes')
-    },
-    {
-        path: 'roles',
-        component: RolesComponent
-    },
-    {
-        path: 'settings',
-        loadChildren: () => import('./configuraciones/configuraciones.routes')
-    },
-    {
-        path: '**',
-        component: ErrorPageComponent
-    }
+ {
+ path: 'users',
+ component: UsersComponent
+ },
+ {
+ path: 'users/:id',
+ component: UserFormsPageComponent
+ },
+ {
+ path: 'menu',
+ loadChildren: () => import('./menu/menu.routes')
+ },
+ {
+ path: 'roles',
+ component: RolesComponent
+ },
+ {
+ path: 'settings',
+ loadChildren: () => import('./configuraciones/configuraciones.routes')
+ },
+ {
+ path: '**',
+ component: ErrorPageComponent
+ }
 ];
 
 export default administracionRoutes;

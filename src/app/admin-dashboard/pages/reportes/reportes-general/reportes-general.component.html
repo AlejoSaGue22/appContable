@@ -1,303 +1,264 @@
 <header-title-page [titleHead]="headTitle" />
 
 <div class="w-full px-4 sm:px-6 lg:px-8 py-6 animate-fade-in">
-    <div class="max-w-7xl mx-auto space-y-8">
+ <div class="max-w-7xl mx-auto space-y-8">
 
-        <!-- Filtros de Período -->
-        <div class="bg-white/70 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100/50 p-6 transition-all duration-300">
-            <div class="flex flex-col md:flex-row md:items-end gap-6">
-                <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div class="space-y-2">
-                        <label class="font-medium text-gray-400 ml-1">Fecha Inicio</label>
-                        <input type="date" [ngModel]="fechaInicio()" (ngModelChange)="fechaInicio.set($event)"
-                            class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all">
-                    </div>
-                    <div class="space-y-2">
-                        <label class="font-medium text-gray-400 ml-1">Fecha Fin</label>
-                        <input type="date" [ngModel]="fechaFin()" (ngModelChange)="fechaFin.set($event)"
-                            class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all">
-                    </div>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button (click)="generarReporte()"
-                        [disabled]="loading()"
-                        class="h-[36px] px-4 bg-slate-900 hover:bg-slate-700 cursor-pointer text-white text-sm font-bold rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[160px]">
-                        @if (loading()) {
-                            <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                        } @else {
-                            <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                            </svg>
-                        }
-                        {{ loading() ? 'Sincronizando...' : 'Actualizar' }}
-                    </button>
-                    <button (click)="limpiarTabla()"
-                        [disabled]="loading()"
-                        class="h-[36px] px-4 bg-slate-100 hover:bg-slate-200 cursor-pointer text-slate-900 text-sm font-bold rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center">
-                        <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                        Limpiar
-                    </button>
-                </div>
-            </div>
-        </div>
+ <!-- Filtros de Período -->
+ <div class="bg-white/70 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100/50 p-6 transition-all duration-300">
+ <div class="flex flex-col md:flex-row md:items-end gap-6">
+ <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-6">
+ <div class="space-y-2">
+ <label class="font-medium text-gray-400 ml-1">Fecha Inicio</label>
+ <input type="date" [ngModel]="fechaInicio()" (ngModelChange)="fechaInicio.set($event)"
+ class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all">
+ </div>
+ <div class="space-y-2">
+ <label class="font-medium text-gray-400 ml-1">Fecha Fin</label>
+ <input type="date" [ngModel]="fechaFin()" (ngModelChange)="fechaFin.set($event)"
+ class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all">
+ </div>
+ </div>
+ <div class="flex items-center gap-2">
+ <button (click)="generarReporte()"
+ [disabled]="loading()"
+ class="h-[36px] px-4 bg-slate-900 hover:bg-slate-700 cursor-pointer text-white text-sm font-bold rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[160px]">
+ @if (loading()) {
+ <svg class="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
+ <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+ <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+ </svg>
+ } @else {
+ <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+ </svg>
+ }
+ {{ loading() ? 'Sincronizando...' : 'Actualizar' }}
+ </button>
+ <button (click)="limpiarTabla()"
+ [disabled]="loading()"
+ class="h-[36px] px-4 bg-slate-100 hover:bg-slate-200 cursor-pointer text-slate-900 text-sm font-bold rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center">
+ <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+ </svg>
+ Limpiar
+ </button>
+ </div>
+ </div>
+ </div>
 
-        <!-- Tabs Navigation -->
-        <div class="flex items-center p-1 bg-gray-100/50 backdrop-blur-md rounded-2xl w-fit flex-wrap gap-1">
-            <button (click)="onTabChange('facturacion')"
-                [class]="activeTab() === 'facturacion' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
-                class="px-6 py-2.5 rounded-xl text-md font-bold transition-all duration-300 cursor-pointer">
-                Dashboard Facturación
-            </button>
-            <button (click)="onTabChange('facturas-venta')"
-                [class]="activeTab() === 'facturas-venta' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
-                class="px-6 py-2.5 rounded-xl text-md font-bold transition-all duration-300 cursor-pointer">
-                Ventas
-            </button>
-            <button (click)="onTabChange('facturas-compra')"
-                [class]="activeTab() === 'facturas-compra' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
-                class="px-6 py-2.5 rounded-xl text-md font-bold transition-all duration-300 cursor-pointer">
-                Compras
-            </button>
-            <button (click)="onTabChange('cxc')"
-                [class]="activeTab() === 'cxc' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
-                class="px-6 py-2.5 rounded-xl text-md font-bold transition-all duration-300 cursor-pointer">
-                Cuentas por Cobrar
-            </button>
-            <button (click)="onTabChange('cxp')"
-                [class]="activeTab() === 'cxp' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
-                class="px-6 py-2.5 rounded-xl text-md font-bold transition-all duration-300 cursor-pointer">
-                Cuentas por Pagar
-            </button>
-            <button (click)="onTabChange('balance')"
-                [class]="activeTab() === 'balance' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-500 hover:text-gray-900'"
-                class="px-6 py-2.5 rounded-xl text-md font-bold transition-all duration-300 cursor-pointer">
-                Balance Contable
-            </button>
-        </div>
+ <app-tabs [tabs]="tabItems" [(activeTab)]="activeTab" variant="pills" />
 
-        <!-- Content Area -->
-        <div class="min-h-[400px]">
+ <!-- Content Area -->
+ <div class="min-h-[400px]">
 
-            <!-- ====== DASHBOARD FACTURACIÓN ====== -->
-            @if (activeTab() === 'facturacion') {
-                @if (loading()) {
-                    <div class="flex flex-col items-center justify-center py-32 bg-white/50 backdrop-blur-xl rounded-3xl border border-gray-100 shadow-sm">
-                        <div class="relative w-20 h-20">
-                            <div class="absolute inset-0 rounded-full border-4 border-blue-50"></div>
-                            <div class="absolute inset-0 rounded-full border-4 border-t-blue-600 animate-spin"></div>
-                        </div>
-                        <p class="mt-6 text-sm font-bold text-gray-900">Analizando registros contables...</p>
-                        <p class="text-xs text-gray-400 mt-1">Esto puede tomar unos segundos</p>
-                    </div>
-                } @else if (!loading() && !facturacion()) {
-                    <div class="flex flex-col items-center justify-center py-32 bg-white/50 backdrop-blur-xl rounded-3xl border border-gray-100 shadow-sm">
-                        <div class="w-24 h-24 bg-gray-50 rounded-3xl flex items-center justify-center mb-6">
-                            <svg class="h-12 w-12 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                            </svg>
-                        </div>
-                        <h3 class="text-lg font-bold text-gray-900">Reporte Vacío</h3>
-                        <p class="text-sm text-gray-400 mt-2 max-w-xs text-center">Selecciona un período válido para generar las métricas de este módulo.</p>
-                    </div>
-                } @else {
-                    @if (facturacion(); as f) {
-                    <div class="animate-slide-up space-y-8">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 group">
-                                <div class="flex items-center justify-between mb-4">
-                                    <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                    </div>
-                                    <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg uppercase">Volumen</span>
-                                </div>
-                                <p class="text-[11px] font-bold text-gray-400 uppercase">Total Facturas</p>
-                                <h4 class="text-3xl font-bold text-gray-900 mt-1">{{ f.resumen.totalFacturas }}</h4>
-                                <div class="mt-6 flex items-center gap-2">
-                                    <div class="flex-1 space-y-1">
-                                        <div class="flex justify-between text-[9px] font-bold uppercase">
-                                            <span class="text-blue-600">Electrónicas</span>
-                                            <span class="text-gray-400">{{ f.resumen.totalElectronicas }}</span>
-                                        </div>
-                                        <div class="h-1 bg-gray-100 rounded-full overflow-hidden">
-                                            <div class="h-full bg-blue-600" [style.width.%]="(f.resumen.totalElectronicas / (f.resumen.totalFacturas || 1)) * 100"></div>
-                                        </div>
-                                    </div>
-                                    <div class="flex-1 space-y-1">
-                                        <div class="flex justify-between text-[9px] font-bold uppercase">
-                                            <span class="text-gray-600">Estándar</span>
-                                            <span class="text-gray-400">{{ f.resumen.totalStandard }}</span>
-                                        </div>
-                                        <div class="h-1 bg-gray-100 rounded-full overflow-hidden">
-                                            <div class="h-full bg-gray-400" [style.width.%]="(f.resumen.totalStandard / (f.resumen.totalFacturas || 1)) * 100"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300">
-                                <div class="flex items-center justify-between mb-4">
-                                    <div class="w-10 h-10 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                    </div>
-                                    <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg uppercase">Bruto</span>
-                                </div>
-                                <p class="text-[11px] font-bold text-gray-400 uppercase">Monto Total</p>
-                                <h4 class="text-3xl font-bold text-gray-900 mt-1">{{ f.resumen.montoTotal | currency:'':'$':'1.0-0' }}</h4>
-                            </div>
-                            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300">
-                                <div class="flex items-center justify-between mb-4">
-                                    <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                                    </div>
-                                    <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg uppercase">DIAN</span>
-                                </div>
-                                <p class="text-[11px] font-bold text-gray-400 uppercase">Tasa Aceptación</p>
-                                <h4 class="text-3xl font-bold text-gray-900 mt-1">{{ f.electronicas.tasaAceptacion }}%</h4>
-                            </div>
-                            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300">
-                                <div class="flex items-center justify-between mb-4">
-                                    <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-                                    </div>
-                                    <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg uppercase">Promedios</span>
-                                </div>
-                                <p class="text-[11px] font-bold text-gray-400 uppercase">Ticket Medio</p>
-                                <h4 class="text-3xl font-bold text-gray-900 mt-1">{{ (f.resumen.montoTotal / (f.resumen.totalFacturas || 1)) | currency:'':'$':'1.0-0' }}</h4>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden group">
-                                <div class="px-8 py-6 bg-blue-600 flex justify-between items-center relative overflow-hidden">
-                                    <div class="relative z-10">
-                                        <h4 class="text-xs font-semibold text-blue-100 uppercase tracking-[0.2em]">Facturación</h4>
-                                        <p class="text-2xl font-bold text-white mt-1">Electrónica (DIAN)</p>
-                                    </div>
-                                    <div class="w-14 h-14 bg-white/20 rounded-2xl backdrop-blur-md flex items-center justify-center relative z-10">
-                                        <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V21a2 2 0 01-2 2H10a2 2 0 01-2-2v-7" />
-                                        </svg>
-                                    </div>
-                                </div>
-                                <div class="p-8 space-y-6">
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100"><p class="text-xs font-bold text-gray-400 mb-1">Emitidas</p><p class="text-xl font-bold text-gray-900">{{ f.electronicas.emitidas }}</p></div>
-                                        <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100"><p class="text-xs font-bold text-gray-400 mb-1">Aceptadas</p><p class="text-xl font-bold text-gray-900">{{ f.electronicas.aceptadas }}</p></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden group">
-                                <div class="px-8 py-6 bg-slate-900 flex justify-between items-center relative overflow-hidden">
-                                    <div class="relative z-10">
-                                        <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-[0.2em]">Facturación</h4>
-                                        <p class="text-2xl font-bold text-white mt-1">Estándar (Local)</p>
-                                    </div>
-                                </div>
-                                <div class="p-8 space-y-6">
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100"><p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Emitidas</p><p class="text-xl font-bold text-gray-900">{{ f.standard.emitidas }}</p></div>
-                                        <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100"><p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Anuladas</p><p class="text-xl font-bold text-gray-900">{{ f.standard.anuladas }}</p></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }
-            }
-        }
+ <!-- ====== DASHBOARD FACTURACIÓN ====== -->
+ @if (activeTab() === 'facturacion') {
+ @if (loading()) {
+ <div class="flex flex-col items-center justify-center py-32 bg-white/50 backdrop-blur-xl rounded-3xl border border-gray-100 shadow-sm">
+ <div class="relative w-20 h-20">
+ <div class="absolute inset-0 rounded-full border-4 border-blue-50"></div>
+ <div class="absolute inset-0 rounded-full border-4 border-t-blue-600 animate-spin"></div>
+ </div>
+ <p class="mt-6 text-sm font-bold text-gray-900">Analizando registros contables...</p>
+ <p class="text-xs text-gray-400 mt-1">Esto puede tomar unos segundos</p>
+ </div>
+ } @else if (!loading() && !facturacion()) {
+ <div class="flex flex-col items-center justify-center py-32 bg-white/50 backdrop-blur-xl rounded-3xl border border-gray-100 shadow-sm">
+ <div class="w-24 h-24 bg-gray-50 rounded-3xl flex items-center justify-center mb-6">
+ <svg class="h-12 w-12 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+ </svg>
+ </div>
+ <h3 class="text-lg font-bold text-gray-900">Reporte Vacío</h3>
+ <p class="text-sm text-gray-400 mt-2 max-w-xs text-center">Selecciona un período válido para generar las métricas de este módulo.</p>
+ </div>
+ } @else {
+ @if (facturacion(); as f) {
+ <div class="animate-slide-up space-y-8">
+ <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+ <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 group">
+ <div class="flex items-center justify-between mb-4">
+ <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
+ <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+ </div>
+ <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg uppercase">Volumen</span>
+ </div>
+ <p class="text-[11px] font-bold text-gray-400 uppercase">Total Facturas</p>
+ <h4 class="text-3xl font-bold text-gray-900 mt-1">{{ f.resumen.totalFacturas }}</h4>
+ <div class="mt-6 flex items-center gap-2">
+ <div class="flex-1 space-y-1">
+ <div class="flex justify-between text-[9px] font-bold uppercase">
+ <span class="text-blue-600">Electrónicas</span>
+ <span class="text-gray-400">{{ f.resumen.totalElectronicas }}</span>
+ </div>
+ <div class="h-1 bg-gray-100 rounded-full overflow-hidden">
+ <div class="h-full bg-blue-600" [style.width.%]="(f.resumen.totalElectronicas / (f.resumen.totalFacturas || 1)) * 100"></div>
+ </div>
+ </div>
+ <div class="flex-1 space-y-1">
+ <div class="flex justify-between text-[9px] font-bold uppercase">
+ <span class="text-gray-600">Estándar</span>
+ <span class="text-gray-400">{{ f.resumen.totalStandard }}</span>
+ </div>
+ <div class="h-1 bg-gray-100 rounded-full overflow-hidden">
+ <div class="h-full bg-gray-400" [style.width.%]="(f.resumen.totalStandard / (f.resumen.totalFacturas || 1)) * 100"></div>
+ </div>
+ </div>
+ </div>
+ </div>
+ <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300">
+ <div class="flex items-center justify-between mb-4">
+ <div class="w-10 h-10 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600">
+ <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+ </div>
+ <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg uppercase">Bruto</span>
+ </div>
+ <p class="text-[11px] font-bold text-gray-400 uppercase">Monto Total</p>
+ <h4 class="text-3xl font-bold text-gray-900 mt-1">{{ f.resumen.montoTotal | currency:'':'$':'1.0-0' }}</h4>
+ </div>
+ <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300">
+ <div class="flex items-center justify-between mb-4">
+ <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
+ <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+ </div>
+ <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg uppercase">DIAN</span>
+ </div>
+ <p class="text-[11px] font-bold text-gray-400 uppercase">Tasa Aceptación</p>
+ <h4 class="text-3xl font-bold text-gray-900 mt-1">{{ f.electronicas.tasaAceptacion }}%</h4>
+ </div>
+ <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300">
+ <div class="flex items-center justify-between mb-4">
+ <div class="w-10 h-10 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
+ <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+ </div>
+ <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg uppercase">Promedios</span>
+ </div>
+ <p class="text-[11px] font-bold text-gray-400 uppercase">Ticket Medio</p>
+ <h4 class="text-3xl font-bold text-gray-900 mt-1">{{ (f.resumen.montoTotal / (f.resumen.totalFacturas || 1)) | currency:'':'$':'1.0-0' }}</h4>
+ </div>
+ </div>
+ <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+ <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden group">
+ <div class="px-8 py-6 bg-blue-600 flex justify-between items-center relative overflow-hidden">
+ <div class="relative z-10">
+ <h4 class="text-xs font-semibold text-blue-100 uppercase tracking-[0.2em]">Facturación</h4>
+ <p class="text-2xl font-bold text-white mt-1">Electrónica (DIAN)</p>
+ </div>
+ <div class="w-14 h-14 bg-white/20 rounded-2xl backdrop-blur-md flex items-center justify-center relative z-10">
+ <svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V21a2 2 0 01-2 2H10a2 2 0 01-2-2v-7" />
+ </svg>
+ </div>
+ </div>
+ <div class="p-8 space-y-6">
+ <div class="grid grid-cols-2 gap-4">
+ <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100"><p class="text-xs font-bold text-gray-400 mb-1">Emitidas</p><p class="text-xl font-bold text-gray-900">{{ f.electronicas.emitidas }}</p></div>
+ <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100"><p class="text-xs font-bold text-gray-400 mb-1">Aceptadas</p><p class="text-xl font-bold text-gray-900">{{ f.electronicas.aceptadas }}</p></div>
+ </div>
+ </div>
+ </div>
+ <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden group">
+ <div class="px-8 py-6 bg-slate-900 flex justify-between items-center relative overflow-hidden">
+ <div class="relative z-10">
+ <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-[0.2em]">Facturación</h4>
+ <p class="text-2xl font-bold text-white mt-1">Estándar (Local)</p>
+ </div>
+ </div>
+ <div class="p-8 space-y-6">
+ <div class="grid grid-cols-2 gap-4">
+ <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100"><p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Emitidas</p><p class="text-xl font-bold text-gray-900">{{ f.standard.emitidas }}</p></div>
+ <div class="p-4 bg-gray-50 rounded-2xl border border-gray-100"><p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Anuladas</p><p class="text-xl font-bold text-gray-900">{{ f.standard.anuladas }}</p></div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </div>
+ }
+ }
+ }
 
-            <!-- ====== FACTURAS VENTA ====== -->
-            @if (activeTab() === 'facturas-venta') {
-                <app-facturas-venta-table [fechaInicio]="appliedDates().inicio" [fechaFin]="appliedDates().fin" />
-            }
+ <!-- ====== FACTURAS VENTA ====== -->
+ @if (activeTab() === 'facturas-venta') {
+ <app-facturas-venta-table [fechaInicio]="appliedDates().inicio" [fechaFin]="appliedDates().fin" />
+ }
 
-            <!-- ====== FACTURAS COMPRA ====== -->
-            @if (activeTab() === 'facturas-compra') {
-                <app-facturas-compra-table [fechaInicio]="appliedDates().inicio" [fechaFin]="appliedDates().fin" />
-            }
+ <!-- ====== FACTURAS COMPRA ====== -->
+ @if (activeTab() === 'facturas-compra') {
+ <app-facturas-compra-table [fechaInicio]="appliedDates().inicio" [fechaFin]="appliedDates().fin" />
+ }
 
-            <!-- ====== CUENTAS POR COBRAR ====== -->
-            @if (activeTab() === 'cxc') {
-                <app-cuentas-cobrar-table [fechaInicio]="appliedDates().inicio" [fechaFin]="appliedDates().fin" />
-            }
+ <!-- ====== CUENTAS POR COBRAR ====== -->
+ @if (activeTab() === 'cxc') {
+ <app-cuentas-cobrar-table [fechaInicio]="appliedDates().inicio" [fechaFin]="appliedDates().fin" />
+ }
 
-            <!-- ====== CUENTAS POR PAGAR ====== -->
-            @if (activeTab() === 'cxp') {
-                <app-cuentas-pagar-table [fechaInicio]="appliedDates().inicio" [fechaFin]="appliedDates().fin" />
-            }
+ <!-- ====== CUENTAS POR PAGAR ====== -->
+ @if (activeTab() === 'cxp') {
+ <app-cuentas-pagar-table [fechaInicio]="appliedDates().inicio" [fechaFin]="appliedDates().fin" />
+ }
 
-            <!-- ====== BALANCE CONTABLE ====== -->
-            @if (activeTab() === 'balance') {
-                @if (loadingCuentas()) {
-                    <div class="flex flex-col items-center justify-center py-32 bg-white/50 backdrop-blur-xl rounded-3xl border border-gray-100 shadow-sm">
-                        <div class="relative w-20 h-20">
-                            <div class="absolute inset-0 rounded-full border-4 border-blue-50"></div>
-                            <div class="absolute inset-0 rounded-full border-4 border-t-blue-600 animate-spin"></div>
-                        </div>
-                        <p class="mt-6 text-sm font-bold text-gray-900">Cargando balance contable...</p>
-                    </div>
-                } @else if (cuentasContables().length > 0) {
-                    <div class="animate-slide-up">
-                        <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-                            <div class="px-8 py-5 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between flex-wrap gap-3">
-                                <div>
-                                    <h3 class="text-sm font-bold text-gray-900">Plan Único de Cuentas (PUC)</h3>
-                                    <p class="text-xs text-gray-400 mt-0.5">Balance de saldos por cuenta del {{ fechaInicio() }} al {{ fechaFin() }}</p>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <button (click)="balanceTable.exportarExcel()"
-                                        class="px-4 py-2 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-colors cursor-pointer flex items-center gap-1.5">
-                                        <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                                        </svg>
-                                        Excel
-                                    </button>
-                                    <button (click)="balanceResource.reload()"
-                                        class="px-4 py-2 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors cursor-pointer flex items-center gap-1.5">
-                                        <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                        </svg>
-                                        Actualizar
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="overflow-x-auto">
-                                <app-balance-cuentas-table #balanceTable [cuentas]="cuentasContables()" />
-                            </div>
-                        </div>
-                    </div>
-                } @else {
-                    <div class="flex flex-col items-center justify-center py-32 bg-white/50 backdrop-blur-xl rounded-3xl border border-gray-100 shadow-sm">
-                        <div class="w-24 h-24 bg-gray-50 rounded-3xl flex items-center justify-center mb-6">
-                            <svg class="h-12 w-12 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                            </svg>
-                        </div>
-                        <h3 class="text-lg font-bold text-gray-900">Sin datos de balance</h3>
-                        <p class="text-sm text-gray-400 mt-2 max-w-xs text-center">No se encontraron cuentas contables para el período seleccionado.</p>
-                    </div>
-                }
-            }
-        </div>
-    </div>
+ <!-- ====== BALANCE CONTABLE ====== -->
+ @if (activeTab() === 'balance') {
+ @if (loadingCuentas()) {
+ <div class="flex flex-col items-center justify-center py-32 bg-white/50 backdrop-blur-xl rounded-3xl border border-gray-100 shadow-sm">
+ <div class="relative w-20 h-20">
+ <div class="absolute inset-0 rounded-full border-4 border-blue-50"></div>
+ <div class="absolute inset-0 rounded-full border-4 border-t-blue-600 animate-spin"></div>
+ </div>
+ <p class="mt-6 text-sm font-bold text-gray-900">Cargando balance contable...</p>
+ </div>
+ } @else if (cuentasContables().length > 0) {
+ <div class="animate-slide-up">
+ <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+ <div class="px-8 py-5 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between flex-wrap gap-3">
+ <div>
+ <h3 class="text-sm font-bold text-gray-900">Plan Único de Cuentas (PUC)</h3>
+ <p class="text-xs text-gray-400 mt-0.5">Balance de saldos por cuenta del {{ fechaInicio() }} al {{ fechaFin() }}</p>
+ </div>
+ <div class="flex items-center gap-2">
+ <button (click)="balanceTable.exportarExcel()"
+ class="px-4 py-2 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-colors cursor-pointer flex items-center gap-1.5">
+ <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20">
+ <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
+ </svg>
+ Excel
+ </button>
+ <button (click)="balanceResource.reload()"
+ class="px-4 py-2 text-xs font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors cursor-pointer flex items-center gap-1.5">
+ <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+ </svg>
+ Actualizar
+ </button>
+ </div>
+ </div>
+ <div class="overflow-x-auto">
+ <app-balance-cuentas-table #balanceTable [cuentas]="cuentasContables()" />
+ </div>
+ </div>
+ </div>
+ } @else {
+ <div class="flex flex-col items-center justify-center py-32 bg-white/50 backdrop-blur-xl rounded-3xl border border-gray-100 shadow-sm">
+ <div class="w-24 h-24 bg-gray-50 rounded-3xl flex items-center justify-center mb-6">
+ <svg class="h-12 w-12 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+ </svg>
+ </div>
+ <h3 class="text-lg font-bold text-gray-900">Sin datos de balance</h3>
+ <p class="text-sm text-gray-400 mt-2 max-w-xs text-center">No se encontraron cuentas contables para el período seleccionado.</p>
+ </div>
+ }
+ }
+ </div>
+ </div>
 </div>
 
 <style>
-    .animate-fade-in {
-        animation: fadeIn 0.4s ease-out forwards;
-    }
-    .animate-slide-up {
-        animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-    @keyframes fadeIn {
-        from { opacity: 0; transform: scale(0.98); }
-        to { opacity: 1; transform: scale(1); }
-    }
-    @keyframes slideUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
+ .animate-slide-up {
+ animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+ }
+ @keyframes slideUp {
+ from { opacity: 0; transform: translateY(20px); }
+ to { opacity: 1; transform: translateY(0); }
+ }
 </style>

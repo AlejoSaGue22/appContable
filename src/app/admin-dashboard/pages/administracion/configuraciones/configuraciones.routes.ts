@@ -6,30 +6,30 @@ import { VendedoresComponent } from "./pages/vendedores/vendedores.component";
 import { ParametrizacionContable } from "./pages/parametrizacion-contable/parametrizacion-contable";
 
 const configuracionesRoutes: Routes = [
-    {
-        path: '',
-        component: ConfiguracionMenuComponent
-    },
-    {
-        path: 'empresa',
-        component: EmpresaComponent
-    },
-    {
-        path: 'impuestos',
-        component: ImpuestosComponent
-    },
-    {
-        path: 'vendedores',
-        component: VendedoresComponent
-    },
-    {
-        path: 'parametrizacion-contable',
-        component: ParametrizacionContable
-    },
-    {
-        path: '**',
-        redirectTo: ''
-    }
+ {
+ path: '',
+ component: ConfiguracionMenuComponent
+ },
+ {
+ path: 'empresa',
+ component: EmpresaComponent
+ },
+ {
+ path: 'impuestos',
+ component: ImpuestosComponent
+ },
+ {
+ path: 'vendedores',
+ component: VendedoresComponent
+ },
+ {
+ path: 'parametrizacion-contable',
+ component: ParametrizacionContable
+ },
+ {
+ path: '**',
+ redirectTo: ''
+ }
 ];
 
 export default configuracionesRoutes;

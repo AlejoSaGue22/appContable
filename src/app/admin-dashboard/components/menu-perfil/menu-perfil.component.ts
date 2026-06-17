@@ -4,12 +4,12 @@ import { RouterLink } from '@angular/router';
 import { HelpersUtils } from '@utils/helpers.utils';
 
 @Component({
-  selector: 'app-menu-perfil',
-  imports: [RouterLink, TitleCasePipe],
-  templateUrl: './menu-perfil.component.html',
+ selector: 'app-menu-perfil',
+ imports: [RouterLink, TitleCasePipe],
+ templateUrl: './menu-perfil.component.html',
 })
 export class MenuPerfilComponent { 
-  logoApp = HelpersUtils.logoApp;
-  nameApp = HelpersUtils.nameApp;
-  sloganApp = HelpersUtils.slogan;
+ logoApp = HelpersUtils.logoApp;
+ nameApp = HelpersUtils.nameApp;
+ sloganApp = HelpersUtils.slogan;
 }

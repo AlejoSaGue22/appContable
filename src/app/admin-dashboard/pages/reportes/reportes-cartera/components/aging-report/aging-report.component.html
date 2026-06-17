@@ -1,82 +1,82 @@
 @if (reporte()) {
-    <div class="space-y-6">
+ <div class="space-y-6">
 
-        <!-- Cards Resumen Aging -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-blue-50 border border-blue-200 rounded-lg px-5 py-4 text-center">
-                <p class="text-xs font-semibold uppercase tracking-wider text-blue-700 mb-1">
-                Total Cartera
-                </p>
-                <p class="text-xl font-bold text-blue-800">
-                {{ reporte().totales.totalCartera | currency:'':'symbol-narrow':'1.0-0' }}
-                </p>
-            </div>
-            <div class="bg-green-50 border border-green-200 rounded-lg px-5 py-4 text-center">
-                <p class="text-xs font-semibold uppercase tracking-wider text-green-700 mb-1">Total Saldo a favor</p>
-                <p class="text-xl font-bold text-green-800">
-                {{ reporte().totales.totalSaldoFavor | currency:'':'symbol-narrow':'1.0-0' }}
-                </p>
-            </div>
-            <div class="bg-red-50 border border-red-200 rounded-lg px-5 py-4 text-center">
-                <p class="text-xs font-semibold uppercase tracking-wider text-red-700 mb-1">
-                {{ vistaActiva() === 'aging-cobrar' ? 'Total por Cobrar' : 'Total por Pagar' }}
-                </p>
-                <p class="text-xl font-bold text-red-800">
-                {{ reporte().totales.totalDeuda | currency:'':'symbol-narrow':'1.0-0' }}
-                </p>
-            </div>
-        </div>
+ <!-- Cards Resumen Aging -->
+ <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+ <div class="bg-blue-50 border border-blue-200 rounded-lg px-5 py-4 text-center">
+ <p class="text-xs font-semibold uppercase text-blue-700 mb-1">
+ Total Cartera
+ </p>
+ <p class="text-xl font-bold text-blue-800">
+ {{ reporte().totales.totalCartera | currency:'':'symbol-narrow':'1.0-0' }}
+ </p>
+ </div>
+ <div class="bg-green-50 border border-green-200 rounded-lg px-5 py-4 text-center">
+ <p class="text-xs font-semibold uppercase text-green-700 mb-1">Total Saldo a favor</p>
+ <p class="text-xl font-bold text-green-800">
+ {{ reporte().totales.totalSaldoFavor | currency:'':'symbol-narrow':'1.0-0' }}
+ </p>
+ </div>
+ <div class="bg-red-50 border border-red-200 rounded-lg px-5 py-4 text-center">
+ <p class="text-xs font-semibold uppercase text-red-700 mb-1">
+ {{ vistaActiva() === 'aging-cobrar' ? 'Total por Cobrar' : 'Total por Pagar' }}
+ </p>
+ <p class="text-xl font-bold text-red-800">
+ {{ reporte().totales.totalDeuda | currency:'':'symbol-narrow':'1.0-0' }}
+ </p>
+ </div>
+ </div>
 
-        <!-- Tabla aging plana -->
-        <div class="overflow-x-auto">
-            <table class="w-full text-left table-auto text-sm shadow-sm rounded-xl">
-                <thead>
-                <tr class="bg-slate-50 border-b border-gray-200">
-                    <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500">Identificación</th>
-                    <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500">
-                    {{ vistaActiva() === 'aging-cobrar' ? 'Cliente' : 'Proveedor' }}
-                    </th>
-                    <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500">Deuda</th>
-                    <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500">Saldo a favor</th>
-                    <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500 text-right">Saldo Cartera</th>
-                </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100">
-                @for (f of reporte().items; track f.identificacion) {
-                    <tr class="hover:bg-slate-50/80 transition-colors">
-                    <td class="p-3 text-slate-600 text-xs">{{ f.identificacion }}</td>
-                    <td class="p-3">
-                        <span class="font-mono text-xs">{{ f.nombre }}</span>
-                    </td>
-                    <td class="p-3 text-slate-700 text-xs">{{ f.deuda | currency:'':'symbol-narrow':'1.0-0' }}</td>
-                    <td class="p-3 text-slate-500 text-xs">
-                        {{ f.saldoFavor | currency:'':'symbol-narrow':'1.0-0' }}
-                    </td>
-                    <td class="p-3 text-right font-semibold text-slate-900">
-                        {{ f.saldoCartera | currency:'':'symbol-narrow':'1.0-0' }}
-                    </td>
-                    </tr>
-                }
-                @if (reporte().items.length === 0) {
-                    <tr>
-                    <td colspan="5" class="p-10 text-center text-slate-400 text-sm">
-                        No hay facturas pendientes en este período
-                    </td>
-                    </tr>
-                }
-                </tbody>
-            </table>
-        </div>
+ <!-- Tabla aging plana -->
+ <div class="overflow-x-auto">
+ <table class="w-full text-left table-auto text-sm shadow-sm rounded-xl">
+ <thead>
+ <tr class="bg-slate-50 border-b border-gray-200">
+ <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500">Identificación</th>
+ <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500">
+ {{ vistaActiva() === 'aging-cobrar' ? 'Cliente' : 'Proveedor' }}
+ </th>
+ <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500">Deuda</th>
+ <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500">Saldo a favor</th>
+ <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500 text-right">Saldo Cartera</th>
+ </tr>
+ </thead>
+ <tbody class="divide-y divide-gray-100">
+ @for (f of reporte().items; track f.identificacion) {
+ <tr class="hover:bg-slate-50/80 transition-colors">
+ <td class="p-3 text-slate-600 text-xs">{{ f.identificacion }}</td>
+ <td class="p-3">
+ <span class="font-mono text-xs">{{ f.nombre }}</span>
+ </td>
+ <td class="p-3 text-slate-700 text-xs">{{ f.deuda | currency:'':'symbol-narrow':'1.0-0' }}</td>
+ <td class="p-3 text-slate-500 text-xs">
+ {{ f.saldoFavor | currency:'':'symbol-narrow':'1.0-0' }}
+ </td>
+ <td class="p-3 text-right font-semibold text-slate-900">
+ {{ f.saldoCartera | currency:'':'symbol-narrow':'1.0-0' }}
+ </td>
+ </tr>
+ }
+ @if (reporte().items.length === 0) {
+ <tr>
+ <td colspan="5" class="p-10 text-center text-slate-400 text-sm">
+ No hay facturas pendientes en este período
+ </td>
+ </tr>
+ }
+ </tbody>
+ </table>
+ </div>
 
-        <p class="text-xs text-slate-400 mt-3 text-right">
-            Generado: {{ reporte().generadoEn | date:'dd/MM/yyyy HH:mm' }}
-        </p>
-    </div>
+ <p class="text-xs text-slate-400 mt-3 text-right">
+ Generado: {{ reporte().generadoEn | date:'dd/MM/yyyy HH:mm' }}
+ </p>
+ </div>
 } @else if (!loadingActual()) {
-    <div class="py-12 text-center">
-        <div class="text-5xl mb-3">
-            <i class="fas fa-file-invoice"></i>
-        </div>
-        <p class="text-sm text-slate-400">Seleccione un período y haga clic en "Generar"</p>
-    </div>
+ <div class="py-12 text-center">
+ <div class="text-5xl mb-3">
+ <i class="fas fa-file-invoice"></i>
+ </div>
+ <p class="text-sm text-slate-400">Seleccione un período y haga clic en "Generar"</p>
+ </div>
 }

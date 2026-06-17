@@ -8,68 +8,68 @@ import { ProveedoresInterface, ProveedoresResponse } from '@dashboard/interfaces
 const baseUrl = environment.baseUrl;
 
 const emptyProveedor: ProveedoresInterface = {
-    id: '',
-    tipoDocumento: '',
-    identificacion: '',
-    tipoPersona: '',
-    razonSocial: '',
-    nombre: '',
-    apellido: '',
-    email: '',
-    telefono: '',
-    direccion: '',
-    ciudad: '',
-    nombreContacto: '',
-    telefonoContacto: '',
-    observaciones: '',
-    isActive: false
+ id: '',
+ tipoDocumento: '',
+ identificacion: '',
+ tipoPersona: '',
+ razonSocial: '',
+ nombre: '',
+ apellido: '',
+ email: '',
+ telefono: '',
+ direccion: '',
+ ciudad: '',
+ nombreContacto: '',
+ telefonoContacto: '',
+ observaciones: '',
+ isActive: false
 }
 
 @Injectable({ providedIn: 'root' })
 export class ProveedoresService {
 
-    private http = inject(HttpClient);
+ private http = inject(HttpClient);
 
-    getProveedores(options: Options): Observable<ProveedoresResponse> {
-        const { limit = 10, offset = 0 } = options;
+ getProveedores(options: Options): Observable<ProveedoresResponse> {
+ const { limit = 10, offset = 0 } = options;
 
-        return this.http.get<ProveedoresResponse>(`${baseUrl}/proveedores`, {
-            params: {
-                limit,
-                offset
-            }
-        });
-    }
+ return this.http.get<ProveedoresResponse>(`${baseUrl}/proveedores`, {
+ params: {
+ limit,
+ offset
+ }
+ });
+ }
 
-    getProveedoresById(id: string): Observable<ProveedoresInterface> {
-        if (id == 'new-Item') {
-            return of(emptyProveedor);
-        }
-        return this.http.get<ProveedoresInterface>(`${baseUrl}/proveedores/${id}`);
-    }
+ getProveedoresById(id: string): Observable<ProveedoresInterface> {
+ if (id == 'new-Item') {
+ return of(emptyProveedor);
+ }
+ return this.http.get<ProveedoresInterface>(`${baseUrl}/proveedores/${id}`);
+ }
 
-    deleteProveedores(id: string) {
-        return this.http.delete(`${baseUrl}/proveedores/${id}`);
-    }
+ deleteProveedores(id: string) {
+ return this.http.delete(`${baseUrl}/proveedores/${id}`);
+ }
 
-    createProveedor(proveedor: Partial<ProveedoresInterface>) {
-        return this.http.post(`${baseUrl}/proveedores`, proveedor).pipe(
-            map((proveedor): ResponseResult => ({ success: true, data: proveedor })),
-            catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
-        );
-    }
+ createProveedor(proveedor: Partial<ProveedoresInterface>) {
+ return this.http.post(`${baseUrl}/proveedores`, proveedor).pipe(
+ map((proveedor): ResponseResult => ({ success: true, data: proveedor })),
+ catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+ );
+ }
 
-    updateProveedor(id: string, proveedor: Partial<ProveedoresInterface>) {
-        return this.http.patch(`${baseUrl}/proveedores/${id}`, proveedor).pipe(
-            map((proveedor): ResponseResult => ({ success: true, data: proveedor })),
-            catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
-        );
-    }
+ updateProveedor(id: string, proveedor: Partial<ProveedoresInterface>) {
+ return this.http.patch(`${baseUrl}/proveedores/${id}`, proveedor).pipe(
+ map((proveedor): ResponseResult => ({ success: true, data: proveedor })),
+ catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+ );
+ }
 
-    deleteProveedor(id: string) {
-        return this.http.delete(`${baseUrl}/proveedores/${id}`).pipe(
-            map((proveedor): ResponseResult => ({ success: true, data: proveedor })),
-            catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
-        );
-    }
+ deleteProveedor(id: string) {
+ return this.http.delete(`${baseUrl}/proveedores/${id}`).pipe(
+ map((proveedor): ResponseResult => ({ success: true, data: proveedor })),
+ catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+ );
+ }
 }

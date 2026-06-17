@@ -1,105 +1,179 @@
 <div class="space-y-6 animate-fade-in">
-  @if ( proveedoresResource.isLoading() ) {
+  @if (proveedoresResource.isLoading()) {
     <div class="flex flex-col gap-3 justify-center items-center h-screen">
-        <app-loader />
-        <p class="text-sm text-gray-400 animate-pulse">Cargando directorio de proveedores...</p>
+      <app-loader />
+      <p class="text-sm text-gray-400 animate-pulse">
+        Cargando directorio de proveedores...
+      </p>
     </div>
   }
 
-  @if ( proveedoresResource.hasValue() ) {
+  @if (proveedoresResource.hasValue()) {
     <!-- Header -->
     <header-title-page [titleHead]="headTitle" />
 
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div class="relative flex-1 max-w-lg group">
-            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <svg class="h-4 w-4 text-gray-400 group-hover:text-blue-500 transition-colors" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-            </div>
-            <input 
-                #txtSearch (input)="onSearch(txtSearch.value)"
-                type="text" 
-                placeholder="Buscar por nombre, NIT o email..."
-                class="block w-full pl-11 pr-4 py-2.5 bg-white border border-gray-100 rounded-2xl text-sm placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/50 transition-all shadow-sm"
-            >
+    <div
+      class="flex flex-col md:flex-row md:items-center justify-between gap-4"
+    >
+      <div class="relative flex-1 max-w-lg group">
+        <div
+          class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
+        >
+          <svg
+            class="h-4 w-4 text-gray-400 group-hover:text-blue-500 transition-colors"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
         </div>
+        <input
+          #txtSearch
+          (input)="onSearch(txtSearch.value)"
+          type="text"
+          placeholder="Buscar por nombre, NIT o email..."
+          class="block w-full pl-11 pr-4 py-2.5 bg-white border border-gray-100 rounded-2xl text-sm placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/50 transition-all shadow-sm"
+        />
+      </div>
 
-        <div class="flex items-center gap-3">
-            <button (click)="proveedoresResource.reload()"
-                class="inline-flex items-center justify-center px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-bold rounded-xl transition-all active:scale-95 cursor-pointer group">
-                <svg class="mr-2 h-4 w-4 transition-transform group-hover:rotate-180 duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                Actualizar
-            </button>
-            <a routerLink="/panel/compras/proveedores/new-Item"
-                class="inline-flex items-center justify-center px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 group">
-                <svg class="mr-2 h-4 w-4 transition-transform group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
-                </svg>
-                Nuevo Proveedor
-            </a>
-        </div>
+      <div class="flex items-center gap-3">
+        <button
+          (click)="proveedoresResource.reload()"
+          class="inline-flex items-center justify-center px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-bold rounded-xl transition-all active:scale-95 cursor-pointer group"
+        >
+          <svg
+            class="mr-2 h-4 w-4 transition-transform group-hover:rotate-180 duration-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+            />
+          </svg>
+          Actualizar
+        </button>
+        <a
+          routerLink="/panel/compras/proveedores/new-Item"
+          class="inline-flex items-center justify-center px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 group"
+        >
+          <svg
+            class="mr-2 h-4 w-4 transition-transform group-hover:rotate-90"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="3"
+              d="M12 4v16m8-8H4"
+            />
+          </svg>
+          Nuevo Proveedor
+        </a>
+      </div>
     </div>
 
     <!-- Table Section -->
     <div class="space-y-4">
-        <app-table-proveedores [proveedorData]="proveedoresResource.value().proveedores" (delete)="openModal($event)" />
+      <app-table-proveedores
+        [proveedorData]="proveedoresResource.value().proveedores"
+        (delete)="openModal($event)"
+      />
 
-        @if (proveedoresList().length > 0) {
-            <app-pagination [length]="proveedoresResource.value().proveedores.length" />
-        }
+      @if (proveedoresList().length > 0) {
+        <app-pagination
+          [length]="proveedoresResource.value().proveedores.length"
+        />
+      }
     </div>
   }
 
   @if (proveedoresResource.error()) {
-
-        <div class="p-10 text-center">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-50 text-red-500 mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-            </div>
-            <h3 class="text-lg font-bold text-gray-900">Error al cargar proveedores</h3>
-            <p class="text-gray-500 max-w-xs mx-auto mt-2">
-                {{ $any(proveedoresResource.error())?.error?.message || 'No se pudo cargar la información. Inténtalo de nuevo más tarde.' }}
-            </p>
-          </div>
-          
+    <div class="p-10 text-center">
+      <div
+        class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-50 text-red-500 mb-4"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-8 w-8"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+          />
+        </svg>
+      </div>
+      <h3 class="text-lg font-bold text-gray-900">
+        Error al cargar proveedores
+      </h3>
+      <p class="text-gray-500 max-w-xs mx-auto mt-2">
+        {{
+          $any(proveedoresResource.error())?.error?.message ||
+            "No se pudo cargar la información. Inténtalo de nuevo más tarde."
+        }}
+      </p>
+    </div>
   }
 
   <!-- Delete Modal Modernized -->
   <app-modal [(visible)]="isModalEdit">
     <div class="p-6 text-center">
-        <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-        </div>
-        <h3 class="text-xl font-black text-gray-900 mb-2">¿Eliminar proveedor?</h3>
-        <p class="text-sm text-gray-500 mb-8 max-w-xs mx-auto">Esta acción eliminará permanentemente al proveedor y todos sus datos asociados. ¿Deseas continuar?</p>
+      <div
+        class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6"
+      >
+        <svg
+          class="w-8 h-8"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+          />
+        </svg>
+      </div>
+      <h3 class="text-xl font-black text-gray-900 mb-2">
+        ¿Eliminar proveedor?
+      </h3>
+      <p class="text-sm text-gray-500 mb-8 max-w-xs mx-auto">
+        Esta acción eliminará permanentemente al proveedor y todos sus datos
+        asociados. ¿Deseas continuar?
+      </p>
 
-        <div class="flex flex-col sm:flex-row gap-3">
-            <button (click)="isModalEdit.set(false)" 
-                class="flex-1 px-6 py-3 border border-gray-100 text-sm font-bold text-gray-500 rounded-xl hover:bg-gray-50 transition-all cursor-pointer">
-                Cancelar
-            </button>
-            <button (click)="onDelete()" 
-                class="flex-1 px-6 py-3 bg-red-600 text-white text-sm font-bold rounded-xl hover:bg-red-700 shadow-lg shadow-red-200 transition-all active:scale-95 cursor-pointer">
-                Confirmar
-            </button>
-        </div>
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button
+          (click)="isModalEdit.set(false)"
+          class="flex-1 px-6 py-3 border border-gray-100 text-sm font-bold text-gray-500 rounded-xl hover:bg-gray-50 transition-all cursor-pointer"
+        >
+          Cancelar
+        </button>
+        <button
+          (click)="onDelete()"
+          class="flex-1 px-6 py-3 bg-red-600 text-white text-sm font-bold rounded-xl hover:bg-red-700 shadow-lg shadow-red-200 transition-all active:scale-95 cursor-pointer"
+        >
+          Confirmar
+        </button>
+      </div>
     </div>
   </app-modal>
 </div>
-
-<style>
-  .animate-fade-in {
-    animation: fadeIn 0.4s ease-out;
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-</style>

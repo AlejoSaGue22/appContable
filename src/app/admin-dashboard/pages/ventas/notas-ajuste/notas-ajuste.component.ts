@@ -14,172 +14,172 @@ import { NotasAjusteService } from '../services/notas-ajuste.service';
 import { TableNotasComponent, NotaFilters } from './components/table-notas/table-notas.component';
 
 @Component({
-  selector: 'app-notas-ajuste',
-  standalone: true,
-  imports: [LoaderComponent, ErrorPages, ModalComponent, TableNotasComponent, RouterLink, HeaderTitlePageComponent],
-  templateUrl: './notas-ajuste.component.html',
+ selector: 'app-notas-ajuste',
+ standalone: true,
+ imports: [LoaderComponent, ErrorPages, ModalComponent, TableNotasComponent, RouterLink, HeaderTitlePageComponent],
+ templateUrl: './notas-ajuste.component.html',
 })
 export class NotasAjusteComponent {
 
-  headTitle: HeaderInput = {
-    title: 'Notas de Crédito',
-    slog: 'Administra las notas de crédito aplicadas a tus facturas'
-  };
+ headTitle: HeaderInput = {
+ title: 'Notas de Crédito',
+ slog: 'Administra las notas de crédito aplicadas a tus facturas'
+ };
 
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  notasService = inject(NotasAjusteService);
-  paginationService = inject(PaginationService);
-  notificationService = inject(NotificationService);
-  loaderService = inject(LoaderService);
+ private route = inject(ActivatedRoute);
+ private router = inject(Router);
+ notasService = inject(NotasAjusteService);
+ paginationService = inject(PaginationService);
+ notificationService = inject(NotificationService);
+ loaderService = inject(LoaderService);
 
-  filters = signal<NotaFilters>({});
-  totalItems = signal(0);
-  totalPages = signal(1);
-  
-  isDeleteModalVisible = signal(false);
-  idToDelete = signal<string>('');
+ filters = signal<NotaFilters>({});
+ totalItems = signal(0);
+ totalPages = signal(1);
+ 
+ isDeleteModalVisible = signal(false);
+ idToDelete = signal<string>('');
 
-  notasResource = rxResource({
-    request: () => ({
-      page: this.paginationService.currentPage(),
-      limit: 10,
-      filters: this.filters()
-    }),
-    loader: ({ request }) => this.notasService.getNotasAjuste({
-      page: request.page,
-      limit: request.limit,
-      ...request.filters
-    }).pipe(
-      tap((res) => {
-        const size = res.meta?.totalPages ? res.meta.totalPages : 1;
-        this.paginationService.totalItems.set(res.meta?.total ?? 0);
-        this.paginationService.pageSize.set(size);
-      })
-    )
-  });
+ notasResource = rxResource({
+ request: () => ({
+ page: this.paginationService.currentPage(),
+ limit: 10,
+ filters: this.filters()
+ }),
+ loader: ({ request }) => this.notasService.getNotasAjuste({
+ page: request.page,
+ limit: request.limit,
+ ...request.filters
+ }).pipe(
+ tap((res) => {
+ const size = res.meta?.totalPages ? res.meta.totalPages : 1;
+ this.paginationService.totalItems.set(res.meta?.total ?? 0);
+ this.paginationService.pageSize.set(size);
+ })
+ )
+ });
 
-  onFilterChange(filters: NotaFilters): void {
-    this.filters.set(filters);
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { ...filters, page: 1 },
-      queryParamsHandling: 'merge'
-    });
-  }
+ onFilterChange(filters: NotaFilters): void {
+ this.filters.set(filters);
+ this.router.navigate([], {
+ relativeTo: this.route,
+ queryParams: { ...filters, page: 1 },
+ queryParamsHandling: 'merge'
+ });
+ }
 
-  onPageChange(page: number): void {
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: { page },
-      queryParamsHandling: 'merge'
-    });
-  }
+ onPageChange(page: number): void {
+ this.router.navigate([], {
+ relativeTo: this.route,
+ queryParams: { page },
+ queryParamsHandling: 'merge'
+ });
+ }
 
-  onEmitir(id: string): void {
-    this.loaderService.show('Emitiendo nota a la DIAN...');
-    this.notasService.emitirNotaAjuste(id).subscribe({
-      next: (res: ResponseResult) => {
-        this.loaderService.hide();
-        if (res.success) {
-          this.notificationService.success('Nota emitida con éxito', 'Éxito');
-          this.notasResource.reload();
-        } else {
-          const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
-          this.notificationService.error(message || 'Error desconocido', 'Error al emitir');
-        }
-      },
-      error: () => this.loaderService.hide()
-    });
-  }
+ onEmitir(id: string): void {
+ this.loaderService.show('Emitiendo nota a la DIAN...');
+ this.notasService.emitirNotaAjuste(id).subscribe({
+ next: (res: ResponseResult) => {
+ this.loaderService.hide();
+ if (res.success) {
+ this.notificationService.success('Nota emitida con éxito', 'Éxito');
+ this.notasResource.reload();
+ } else {
+ const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
+ this.notificationService.error(message || 'Error desconocido', 'Error al emitir');
+ }
+ },
+ error: () => this.loaderService.hide()
+ });
+ }
 
-  confirmDelete(id: string): void {
-    this.idToDelete.set(id);
-    this.isDeleteModalVisible.set(true);
-  }
+ confirmDelete(id: string): void {
+ this.idToDelete.set(id);
+ this.isDeleteModalVisible.set(true);
+ }
 
-  onDelete(): void {
-    this.loaderService.show('Eliminando nota...');
-    this.notasService.removeNotaAjuste(this.idToDelete()).subscribe({
-      next: (res: ResponseResult) => {
-        this.loaderService.hide();
-        this.isDeleteModalVisible.set(false);
-        if (res.success) {
-          this.notificationService.success('Nota eliminada con éxito', 'Éxito');
-          this.notasResource.reload();
-        } else {
-          const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
-          this.notificationService.error(message || 'Error desconocido', 'Error al eliminar');
-        }
-      },
-      error: () => this.loaderService.hide()
-    });
-  }
+ onDelete(): void {
+ this.loaderService.show('Eliminando nota...');
+ this.notasService.removeNotaAjuste(this.idToDelete()).subscribe({
+ next: (res: ResponseResult) => {
+ this.loaderService.hide();
+ this.isDeleteModalVisible.set(false);
+ if (res.success) {
+ this.notificationService.success('Nota eliminada con éxito', 'Éxito');
+ this.notasResource.reload();
+ } else {
+ const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
+ this.notificationService.error(message || 'Error desconocido', 'Error al eliminar');
+ }
+ },
+ error: () => this.loaderService.hide()
+ });
+ }
 
-  onDownloadPDF(id: string): void {
-    this.loaderService.show('Preparando PDF...');
-    this.notasService.downloadPDF(id).subscribe({
-      next: (blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `nota-${id}.pdf`;
-        a.click();
-        window.URL.revokeObjectURL(url);
-        this.loaderService.hide();
-      },
-      error: () => this.loaderService.hide()
-    });
-  }
+ onDownloadPDF(id: string): void {
+ this.loaderService.show('Preparando PDF...');
+ this.notasService.downloadPDF(id).subscribe({
+ next: (blob) => {
+ const url = window.URL.createObjectURL(blob);
+ const a = document.createElement('a');
+ a.href = url;
+ a.download = `nota-${id}.pdf`;
+ a.click();
+ window.URL.revokeObjectURL(url);
+ this.loaderService.hide();
+ },
+ error: () => this.loaderService.hide()
+ });
+ }
 
-  onDownloadXML(id: string): void {
-    this.loaderService.show('Preparando XML...');
-    this.notasService.downloadXML(id).subscribe({
-      next: (blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `nota-${id}.xml`;
-        a.click();
-        window.URL.revokeObjectURL(url);
-        this.loaderService.hide();
-      },
-      error: () => this.loaderService.hide()
-    });
-  }
+ onDownloadXML(id: string): void {
+ this.loaderService.show('Preparando XML...');
+ this.notasService.downloadXML(id).subscribe({
+ next: (blob) => {
+ const url = window.URL.createObjectURL(blob);
+ const a = document.createElement('a');
+ a.href = url;
+ a.download = `nota-${id}.xml`;
+ a.click();
+ window.URL.revokeObjectURL(url);
+ this.loaderService.hide();
+ },
+ error: () => this.loaderService.hide()
+ });
+ }
 
-  onSincronizar(id: string): void {
-    this.loaderService.show('Sincronizando con la DIAN...');
-    this.notasService.sincronizarNotaAjuste(id).subscribe({
-      next: (res: ResponseResult) => {
-        this.loaderService.hide();
-        if (res.success) {
-          this.notificationService.success('Estado sincronizado con éxito', 'Éxito');
-          this.notasResource.reload();
-        } else {
-          const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
-          this.notificationService.error(message || 'Error desconocido', 'Error al sincronizar');
-        }
-      },
-      error: () => this.loaderService.hide()
-    });
-  }
+ onSincronizar(id: string): void {
+ this.loaderService.show('Sincronizando con la DIAN...');
+ this.notasService.sincronizarNotaAjuste(id).subscribe({
+ next: (res: ResponseResult) => {
+ this.loaderService.hide();
+ if (res.success) {
+ this.notificationService.success('Estado sincronizado con éxito', 'Éxito');
+ this.notasResource.reload();
+ } else {
+ const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
+ this.notificationService.error(message || 'Error desconocido', 'Error al sincronizar');
+ }
+ },
+ error: () => this.loaderService.hide()
+ });
+ }
 
-  onReintentarAsiento(id: string): void {
-    this.loaderService.show('Generando asiento contable...');
-    this.notasService.reintentarAsiento(id).subscribe({
-      next: (res: ResponseResult) => {
-        this.loaderService.hide();
-        if (res.success) {
-          this.notificationService.success('Asiento generado con éxito', 'Éxito');
-          this.notasResource.reload();
-        } else {
-          const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
-          this.notificationService.error(message || 'Error desconocido', 'Error al generar asiento');
-        }
-      },
-      error: () => this.loaderService.hide()
-    });
-  }
+ onReintentarAsiento(id: string): void {
+ this.loaderService.show('Generando asiento contable...');
+ this.notasService.reintentarAsiento(id).subscribe({
+ next: (res: ResponseResult) => {
+ this.loaderService.hide();
+ if (res.success) {
+ this.notificationService.success('Asiento generado con éxito', 'Éxito');
+ this.notasResource.reload();
+ } else {
+ const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
+ this.notificationService.error(message || 'Error desconocido', 'Error al generar asiento');
+ }
+ },
+ error: () => this.loaderService.hide()
+ });
+ }
 }
 

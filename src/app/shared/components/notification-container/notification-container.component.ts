@@ -1,92 +1,84 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { Component, signal } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 import { NotificationService, NotificationType } from '@shared/services/notification.service';
-import { Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-notification-container',
-  imports: [CommonModule],
-  templateUrl: './notification-container.component.html',
+ selector: 'app-notification-container',
+ imports: [],
+ templateUrl: './notification-container.component.html',
 })
 export class NotificationContainer {
-   notifications: any[] = [];
-  private subscription!: Subscription;
+ notifications = signal<any[]>([]);
 
-  constructor(private notificationService: NotificationService, private sanitizer: DomSanitizer) {}
+ private intervalId: any;
 
-  ngOnInit() {
-    // En una implementación real, podrías usar observables
-    // Para simplificar, usaremos polling o eventos personalizados
-    this.checkNotifications();
-    
-    // Revisar notificaciones cada 100ms
-    setInterval(() => {
-      this.checkNotifications();
-    }, 100);
-  }
+ constructor(
+ private notificationService: NotificationService,
+ private sanitizer: DomSanitizer
+ ) {}
 
-  private checkNotifications() {
-    this.notifications = this.notificationService.getNotifications();
-  }
-
-  getNotificationIcon(type: NotificationType): SafeHtml {
-    let svgString: string;
-
-    switch (type) {
-      case 'success':
-        svgString = `<svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
-        </svg>`;
-        break;
-      case 'error':
-        svgString = `<svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z"/>
-        </svg>`;
-        break;
-      case 'warning':
-        svgString = `<svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM10 15a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm1-4a1 1 0 0 1-2 0V6a1 1 0 0 1 2 0v5Z"/>
-        </svg>`;
-        break;
-      case 'info':
-        svgString = `<svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM10 15a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm1-4a1 1 0 0 1-2 0V6a1 1 0 0 1 2 0v5Z"/>
-        </svg>`;
-        break;
-      default:
-        svgString = `<svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM10 15a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm1-4a1 1 0 0 1-2 0V6a1 1 0 0 1 2 0v5Z"/>
-        </svg>`;
-    }
-
-    return this.sanitizer.bypassSecurityTrustHtml(svgString);
-  }
-
-  getNotificationClasses(type: NotificationType): string {
-    const baseClasses = 'flex items-center w-full max-w-xl p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800';
-    
-    switch (type) {
-      case 'success':
-        return `${baseClasses} border-l-4 border-green-500`;
-      case 'error':
-        return `${baseClasses} border-l-4 border-red-500`;
-      case 'warning':
-        return `${baseClasses} border-l-4 border-yellow-500`;
-      case 'info':
-        return `${baseClasses} border-l-4 border-blue-500`;
-      default:
-        return baseClasses;
-    }
-  }
-
-  closeNotification(id: number) {
-    this.notificationService.remove(id);
-  }
-
-  ngOnDestroy() {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
-  }
+ ngOnInit() {
+ this.sync();
+ this.intervalId = setInterval(() => this.sync(), 200);
  }
+
+ private sync() {
+ this.notifications.set(this.notificationService.getNotifications());
+ }
+
+ getNotificationIcon(type: NotificationType): string {
+ switch (type) {
+ case 'success':
+ return `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
+ case 'error':
+ return `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
+ case 'warning':
+ return `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>`;
+ case 'info':
+ return `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`;
+ default:
+ return '';
+ }
+ }
+
+ getAccentClass(type: NotificationType): string {
+ switch (type) {
+ case 'success': return 'from-green-500 to-emerald-600';
+ case 'error': return 'from-red-500 to-rose-600';
+ case 'warning': return 'from-amber-500 to-yellow-600';
+ case 'info': return 'from-blue-500 to-indigo-600';
+ default: return 'from-gray-500 to-slate-600';
+ }
+ }
+
+ getIconBgClass(type: NotificationType): string {
+ switch (type) {
+ case 'success': return 'bg-green-100 text-green-600';
+ case 'error': return 'bg-red-100 text-red-600';
+ case 'warning': return 'bg-amber-100 text-amber-600';
+ case 'info': return 'bg-blue-100 text-blue-600';
+ default: return 'bg-gray-100 text-gray-600';
+ }
+ }
+
+ getProgressClass(type: NotificationType): string {
+ switch (type) {
+ case 'success': return 'bg-gradient-to-r from-green-500 to-emerald-500';
+ case 'error': return 'bg-gradient-to-r from-red-500 to-rose-500';
+ case 'warning': return 'bg-gradient-to-r from-amber-500 to-yellow-500';
+ case 'info': return 'bg-gradient-to-r from-blue-500 to-indigo-500';
+ default: return 'bg-gray-500';
+ }
+ }
+
+ closeNotification(id: number) {
+ this.notificationService.remove(id);
+ this.sync();
+ }
+
+ ngOnDestroy() {
+ if (this.intervalId) {
+ clearInterval(this.intervalId);
+ }
+ }
+}

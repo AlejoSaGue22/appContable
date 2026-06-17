@@ -5,26 +5,26 @@ import { MovimientosComponent } from "./movimientos/movimientos.component";
 import { Routes } from "@angular/router";
 
 export const pagosRoutes: Routes = [
-    {
-        path: 'cxc',
-        component: CxcComponent
-    },
-    {
-        path: 'cxp',
-        component: CxpComponent
-    },
-    {
-        path: 'movimientos',
-        component: MovimientosComponent
-    },
-    {
-        path: 'aging',
-        component: AntiguedadComponent
-    },
-    {
-        path: '**',
-        redirectTo: 'cxc'
-    }
+ {
+ path: 'cxc',
+ component: CxcComponent
+ },
+ {
+ path: 'cxp',
+ component: CxpComponent
+ },
+ {
+ path: 'movimientos',
+ component: MovimientosComponent
+ },
+ {
+ path: 'aging',
+ component: AntiguedadComponent
+ },
+ {
+ path: '**',
+ redirectTo: 'cxc'
+ }
 ]
 
 export default pagosRoutes;

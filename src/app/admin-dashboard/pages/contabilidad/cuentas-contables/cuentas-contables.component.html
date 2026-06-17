@@ -1,171 +1,152 @@
 <div class="space-y-6 animate-fade-in">
-  <!-- Header -->
-  <header-title-page [titleHead]="headTitle">
-    @if (tabs() === 'categorias') {
-      <button actions (click)="openCreateModal()" 
-              class="inline-flex items-center justify-center cursor-pointer px-6 py-2.5 bg-gray-900 hover:bg-black text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 group">
-        <svg class="mr-2 h-4 w-4 transition-transform group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
-        </svg>
-        Nueva Categoría
-      </button>
-    }
-  </header-title-page>
+ <!-- Header -->
+ <header-title-page [titleHead]="headTitle">
+ @if (tabs() === 'categorias') {
+ <button actions (click)="openCreateModal()" 
+ class="inline-flex items-center justify-center cursor-pointer px-6 py-2.5 bg-gray-900 hover:bg-black text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 group">
+ <svg class="mr-2 h-4 w-4 transition-transform group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
+ </svg>
+ Nueva Categoría
+ </button>
+ }
+ </header-title-page>
 
-  <!-- Tabs Navigation -->
-  <div class="flex border-b border-gray-200 dark:border-gray-700 overflow-x-auto scrollbar-hide">
-    <button (click)="tabs.set('cuentas')"
-      [class]="tabs() === 'cuentas' ? 'border-blue-500 text-blue-600 bg-blue-50/50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-      class="whitespace-nowrap py-4 px-8 border-b-2 font-bold text-xs transition-all duration-300 cursor-pointer">
-      Plan de Cuentas
-    </button>
-    <button (click)="tabs.set('categorias')"
-      [class]="tabs() === 'categorias' ? 'border-blue-500 text-blue-600 bg-blue-50/50' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-      class="whitespace-nowrap py-4 px-8 border-b-2 font-bold text-xs transition-all duration-300 cursor-pointer">
-      Categorías de Artículos
-    </button>
-  </div>
+ <app-tabs [tabs]="tabItems" [(activeTab)]="tabs" variant="underline" color="blue" />
 
-  <!-- Content Card -->
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden dark:bg-gray-800 dark:border-gray-700 min-h-[400px]">
-    
-    @if (tabs() === 'cuentas') {
-        @if (cuentasResource.isLoading()) {
-          <div class="flex flex-col justify-center items-center h-80 space-y-4">
-            <app-loader />
-            <p class="text-sm text-gray-400 animate-pulse">Sincronizando plan de cuentas...</p>
-          </div>
-        } @else if (cuentasResource.error()) {
-          <div class="p-10 text-center">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-50 text-red-500 mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-            </div>
-            <h3 class="text-lg font-bold text-gray-900">Error de Conexión</h3>
-            <p class="text-gray-500 max-w-xs mx-auto mt-2">No pudimos recuperar el catálogo de cuentas. Por favor, verifica tu conexión.</p>
-            <button (click)="cuentasResource.reload()" class="mt-6 px-6 py-2.5 bg-gray-900 text-white text-sm font-bold rounded-xl hover:bg-gray-800 transition-all shadow-lg active:scale-95">
-              Reintentar ahora
-            </button>
-          </div>
-        }
+ <!-- Content Card -->
+ <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden dark:bg-gray-800 dark:border-gray-700 min-h-[400px]">
+ 
+ @if (tabs() === 'cuentas') {
+ @if (cuentasResource.isLoading()) {
+ <div class="flex flex-col justify-center items-center h-80 space-y-4">
+ <app-loader />
+ <p class="text-sm text-gray-400 animate-pulse">Sincronizando plan de cuentas...</p>
+ </div>
+ } @else if (cuentasResource.error()) {
+ <div class="p-10 text-center">
+ <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-50 text-red-500 mb-4">
+ <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+ </svg>
+ </div>
+ <h3 class="text-lg font-bold text-gray-900">Error de Conexión</h3>
+ <p class="text-gray-500 max-w-xs mx-auto mt-2">No pudimos recuperar el catálogo de cuentas. Por favor, verifica tu conexión.</p>
+ <button (click)="cuentasResource.reload()" class="mt-6 px-6 py-2.5 bg-gray-900 text-white text-sm font-bold rounded-xl hover:bg-gray-800 transition-all shadow-lg active:scale-95">
+ Reintentar ahora
+ </button>
+ </div>
+ }
 
-        @if (cuentasResource.hasValue()) {
-          <!-- Búsqueda por Rango de Fechas -->
-          <!-- <div class="px-6 py-4 bg-gray-50/50 border-b border-gray-100 flex flex-col md:flex-row items-center gap-4">
-              <div class="flex items-center gap-2">
-                <div class="p-2 bg-blue-100 text-blue-600 rounded-lg">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <h4 class="text-xs font-bold text-gray-700 whitespace-nowrap">Filtrar Saldos:</h4>
-              </div>
+ @if (cuentasResource.hasValue()) {
+ <!-- Búsqueda por Rango de Fechas -->
+ <!-- <div class="px-6 py-4 bg-gray-50/50 border-b border-gray-100 flex flex-col md:flex-row items-center gap-4">
+ <div class="flex items-center gap-2">
+ <div class="p-2 bg-blue-100 text-blue-600 rounded-lg">
+ <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+ </svg>
+ </div>
+ <h4 class="text-xs font-bold text-gray-700 whitespace-nowrap">Filtrar Saldos:</h4>
+ </div>
 
-              <div class="flex flex-1 flex-wrap items-center gap-3">
-                <input type="date" 
-                      [ngModel]="selectedFechaInicio()"
-                      (ngModelChange)="selectedFechaInicio.set($event)"
-                      class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all w-full md:w-auto"
-                      placeholder="Fecha Inicio" />
+ <div class="flex flex-1 flex-wrap items-center gap-3">
+ <input type="date" 
+ [ngModel]="selectedFechaInicio()"
+ (ngModelChange)="selectedFechaInicio.set($event)"
+ class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all w-full md:w-auto"
+ placeholder="Fecha Inicio" />
 
-                <span class="text-gray-400 text-xs font-bold hidden md:block">→</span>
+ <span class="text-gray-400 text-xs font-bold hidden md:block">→</span>
 
-                <input type="date" 
-                      [ngModel]="selectedFechaFin()"
-                      (ngModelChange)="selectedFechaFin.set($event)"
-                      class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all w-full md:w-auto"
-                      placeholder="Fecha Fin" />
+ <input type="date" 
+ [ngModel]="selectedFechaFin()"
+ (ngModelChange)="selectedFechaFin.set($event)"
+ class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all w-full md:w-auto"
+ placeholder="Fecha Fin" />
 
-                <div class="flex gap-2 ml-auto">
-                  <button (click)="searchCuentas()"
-                          class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs cursor-pointer font-bold rounded-lg transition-all shadow-sm active:scale-95 flex items-center gap-1.5">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                    Buscar
-                  </button>
+ <div class="flex gap-2 ml-auto">
+ <button (click)="searchCuentas()"
+ class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs cursor-pointer font-bold rounded-lg transition-all shadow-sm active:scale-95 flex items-center gap-1.5">
+ <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+ </svg>
+ Buscar
+ </button>
 
-                  @if (selectedFechaInicio() || selectedFechaFin() || appliedFechaInicio() || appliedFechaFin()) {
-                    <button (click)="clearSearch()"
-                            class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 cursor-pointer rounded-lg transition-all"
-                            title="Limpiar filtros">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  }
-                </div>
-              </div>
-          </div> -->
+ @if (selectedFechaInicio() || selectedFechaFin() || appliedFechaInicio() || appliedFechaFin()) {
+ <button (click)="clearSearch()"
+ class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 cursor-pointer rounded-lg transition-all"
+ title="Limpiar filtros">
+ <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+ </svg>
+ </button>
+ }
+ </div>
+ </div>
+ </div> -->
 
-          <!-- ═══ SPLIT PANEL LAYOUT ═══ -->
-          <div class="flex border-t border-gray-100" style="height: calc(100vh - 340px); min-height: 500px;">
+ <!-- ═══ SPLIT PANEL LAYOUT ═══ -->
+ <div class="flex border-t border-gray-100" style="height: calc(100vh - 340px); min-height: 500px;">
 
-            <!-- LEFT: Tree List -->
-            <div class="w-[380px] flex-shrink-0 border-r border-gray-100 flex flex-col">
-              <app-cuentas-contables-list 
-                [cuentas]="cuentasOrdenadas()"
-                [selectedId]="selectedAccount()?.id ?? null"
-                (selectAccount)="onSelectAccount($event)"
-                (addSubAccount)="onAddSubAccount($event)"
-              />
-            </div>
+ <!-- LEFT: Tree List -->
+ <div class="w-[380px] flex-shrink-0 border-r border-gray-100 flex flex-col">
+ <app-cuentas-contables-list 
+ [cuentas]="cuentasOrdenadas()"
+ [selectedId]="selectedAccount()?.id ?? null"
+ (selectAccount)="onSelectAccount($event)"
+ (addSubAccount)="onAddSubAccount($event)"
+ />
+ </div>
 
-            <!-- RIGHT: Detail Panel -->
-            <div class="flex-1 overflow-hidden">
-              <app-cuenta-detail-panel
-                [account]="selectedAccount()"
-                [parentAccount]="parentAccount()"
-                [mode]="panelMode()"
-                (modeChange)="onPanelModeChange($event)"
-                (saved)="onAccountSaved()"
-              />
-            </div>
+ <!-- RIGHT: Detail Panel -->
+ <div class="flex-1 overflow-hidden">
+ <app-cuenta-detail-panel
+ [account]="selectedAccount()"
+ [parentAccount]="parentAccount()"
+ [mode]="panelMode()"
+ (modeChange)="onPanelModeChange($event)"
+ (saved)="onAccountSaved()"
+ />
+ </div>
 
-          </div>
-        }
-    }
+ </div>
+ }
+ }
 
-    @if (tabs() === 'categorias') {
-        @if (categoriesResource.isLoading()) {
-            <div class="flex flex-col justify-center items-center h-80 space-y-4">
-                <app-loader />
-                <p class="text-sm text-gray-400 animate-pulse">Sincronizando categorías...</p>
-            </div>
-        } @else {
-            <app-categorias-list [categories]="categories()" [cuentasAceptanMovimiento]="cuentasAceptanMovimiento()"
-                (categoryUpdated)="categoriesResource.reload()" (editCategory)="openEditModal($event)" />
+ @if (tabs() === 'categorias') {
+ @if (categoriesResource.isLoading()) {
+ <div class="flex flex-col justify-center items-center h-80 space-y-4">
+ <app-loader />
+ <p class="text-sm text-gray-400 animate-pulse">Sincronizando categorías...</p>
+ </div>
+ } @else {
+ <app-categorias-list [categories]="categories()" [cuentasAceptanMovimiento]="cuentasAceptanMovimiento()"
+ (categoryUpdated)="categoriesResource.reload()" (editCategory)="openEditModal($event)" />
 
-            <div class="p-6 border-t border-gray-100 bg-gray-50/50 dark:bg-gray-800/50">
-                <app-pagination [length]="categories().length"/>
-            </div>
-        }
-    }
+ <div class="p-6 border-t border-gray-100 bg-gray-50/50 dark:bg-gray-800/50">
+ <app-pagination [length]="categories().length"/>
+ </div>
+ }
+ }
 
-  </div>
+ </div>
 </div>
 
 <!-- Categories Modal -->
 @if (isModalOpen()) {
-  <app-categoria-form-modal 
-    [isOpen]="isModalOpen()"
-    [category]="selectedCategory()"
-    [cuentasList]="cuentasAceptanMovimiento()"
-    (close)="closeModal()"
-    (submitForm)="onFormSubmit()"
-  ></app-categoria-form-modal>
+ <app-categoria-form-modal 
+ [isOpen]="isModalOpen()"
+ [category]="selectedCategory()"
+ [cuentasList]="cuentasAceptanMovimiento()"
+ (close)="closeModal()"
+ (submitForm)="onFormSubmit()"
+ ></app-categoria-form-modal>
 }
 
 <style>
-  .animate-fade-in {
-    animation: fadeIn 0.4s ease-out;
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
+ .scrollbar-hide::-webkit-scrollbar {
+ display: none;
+ }
 </style>

@@ -1,23 +1,23 @@
 @for (option of menuItemsOther(); track $index) {
 <div class="px-4">
-    <app-barralateral-menu [title]="option.title" 
-        [subItems]="option.children ?? []" 
-        [menuSection]="option"
-        (menuToggled)="toggleActiveMenu($event)"
-        [activeMenu]="activeMenu()" 
-        [isActive]="isItemActive(option)"
-        [menuId]="option.title"/>
+ <app-barralateral-menu [title]="option.title" 
+ [subItems]="option.children ?? []" 
+ [menuSection]="option"
+ (menuToggled)="toggleActiveMenu($event)"
+ [activeMenu]="activeMenu()" 
+ [isActive]="isItemActive(option)"
+ [menuId]="option.title"/>
 </div>
 }
 
 <div class="mt-4 px-4 pb-4">
-    <button (click)="cerrarSesion()" 
-            class="flex items-center w-full p-3 text-sm font-semibold text-gray-500 rounded-xl transition-all duration-300 group hover:bg-red-500/10 hover:text-red-400 cursor-pointer">
-        <div class="flex-shrink-0 w-5 h-5 transition-transform duration-300 group-hover:scale-110">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-        </div>
-        <span class="ml-3">Cerrar Sesión</span>
-    </button>
+ <button (click)="cerrarSesion()" 
+ class="flex items-center w-full p-3 text-sm font-semibold text-gray-500 rounded-xl transition-all duration-300 group hover:bg-red-500/10 hover:text-red-400 cursor-pointer">
+ <div class="flex-shrink-0 w-5 h-5 transition-transform duration-300 group-hover:scale-110">
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+ </svg>
+ </div>
+ <span class="ml-3">Cerrar Sesión</span>
+ </button>
 </div>

@@ -1,110 +1,110 @@
 <table class="w-full text-left text-sm text-gray-500">
-    <thead class="text-[11px] text-gray-400 uppercase bg-gray-50/50 border-b border-gray-100">
-        <tr>
-            <th scope="col" class="px-8 py-5">Código Contable</th>
-            <th scope="col" class="px-8 py-5">Nombre de la Cuenta</th>
-            <th scope="col" class="px-8 py-5">Naturaleza</th>
-            <th scope="col" class="px-8 py-5 text-right">Débitos</th>
-            <th scope="col" class="px-8 py-5 text-right">Créditos</th>
-            <th scope="col" class="px-8 py-5 text-right">Saldo Actual</th>
-            <th scope="col" class="px-8 py-5 text-center">Estado</th>
-        </tr>
-    </thead>
-    <tbody class="divide-y divide-gray-50">
-        @for (cuenta of visibleCuentas(); track cuenta.id) {
-            <tr class="hover:bg-blue-50/30 transition-all duration-200 group font-normal" 
-                [class.bg-gray-50]="getDerivedLevel(cuenta.codigo) === 1" 
-                [class.text-gray-900]="getDerivedLevel(cuenta.codigo) <= 3"
-                [class.text-gray-500]="getDerivedLevel(cuenta.codigo) > 3">
-                
-                <!-- Código with Hierarchical Nesting & Expand/Collapse -->
-                <td class="px-8 py-4 whitespace-nowrap">
-                    <div class="flex items-center gap-2" [style.padding-left.rem]="(getDerivedLevel(cuenta.codigo) - 1) * 1.5">
-                        
-                        @if (hasChildren(cuenta)) {
-                            <button (click)="toggleExpand(cuenta.id)" 
-                                    class="w-5 h-5 flex items-center justify-center rounded border border-gray-200 bg-white hover:bg-blue-50 hover:border-blue-200 transition-colors cursor-pointer">
-                                @if (isExpanded(cuenta.id)) {
-                                    <svg class="w-3 h-3 text-gray-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4"></path>
-                                    </svg>
-                                } @else {
-                                    <svg class="w-3 h-3 text-gray-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
-                                    </svg>
-                                }
-                            </button>
-                        } @else {
-                            <div class="w-5 h-5 flex items-center justify-center">
-                                <div class="w-1.5 h-1.5 rounded-full" 
-                                     [class]="cuenta.aceptaMovimiento ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]' : 'bg-gray-200'"></div>
-                            </div>
-                        }
+ <thead class="text-[11px] text-gray-400 uppercase bg-gray-50/50 border-b border-gray-100">
+ <tr>
+ <th scope="col" class="px-8 py-5">Código Contable</th>
+ <th scope="col" class="px-8 py-5">Nombre de la Cuenta</th>
+ <th scope="col" class="px-8 py-5">Naturaleza</th>
+ <th scope="col" class="px-8 py-5 text-right">Débitos</th>
+ <th scope="col" class="px-8 py-5 text-right">Créditos</th>
+ <th scope="col" class="px-8 py-5 text-right">Saldo Actual</th>
+ <th scope="col" class="px-8 py-5 text-center">Estado</th>
+ </tr>
+ </thead>
+ <tbody class="divide-y divide-gray-50">
+ @for (cuenta of visibleCuentas(); track cuenta.id) {
+ <tr class="hover:bg-blue-50/30 transition-all duration-200 group font-normal" 
+ [class.bg-gray-50]="getDerivedLevel(cuenta.codigo) === 1" 
+ [class.text-gray-900]="getDerivedLevel(cuenta.codigo) <= 3"
+ [class.text-gray-500]="getDerivedLevel(cuenta.codigo) > 3">
+ 
+ <!-- Código with Hierarchical Nesting & Expand/Collapse -->
+ <td class="px-8 py-4 whitespace-nowrap">
+ <div class="flex items-center gap-2" [style.padding-left.rem]="(getDerivedLevel(cuenta.codigo) - 1) * 1.5">
+ 
+ @if (hasChildren(cuenta)) {
+ <button (click)="toggleExpand(cuenta.id)" 
+ class="w-5 h-5 flex items-center justify-center rounded border border-gray-200 bg-white hover:bg-blue-50 hover:border-blue-200 transition-colors cursor-pointer">
+ @if (isExpanded(cuenta.id)) {
+ <svg class="w-3 h-3 text-gray-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4"></path>
+ </svg>
+ } @else {
+ <svg class="w-3 h-3 text-gray-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+ </svg>
+ }
+ </button>
+ } @else {
+ <div class="w-5 h-5 flex items-center justify-center">
+ <div class="w-1.5 h-1.5 rounded-full" 
+ [class]="cuenta.aceptaMovimiento ? 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]' : 'bg-gray-200'"></div>
+ </div>
+ }
 
-                        <span [class.text-blue-700]="getDerivedLevel(cuenta.codigo) === 1" class="font-mono text-xs ml-1">
-                            {{ cuenta.codigo }}
-                        </span>
-                    </div>
-                </td>
-                
-                <!-- Nombre y Descripción -->
-                <td class="px-8 py-4">
-                    <div class="flex flex-col">
-                        <span class="tracking-tight">{{ cuenta.nombre }}</span>
-                        @if (cuenta.descripcion && getDerivedLevel(cuenta.codigo) > 3) {
-                            <span class="text-[10px] text-gray-400 font-normal mt-0.5 truncate max-w-xs" [title]="cuenta.descripcion">
-                                {{ cuenta.descripcion }}
-                            </span>
-                        }
-                    </div>
-                </td>
-                
-                <td class="px-8 py-4 whitespace-nowrap">
-                    <span class="px-2.5 py-1 text-[10px] font-semibold tracking-tighter rounded-lg uppercase"
-                        [class]="cuenta.naturaleza === 'DEBITO' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-amber-50 text-amber-600 border border-amber-100'">
-                        {{ cuenta.naturaleza }}
-                    </span>
-                </td>
+ <span [class.text-blue-700]="getDerivedLevel(cuenta.codigo) === 1" class="font-mono text-xs ml-1">
+ {{ cuenta.codigo }}
+ </span>
+ </div>
+ </td>
+ 
+ <!-- Nombre y Descripción -->
+ <td class="px-8 py-4">
+ <div class="flex flex-col">
+ <span class=" ">{{ cuenta.nombre }}</span>
+ @if (cuenta.descripcion && getDerivedLevel(cuenta.codigo) > 3) {
+ <span class="text-[10px] text-gray-400 font-normal mt-0.5 truncate max-w-xs" [title]="cuenta.descripcion">
+ {{ cuenta.descripcion }}
+ </span>
+ }
+ </div>
+ </td>
+ 
+ <td class="px-8 py-4 whitespace-nowrap">
+ <span class="px-2.5 py-1 text-[10px] font-semibold er rounded-lg uppercase"
+ [class]="cuenta.naturaleza === 'DEBITO' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-amber-50 text-amber-600 border border-amber-100'">
+ {{ cuenta.naturaleza }}
+ </span>
+ </td>
 
-                <td class="px-8 py-4 text-right whitespace-nowrap text-gray-700">
-                    {{ cuenta.totalDebito | currency:'':'$':'1.0-0' }}
-                </td>
+ <td class="px-8 py-4 text-right whitespace-nowrap text-gray-700">
+ {{ cuenta.totalDebito | currency:'':'$':'1.0-0' }}
+ </td>
 
-                <td class="px-8 py-4 text-right whitespace-nowrap text-gray-700">
-                    {{ cuenta.totalCredito | currency:'':'$':'1.0-0' }}
-                </td>
+ <td class="px-8 py-4 text-right whitespace-nowrap text-gray-700">
+ {{ cuenta.totalCredito | currency:'':'$':'1.0-0' }}
+ </td>
 
-                <td class="px-8 py-4 text-right whitespace-nowrap font-semibold" 
-                    [class.text-red-500]="cuenta.saldo < 0"
-                    [class.text-gray-900]="cuenta.saldo >= 0">
-                    {{ cuenta.saldo | currency:'':'$':'1.0-0' }}
-                </td>
+ <td class="px-8 py-4 text-right whitespace-nowrap font-semibold" 
+ [class.text-red-500]="cuenta.saldo < 0"
+ [class.text-gray-900]="cuenta.saldo >= 0">
+ {{ cuenta.saldo | currency:'':'$':'1.0-0' }}
+ </td>
 
-                <td class="px-8 py-4">
-                    <div class="flex justify-center items-center">
-                        @if (cuenta.isActive) {
-                            <span class="px-2 py-0.5 rounded-full bg-green-100 text-[9px] font-semibold text-green-700 uppercase tracking-tighter">Activa</span>
-                        } @else {
-                            <span class="px-2 py-0.5 rounded-full bg-gray-100 text-[9px] font-semibold text-gray-400 uppercase tracking-tighter">Inactiva</span>
-                        }
-                    </div>
-                </td>
-            </tr>
-        }
-        @if (visibleCuentas().length === 0) {
-            <tr>
-                <td colspan="7" class="px-8 py-20 text-center text-gray-400">
-                    <div class="flex flex-col items-center">
-                        <div class="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
-                            <svg class="w-10 h-10 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                            </svg>
-                        </div>
-                        <p class="text-sm font-bold text-gray-900">No se encontraron cuentas</p>
-                        <p class="text-xs mt-1">El catálogo está vacío o no hay cuentas visibles en este nivel.</p>
-                    </div>
-                </td>
-            </tr>
-        }
-    </tbody>
+ <td class="px-8 py-4">
+ <div class="flex justify-center items-center">
+ @if (cuenta.isActive) {
+ <span class="px-2 py-0.5 rounded-full bg-green-100 text-[9px] font-semibold text-green-700 uppercase er">Activa</span>
+ } @else {
+ <span class="px-2 py-0.5 rounded-full bg-gray-100 text-[9px] font-semibold text-gray-400 uppercase er">Inactiva</span>
+ }
+ </div>
+ </td>
+ </tr>
+ }
+ @if (visibleCuentas().length === 0) {
+ <tr>
+ <td colspan="7" class="px-8 py-20 text-center text-gray-400">
+ <div class="flex flex-col items-center">
+ <div class="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
+ <svg class="w-10 h-10 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+ </svg>
+ </div>
+ <p class="text-sm font-bold text-gray-900">No se encontraron cuentas</p>
+ <p class="text-xs mt-1">El catálogo está vacío o no hay cuentas visibles en este nivel.</p>
+ </div>
+ </td>
+ </tr>
+ }
+ </tbody>
 </table>

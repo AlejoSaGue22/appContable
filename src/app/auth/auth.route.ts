@@ -4,25 +4,25 @@ import { LoginPageComponent } from "./pages/login-page.component/login-page.comp
 import { RegisterPageComponent } from "./pages/register-page.component/register-page.component";
 
 export const route: Routes = [
-    {
-        path: '',
-        component: AuthLayoutComponent,
-        children: [
-            {
-                path: 'login',
-                component: LoginPageComponent
-            },
-            {
-                path: 'register',
-                component: RegisterPageComponent
-            },
-            {
-                path: '**',
-                redirectTo: 'login'
-            }
-        
-        ]
-    }
+ {
+ path: '',
+ component: AuthLayoutComponent,
+ children: [
+ {
+ path: 'login',
+ component: LoginPageComponent
+ },
+ {
+ path: 'register',
+ component: RegisterPageComponent
+ },
+ {
+ path: '**',
+ redirectTo: 'login'
+ }
+ 
+ ]
+ }
 ]
 
 export default route

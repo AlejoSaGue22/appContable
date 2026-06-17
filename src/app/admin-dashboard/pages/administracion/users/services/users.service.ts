@@ -10,58 +10,58 @@ const baseUrl = environment.baseUrl;
 @Injectable({ providedIn: 'root' })
 export class UsersService {
 
-    private http = inject(HttpClient);
+ private http = inject(HttpClient);
 
-    getUsers(options: Options): Observable<UsersResponse> {
-        const { limit = 10, offset = 0, search = '' } = options;
+ getUsers(options: Options): Observable<UsersResponse> {
+ const { limit = 10, offset = 0, search = '' } = options;
 
-        return this.http.get<UsersResponse>(`${baseUrl}/users`, {
-            params: {
-                limit,
-                offset,
-                search
-            }
-        });
-    }
+ return this.http.get<UsersResponse>(`${baseUrl}/users`, {
+ params: {
+ limit,
+ offset,
+ search
+ }
+ });
+ }
 
-    getUsersById(id: string): Observable<User> {
-        return this.http.get<any>(`${baseUrl}/users/${id}`).pipe(
-            map(resp => resp.data || resp)
-        );
-    }
+ getUsersById(id: string): Observable<User> {
+ return this.http.get<any>(`${baseUrl}/users/${id}`).pipe(
+ map(resp => resp.data || resp)
+ );
+ }
 
-    getRoles(): Observable<Role[]> {
-        return this.http.get<any>(`${baseUrl}/roles`).pipe(
-            map(resp => resp.data || resp)
-        );
-    }
+ getRoles(): Observable<Role[]> {
+ return this.http.get<any>(`${baseUrl}/roles`).pipe(
+ map(resp => resp.data || resp)
+ );
+ }
 
-    createUser(user: any): Observable<ResponseResult> {
-        return this.http.post(`${baseUrl}/users`, user).pipe(
-            map((resp): ResponseResult => ({ success: true, data: resp })),
-            catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
-        );
-    }
+ createUser(user: any): Observable<ResponseResult> {
+ return this.http.post(`${baseUrl}/users`, user).pipe(
+ map((resp): ResponseResult => ({ success: true, data: resp })),
+ catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+ );
+ }
 
-    updateUser(id: string, user: any): Observable<ResponseResult> {
-        return this.http.patch(`${baseUrl}/users/${id}`, user).pipe(
-            map((resp): ResponseResult => ({ success: true, data: resp })),
-            catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
-        );
-    }
+ updateUser(id: string, user: any): Observable<ResponseResult> {
+ return this.http.patch(`${baseUrl}/users/${id}`, user).pipe(
+ map((resp): ResponseResult => ({ success: true, data: resp })),
+ catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+ );
+ }
 
-    deleteUser(id: string): Observable<ResponseResult> {
-        return this.http.delete(`${baseUrl}/users/${id}`).pipe(
-            map((resp): ResponseResult => ({ success: true, data: resp })),
-            catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
-        );
-    }
+ deleteUser(id: string): Observable<ResponseResult> {
+ return this.http.delete(`${baseUrl}/users/${id}`).pipe(
+ map((resp): ResponseResult => ({ success: true, data: resp })),
+ catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+ );
+ }
 
-    // change password for user - CAMBIAR CONTRASEÑA DE USUARIO
-    updateUserPassword(id: string, password: string): Observable<ResponseResult> {
-        return this.http.patch(`${baseUrl}/users/${id}`, { password }).pipe(
-            map((resp): ResponseResult => ({ success: true, data: resp })),
-            catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
-        );
-    }
+ // change password for user - CAMBIAR CONTRASEÑA DE USUARIO
+ updateUserPassword(id: string, password: string): Observable<ResponseResult> {
+ return this.http.patch(`${baseUrl}/users/${id}`, { password }).pipe(
+ map((resp): ResponseResult => ({ success: true, data: resp })),
+ catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+ );
+ }
 }

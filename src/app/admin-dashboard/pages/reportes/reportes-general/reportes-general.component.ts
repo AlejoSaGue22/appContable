@@ -12,102 +12,111 @@ import { FacturasCompraTableComponent } from './components/facturas-compra-table
 import { CuentasCobrarTableComponent } from './components/cuentas-cobrar-table/cuentas-cobrar-table.component';
 import { CuentasPagarTableComponent } from './components/cuentas-pagar-table/cuentas-pagar-table.component';
 import { CuentasContablesService } from '../../contabilidad/services/cuentas-contables.service';
+import { TabsComponent, TabItem } from '@shared/components/tabs/tabs.component';
 
 @Component({
-  selector: 'app-reportes-general',
-  standalone: true,
-  imports: [
-    CommonModule, CurrencyPipe, DatePipe, FormsModule, HeaderTitlePageComponent,
-    BalanceCuentasTableComponent, FacturasVentaTableComponent,
-    FacturasCompraTableComponent, CuentasCobrarTableComponent,
-    CuentasPagarTableComponent
-  ],
-  templateUrl: './reportes-general.component.html',
+ selector: 'app-reportes-general',
+ standalone: true,
+ imports: [
+ CommonModule, CurrencyPipe, DatePipe, FormsModule, HeaderTitlePageComponent,
+ BalanceCuentasTableComponent, FacturasVentaTableComponent,
+ FacturasCompraTableComponent, CuentasCobrarTableComponent,
+ CuentasPagarTableComponent, TabsComponent
+ ],
+ templateUrl: './reportes-general.component.html',
 })
 export class ReportesGeneralComponent {
-  private reportesService = inject(ReportesService);
-  private notificationService = inject(NotificationService);
-  private cuentasService = inject(CuentasContablesService);
+ private reportesService = inject(ReportesService);
+ private notificationService = inject(NotificationService);
+ private cuentasService = inject(CuentasContablesService);
 
-  activeTab = signal<'facturacion' | 'facturas-venta' | 'facturas-compra' | 'cxc' | 'cxp' | 'balance'>('facturacion');
+ activeTab = signal<string>('facturacion');
+ tabItems: TabItem[] = [
+ { id: 'facturacion', label: 'Dashboard Facturación' },
+ { id: 'facturas-venta', label: 'Ventas' },
+ { id: 'facturas-compra', label: 'Compras' },
+ { id: 'cxc', label: 'Cuentas por Cobrar' },
+ { id: 'cxp', label: 'Cuentas por Pagar' },
+ { id: 'balance', label: 'Balance Contable' }
+ ];
 
-  fechaInicio = signal<string>(this.getDefaultDates().firstDay);
-  fechaFin = signal<string>(this.getDefaultDates().lastDay);
+ fechaInicio = signal<string>(this.getDefaultDates().firstDay);
+ fechaFin = signal<string>(this.getDefaultDates().lastDay);
 
-  appliedDates = signal({
-    inicio: this.fechaInicio(),
-    fin: this.fechaFin()
-  });
+ appliedDates = signal({
+ inicio: this.fechaInicio(),
+ fin: this.fechaFin()
+ });
 
-  headTitle: HeaderInput = {
-    title: 'Reportes Generales',
-    slog: 'Análisis de rentabilidad del período'
-  };
+ headTitle: HeaderInput = {
+ title: 'Reportes Generales',
+ slog: 'Análisis de rentabilidad del período'
+ };
 
-  protected readonly Math = Math;
+ protected readonly Math = Math;
 
-  private getDefaultDates() {
-    const now = new Date();
-    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
-    return { firstDay, lastDay };
-  }
+ private getDefaultDates() {
+ const now = new Date();
+ const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+ const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+ return { firstDay, lastDay };
+ }
 
-  reportesResource = rxResource({
-    request: () => ({ ...this.appliedDates(), activeTab: this.activeTab() }),
-    loader: ({ request }) => {
-      if (request.activeTab !== 'facturacion') return of(null);
-      return this.reportesService.getFacturacionDetallada(request.inicio, request.fin).pipe(
-        catchError((err) => {
-          this.notificationService.error('Error al generar el reporte de facturación', err.error?.message || 'Error');
-          return of(null);
-        })
-      );
-    }
-  });
+ reportesResource = rxResource({
+ request: () => ({ ...this.appliedDates(), activeTab: this.activeTab() }),
+ loader: ({ request }) => {
+ if (request.activeTab !== 'facturacion') return of(null);
+ return this.reportesService.getFacturacionDetallada(request.inicio, request.fin).pipe(
+ catchError((err) => {
+ this.notificationService.error('Error al generar el reporte de facturación', err.error?.message || 'Error');
+ return of(null);
+ })
+ );
+ }
+ });
 
-  balanceResource = rxResource({
-    request: () => ({ ...this.appliedDates(), activeTab: this.activeTab() }),
-    loader: ({ request }) => {
-      if (request.activeTab !== 'balance') return of([]);
-      return this.cuentasService.getCuentasContables({
-        fechaInicio: request.inicio,
-        fechaFin: request.fin
-      }).pipe(
-        catchError(() => {
-          this.notificationService.error('Error al cargar el balance contable', 'Error');
-          return of([]);
-        })
-      );
-    }
-  });
+ balanceResource = rxResource({
+ request: () => ({ ...this.appliedDates(), activeTab: this.activeTab() }),
+ loader: ({ request }) => {
+ if (request.activeTab !== 'balance') return of([]);
+ return this.cuentasService.getCuentasContables({
+ fechaInicio: request.inicio,
+ fechaFin: request.fin
+ }).pipe(
+ catchError(() => {
+ this.notificationService.error('Error al cargar el balance contable', 'Error');
+ return of([]);
+ })
+ );
+ }
+ });
 
-  facturacion = computed(() => this.reportesResource.value());
+ facturacion = computed(() => this.reportesResource.value());
 
-  cuentasContables = computed(() => {
-    const data = this.balanceResource.value() || [];
-    return [...data].sort((a, b) => a.codigo.localeCompare(b.codigo));
-  });
+ cuentasContables = computed(() => {
+ const data = this.balanceResource.value() || [];
+ return [...data].sort((a, b) => a.codigo.localeCompare(b.codigo));
+ });
 
-  loading = computed(() => this.reportesResource.isLoading());
-  loadingCuentas = computed(() => this.balanceResource.isLoading());
+ loading = computed(() => this.reportesResource.isLoading());
+ loadingCuentas = computed(() => this.balanceResource.isLoading());
 
-  generarReporte(): void {
-    this.appliedDates.set({
-      inicio: this.fechaInicio(),
-      fin: this.fechaFin()
-    });
-  }
+ generarReporte(): void {
+ this.appliedDates.set({
+ inicio: this.fechaInicio(),
+ fin: this.fechaFin()
+ });
+ }
 
-  onTabChange(tab: 'facturacion' | 'facturas-venta' | 'facturas-compra' | 'cxc' | 'cxp' | 'balance'): void {
-    this.activeTab.set(tab);
-  }
+ onTabChange(tab: string): void {
+ this.activeTab.set(tab);
+ }
 
-  limpiarTabla(): void {
-    const defaults = this.getDefaultDates();
-    this.fechaInicio.set(defaults.firstDay);
-    this.fechaFin.set(defaults.lastDay);
-    this.appliedDates.set({ inicio: '', fin: '' });
-    this.activeTab.set('facturacion');
-  }
+ limpiarTabla(): void {
+ const defaults = this.getDefaultDates();
+ this.fechaInicio.set(defaults.firstDay);
+ this.fechaFin.set(defaults.lastDay);
+ this.appliedDates.set({ inicio: '', fin: '' });
+ this.activeTab.set('facturacion');
+ }
 }

@@ -1,311 +1,311 @@
 <div class="mb-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-      <!-- Buscador Principal -->
-      <div class="relative w-full sm:max-w-md flex-1">
-        <div class="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3">
-          <svg class="h-4 w-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-          </svg>
-        </div>
-        <input type="text" id="clientNameSearch" placeholder="Buscar por cliente..." [(ngModel)]="clientName" (keyup.enter)="applyFilters()"
-          class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 ps-10 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400" />
-      </div>
+ <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+ <!-- Buscador Principal -->
+ <div class="relative w-full sm:max-w-md flex-1">
+ <div class="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3">
+ <svg class="h-4 w-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+ <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+ </svg>
+ </div>
+ <input type="text" id="clientNameSearch" placeholder="Buscar por cliente..." [(ngModel)]="clientName" (keyup.enter)="applyFilters()"
+ class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 ps-10 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400" />
+ </div>
 
-      <!-- Botones Principales -->
-      <div class="flex w-full sm:w-auto items-center gap-2">
-        <button (click)="toggleFilters()" 
-          class="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 cursor-pointer text-sm font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700">
-          <svg class="h-4 w-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M5.05 3C3.291 3 2.352 5.024 3.51 6.182l5.42 5.421a1.002 1.002 0 0 1 .253.535l1.09 5.45a1 1 0 0 0 1.954-.035l1.045-5.228a1.002 1.002 0 0 1 .28-.564l5.441-5.442C20.15 5.16 19.21 3 17.5 3H5.05Z"/>
-          </svg>
-          Filtros
-          @if (activeFiltersCount() > 0) {
-          <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-            {{ activeFiltersCount() }}
-          </span>
-          }
-        </button>
+ <!-- Botones Principales -->
+ <div class="flex w-full sm:w-auto items-center gap-2">
+ <button (click)="toggleFilters()" 
+ class="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 cursor-pointer text-sm font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700">
+ <svg class="h-4 w-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+ <path d="M5.05 3C3.291 3 2.352 5.024 3.51 6.182l5.42 5.421a1.002 1.002 0 0 1 .253.535l1.09 5.45a1 1 0 0 0 1.954-.035l1.045-5.228a1.002 1.002 0 0 1 .28-.564l5.441-5.442C20.15 5.16 19.21 3 17.5 3H5.05Z"/>
+ </svg>
+ Filtros
+ @if (activeFiltersCount() > 0) {
+ <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+ {{ activeFiltersCount() }}
+ </span>
+ }
+ </button>
 
-        <button (click)="applyFilters()"
-          class="rounded-lg bg-blue-700 px-4 py-2 text-sm cursor-pointer font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-          Buscar
-        </button>
-        
-        @if (activeFiltersCount() > 0) {
-        <button (click)="clearFilters()" title="Limpiar todos los filtros"
-          class="rounded-lg p-2 text-gray-500 cursor-pointer hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
-          <svg class="h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-        }
-      </div>
-  </div>
+ <button (click)="applyFilters()"
+ class="rounded-lg bg-blue-700 px-4 py-2 text-sm cursor-pointer font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+ Buscar
+ </button>
+ 
+ @if (activeFiltersCount() > 0) {
+ <button (click)="clearFilters()" title="Limpiar todos los filtros"
+ class="rounded-lg p-2 text-gray-500 cursor-pointer hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+ <svg class="h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+ <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+ </svg>
+ </button>
+ }
+ </div>
+ </div>
 
-  <!-- Filtros Extendidos Colapsables -->
-  @if (showFilters()) {
-  <div class="mt-4 border-t border-gray-200 pt-4 dark:border-gray-700">
-    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-      <!-- Filtro N° de Factura -->
-      <div>
-        <label for="numeroFactura" class="mb-2 block text-xs font-medium text-gray-900 dark:text-gray-300">
-          Nº Factura
-        </label>
-        <input type="text" id="numeroFactura" placeholder="Ej: FV-001" [(ngModel)]="numeroFactura"
-          class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400" />
-      </div>
+ <!-- Filtros Extendidos Colapsables -->
+ @if (showFilters()) {
+ <div class="mt-4 border-t border-gray-200 pt-4 dark:border-gray-700">
+ <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+ <!-- Filtro N° de Factura -->
+ <div>
+ <label for="numeroFactura" class="mb-2 block text-xs font-medium text-gray-900 dark:text-gray-300">
+ Nº Factura
+ </label>
+ <input type="text" id="numeroFactura" placeholder="Ej: FV-001" [(ngModel)]="numeroFactura"
+ class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400" />
+ </div>
 
-      <!-- Filtro Tipo de Factura -->
-      <div>
-        <label for="tipoFactura" class="mb-2 block text-xs font-medium text-gray-900 dark:text-gray-300">
-          Tipo de Factura
-        </label>
-        <select id="tipoFactura" [(ngModel)]="tipoFactura"
-          class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
-          @for (tipo of tiposFactura; track tipo.value) {
-          <option [value]="tipo.value">{{ tipo.label }}</option>
-          }
-        </select>
-      </div>
+ <!-- Filtro Tipo de Factura -->
+ <div>
+ <label for="tipoFactura" class="mb-2 block text-xs font-medium text-gray-900 dark:text-gray-300">
+ Tipo de Factura
+ </label>
+ <select id="tipoFactura" [(ngModel)]="tipoFactura"
+ class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+ @for (tipo of tiposFactura; track tipo.value) {
+ <option [value]="tipo.value">{{ tipo.label }}</option>
+ }
+ </select>
+ </div>
 
-      <!-- Filtro por estado -->
-      <div>
-        <label for="status" class="mb-2 block text-xs font-medium text-gray-900 dark:text-gray-300">
-          Estado de Factura
-        </label>
-        <select id="status" [(ngModel)]="status"
-          class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
-          @for (status of statuses; track status.value) {
-          <option [value]="status.value">{{ status.label }}</option>
-          }
-        </select>
-      </div>
+ <!-- Filtro por estado -->
+ <div>
+ <label for="status" class="mb-2 block text-xs font-medium text-gray-900 dark:text-gray-300">
+ Estado de Factura
+ </label>
+ <select id="status" [(ngModel)]="status"
+ class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+ @for (status of statuses; track status.value) {
+ <option [value]="status.value">{{ status.label }}</option>
+ }
+ </select>
+ </div>
 
-      <!-- Filtro Estado DIAN -->
-      <div>
-        <label for="dianStatus" class="mb-2 block text-xs font-medium text-gray-900 dark:text-gray-300">
-          Estado DIAN
-        </label>
-        <select id="dianStatus" [(ngModel)]="dianStatus"
-          class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
-          @for (ds of dianStatuses; track ds.value) {
-            <option [value]="ds.value">{{ ds.label }}</option>
-          }
-        </select>
-      </div>
+ <!-- Filtro Estado DIAN -->
+ <div>
+ <label for="dianStatus" class="mb-2 block text-xs font-medium text-gray-900 dark:text-gray-300">
+ Estado DIAN
+ </label>
+ <select id="dianStatus" [(ngModel)]="dianStatus"
+ class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
+ @for (ds of dianStatuses; track ds.value) {
+ <option [value]="ds.value">{{ ds.label }}</option>
+ }
+ </select>
+ </div>
 
-      <!-- Fechas -->
-      <div class="sm:col-span-2 lg:col-span-1 grid grid-cols-2 gap-2">
-        <div>
-          <label for="startDate" class="mb-2 block text-xs font-medium text-gray-900 dark:text-gray-300">
-            Desde
-          </label>
-          <input type="date" id="startDate" [(ngModel)]="startDate"
-            class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white" />
-        </div>
-        <div>
-          <label for="endDate" class="mb-2 block text-xs font-medium text-gray-900 dark:text-gray-300">
-            Hasta
-          </label>
-          <input type="date" id="endDate" [(ngModel)]="endDate"
-            class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white" />
-        </div>
-      </div>
-    </div>
-    
-    <div class="mt-4 flex justify-end gap-2">
-      <button (click)="clearFilters()" class="rounded-lg cursor-pointer border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700">
-        Limpiar Filtros
-      </button>
-      <button (click)="applyFilters()" class="rounded-lg cursor-pointer bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-        Aplicar Filtros
-      </button>
-    </div>
-  </div>
-  }
+ <!-- Fechas -->
+ <div class="sm:col-span-2 lg:col-span-1 grid grid-cols-2 gap-2">
+ <div>
+ <label for="startDate" class="mb-2 block text-xs font-medium text-gray-900 dark:text-gray-300">
+ Desde
+ </label>
+ <input type="date" id="startDate" [(ngModel)]="startDate"
+ class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white" />
+ </div>
+ <div>
+ <label for="endDate" class="mb-2 block text-xs font-medium text-gray-900 dark:text-gray-300">
+ Hasta
+ </label>
+ <input type="date" id="endDate" [(ngModel)]="endDate"
+ class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white" />
+ </div>
+ </div>
+ </div>
+ 
+ <div class="mt-4 flex justify-end gap-2">
+ <button (click)="clearFilters()" class="rounded-lg cursor-pointer border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:border-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700">
+ Limpiar Filtros
+ </button>
+ <button (click)="applyFilters()" class="rounded-lg cursor-pointer bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+ Aplicar Filtros
+ </button>
+ </div>
+ </div>
+ }
 </div>
 
 <!-- Tabla de Facturas -->
 <div class="relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
-  <div class="overflow-x-auto">
-    <table class="w-full text-left text-sm text-gray-500 dark:text-gray-400">
-      <thead class="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
-        <tr>
-          <th scope="col" class="px-6 py-3">Fecha</th>
-          <th scope="col" class="px-6 py-3">Nº Factura</th>
-          <th scope="col" class="px-6 py-3">Tipo Factura</th>
-          <th scope="col" class="px-6 py-3">Cliente</th>
-          <th scope="col" class="px-6 py-3">Estado</th>
-          <th scope="col" class="px-6 py-3 text-right">Forma Pago</th>
-          <th scope="col" class="px-6 py-3 text-right">Total</th>
-          <th scope="col" class="px-6 py-3 text-center">Saldo</th>
-          <th scope="col" class="px-6 py-3 text-center">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @if (invoiceDataArray.length == 0) {
-            <tr>
-              <td colspan="10" class="px-6 py-12 text-center">
-                <div class="flex flex-col items-center justify-center">
-                  <svg class="mb-3 h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  <p class="text-gray-500">No se encontraron facturas</p>
-                </div>
-              </td>
-            </tr>
-        }
+ <div class="overflow-x-auto">
+ <table class="w-full text-left text-sm text-gray-500 dark:text-gray-400">
+ <thead class="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
+ <tr>
+ <th scope="col" class="px-6 py-3">Fecha</th>
+ <th scope="col" class="px-6 py-3">Nº Factura</th>
+ <th scope="col" class="px-6 py-3">Tipo Factura</th>
+ <th scope="col" class="px-6 py-3">Cliente</th>
+ <th scope="col" class="px-6 py-3">Estado</th>
+ <th scope="col" class="px-6 py-3 text-right">Forma Pago</th>
+ <th scope="col" class="px-6 py-3 text-right">Total</th>
+ <th scope="col" class="px-6 py-3 text-center">Saldo</th>
+ <th scope="col" class="px-6 py-3 text-center">Acciones</th>
+ </tr>
+ </thead>
+ <tbody>
+ @if (invoiceDataArray.length == 0) {
+ <tr>
+ <td colspan="10" class="px-6 py-12 text-center">
+ <div class="flex flex-col items-center justify-center">
+ <svg class="mb-3 h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+ d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+ </svg>
+ <p class="text-gray-500">No se encontraron facturas</p>
+ </div>
+ </td>
+ </tr>
+ }
 
-        @for (invoice of invoiceDataArray; track $index) {
-            <tr class="border-b border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
-              <td class="px-6 py-4">
-                {{ invoice.fecha }}
-              </td>
-              <td class="px-6 py-4 text-gray-900 dark:text-white">
-                {{ invoice.comprobante_completo }}
-              </td>
-              <td class="px-6 py-4">
-                <span [class]="invoice.tipoFactura != 'ESTANDAR' 
-                      ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' 
-                      : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'"
-                  class="rounded px-2.5 py-0.5 text-xs font-medium">
-                  {{ invoice.tipoFactura }}
-                </span>
-              </td>
-              <td class="px-6 py-4">
-                {{ invoice.client.razonSocial || invoice.client.nombre + ' ' + invoice.client.apellido }} 
-              </td>
-              <td class="px-6 py-4">
-                <span 
-                  class="px-2.5 py-1 text-[10px] font-semibold uppercase tracking-tighter rounded-lg border"
-                  [class]="getStatusClass(invoice.status)">
-                  {{ getStatusLabel(invoice.status) }}
-                </span>
-              </td>
-              <td class="px-6 py-4 text-center">
-                {{ invoice.formaPago }} 
-              </td>
-              <td class="px-6 py-4 text-right">
-                {{ invoice.total | currency: '' : 'symbol' : '0.0-0' }}
-              </td>
-              <td class="px-6 py-4 text-center">
-                @if (invoice.formaPago === 'CREDITO') {
-                  <p class="text-sm text-slate-500">{{ invoice.totalPagado | currency: '' : 'symbol' : '0.0-0' }}</p>
-                  <p class="text-sm mt-2" [class.text-red-600]="invoice.saldoPendiente > 0"
-                        [class.text-green-600]="invoice.saldoPendiente === 0">
-                    {{ invoice.saldoPendiente | currency: '' : 'symbol' : '0.0-0' }}
-                  </p>
-                } @else {
-                  <span class="text-xs text-slate-400">—</span>
-                }
-              </td>
-              <td class="px-6 py-4">
-                <div class="flex justify-center gap-2">
-                  @if(invoice.status !== 'draft') {
-                      <!-- Botón Ver Detalle -->
-                      <a [routerLink]="['/panel/ventas/comprobantes/', invoice.id, 'details']"
-                        class="inline-flex items-center rounded-lg text-sm text-blue-600 hover:text-blue-900 cursor-pointer"
-                        title="Ver detalle">
-                        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                          <path fill-rule="evenodd"
-                            d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                            clip-rule="evenodd" />
-                        </svg>
-                      </a>
-                  }
+ @for (invoice of invoiceDataArray; track $index) {
+ <tr class="border-b border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+ <td class="px-6 py-4">
+ {{ invoice.fecha }}
+ </td>
+ <td class="px-6 py-4 text-gray-900 dark:text-white">
+ {{ invoice.comprobante_completo }}
+ </td>
+ <td class="px-6 py-4">
+ <span [class]="invoice.tipoFactura != 'ESTANDAR' 
+ ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' 
+ : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'"
+ class="rounded px-2.5 py-0.5 text-xs font-medium">
+ {{ invoice.tipoFactura }}
+ </span>
+ </td>
+ <td class="px-6 py-4">
+ {{ invoice.client.razonSocial || invoice.client.nombre + ' ' + invoice.client.apellido }} 
+ </td>
+ <td class="px-6 py-4">
+ <span 
+ class="px-2.5 py-1 text-[10px] font-semibold uppercase er rounded-lg border"
+ [class]="getStatusClass(invoice.status)">
+ {{ getStatusLabel(invoice.status) }}
+ </span>
+ </td>
+ <td class="px-6 py-4 text-center">
+ {{ invoice.formaPago }} 
+ </td>
+ <td class="px-6 py-4 text-right">
+ {{ invoice.total | currency: '' : 'symbol' : '0.0-0' }}
+ </td>
+ <td class="px-6 py-4 text-center">
+ @if (invoice.formaPago === 'CREDITO') {
+ <p class="text-sm text-slate-500">{{ invoice.totalPagado | currency: '' : 'symbol' : '0.0-0' }}</p>
+ <p class="text-sm mt-2" [class.text-red-600]="invoice.saldoPendiente > 0"
+ [class.text-green-600]="invoice.saldoPendiente === 0">
+ {{ invoice.saldoPendiente | currency: '' : 'symbol' : '0.0-0' }}
+ </p>
+ } @else {
+ <span class="text-xs text-slate-400">—</span>
+ }
+ </td>
+ <td class="px-6 py-4">
+ <div class="flex justify-center gap-2">
+ @if(invoice.status !== 'draft') {
+ <!-- Botón Ver Detalle -->
+ <a [routerLink]="['/panel/ventas/comprobantes/', invoice.id, 'details']"
+ class="inline-flex items-center rounded-lg text-sm text-blue-600 hover:text-blue-900 cursor-pointer"
+ title="Ver detalle">
+ <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+ <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+ <path fill-rule="evenodd"
+ d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+ clip-rule="evenodd" />
+ </svg>
+ </a>
+ }
 
-                  @if (invoice.status === 'draft' || invoice.status === 'rejected') {
-                      <a [routerLink]="['/panel/ventas/comprobantes/', invoice.id]"
-                        class="inline-flex items-center rounded-lg text-sm text-green-600 hover:text-green-900 cursor-pointer"
-                        title="Editar">
-                        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                          <path
-                            d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                        </svg>
-                      </a>
-                  }
+ @if (invoice.status === 'draft' || invoice.status === 'rejected') {
+ <a [routerLink]="['/panel/ventas/comprobantes/', invoice.id]"
+ class="inline-flex items-center rounded-lg text-sm text-green-600 hover:text-green-900 cursor-pointer"
+ title="Editar">
+ <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+ <path
+ d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+ </svg>
+ </a>
+ }
 
-                  <!-- Botón Emitir (Solo Electrónica en Borrador) -->
-                  @if (invoice.tipoFactura === 'ELECTRONICA' && invoice.status === 'draft') {
-                      <button (click)="onEmitir(invoice.id)"
-                        class="inline-flex items-center rounded-lg text-sm text-purple-600 hover:text-purple-900 cursor-pointer"
-                        title="Emitir a la DIAN">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                        </svg>
-                      </button>
-                  }
+ <!-- Botón Emitir (Solo Electrónica en Borrador) -->
+ @if (invoice.tipoFactura === 'ELECTRONICA' && invoice.status === 'draft') {
+ <button (click)="onEmitir(invoice.id)"
+ class="inline-flex items-center rounded-lg text-sm text-purple-600 hover:text-purple-900 cursor-pointer"
+ title="Emitir a la DIAN">
+ <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+ </svg>
+ </button>
+ }
 
-                  <!-- Botón Emitir (Solo Estándar en Borrador) -->
-                  @if (invoice.tipoFactura === 'ESTANDAR' && invoice.status === 'draft') {
-                      <button (click)="onEmitirEstandar(invoice.id)"
-                        class="inline-flex items-center rounded-lg text-sm text-green-600 hover:text-green-900 cursor-pointer"
-                        title="Emitir Factura">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      </button>
-                  }
+ <!-- Botón Emitir (Solo Estándar en Borrador) -->
+ @if (invoice.tipoFactura === 'ESTANDAR' && invoice.status === 'draft') {
+ <button (click)="onEmitirEstandar(invoice.id)"
+ class="inline-flex items-center rounded-lg text-sm text-green-600 hover:text-green-900 cursor-pointer"
+ title="Emitir Factura">
+ <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+ </svg>
+ </button>
+ }
 
-                  @if (invoice.status === 'rejected') {
-                      <button (click)="onRetry(invoice.id)"
-                        class="inline-flex items-center rounded-lg text-sm text-yellow-600 hover:text-yellow-900 cursor-pointer"
-                        title="Reintentar Enviar a DIAN">
-                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                        </svg>
-                      </button>
-                  } 
+ @if (invoice.status === 'rejected') {
+ <button (click)="onRetry(invoice.id)"
+ class="inline-flex items-center rounded-lg text-sm text-yellow-600 hover:text-yellow-900 cursor-pointer"
+ title="Reintentar Enviar a DIAN">
+ <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+ </svg>
+ </button>
+ } 
 
-                  <!-- Botones Descarga (Solo si está aceptada o emitida) -->
-                  @if (invoice.tipoFactura === 'ELECTRONICA' && (invoice.status === 'accepted' || invoice.status === 'paid')) {
-                      <button (click)="onDownloadPDF(invoice.id)"
-                          class="inline-flex items-center rounded-lg text-sm text-red-600 hover:text-red-900 cursor-pointer"
-                          title="Descargar PDF">
-                          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                          </svg>
-                      </button>
-                      <button (click)="onDownloadXML(invoice.id)"
-                          class="inline-flex items-center rounded-lg text-sm text-orange-600 hover:text-orange-900 cursor-pointer"
-                          title="Descargar XML">
-                          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                          </svg>
-                      </button>
-                  }
+ <!-- Botones Descarga (Solo si está aceptada o emitida) -->
+ @if (invoice.tipoFactura === 'ELECTRONICA' && (invoice.status === 'accepted' || invoice.status === 'paid')) {
+ <button (click)="onDownloadPDF(invoice.id)"
+ class="inline-flex items-center rounded-lg text-sm text-red-600 hover:text-red-900 cursor-pointer"
+ title="Descargar PDF">
+ <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+ </svg>
+ </button>
+ <button (click)="onDownloadXML(invoice.id)"
+ class="inline-flex items-center rounded-lg text-sm text-orange-600 hover:text-orange-900 cursor-pointer"
+ title="Descargar XML">
+ <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+ </svg>
+ </button>
+ }
 
-                  <!-- Botón Anular (Si no está ya cancelada) -->
-                  @if (invoice.tipoFactura !== 'ELECTRONICA' && (invoice.status == 'accepted' || invoice.status == 'issued')) {
-                      <button (click)="onAnular(invoice.id)"
-                          class="inline-flex items-center rounded-lg text-sm text-gray-600 hover:text-gray-900 cursor-pointer"
-                          title="Anular Factura">
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                      </button>
-                  }
+ <!-- Botón Anular (Si no está ya cancelada) -->
+ @if (invoice.tipoFactura !== 'ELECTRONICA' && (invoice.status == 'accepted' || invoice.status == 'issued')) {
+ <button (click)="onAnular(invoice.id)"
+ class="inline-flex items-center rounded-lg text-sm text-gray-600 hover:text-gray-900 cursor-pointer"
+ title="Anular Factura">
+ <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+ </svg>
+ </button>
+ }
 
-                  @if (invoice.status === 'draft') {
-                      <button (click)="onDelete(invoice.id)"
-                        class="inline-flex items-center rounded-lg text-sm text-gray-600 hover:text-gray-900 cursor-pointer"
-                        title="Eliminar Factura">
-                        <svg class="h-5 w-5 text-red-600 dark:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
-                  }
+ @if (invoice.status === 'draft') {
+ <button (click)="onDelete(invoice.id)"
+ class="inline-flex items-center rounded-lg text-sm text-gray-600 hover:text-gray-900 cursor-pointer"
+ title="Eliminar Factura">
+ <svg class="h-5 w-5 text-red-600 dark:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+ <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+ </svg>
+ </button>
+ }
 
-                </div>
-              </td>
-            </tr>
-        }
-      </tbody>
-    </table>
-  </div>
+ </div>
+ </td>
+ </tr>
+ }
+ </tbody>
+ </table>
+ </div>
 
-  <!-- Paginación -->
-  <app-pagination [length]="invoiceDataArray.length"/>
+ <!-- Paginación -->
+ <app-pagination [length]="invoiceDataArray.length"/>
 </div>

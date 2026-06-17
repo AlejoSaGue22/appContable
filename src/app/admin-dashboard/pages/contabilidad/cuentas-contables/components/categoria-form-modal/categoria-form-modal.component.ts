@@ -5,96 +5,96 @@ import { CategoryArticle, GetCuentasContables } from '../../../../../interfaces/
 import { NotificationService } from '@shared/services/notification.service';
 
 @Component({
-  selector: 'app-categoria-form-modal',
-  standalone: true,
-  imports: [ReactiveFormsModule],
-  templateUrl: './categoria-form-modal.component.html'
+ selector: 'app-categoria-form-modal',
+ standalone: true,
+ imports: [ReactiveFormsModule],
+ templateUrl: './categoria-form-modal.component.html'
 })
 export class CategoriaFormModalComponent implements OnInit {
-  private fb = inject(FormBuilder);
-  private catalogsService = inject(CatalogsService);
-  private notificationService = inject(NotificationService);
+ private fb = inject(FormBuilder);
+ private catalogsService = inject(CatalogsService);
+ private notificationService = inject(NotificationService);
 
-  @Input() isOpen = false;
-  @Input() category: CategoryArticle | null = null;
-  @Input() cuentasList: GetCuentasContables[] = [];
-  @Output() close = new EventEmitter<void>();
-  @Output() submitForm = new EventEmitter<void>();
+ @Input() isOpen = false;
+ @Input() category: CategoryArticle | null = null;
+ @Input() cuentasList: GetCuentasContables[] = [];
+ @Output() close = new EventEmitter<void>();
+ @Output() submitForm = new EventEmitter<void>();
 
-  form: FormGroup = this.fb.group({
-    nombre: ['', [Validators.required, Validators.maxLength(100)]],
-    tipo: ['PRODUCTO', [Validators.required]],
-    descripcion: ['', [Validators.maxLength(255)]],
-    cuentaPrincipalId: ['', [Validators.required]],
-    cuentaCostoId: [''],
-    cuentaInventarioId: [''],
-    manejaInventario: [false]
-  });
+ form: FormGroup = this.fb.group({
+ nombre: ['', [Validators.required, Validators.maxLength(100)]],
+ tipo: ['PRODUCTO', [Validators.required]],
+ descripcion: ['', [Validators.maxLength(255)]],
+ cuentaPrincipalId: ['', [Validators.required]],
+ cuentaCostoId: [''],
+ cuentaInventarioId: [''],
+ manejaInventario: [false]
+ });
 
-  isSubmitting = signal(false);
-  cuentaPrincipal = computed(() => this.cuentasList.filter((cuenta) => 
-    cuenta.aceptaMovimiento ));
-  cuentaCosto = computed(() => this.cuentasList.filter((cuenta) => 
-    cuenta.aceptaMovimiento ));
-  cuentaInventario = computed(() => this.cuentasList.filter((cuenta) => 
-    cuenta.aceptaMovimiento ));
+ isSubmitting = signal(false);
+ cuentaPrincipal = computed(() => this.cuentasList.filter((cuenta) => 
+ cuenta.aceptaMovimiento ));
+ cuentaCosto = computed(() => this.cuentasList.filter((cuenta) => 
+ cuenta.aceptaMovimiento ));
+ cuentaInventario = computed(() => this.cuentasList.filter((cuenta) => 
+ cuenta.aceptaMovimiento ));
 
-  ngOnInit() {
-    if (this.category) {
-      this.form.patchValue({
-        nombre: this.category.nombre,
-        tipo: this.category.tipo.toUpperCase(),
-        descripcion: this.category.descripcion,
-        cuentaPrincipalId: this.category.cuentaPrincipalId || this.category.cuentaPrincipal?.id || '',
-        cuentaCostoId: this.category.cuentaCostoId || this.category.cuentaCosto?.id || '',
-        cuentaInventarioId: this.category.cuentaInventarioId || this.category.cuentaInventario?.id || '',
-        manejaInventario: this.category.manejaInventario || false
-      });
-    }
-  }
+ ngOnInit() {
+ if (this.category) {
+ this.form.patchValue({
+ nombre: this.category.nombre,
+ tipo: this.category.tipo.toUpperCase(),
+ descripcion: this.category.descripcion,
+ cuentaPrincipalId: this.category.cuentaPrincipalId || this.category.cuentaPrincipal?.id || '',
+ cuentaCostoId: this.category.cuentaCostoId || this.category.cuentaCosto?.id || '',
+ cuentaInventarioId: this.category.cuentaInventarioId || this.category.cuentaInventario?.id || '',
+ manejaInventario: this.category.manejaInventario || false
+ });
+ }
+ }
 
-  onSubmit() {
-      if (this.form.invalid) {
-        this.form.markAllAsTouched();
-        this.notificationService.error('Formulario inválido', 'Por favor, complete todos los campos obligatorios');
-        return;
-      }
+ onSubmit() {
+ if (this.form.invalid) {
+ this.form.markAllAsTouched();
+ this.notificationService.error('Formulario inválido', 'Por favor, complete todos los campos obligatorios');
+ return;
+ }
 
-      this.isSubmitting.set(true);
-      const dto = this.form.value;
+ this.isSubmitting.set(true);
+ const dto = this.form.value;
 
-      if (this.category) {
-        this.catalogsService.updateCategoryArticle(this.category.id.toString(), dto).subscribe({
-          next: () => {
-            this.notificationService.success('Categoría actualizada correctamente', 'Éxito');
-            this.submitForm.emit();
-            this.onClose();
-          },
-          error: (err: any) => {
-            this.notificationService.error('Error al actualizar la categoría', err.error?.message || 'Error desconocido');
-          }, 
-          complete: () => {
-            this.isSubmitting.set(false);
-          }
-        });
-      } else {
-        this.catalogsService.createCategoryArticle(dto).subscribe({
-          next: () => {
-            this.notificationService.success('Categoría creada correctamente', 'Éxito');
-            this.submitForm.emit();
-            this.onClose();
-          },
-          error: (err: any) => {
-            this.notificationService.error('Error al crear la categoría', err.error?.message || 'Error desconocido');
-          },
-          complete: () => {
-            this.isSubmitting.set(false);
-          }
-        });
-      }
-  }
+ if (this.category) {
+ this.catalogsService.updateCategoryArticle(this.category.id.toString(), dto).subscribe({
+ next: () => {
+ this.notificationService.success('Categoría actualizada correctamente', 'Éxito');
+ this.submitForm.emit();
+ this.onClose();
+ },
+ error: (err: any) => {
+ this.notificationService.error('Error al actualizar la categoría', err.error?.message || 'Error desconocido');
+ }, 
+ complete: () => {
+ this.isSubmitting.set(false);
+ }
+ });
+ } else {
+ this.catalogsService.createCategoryArticle(dto).subscribe({
+ next: () => {
+ this.notificationService.success('Categoría creada correctamente', 'Éxito');
+ this.submitForm.emit();
+ this.onClose();
+ },
+ error: (err: any) => {
+ this.notificationService.error('Error al crear la categoría', err.error?.message || 'Error desconocido');
+ },
+ complete: () => {
+ this.isSubmitting.set(false);
+ }
+ });
+ }
+ }
 
-  onClose() {
-      this.close.emit();
-  }
+ onClose() {
+ this.close.emit();
+ }
 }

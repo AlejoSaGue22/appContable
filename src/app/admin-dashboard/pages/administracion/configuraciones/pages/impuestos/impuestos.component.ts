@@ -1,21 +1,36 @@
 import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { HeaderTitlePageComponent, HeaderInput } from '@dashboard/components/header-title-page/header-title-page.component';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import {
+  HeaderTitlePageComponent,
+  HeaderInput,
+} from '@dashboard/components/header-title-page/header-title-page.component';
 import { ImpuestosListComponent } from './components/impuestos-list/impuestos-list.component';
 import { ModalComponent } from '@shared/components/modal/modal.component';
 import { ImpuestosService } from './services/impuestos.service';
 import { Impuesto } from './interfaces/impuesto.interface';
 import { CuentasContablesService } from '@dashboard/pages/contabilidad/services/cuentas-contables.service';
 import { firstValueFrom } from 'rxjs';
-import { PaginationComponent } from "@shared/components/pagination/pagination";
+import { PaginationComponent } from '@shared/components/pagination/pagination';
 import { PaginationService } from '@shared/components/pagination/pagination.service';
 import { NotificationService } from '@shared/services/notification.service';
 
 @Component({
   selector: 'app-config-impuestos',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, HeaderTitlePageComponent, ImpuestosListComponent, ModalComponent, PaginationComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    HeaderTitlePageComponent,
+    ImpuestosListComponent,
+    ModalComponent,
+    PaginationComponent,
+  ],
   templateUrl: './impuestos.component.html',
 })
 export class ImpuestosComponent implements OnInit {
@@ -27,20 +42,21 @@ export class ImpuestosComponent implements OnInit {
 
   headTitle = signal<HeaderInput>({
     title: 'Impuestos',
-    slog: 'Define los tipos de impuestos y retenciones que aplicas en tus transacciones'
+    slog: 'Define los tipos de impuestos y retenciones que aplicas en tus transacciones',
   });
 
   impuestos = signal<Impuesto[]>([]);
   cuentas = signal<any[]>([]);
   cuentasFiltradas = computed(() => {
-    return this.cuentas().filter(c => 
-      c.aceptaMovimiento && 
-      (c.codigo.startsWith('1355') || 
-       c.codigo.startsWith('24') || 
-       c.codigo.startsWith('2365') || 
-       c.codigo.startsWith('2367') || 
-       c.codigo.startsWith('2368') || 
-       c.codigo.startsWith('2370'))
+    return this.cuentas().filter(
+      (c) =>
+        c.aceptaMovimiento &&
+        (c.codigo.startsWith('1355') ||
+          c.codigo.startsWith('24') ||
+          c.codigo.startsWith('2365') ||
+          c.codigo.startsWith('2367') ||
+          c.codigo.startsWith('2368') ||
+          c.codigo.startsWith('2370')),
     );
   });
   loading = signal<boolean>(false);
@@ -58,7 +74,7 @@ export class ImpuestosComponent implements OnInit {
     cuentaVentasId: [null],
     cuentaComprasId: [null],
     cuentaDevVentasId: [null],
-    cuentaDevComprasId: [null]
+    cuentaDevComprasId: [null],
   });
 
   ngOnInit(): void {
@@ -69,10 +85,12 @@ export class ImpuestosComponent implements OnInit {
   async loadData(page: number = 1, limit: number = 10) {
     this.loading.set(true);
     try {
-      const response = await firstValueFrom(this.impuestosService.getAll(page, limit));
+      const response = await firstValueFrom(
+        this.impuestosService.getAll(page, limit),
+      );
       this.impuestos.set(response.data);
       this.paginationService.totalItems.set(response.meta.total);
-      this.paginationService.pageSize.set(response.meta.limit);
+      this.paginationService.pageSize.set(response.meta.totalPages);
     } catch (error) {
       this.notificationService.error('Error al cargar los impuestos', 'Error');
     } finally {
@@ -82,7 +100,9 @@ export class ImpuestosComponent implements OnInit {
 
   async loadCuentas() {
     try {
-      const data = await firstValueFrom(this.cuentasService.getCuentasContables());
+      const data = await firstValueFrom(
+        this.cuentasService.getCuentasContables(),
+      );
       this.cuentas.set(data);
     } catch (error) {
       console.error('Error loading accounts', error);
@@ -96,14 +116,14 @@ export class ImpuestosComponent implements OnInit {
       activo: true,
       tipo: 'IVA',
       tarifa: 0,
-      isAcreditable: false
+      isAcreditable: false,
     });
     this.modalVisible.set(true);
   }
 
   async onEdit(impuesto: Impuesto) {
     const id = impuesto.id;
-    if(!id){
+    if (!id) {
       return;
     }
     this.isEditing.set(true);
@@ -112,7 +132,7 @@ export class ImpuestosComponent implements OnInit {
       const data = await firstValueFrom(this.impuestosService.getById(id));
       this.taxForm.patchValue({
         ...data,
-        tarifa: parseInt(data.tarifa)
+        tarifa: parseInt(data.tarifa),
       });
       this.modalVisible.set(true);
     } catch (error) {
@@ -126,20 +146,27 @@ export class ImpuestosComponent implements OnInit {
     const data = this.taxForm.value;
     try {
       if (this.isEditing() && this.selectedId()) {
-        const response = await firstValueFrom(this.impuestosService.update(this.selectedId()!, data));
+        const response = await firstValueFrom(
+          this.impuestosService.update(this.selectedId()!, data),
+        );
         this.notificationService.success(response.message, 'Éxito');
       } else {
-        const response = await firstValueFrom(this.impuestosService.create(data));
+        const response = await firstValueFrom(
+          this.impuestosService.create(data),
+        );
         this.notificationService.success(response.message, 'Éxito');
       }
       this.modalVisible.set(false);
       this.loadData();
     } catch (error: any) {
-      this.notificationService.error(error?.error?.message || 'Error al guardar el impuesto', 'Error');
+      this.notificationService.error(
+        error?.error?.message || 'Error al guardar el impuesto',
+        'Error',
+      );
     }
   }
 
   toggleAdvanced() {
-    this.showAdvanced.update(v => !v);
+    this.showAdvanced.update((v) => !v);
   }
 }

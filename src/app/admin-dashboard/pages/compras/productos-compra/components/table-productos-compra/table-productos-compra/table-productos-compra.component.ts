@@ -5,16 +5,16 @@ import { CurrencyPipe, TitleCasePipe } from '@angular/common';
 import { GetProductosDetalle } from '@dashboard/interfaces/productos-interface';
 
 @Component({
-  selector: 'app-table-productos-compra',
-  imports: [RouterLink, TitleCasePipe, CurrencyPipe],
-  templateUrl: './table-productos-compra.component.html',
+ selector: 'app-table-productos-compra',
+ imports: [RouterLink, TitleCasePipe, CurrencyPipe],
+ templateUrl: './table-productos-compra.component.html',
 })
 export class TableProductosCompra {
 
-  productoData = input<GetProductosDetalle[]>([]);
-  @Output() delete = new EventEmitter<modalOpen>();
+ productoData = input<GetProductosDetalle[]>([]);
+ @Output() delete = new EventEmitter<modalOpen>();
 
-  onDeleteProducto(id: string) {
-    this.delete.emit({ open: true, id });
-  }
+ onDeleteProducto(id: string) {
+ this.delete.emit({ open: true, id });
+ }
 }

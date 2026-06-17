@@ -4,50 +4,50 @@ import { debounceTime, filter, tap } from 'rxjs/operators';
 import { initFlowbite } from 'flowbite';
 
 @Injectable({
-  providedIn: 'root'
+ providedIn: 'root'
 })
 export class FlowbiteService {
-  
-  private initialized = false;
+ 
+ private initialized = false;
 
-  constructor(private router: Router) {
-    this.initializeFlowbiteGlobal();
-  }
+ constructor(private router: Router) {
+ this.initializeFlowbiteGlobal();
+ }
 
-  private initializeFlowbiteGlobal() {
-    this.initializeOnce();
+ private initializeFlowbiteGlobal() {
+ this.initializeOnce();
 
-    this.router.events
-      .pipe(
-        filter(event => event instanceof NavigationEnd),
-        debounceTime(300)
-      )
-      .subscribe(() => {
-        this.reinitialize();
-      });
-  }
+ this.router.events
+ .pipe(
+ filter(event => event instanceof NavigationEnd),
+ debounceTime(300)
+ )
+ .subscribe(() => {
+ this.reinitialize();
+ });
+ }
 
-  private initializeOnce() {
-    if (!this.initialized) {
-      // Delay para asegurar que el DOM esté listo
-      setTimeout(() => {
-        initFlowbite();
-        this.initialized = true;
-        console.log('Flowbite inicializado globalmente');
-      }, 100);
-    }
-  }
+ private initializeOnce() {
+ if (!this.initialized) {
+ // Delay para asegurar que el DOM esté listo
+ setTimeout(() => {
+ initFlowbite();
+ this.initialized = true;
+ console.log('Flowbite inicializado globalmente');
+ }, 100);
+ }
+ }
 
-  private reinitialize() {
-    // Pequeño delay para que Angular renderice el nuevo componente
-    setTimeout(() => {
-      initFlowbite();
-      console.log('Flowbite reinicializado después de navegación');
-    }, 200);
-  }
+ private reinitialize() {
+ // Pequeño delay para que Angular renderice el nuevo componente
+ setTimeout(() => {
+ initFlowbite();
+ console.log('Flowbite reinicializado después de navegación');
+ }, 200);
+ }
 
-  // Método público para reinicializar manualmente si es necesario
-  public forceReinitialize() {
-    this.reinitialize();
-  }
+ // Método público para reinicializar manualmente si es necesario
+ public forceReinitialize() {
+ this.reinitialize();
+ }
 }

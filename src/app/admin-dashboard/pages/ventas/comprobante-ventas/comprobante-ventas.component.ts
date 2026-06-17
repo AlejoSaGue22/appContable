@@ -16,193 +16,193 @@ import { LoaderService } from '@utils/services/loader.service';
 import { InvoiceFilters } from '@dashboard/interfaces/documento-venta-interface';
 
 @Component({
-   selector: 'app-comprobante-ventas',
-   imports: [LoaderComponent, ErrorPages, HeaderTitleInvoices, TableInvoices, ModalComponent],
-   templateUrl: './comprobante-ventas.component.html',
+ selector: 'app-comprobante-ventas',
+ imports: [LoaderComponent, ErrorPages, HeaderTitleInvoices, TableInvoices, ModalComponent],
+ templateUrl: './comprobante-ventas.component.html',
 })
 export class ComprobanteVentasComponent {
 
-   headTitle: HeaderInput = {
-      title: 'Gestión de Documentos de venta',
-      slog: 'Administra la información de tus facturas'
-   }
-   notificacionService = inject(NotificationService);
-   comprobantesVentasService = inject(ComprobantesVentasService);
-   paginationService = inject(PaginationService);
-   loaderService = inject(LoaderService);
+ headTitle: HeaderInput = {
+ title: 'Gestión de Documentos de venta',
+ slog: 'Administra la información de tus facturas'
+ }
+ notificacionService = inject(NotificationService);
+ comprobantesVentasService = inject(ComprobantesVentasService);
+ paginationService = inject(PaginationService);
+ loaderService = inject(LoaderService);
 
-   isModalItem = signal<boolean>(false);
-   idItem = signal<string>('');
-   action = signal<string>('');
-   totalComprobantes = signal<number>(0);
-   cardsTotales = signal<CardsTotales[]>([]);
-   filters = signal<InvoiceFilters>({});
+ isModalItem = signal<boolean>(false);
+ idItem = signal<string>('');
+ action = signal<string>('');
+ totalComprobantes = signal<number>(0);
+ cardsTotales = signal<CardsTotales[]>([]);
+ filters = signal<InvoiceFilters>({});
 
 
-   comprobanteVentasResource = rxResource({
-      request: () => ({
-         page: this.paginationService.currentPage(),
-         limit: 10,
-         filters: this.filters()
-      }),
-      loader: ({ request }) => this.comprobantesVentasService.getComprobanteVentas({
-         page: request.page,
-         limit: request.limit,
-         ...request.filters
-      })
-         .pipe(
-            tap((el) => {
-               this.totalComprobantes.set(el.meta?.total ?? 0);
-                this.paginationService.totalItems.set(el.meta?.total ?? 0);
-                this.paginationService.pageSize.set(el.meta?.totalPages ?? 0);
-                this.cardsTotales.set([
-                  { title: 'Total Facturas', valor: this.totalComprobantes().toString(), percent: '0' },
-                  { title: 'Balance General', valor: '0', percent: '0' },
-               ]);
-            })
-         )
-   })
+ comprobanteVentasResource = rxResource({
+ request: () => ({
+ page: this.paginationService.currentPage(),
+ limit: 10,
+ filters: this.filters()
+ }),
+ loader: ({ request }) => this.comprobantesVentasService.getComprobanteVentas({
+ page: request.page,
+ limit: request.limit,
+ ...request.filters
+ })
+ .pipe(
+ tap((el) => {
+ this.totalComprobantes.set(el.meta?.total ?? 0);
+ this.paginationService.totalItems.set(el.meta?.total ?? 0);
+ this.paginationService.pageSize.set(el.meta?.totalPages ?? 0);
+ this.cardsTotales.set([
+ { title: 'Total Facturas', valor: this.totalComprobantes().toString(), percent: '0' },
+ { title: 'Balance General', valor: '0', percent: '0' },
+ ]);
+ })
+ )
+ })
 
-   onFilterChange(filters: InvoiceFilters): void {
-      console.log(filters);
-      this.filters.set(filters);
-   }
+ onFilterChange(filters: InvoiceFilters): void {
+ console.log(filters);
+ this.filters.set(filters);
+ }
 
-   //    getStatusLabel(status: InvoiceStatus): string {
-   //     const labels: Record<InvoiceStatus, string> = {
-   //       [InvoiceStatus.DRAFT]: 'Borrador',
-   //       [InvoiceStatus.ISSUED]: 'Emitida',
-   //       [InvoiceStatus.PAID]: 'Pagada',
-   //       [InvoiceStatus.CANCELLED]: 'Cancelada'
-   //     };
-   //     return labels[status];
-   //   }
+ // getStatusLabel(status: InvoiceStatus): string {
+ // const labels: Record<InvoiceStatus, string> = {
+ // [InvoiceStatus.DRAFT]: 'Borrador',
+ // [InvoiceStatus.ISSUED]: 'Emitida',
+ // [InvoiceStatus.PAID]: 'Pagada',
+ // [InvoiceStatus.CANCELLED]: 'Cancelada'
+ // };
+ // return labels[status];
+ // }
 
-   get columnsTable() {
-      return [
-         { key: 'fecha', header: 'Fecha' },
-         { key: 'comprobante', header: 'Comprobante' },
-         { key: 'identificacion', header: 'Identificacion' },
-         { key: 'cliente', header: 'Cliente' },
-         { key: 'total', header: 'Total' },
-         { key: 'impuestos', header: 'Impuestos' },
-         { key: 'estado', header: 'Estado' },
-      ]
-   }
+ get columnsTable() {
+ return [
+ { key: 'fecha', header: 'Fecha' },
+ { key: 'comprobante', header: 'Comprobante' },
+ { key: 'identificacion', header: 'Identificacion' },
+ { key: 'cliente', header: 'Cliente' },
+ { key: 'total', header: 'Total' },
+ { key: 'impuestos', header: 'Impuestos' },
+ { key: 'estado', header: 'Estado' },
+ ]
+ }
 
-   openModalItem(id: string, action: string): void {
-      this.isModalItem.set(true);
-      this.idItem.set(id);
-      this.action.set(action);
-   }
+ openModalItem(id: string, action: string): void {
+ this.isModalItem.set(true);
+ this.idItem.set(id);
+ this.action.set(action);
+ }
 
-   onAction(): void {
-      switch (this.action()) {
-         case 'anular':
-            this.onAnular();
-            break;
-         case 'delete':
-            this.onDelete();
-            break;
-         default:
-            break;
-      }
-   }
+ onAction(): void {
+ switch (this.action()) {
+ case 'anular':
+ this.onAnular();
+ break;
+ case 'delete':
+ this.onDelete();
+ break;
+ default:
+ break;
+ }
+ }
 
-   onEmitir(id: string): void {
-      this.loaderService.show('Emitiendo factura a la DIAN...');
-      this.comprobantesVentasService.emitirInvoice(id).subscribe((res: ResponseResult) => {
-         this.loaderService.hide();
-         if (res.success) {
-             this.notificacionService.success('Factura emitida con éxito', 'Éxito');
-             this.comprobanteVentasResource.reload();
-          } else {
-             const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
-             this.notificacionService.error(message || 'Error desconocido', 'Error al emitir factura');
-          }
-       }, () => this.loaderService.hide());
-    }
+ onEmitir(id: string): void {
+ this.loaderService.show('Emitiendo factura a la DIAN...');
+ this.comprobantesVentasService.emitirInvoice(id).subscribe((res: ResponseResult) => {
+ this.loaderService.hide();
+ if (res.success) {
+ this.notificacionService.success('Factura emitida con éxito', 'Éxito');
+ this.comprobanteVentasResource.reload();
+ } else {
+ const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
+ this.notificacionService.error(message || 'Error desconocido', 'Error al emitir factura');
+ }
+ }, () => this.loaderService.hide());
+ }
 
-   onEmitirEstandar(id: string): void {
-      this.loaderService.show('Emitiendo factura estándar...');
-      this.comprobantesVentasService.emitirEstandarInvoice(id).subscribe((res: ResponseResult) => {
-         this.loaderService.hide();
-         if (res.success) {
-             this.notificacionService.success('Factura estándar emitida con éxito', 'Éxito');
-             this.comprobanteVentasResource.reload();
-          } else {
-             const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
-             this.notificacionService.error(message || 'Error desconocido', 'Error al emitir factura estándar');
-          }
-       }, () => this.loaderService.hide());
-    }
+ onEmitirEstandar(id: string): void {
+ this.loaderService.show('Emitiendo factura estándar...');
+ this.comprobantesVentasService.emitirEstandarInvoice(id).subscribe((res: ResponseResult) => {
+ this.loaderService.hide();
+ if (res.success) {
+ this.notificacionService.success('Factura estándar emitida con éxito', 'Éxito');
+ this.comprobanteVentasResource.reload();
+ } else {
+ const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
+ this.notificacionService.error(message || 'Error desconocido', 'Error al emitir factura estándar');
+ }
+ }, () => this.loaderService.hide());
+ }
 
-   onAnular(): void {
-      const motivo = 'Anulación solicitada por el usuario';
-      this.loaderService.show('Anulando factura...');
-      this.comprobantesVentasService.anularInvoice(this.idItem(), motivo).subscribe((res: ResponseResult) => {
-          if (res.success) {
-            this.loaderService.hide();
-            this.isModalItem.set(false);
-            this.notificacionService.success('Factura anulada con éxito', 'Éxito');
-            this.comprobanteVentasResource.reload();
-         } else {
-            this.loaderService.hide();
-            const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
-            this.notificacionService.error(message || 'Error desconocido', 'Error al anular factura');
-         }
-      });
-   }
+ onAnular(): void {
+ const motivo = 'Anulación solicitada por el usuario';
+ this.loaderService.show('Anulando factura...');
+ this.comprobantesVentasService.anularInvoice(this.idItem(), motivo).subscribe((res: ResponseResult) => {
+ if (res.success) {
+ this.loaderService.hide();
+ this.isModalItem.set(false);
+ this.notificacionService.success('Factura anulada con éxito', 'Éxito');
+ this.comprobanteVentasResource.reload();
+ } else {
+ this.loaderService.hide();
+ const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
+ this.notificacionService.error(message || 'Error desconocido', 'Error al anular factura');
+ }
+ });
+ }
 
-   onRetry(id: string): void {
-      this.comprobantesVentasService.retryInvoice(id).subscribe((res: ResponseResult) => {
-         if (res.success) {
-            this.notificacionService.success('Factura reintentada con éxito', 'Éxito');
-            this.comprobanteVentasResource.reload();
-         } else {
-            const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
-            this.notificacionService.error(message || 'Error desconocido', 'Error al reintentar factura');
-         }
-      });
-   }
+ onRetry(id: string): void {
+ this.comprobantesVentasService.retryInvoice(id).subscribe((res: ResponseResult) => {
+ if (res.success) {
+ this.notificacionService.success('Factura reintentada con éxito', 'Éxito');
+ this.comprobanteVentasResource.reload();
+ } else {
+ const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
+ this.notificacionService.error(message || 'Error desconocido', 'Error al reintentar factura');
+ }
+ });
+ }
 
-   onDelete(): void {
-      this.comprobantesVentasService.deleteInvoice(this.idItem()).subscribe((res: ResponseResult) => {
-         if (res.success) {
-            this.isModalItem.set(false);
-            this.notificacionService.success('Factura eliminada con éxito', 'Éxito');
-            this.comprobanteVentasResource.reload();
-         } else {
-            const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
-            this.notificacionService.error(message || 'Error desconocido', 'Error al eliminar factura');
-         }
-      });
-   }
+ onDelete(): void {
+ this.comprobantesVentasService.deleteInvoice(this.idItem()).subscribe((res: ResponseResult) => {
+ if (res.success) {
+ this.isModalItem.set(false);
+ this.notificacionService.success('Factura eliminada con éxito', 'Éxito');
+ this.comprobanteVentasResource.reload();
+ } else {
+ const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
+ this.notificacionService.error(message || 'Error desconocido', 'Error al eliminar factura');
+ }
+ });
+ }
 
-   onDownloadPDF(id: string): void {
-      this.loaderService.show('Preparando descarga de PDF...');
-      this.comprobantesVentasService.downloadPDF(id).subscribe((blob) => {
-         const url = window.URL.createObjectURL(blob);
-         const a = document.createElement('a');
-         a.href = url;
-         a.download = `factura-${id}.pdf`;
-         a.click();
-         window.URL.revokeObjectURL(url);
-         this.loaderService.hide();
-      }, () => this.loaderService.hide());
-   }
+ onDownloadPDF(id: string): void {
+ this.loaderService.show('Preparando descarga de PDF...');
+ this.comprobantesVentasService.downloadPDF(id).subscribe((blob) => {
+ const url = window.URL.createObjectURL(blob);
+ const a = document.createElement('a');
+ a.href = url;
+ a.download = `factura-${id}.pdf`;
+ a.click();
+ window.URL.revokeObjectURL(url);
+ this.loaderService.hide();
+ }, () => this.loaderService.hide());
+ }
 
-   onDownloadXML(id: string): void {
-      this.loaderService.show('Preparando descarga de XML...');
-      this.comprobantesVentasService.downloadXML(id).subscribe((blob) => {
-         const url = window.URL.createObjectURL(blob);
-         const a = document.createElement('a');
-         a.href = url;
-         a.download = `factura-${id}.xml`;
-         a.click();
-         window.URL.revokeObjectURL(url);
-         this.loaderService.hide();
-      }, () => this.loaderService.hide());
-   }
+ onDownloadXML(id: string): void {
+ this.loaderService.show('Preparando descarga de XML...');
+ this.comprobantesVentasService.downloadXML(id).subscribe((blob) => {
+ const url = window.URL.createObjectURL(blob);
+ const a = document.createElement('a');
+ a.href = url;
+ a.download = `factura-${id}.xml`;
+ a.click();
+ window.URL.revokeObjectURL(url);
+ this.loaderService.hide();
+ }, () => this.loaderService.hide());
+ }
 
 }

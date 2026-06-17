@@ -1,81 +1,81 @@
 <header-title-page [titleHead]="headTitle()" />
 
 <div class="w-full px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-    <div class="max-w-7xl mx-auto">
-        <!-- Actions Bar -->
-        <div class="flex justify-end items-center mb-4">
-            <button (click)="openNew()" class="inline-flex items-center px-4 py-2 bg-slate-900 cursor-pointer border border-transparent rounded-xl font-bold text-xs text-white hover:bg-slate-800 active:bg-slate-950 focus:outline-none focus:border-slate-950 focus:ring focus:ring-slate-300 disabled:opacity-25 transition-all shadow-lg shadow-slate-200">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                Nuevo Vendedor
-            </button>
-        </div>
+ <div class="max-w-7xl mx-auto">
+ <!-- Actions Bar -->
+ <div class="flex justify-end items-center mb-4">
+ <button (click)="openNew()" class="inline-flex items-center px-4 py-2 bg-slate-900 cursor-pointer border border-transparent rounded-xl font-bold text-xs text-white hover:bg-slate-800 active:bg-slate-950 focus:outline-none focus:border-slate-950 focus:ring focus:ring-slate-300 disabled:opacity-25 transition-all shadow-lg shadow-slate-200">
+ <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+ Nuevo Vendedor
+ </button>
+ </div>
 
-        <!-- Vendedores Table -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <app-vendedores-list 
-                [vendedores]="vendedores()" 
-                (edit)="onEdit($event)"
-                (deleted)="loadData()"
-            />
+ <!-- Vendedores Table -->
+ <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+ <app-vendedores-list 
+ [vendedores]="vendedores()" 
+ (edit)="onEdit($event)"
+ (deleted)="loadData()"
+ />
 
-            @if(vendedores().length > 0) {
-              <app-pagination [length]="vendedores().length" />
-            }
-        </div>
-    </div>
+ @if(vendedores().length > 0) {
+ <app-pagination [length]="vendedores().length" />
+ }
+ </div>
+ </div>
 </div>
 
 <!-- Vendedor Modal -->
 <app-modal [(visible)]="modalVisible" [title]="isEditing() ? 'Editar Vendedor' : 'Nuevo Vendedor'" width="max-w-2xl">
-    <form [formGroup]="vendedorForm" (ngSubmit)="save()" class="space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Nombre -->
-            <div>
-                <label class="block text-xs font-medium text-gray-500 mb-2">Nombre *</label>
-                <input type="text" formControlName="nombre" placeholder="Ej. Juan"
-                    class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all">
-            </div>
+ <form [formGroup]="vendedorForm" (ngSubmit)="save()" class="space-y-6">
+ <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+ <!-- Nombre -->
+ <div>
+ <label class="block text-xs font-medium text-gray-500 mb-2">Nombre *</label>
+ <input type="text" formControlName="nombre" placeholder="Ej. Juan"
+ class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all">
+ </div>
 
-            <!-- Apellido -->
-            <div>
-                <label class="block text-xs font-medium text-gray-500 mb-2">Apellido *</label>
-                <input type="text" formControlName="apellido" placeholder="Ej. Pérez"
-                    class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all">
-            </div>
+ <!-- Apellido -->
+ <div>
+ <label class="block text-xs font-medium text-gray-500 mb-2">Apellido *</label>
+ <input type="text" formControlName="apellido" placeholder="Ej. Pérez"
+ class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all">
+ </div>
 
-            <!-- Identificación -->
-            <div>
-                <label class="block text-xs font-medium text-gray-500 mb-2">Identificación *</label>
-                <input type="text" formControlName="identificacion" placeholder="Ej. 1234567890"
-                    class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all">
-            </div>
+ <!-- Identificación -->
+ <div>
+ <label class="block text-xs font-medium text-gray-500 mb-2">Identificación *</label>
+ <input type="text" formControlName="identificacion" placeholder="Ej. 1234567890"
+ class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all">
+ </div>
 
-            <!-- Teléfono -->
-            <div>
-                <label class="block text-xs font-medium text-gray-500 mb-2">Teléfono</label>
-                <input type="text" formControlName="telefono" placeholder="Ej. 300 123 4567"
-                    class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all">
-            </div>
+ <!-- Teléfono -->
+ <div>
+ <label class="block text-xs font-medium text-gray-500 mb-2">Teléfono</label>
+ <input type="text" formControlName="telefono" placeholder="Ej. 300 123 4567"
+ class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all">
+ </div>
 
-            <!-- Activo -->
-            <div class="md:col-span-2">
-                <label class="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" formControlName="activo" class="w-4 h-4 text-slate-900 border-gray-300 rounded focus:ring-slate-500">
-                    <span class="text-xs font-medium text-gray-500">Vendedor activo</span>
-                </label>
-            </div>
-        </div>
+ <!-- Activo -->
+ <div class="md:col-span-2">
+ <label class="flex items-center gap-2 cursor-pointer">
+ <input type="checkbox" formControlName="activo" class="w-4 h-4 text-slate-900 border-gray-300 rounded focus:ring-slate-500">
+ <span class="text-xs font-medium text-gray-500">Vendedor activo</span>
+ </label>
+ </div>
+ </div>
 
-        <!-- Footer Actions -->
-        <div class="flex justify-end gap-3 pt-6 border-t border-gray-100">
-            <button type="button" (click)="modalVisible.set(false)" 
-                class="px-6 py-2.5 border border-gray-200 rounded-xl text-sm font-medium cursor-pointer text-gray-500 hover:bg-gray-50 transition-all">
-                Cancelar
-            </button>
-            <button type="submit" [disabled]="vendedorForm.invalid"
-                class="px-8 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-bold cursor-pointer hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-slate-200">
-                {{ isEditing() ? 'Actualizar Vendedor' : 'Guardar Vendedor' }}
-            </button>
-        </div>
-    </form>
+ <!-- Footer Actions -->
+ <div class="flex justify-end gap-3 pt-6 border-t border-gray-100">
+ <button type="button" (click)="modalVisible.set(false)" 
+ class="px-6 py-2.5 border border-gray-200 rounded-xl text-sm font-medium cursor-pointer text-gray-500 hover:bg-gray-50 transition-all">
+ Cancelar
+ </button>
+ <button type="submit" [disabled]="vendedorForm.invalid"
+ class="px-8 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-bold cursor-pointer hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-slate-200">
+ {{ isEditing() ? 'Actualizar Vendedor' : 'Guardar Vendedor' }}
+ </button>
+ </div>
+ </form>
 </app-modal>

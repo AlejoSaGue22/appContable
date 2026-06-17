@@ -1,61 +1,55 @@
 <div
-      class="bg-white p-7 rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-gray-100 h-[400px] flex flex-col">
-      <div class="flex items-center justify-between mb-8">
-        <div>
-          <h2 class="text-lg font-bold text-gray-800">Transacciones Recientes</h2>
-          <p class="text-xs text-gray-400 font-medium">Últimos movimientos registrados</p>
-        </div>
-        <!-- <button
-          class="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 uppercase tracking-wider px-3
-           py-1.5 bg-indigo-50 rounded-lg transition-colors">
-          Ver todo
-        </button> -->
-      </div>
+ class="bg-white p-7 rounded-2xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] border border-gray-100 h-[400px] flex flex-col">
+ <div class="flex items-center justify-between mb-8">
+ <div>
+ <h2 class="text-lg font-bold text-gray-800">Transacciones Recientes</h2>
+ <p class="text-xs text-gray-400 font-medium">Últimos movimientos registrados</p>
+ </div>
+ <!-- <button
+ class="text-[11px] font-bold text-indigo-600 hover:text-indigo-800 uppercase px-3
+ py-1.5 bg-indigo-50 rounded-lg transition-colors">
+ Ver todo
+ </button> -->
+ </div>
 
-      <div class="flex-1 overflow-y-auto">
-        <table class="w-full text-sm text-left">
-          <tbody>
-            @for (tx of recentTransactions(); track tx.id) {
-            <tr class="group hover:bg-gray-50/80 transition-colors border-b border-gray-50 last:border-0">
-              <td class="py-4 pr-3">
-                <div class="flex flex-col">
-                  <span class="text-xs font-bold text-gray-700">{{ tx.entidad }}</span>
-                  <span class="text-[10px] font-medium text-gray-400 uppercase">{{ tx.fecha | date:'dd MMM, yyyy'
-                    }}</span>
-                </div>
-              </td>
-              <td class="py-4 px-3">
-                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide"
-                  [class.bg-emerald-50]="tx.type === 'venta'" [class.text-emerald-700]="tx.type === 'venta'"
-                  [class.bg-rose-50]="tx.type === 'compra'" [class.text-rose-700]="tx.type === 'compra'">
-                  {{ tx.type }}
-                </span>
-              </td>
-              <td class="py-4 pl-3 text-right">
-                <span class="text-sm tracking-tight" [class.text-emerald-600]="tx.type === 'venta'"
-                  [class.text-gray-800]="tx.type === 'compra'">
-                  {{ tx.type === 'venta' ? '+' : '-' }} {{ tx.total | currency }}
-                </span>
-              </td>
-            </tr>
-            }
-            @empty {
-                <tr>
-                  <td colspan="7" class="px-6 py-14 text-center">
-                    <div class="flex flex-col items-center justify-center">
-                      <div class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
-                        <svg class="h-8 w-8 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                        </svg>
-                      </div>
-                      <p class="text-sm font-bold text-gray-900">No se ha registrado ningun movimiento</p>
-                      <p class="mt-1 text-xs text-gray-400">Se observará la transacción al momento de registrar una factura.</p>
-                    </div>
-                  </td>
-                </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    </div>
+ <div class="flex-1 overflow-y-auto">
+ <table class="w-full text-sm text-left">
+ <tbody>
+ @for (tx of recentTransactions(); track tx.id) {
+ <tr class="group hover:bg-gray-50/80 transition-colors border-b border-gray-50 last:border-0">
+ <td class="py-4 pr-3">
+ <div class="flex flex-col">
+ <span class="text-xs font-bold text-gray-700">{{ tx.entidad }}</span>
+ <span class="text-[10px] font-medium text-gray-400 uppercase">{{ tx.fecha | date:'dd MMM, yyyy'
+ }}</span>
+ </div>
+ </td>
+ <td class="py-4 px-3">
+ <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide"
+ [class.bg-emerald-50]="tx.type === 'venta'" [class.text-emerald-700]="tx.type === 'venta'"
+ [class.bg-rose-50]="tx.type === 'compra'" [class.text-rose-700]="tx.type === 'compra'">
+ {{ tx.type }}
+ </span>
+ </td>
+ <td class="py-4 pl-3 text-right">
+ <span class="text-sm " [class.text-emerald-600]="tx.type === 'venta'"
+ [class.text-gray-800]="tx.type === 'compra'">
+ {{ tx.type === 'venta' ? '+' : '-' }} {{ tx.total | currency }}
+ </span>
+ </td>
+ </tr>
+ }
+ @empty {
+ <tr>
+ <td colspan="7">
+ <app-empty-state
+ title="No se ha registrado ningún movimiento"
+ description="Se observará la transacción al momento de registrar una factura."
+ />
+ </td>
+ </tr>
+ }
+ </tbody>
+ </table>
+ </div>
+ </div>

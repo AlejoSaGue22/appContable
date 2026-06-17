@@ -13,152 +13,152 @@ const baseURL = environment.baseUrl;
 type AuthStatus = 'checking' | 'authenticated' | 'not-authenticated';
 
 @Injectable({
-  providedIn: 'root'
+ providedIn: 'root'
 })
 export class AuthService {
 
-  private http = inject(HttpClient);
-  private router = inject(Router);
-  private _authStatus = signal<AuthStatus>('checking');
-  private _user = signal<UserAuth | null>(null);
-  private _token = signal<string | null>(sessionStorage.getItem('token'));
+ private http = inject(HttpClient);
+ private router = inject(Router);
+ private _authStatus = signal<AuthStatus>('checking');
+ private _user = signal<UserAuth | null>(null);
+ private _token = signal<string | null>(sessionStorage.getItem('token'));
 
-  token = computed(() => this._token());
-  user = computed(() => this._user());
-  authStatus = computed(() => this._authStatus());
+ token = computed(() => this._token());
+ user = computed(() => this._user());
+ authStatus = computed(() => this._authStatus());
 
-  private authEvents = new Subject<'login' | 'logout' | 'status-changed'>();
-  authEvents$ = this.authEvents.asObservable();
+ private authEvents = new Subject<'login' | 'logout' | 'status-changed'>();
+ authEvents$ = this.authEvents.asObservable();
 
-  login(email: string, password: string): Observable<ResponseResult> {
+ login(email: string, password: string): Observable<ResponseResult> {
 
-    return this.http.post<LoginResponse>(`${baseURL}/auth/login`, { email, password })
-      .pipe(
-        // delay(3000),
-        map((auth: LoginResponse): ResponseResult => {
-          this.handleAuthSuccess(auth, true) // true = initial login
-          return { success: true }
-        }),
-        catchError((error: any): Observable<ResponseResult> => {
-          this.logout();
-          const errorResp: ErrorAuthResponse = error?.error ?? {
-            message: 'Error desconocido en autenticación',
-            error: 'Unknown',
-            statusCode: 500,
-          };
+ return this.http.post<LoginResponse>(`${baseURL}/auth/login`, { email, password })
+ .pipe(
+ // delay(3000),
+ map((auth: LoginResponse): ResponseResult => {
+ this.handleAuthSuccess(auth, true) // true = initial login
+ return { success: true }
+ }),
+ catchError((error: any): Observable<ResponseResult> => {
+ this.logout();
+ const errorResp: ErrorAuthResponse = error?.error ?? {
+ message: 'Error desconocido en autenticación',
+ error: 'Unknown',
+ statusCode: 500,
+ };
 
-          return of({ success: false, error: errorResp, message: [errorResp.message] })
-        }),
-      )
-  }
+ return of({ success: false, error: errorResp, message: [errorResp.message] })
+ }),
+ )
+ }
 
-  register(fullname: string, email: string, password: string): Observable<boolean> {
+ register(fullname: string, email: string, password: string): Observable<boolean> {
 
-    return this.http.post<LoginResponse>(`${baseURL}/auth/register`, { fullname, email, password }).pipe(
-      map((auth) => this.handleAuthSuccess(auth))
-    )
-  }
+ return this.http.post<LoginResponse>(`${baseURL}/auth/register`, { fullname, email, password }).pipe(
+ map((auth) => this.handleAuthSuccess(auth))
+ )
+ }
 
-  checkStatus(): Observable<boolean> {
-    const token = sessionStorage.getItem("token");
+ checkStatus(): Observable<boolean> {
+ const token = sessionStorage.getItem("token");
 
-    if (!token) {
-      this.logout();
-      return of(false);
-    }
-    this._authStatus.set('checking');
+ if (!token) {
+ this.logout();
+ return of(false);
+ }
+ this._authStatus.set('checking');
 
-    return this.http.get<LoginResponse>(`${baseURL}/auth/check-status`, {
-      // headers: {
-      //   Authorization: `Bearer ${token}`
-      // }
-    }).pipe(
-      map((resp) => {
-        const result = this.handleAuthSuccess(resp, false) // false = status check
-        return result;
-      }),
-      catchError((error: any) => this.handleAuthError(error))
-    )
+ return this.http.get<LoginResponse>(`${baseURL}/auth/check-status`, {
+ // headers: {
+ // Authorization: `Bearer ${token}`
+ // }
+ }).pipe(
+ map((resp) => {
+ const result = this.handleAuthSuccess(resp, false) // false = status check
+ return result;
+ }),
+ catchError((error: any) => this.handleAuthError(error))
+ )
 
-  }
+ }
 
-  logout() {
-    sessionStorage.removeItem('token');
-    this._user.set(null);
-    this._token.set(null);
-    this._authStatus.set('not-authenticated');
-    this.authEvents.next('logout');
-  }
+ logout() {
+ sessionStorage.removeItem('token');
+ this._user.set(null);
+ this._token.set(null);
+ this._authStatus.set('not-authenticated');
+ this.authEvents.next('logout');
+ }
 
-  private handleAuthSuccess({ token, user, menu }: LoginResponse, isInitialLogin: boolean = false) {
-    sessionStorage.setItem('token', token);
-    const decoded = jwtDecode<JwtPayload>(token);
+ private handleAuthSuccess({ token, user, menu }: LoginResponse, isInitialLogin: boolean = false) {
+ sessionStorage.setItem('token', token);
+ const decoded = jwtDecode<JwtPayload>(token);
 
-    const userAuth: UserAuth = {
-      id: decoded.sub,
-      email: decoded.email,
-      fullName: user.fullName,
-      role: decoded.role,
-      permissions: decoded.permissions,
-      lastLogin: new Date(),
-      createdAt: user.createdAt
-    };
+ const userAuth: UserAuth = {
+ id: decoded.sub,
+ email: decoded.email,
+ fullName: user.fullName,
+ role: decoded.role,
+ permissions: decoded.permissions,
+ lastLogin: new Date(),
+ createdAt: user.createdAt
+ };
 
-    this._user.set(userAuth);
-    this._token.set(token);
+ this._user.set(userAuth);
+ this._token.set(token);
 
-    // Only emit 'login' event on actual login, not on status checks
-    if (isInitialLogin) {
-      this.authEvents.next('login');
-    } else if (this._authStatus() === 'checking') {
-      this.authEvents.next('status-changed');
-    }
+ // Only emit 'login' event on actual login, not on status checks
+ if (isInitialLogin) {
+ this.authEvents.next('login');
+ } else if (this._authStatus() === 'checking') {
+ this.authEvents.next('status-changed');
+ }
 
-    this._authStatus.set('authenticated');
+ this._authStatus.set('authenticated');
 
-    return true;
-  }
+ return true;
+ }
 
-  private handleAuthError(error: any) {
-    this.logout()
-    console.log(error);
+ private handleAuthError(error: any) {
+ this.logout()
+ console.log(error);
 
-    return of(false);
-  }
+ return of(false);
+ }
 
-  hasPermission(permission: Permission): boolean {
-    const user = this._user();
-    return user?.permissions?.includes(permission) || false;
-  }
+ hasPermission(permission: Permission): boolean {
+ const user = this._user();
+ return user?.permissions?.includes(permission) || false;
+ }
 
-  hasRole(role: UserRole): boolean {
-    return this._user()?.role === role;
-  }
+ hasRole(role: UserRole): boolean {
+ return this._user()?.role === role;
+ }
 
-  getToken(): string | null {
-    return sessionStorage.getItem('token');
-  }
+ getToken(): string | null {
+ return sessionStorage.getItem('token');
+ }
 
-  refreshToken(): Observable<boolean> {
-    const token = sessionStorage.getItem('token');
-    if (!token) return of(false);
+ refreshToken(): Observable<boolean> {
+ const token = sessionStorage.getItem('token');
+ if (!token) return of(false);
 
-    return this.http.post<LoginResponse>(`${baseURL}/auth/refresh`, {}).pipe(
-      map((resp) => {
-        return this.handleAuthSuccess(resp, false);
-      }),
-      catchError(() => {
-        this.logout();
-        this.router.navigate(['/login']);
-        return of(false);
-      })
-    );
-  }
+ return this.http.post<LoginResponse>(`${baseURL}/auth/refresh`, {}).pipe(
+ map((resp) => {
+ return this.handleAuthSuccess(resp, false);
+ }),
+ catchError(() => {
+ this.logout();
+ this.router.navigate(['/login']);
+ return of(false);
+ })
+ );
+ }
 
-  changePassword(id: string, password: string): Observable<ResponseResult> {
-    return this.http.patch<ResponseResult>(`${baseURL}/auth/change-password/${id}`, { password }).pipe(
-      catchError((error: any) => of({ success: false, error, message: error.error.message }))
-    );
-  }
+ changePassword(id: string, password: string): Observable<ResponseResult> {
+ return this.http.patch<ResponseResult>(`${baseURL}/auth/change-password/${id}`, { password }).pipe(
+ catchError((error: any) => of({ success: false, error, message: error.error.message }))
+ );
+ }
 
 }

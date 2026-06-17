@@ -5,52 +5,52 @@ import { environment } from "src/app/environments/environment";
 import { ReporteFacturacionAvanzada } from "../../../interfaces/reportes-avanzados.interface";
 
 export interface EstadoResultados {
-    periodo: { inicio: string; fin: string };
-    ingresos: { total: number; detalle: any[] };
-    costos: { total: number; detalle: any[] };
-    utilidadBruta: number;
-    gastos: { total: number; detalle: any[] };
-    utilidadNeta: number;
+ periodo: { inicio: string; fin: string };
+ ingresos: { total: number; detalle: any[] };
+ costos: { total: number; detalle: any[] };
+ utilidadBruta: number;
+ gastos: { total: number; detalle: any[] };
+ utilidadNeta: number;
 }
 
 export interface FlujoCaja {
-    periodo: { inicio: string; fin: string };
-    entradas: { total: number; detalle: any[] };
-    salidas: { total: number; detalle: any[] };
-    flujoNeto: number;
-    saldoInicial: number;
-    saldoFinal: number;
+ periodo: { inicio: string; fin: string };
+ entradas: { total: number; detalle: any[] };
+ salidas: { total: number; detalle: any[] };
+ flujoNeto: number;
+ saldoInicial: number;
+ saldoFinal: number;
 }
 
 @Injectable({
-    providedIn: 'root'
+ providedIn: 'root'
 })
 export class ReportesService {
-    private readonly apiUrl = `${environment.baseUrl}/reportes`;
+ private readonly apiUrl = `${environment.baseUrl}/reportes`;
 
-    constructor(private http: HttpClient) { }
+ constructor(private http: HttpClient) { }
 
-    estadoResultados(fechaInicio: string, fechaFin: string): Observable<EstadoResultados> {
-        const params = new HttpParams()
-            .set('fechaInicio', fechaInicio)
-            .set('fechaFin', fechaFin);
-        return this.http.get<EstadoResultados>(`${this.apiUrl}/estado-resultados`, { params });
-    }
+ estadoResultados(fechaInicio: string, fechaFin: string): Observable<EstadoResultados> {
+ const params = new HttpParams()
+ .set('fechaInicio', fechaInicio)
+ .set('fechaFin', fechaFin);
+ return this.http.get<EstadoResultados>(`${this.apiUrl}/estado-resultados`, { params });
+ }
 
-    flujoCaja(fechaInicio: string, fechaFin: string): Observable<FlujoCaja> {
-        const params = new HttpParams()
-            .set('fechaInicio', fechaInicio)
-            .set('fechaFin', fechaFin);
-        return this.http.get<FlujoCaja>(`${this.apiUrl}/flujo-caja`, { params });
-    }
+ flujoCaja(fechaInicio: string, fechaFin: string): Observable<FlujoCaja> {
+ const params = new HttpParams()
+ .set('fechaInicio', fechaInicio)
+ .set('fechaFin', fechaFin);
+ return this.http.get<FlujoCaja>(`${this.apiUrl}/flujo-caja`, { params });
+ }
 
-    balanceGeneral(fecha: string): Observable<any> {
-        const params = new HttpParams().set('fecha', fecha);
-        return this.http.get(`${this.apiUrl}/balance-general`, { params });
-    }
+ balanceGeneral(fecha: string): Observable<any> {
+ const params = new HttpParams().set('fecha', fecha);
+ return this.http.get(`${this.apiUrl}/balance-general`, { params });
+ }
 
-    getFacturacionDetallada(fechaInicio: string, fechaFin: string): Observable<ReporteFacturacionAvanzada> {
-        const params = new HttpParams().set('fechaInicio', fechaInicio).set('fechaFin', fechaFin);
-        return this.http.get<ReporteFacturacionAvanzada>(`${this.apiUrl}/facturacion-detallada`, { params });
-    }
+ getFacturacionDetallada(fechaInicio: string, fechaFin: string): Observable<ReporteFacturacionAvanzada> {
+ const params = new HttpParams().set('fechaInicio', fechaInicio).set('fechaFin', fechaFin);
+ return this.http.get<ReporteFacturacionAvanzada>(`${this.apiUrl}/facturacion-detallada`, { params });
+ }
 }
