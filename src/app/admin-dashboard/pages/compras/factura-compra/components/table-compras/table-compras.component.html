@@ -108,59 +108,59 @@
 
  <div class="relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
  <div class="overflow-x-auto">
- <table class="w-full text-left text-sm text-gray-500 dark:text-gray-400">
- <thead class="bg-gray-50 text-xs text-gray-700 dark:bg-gray-700 dark:text-gray-400">
- <tr>
- <th scope="col" class="px-6 py-3">Fecha Emisión</th>
- <th scope="col" class="px-6 py-3">N° Comprobante</th>
- <th scope="col" class="px-6 py-3">Forma Pago</th>
- <th scope="col" class="px-6 py-3">Proveedor</th>
- <th scope="col" class="px-6 py-3 text-right">Monto Total</th>
- <th scope="col" class="px-6 py-3 text-right">Saldo Pendiente</th>
- <th scope="col" class="px-6 py-3 text-center">Estado</th>
- <th scope="col" class="px-6 py-3 text-center">Acciones</th>
- </tr>
- </thead>
- <tbody class="divide-y divide-gray-50">
+  <table class="ledger-table">
+  <thead>
+  <tr>
+  <th>Fecha Emisión</th>
+  <th>N° Comprobante</th>
+  <th>Forma Pago</th>
+  <th>Proveedor</th>
+  <th class="text-right">Monto Total</th>
+  <th class="text-right">Saldo Pendiente</th>
+  <th class="text-center">Estado</th>
+  <th class="text-center">Acciones</th>
+  </tr>
+  </thead>
+  <tbody>
  @if (compraData().length === 0) {
  <tr>
- <td colspan="7" class="px-6 py-20 text-center">
- <div class="flex flex-col items-center justify-center">
- <div class="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
- <svg class="h-10 w-10 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
- </svg>
- </div>
- <p class="text-sm font-bold text-gray-900">Sin comprobantes de compra</p>
- <p class="mt-1 text-xs text-gray-400">Aún no se han registrado transacciones con los filtros aplicados.</p>
- </div>
- </td>
+  <td colspan="7" class="text-center">
+  <div class="flex flex-col items-center justify-center py-14">
+  <div class="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
+  <svg class="h-10 w-10 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+  </svg>
+  </div>
+  <p class="text-sm font-bold text-gray-900">Sin comprobantes de compra</p>
+  <p class="mt-1 text-xs text-gray-400">Aún no se han registrado transacciones con los filtros aplicados.</p>
+  </div>
+  </td>
  </tr>
  }
 
  @for (compra of compraData(); track compra.id) {
- <tr class="hover:bg-blue-50/30 transition-all duration-200 group">
-      <td class="px-6 py-4 text-gray-500">
-        {{ compra.fecha }}
-      </td>
-      <td class="px-6 py-4">
-        <span class="font-mono text-xs text-gray-900">{{ compra.numero }}</span>
-      </td>
-      <td class="px-6 py-4">
-        <span class="font-mono text-xs text-gray-900">{{ compra.formaPago }}</span>
-      </td>
-      <td class="px-6 py-4">
-        <span class="text-gray-900">{{ compra.proveedor.razonSocial || (compra.proveedor.nombre + ' ' + compra.proveedor.apellido) }}</span>
-      </td>
-      <td class="px-6 py-4 text-right">
-        <span class="text-gray-900">{{ compra.total | currency:'':'$':'1.0-0' }}</span>
-      </td>
-      <td class="px-6 py-4 text-right">
-        <span [class.text-red-500]="compra.saldoPendiente > 0" [class.text-emerald-500]="compra.saldoPendiente === 0">
-          {{ compra.saldoPendiente | currency:'':'$':'1.0-0' }}
-        </span>
-      </td>
-      <td class="px-6 py-4 text-center">
+  <tr>
+       <td>
+         {{ compra.fecha }}
+       </td>
+       <td class="font-mono">
+         <span class="font-semibold text-slate-900">{{ compra.numero }}</span>
+       </td>
+       <td>
+         <span class="font-mono">{{ compra.formaPago }}</span>
+       </td>
+       <td>
+         <span class="text-gray-900">{{ compra.proveedor.razonSocial || (compra.proveedor.nombre + ' ' + compra.proveedor.apellido) }}</span>
+       </td>
+       <td class="text-right tabular-nums">
+         <span class="font-semibold text-slate-900">{{ compra.total | currency:'':'$':'1.0-0' }}</span>
+       </td>
+       <td class="text-right tabular-nums">
+         <span [class.text-red-500]="compra.saldoPendiente > 0" [class.text-emerald-500]="compra.saldoPendiente === 0">
+           {{ compra.saldoPendiente | currency:'':'$':'1.0-0' }}
+         </span>
+       </td>
+       <td class="text-center">
         <span class="px-2.5 py-1 text-[10px] font-semibold uppercase er rounded-lg border"
           [class]="getStatusClass(compra.estado)"
           [class.bg-gray-50]="compra.estado === 'borrador'"
@@ -175,8 +175,8 @@
           {{ compra.estado === 'error_asiento' ? 'Error Registro' : (compra.estado | titlecase) }}
         </span>
       </td>
-      <td class="px-6 py-4 text-right">
-        <div class="flex justify-center gap-2">
+       <td>
+         <div class="flex justify-center gap-2">
           @if(compra.estado !== 'borrador'){
             <a [routerLink]="['/panel/compras/purchases/', compra.id, 'details']"
             class="inline-flex items-center rounded-lg text-sm text-blue-600 hover:text-blue-900 cursor-pointer"

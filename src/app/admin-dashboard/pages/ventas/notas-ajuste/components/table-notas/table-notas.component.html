@@ -90,46 +90,46 @@
 
 <div class="relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
  <div class="overflow-x-auto">
- <table class="w-full text-left text-sm text-gray-500 dark:text-gray-400">
- <thead class="bg-gray-50 text-xs text-gray-700 dark:bg-gray-700 dark:text-gray-400">
- <tr>
- <th scope="col" class="px-6 py-3">Fecha</th>
- <th scope="col" class="px-6 py-3">Nº Nota</th>
- <th scope="col" class="px-6 py-3">Concepto</th>
- <th scope="col" class="px-6 py-3">Factura Rel.</th>
- <th scope="col" class="px-6 py-3">Tipo Factura</th>
- <th scope="col" class="px-6 py-3">Cliente</th>
- <th scope="col" class="px-6 py-3">Estado</th>
- <th scope="col" class="px-6 py-3 text-right">Total</th>
- <th scope="col" class="px-6 py-3 text-center">Acciones</th>
- </tr>
- </thead>
+  <table class="ledger-table">
+  <thead>
+  <tr>
+  <th>Fecha</th>
+  <th>Nº Nota</th>
+  <th>Concepto</th>
+  <th>Factura Rel.</th>
+  <th>Tipo Factura</th>
+  <th>Cliente</th>
+  <th>Estado</th>
+  <th class="text-right">Total</th>
+  <th class="text-center">Acciones</th>
+  </tr>
+  </thead>
  <tbody>
  @if (notaDataArray.length == 0) {
  <tr>
- <td colspan="10" class="px-6 py-12 text-center text-gray-500">
- No se encontraron notas de ajuste
- </td>
+  <td colspan="10" class="text-center">
+  No se encontraron notas de ajuste
+  </td>
  </tr>
  }
 
  @for (nota of notaDataArray; track nota.id) {
- <tr class="border-b border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
- <td class="px-6 py-4">{{ nota.fecha }}</td>
- <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">{{ nota.prefijo }}-{{ nota.numero }}</td>
- <td class="px-6 py-4 truncate max-w-[200px]" [title]="getConceptoLabel(nota.tipo, nota.concepto)">
+  <tr>
+  <td>{{ nota.fecha }}</td>
+  <td class="font-medium text-gray-900">{{ nota.prefijo }}-{{ nota.numero }}</td>
+  <td class="truncate max-w-[200px]" [title]="getConceptoLabel(nota.tipo, nota.concepto)">
  {{ getConceptoLabel(nota.tipo, nota.concepto) }}
  </td>
- <td class="px-6 py-4">{{ nota.facturaOriginal?.comprobante_completo || '-' }}</td>
- <td class="px-6 py-4">{{ nota.facturaOriginal?.tipoFactura }}</td>
- <td class="px-6 py-4">{{ nota.cliente?.razonSocial || nota.cliente?.nombre + ' ' + nota.cliente?.apellido }}</td>
- <td class="px-6 py-4">
+  <td>{{ nota.facturaOriginal?.comprobante_completo || '-' }}</td>
+  <td>{{ nota.facturaOriginal?.tipoFactura }}</td>
+  <td>{{ nota.cliente?.razonSocial || nota.cliente?.nombre + ' ' + nota.cliente?.apellido }}</td>
+  <td>
  <span [class]="'inline-flex rounded-full px-2 py-1 text-xs ' + getStatusClass(nota.estado)">
  {{ getStatusLabel(nota.estado) }}
  </span>
  </td>
- <td class="px-6 py-4 text-right font-semibold">{{ nota.total | currency: '' : 'symbol' : '0.0-0' }}</td>
- <td class="px-6 py-4">
+  <td class="text-right tabular-nums"><span class="font-semibold text-slate-900">{{ nota.total | currency: '' : 'symbol' : '0.0-0' }}</span></td>
+  <td>
  <div class="flex justify-center gap-2">
  @if (nota.estado == 'borrador' || nota.estado == 'rechazada') {
  <a [routerLink]="['/panel/ventas/notas-ajuste/', nota.id]" class="text-blue-600 hover:text-blue-900" title="Editar">

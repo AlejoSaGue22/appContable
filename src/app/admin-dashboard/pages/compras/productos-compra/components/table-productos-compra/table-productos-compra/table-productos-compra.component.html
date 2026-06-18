@@ -1,24 +1,23 @@
 <div class="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 sm:rounded-lg">
  <div class="overflow-x-auto">
- <table class="w-full text-left text-sm text-gray-500 dark:text-gray-400">
- <thead class="bg-gray-50 text-xs text-gray-700 dark:bg-gray-700 dark:text-gray-400">
+ <table class="ledger-table">
+ <thead>
  <tr>
- <th scope="col" class="px-6 py-3">Codigo</th>
- <th scope="col" class="px-6 py-3">Nombre</th>
- <th scope="col" class="px-6 py-3">Categoria</th>
- <th scope="col" class="px-6 py-3">Precio Referencial</th>
- <th scope="col" class="px-6 py-3">Iva</th>
- <!-- <th scope="col" class="px-6 py-3">Retencion</th> -->
- <th scope="col" class="px-6 py-3">Medida</th>
- <th scope="col" class="px-6 py-3">Estado</th>
- <th scope="col" class="px-6 py-3">Acciones</th>
+ <th>Codigo</th>
+ <th>Nombre</th>
+ <th>Categoria</th>
+ <th>Precio Referencial</th>
+ <th>Iva</th>
+ <th>Medida</th>
+ <th>Estado</th>
+ <th>Acciones</th>
  </tr>
  </thead>
  <tbody>
  @if (productoData().length === 0) {
  <tr>
- <td colspan="6" class="px-6 py-12 text-center">
- <div class="flex flex-col items-center justify-center">
+ <td colspan="6" class="text-center">
+ <div class="flex flex-col items-center justify-center py-14">
  <svg class="mb-4 h-16 w-16 text-gray-400" fill="none" stroke="currentColor"
  viewBox="0 0 24 24">
  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -34,20 +33,20 @@
  }
 
  @for (producto of productoData(); track producto.id) {
- <tr class="border-b border-gray-200">
- <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
+ <tr>
+ <td>
  {{ producto.codigo }}
  </td>
- <td class="px-6 py-4">{{ producto.nombre }}</td>
- <td class="px-6 py-4">
+ <td>{{ producto.nombre }}</td>
+ <td>
  <span class="px-2 py-0.5 text-[10px] font-medium text-gray-500 bg-gray-100 rounded-md uppercase ">
  {{ producto.categoriaArticulo.nombre | titlecase }}
  </span>
  </td>
- <td class="px-6 py-4">{{ producto.precio | currency : '$'}}</td>
- <td class="px-6 py-4">{{ producto.iva_percent }}</td>
- <td class="px-6 py-4">{{ producto.unidadmedidaRel.nombre | titlecase }}</td>
- <td class="px-6 py-4">
+ <td>{{ producto.precio | currency : '$'}}</td>
+ <td>{{ producto.iva_percent }}</td>
+ <td>{{ producto.unidadmedidaRel.nombre | titlecase }}</td>
+ <td>
  <span [class]="producto.isActive === true 
  ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' 
  : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'"
@@ -55,7 +54,7 @@
  {{ producto.isActive === true ? 'Activo' : 'Inactivo' }}
  </span>
  </td>
- <td class="px-6 py-4">
+ <td>
  <div class="flex items-center gap-2">
 
  <a [routerLink]="['/panel/compras/articles/', producto.id]"

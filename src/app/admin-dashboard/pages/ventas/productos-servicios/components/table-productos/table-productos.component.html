@@ -1,22 +1,22 @@
 <div class="relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
  <div class="overflow-x-auto">
- <table class="w-full text-left text-sm text-gray-500 dark:text-gray-400">
- <thead class="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
+ <table class="ledger-table">
+ <thead>
  <tr>
- <th scope="col" class="px-6 py-3">Código</th>
- <th scope="col" class="px-6 py-3">Nombre / Descripción</th>
- <th scope="col" class="px-6 py-3 text-center">Categoría</th>
- <th scope="col" class="px-6 py-3 text-center">Unidad</th>
- <th scope="col" class="px-6 py-3 text-center">Precio</th>
- <th scope="col" class="px-6 py-3 text-center">Estado</th>
- <th scope="col" class="px-6 py-3 text-center">Acciones</th>
+ <th>Código</th>
+ <th>Nombre / Descripción</th>
+ <th class="text-center">Categoría</th>
+ <th class="text-center">Unidad</th>
+ <th class="text-center">Precio</th>
+ <th class="text-center">Estado</th>
+ <th class="text-center">Acciones</th>
  </tr>
  </thead>
- <tbody class="divide-y divide-gray-50">
+ <tbody>
  @if (productosData().length === 0) {
  <tr>
- <td colspan="7" class="px-8 py-20 text-center">
- <div class="flex flex-col items-center justify-center">
+ <td colspan="7" class="text-center">
+ <div class="flex flex-col items-center justify-center py-14">
  <div class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
  <svg class="h-8 w-8 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
@@ -31,34 +31,34 @@
  }
 
  @for (art of productosData(); track art.id) {
- <tr class="border-b border-gray-300 hover:bg-blue-50/30 transition-all duration-200 group">
- <td class="px-8 py-4 font-mono text-xs text-blue-700 font-medium">
+ <tr>
+ <td class="font-mono">
  {{ art.codigo }}
  </td>
- <td class="px-8 py-4">
+ <td>
  <div class="flex flex-col">
- <span class="text-gray-900">{{ art.nombre }}</span>
+ <span>{{ art.nombre }}</span>
  </div>
  </td>
- <td class="px-8 py-4 text-center">
+ <td class="text-center">
  <span class="px-2 py-0.5 text-[10px] font-medium text-gray-500 bg-gray-100 rounded-md uppercase ">
  {{ art.categoriaArticulo.nombre | titlecase }}
  </span>
  </td>
- <td class="px-8 py-4 text-center">
- <span class="text-xs text-gray-500">{{ art.unidadmedidaRel.nombre | titlecase }}</span>
+ <td class="text-center">
+ <span>{{ art.unidadmedidaRel.nombre | titlecase }}</span>
  </td>
- <td class="px-8 py-4 text-center">
+ <td class="text-center">
  <span class="font-normal text-gray-900">{{ art.precio | currency:'$':'symbol':'1.0-0' }}</span>
  </td>
- <td class="px-8 py-4 text-center">
+ <td class="text-center">
  @if (art.isActive !== false) {
  <span class="px-2.5 py-1 text-[10px] font-semibold uppercase er bg-emerald-50 text-emerald-600 rounded-lg border border-emerald-100">Activo</span>
  } @else {
  <span class="px-2.5 py-1 text-[10px] font-semibold uppercase er bg-gray-50 text-gray-400 rounded-lg border border-gray-100">Inactivo</span>
  }
  </td>
- <td class="px-8 py-4">
+ <td class="text-center">
  <div class="flex items-center justify-center gap-2">
  <a [routerLink]="['/panel/ventas/products_services/', art.id]"
  class="text-blue-600 hover:text-blue-900"

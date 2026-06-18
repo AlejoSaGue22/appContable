@@ -47,30 +47,30 @@
  </div>
  } @else {
  <div class="overflow-x-auto">
- <table class="w-full text-left table-auto shadow-sm rounded-xl">
- <thead>
- <tr class="bg-slate-50 border-b border-gray-200">
- <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 ">Documento</th>
- <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 ">Proveedor</th>
- <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 text-center">Vencimiento</th>
- <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 text-center">Dias</th>
- <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 text-right">Total</th>
- <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 text-right">Pagado</th>
- <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 text-right">Saldo</th>
- <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 text-center">Estado</th>
- <th class="p-4 w-36 text-xs border-l border-gray-200 text-center text-slate-500">ACCIONES</th>
- </tr>
- </thead>
- <tbody class="divide-y divide-gray-100">
+  <table class="ledger-table">
+  <thead>
+  <tr>
+  <th>Documento</th>
+  <th>Proveedor</th>
+  <th class="text-center">Vencimiento</th>
+  <th class="text-center">Dias</th>
+  <th class="text-right">Total</th>
+  <th class="text-right">Pagado</th>
+  <th class="text-right">Saldo</th>
+  <th class="text-center">Estado</th>
+  <th class="text-center">Acciones</th>
+  </tr>
+  </thead>
+  <tbody>
 
- @for (item of itemsFiltrados(); track item.facturaId) {
- <tr class="hover:bg-slate-50/80 transition-colors group" [class.bg-red-50]="item.paymentStatus === 'vencido'">
- <td class="p-4"><span class="font-mono text-sm font-semibold">{{ item.numeroFactura }}</span></td>
- <td class="p-4"><span class="text-sm text-slate-700">{{ item.proveedorNombre }}</span></td>
- <td class="p-4 text-center">
- <span class="text-sm text-slate-600">{{ item.fechaVencimiento ? (item.fechaVencimiento | date:'dd/MM/yyyy') : '—' }}</span>
- </td>
- <td class="p-4 text-center">
+  @for (item of itemsFiltrados(); track item.facturaId) {
+  <tr [class.bg-red-50]="item.paymentStatus === 'vencido'">
+  <td><span class="font-mono font-semibold">{{ item.numeroFactura }}</span></td>
+  <td><span>{{ item.proveedorNombre }}</span></td>
+  <td class="text-center">
+  <span class="text-slate-600">{{ item.fechaVencimiento ? (item.fechaVencimiento | date:'dd/MM/yyyy') : '—' }}</span>
+  </td>
+  <td class="text-center">
  @if (item.diasVencida > 0) {
  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700">+{{ item.diasVencida }}d</span>
  } @else if (item.diasVencida < 0) {
@@ -79,10 +79,10 @@
  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Hoy</span>
  }
  </td>
- <td class="p-4 text-right text-sm text-slate-600">{{ item.total | currency:'':'symbol-narrow':'1.0-0' }}</td>
- <td class="p-4 text-right text-sm text-slate-400">{{ item.totalPagado | currency:'':'symbol-narrow':'1.0-0' }}</td>
- <td class="p-4 text-right"><span class="text-sm text-slate-800">{{ item.saldoPendiente | currency:'':'symbol-narrow':'1.0-0' }}</span></td>
- <td class="p-4 text-center">
+  <td class="text-right tabular-nums"><span class="font-semibold text-slate-900">{{ item.total | currency:'':'symbol-narrow':'1.0-0' }}</span></td>
+  <td class="text-right tabular-nums"><span class="text-slate-500">{{ item.totalPagado | currency:'':'symbol-narrow':'1.0-0' }}</span></td>
+  <td class="text-right tabular-nums"><span class="font-semibold text-slate-900">{{ item.saldoPendiente | currency:'':'symbol-narrow':'1.0-0' }}</span></td>
+  <td class="text-center">
  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
  [ngClass]="{
  'bg-blue-100 text-blue-700': item.paymentStatus === 'pendiente',
@@ -93,42 +93,42 @@
  {{ etiquetaEstado(item.paymentStatus) }}
  </span>
  </td>
- <td class="p-4 text-right">
- <div class="flex items-center justify-end gap-2">
- <button type="button" (click)="abrirHistorial(item)"
- class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold cursor-pointer rounded-xl transition-all shadow-sm hover:shadow flex items-center gap-1" title="Ver historial">
- <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
- <polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
- </svg>
- Historial
- </button>
- <button type="button" (click)="abrirPago(item)"
- class="px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold cursor-pointer rounded-xl transition-all shadow-sm hover:shadow flex items-center gap-1">
- <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
- <line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline>
- </svg>
- Pagar
- </button>
- </div>
- </td>
- </tr>
- }
+  <td class="text-right">
+  <div class="flex items-center justify-end gap-2">
+  <button type="button" (click)="abrirHistorial(item)"
+  class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold cursor-pointer rounded-xl transition-all flex items-center gap-1" title="Ver historial">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+  <polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+  </svg>
+  Historial
+  </button>
+  <button type="button" (click)="abrirPago(item)"
+  class="px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold cursor-pointer rounded-xl transition-all flex items-center gap-1">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+  <line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline>
+  </svg>
+  Pagar
+  </button>
+  </div>
+  </td>
+  </tr>
+  }
 
- @if (itemsFiltrados().length === 0 && !loading()) {
- <tr>
- <td colspan="9" class="p-12 text-center">
- <div class="flex flex-col items-center justify-center text-slate-400">
- <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2 opacity-20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
- <circle cx="12" cy="12" r="10"></circle><path d="M12 8v4"></path><path d="M12 16h.01"></path>
- </svg>
- <p class="text-sm font-medium">No hay facturas por liquidar</p>
- <p class="text-xs mt-1">No se encontraron resultados con los filtros aplicados.</p>
- </div>
- </td>
- </tr>
- }
- </tbody>
- </table>
+  @if (itemsFiltrados().length === 0 && !loading()) {
+  <tr>
+  <td colspan="9" class="text-center">
+  <div class="flex flex-col items-center justify-center py-14 text-slate-400">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2 opacity-20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+  <circle cx="12" cy="12" r="10"></circle><path d="M12 8v4"></path><path d="M12 16h.01"></path>
+  </svg>
+  <p class="text-sm font-medium">No hay facturas por liquidar</p>
+  <p class="text-xs mt-1">No se encontraron resultados con los filtros aplicados.</p>
+  </div>
+  </td>
+  </tr>
+  }
+  </tbody>
+  </table>
  </div>
  @if (itemsFiltrados().length > 0) {
  <app-pagination [length]="itemsFiltrados().length"/>
@@ -206,64 +206,64 @@
  }
 
  <div class="overflow-x-auto">
- <table class="w-full text-left table-auto shadow-sm rounded-xl">
- <thead>
- <tr class="bg-slate-50 border-b border-gray-200">
- <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 ">N° Comprobante</th>
- <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 ">Fecha</th>
- <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 ">Factura</th>
- <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 ">Proveedor</th>
- <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 text-right">Monto</th>
- <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 ">Medio</th>
- <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 ">Referencia</th>
- <th class="p-4 w-40 text-xs border-l border-gray-200 text-center text-slate-500">ACCIONES</th>
- </tr>
- </thead>
- <tbody class="divide-y divide-gray-100">
- @for (item of pagosData().items; track item.id) {
- <tr class="hover:bg-slate-50/80 transition-colors">
- <td class="p-4 text-xs font-mono font-semibold text-slate-700">{{ item.numero }}</td>
- <td class="p-4 text-sm text-slate-600">{{ item.fecha | date:'dd/MM/yyyy' }}</td>
- <td class="p-4"><span class="font-mono text-sm font-semibold">{{ item.numeroFactura }}</span></td>
- <td class="p-4 text-sm text-slate-700">{{ item.contraparteNombre }}</td>
- <td class="p-4 text-right"><span class="text-sm font-bold text-orange-700">{{ item.monto | currency:'':'symbol-narrow':'1.0-0' }}</span></td>
- <td class="p-4 text-sm text-slate-600 capitalize">{{ etiquetaMedio(item.medioPago) }}</td>
- <td class="p-4 text-sm text-slate-400 font-mono">{{ item.referencia ?? '—' }}</td>
- <td class="p-4">
- <div class="flex items-center justify-center gap-1.5">
- <button type="button" (click)="imprimirVolante(item)"
- class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold cursor-pointer rounded-xl transition-all shadow-sm flex items-center gap-1" title="Imprimir volante">
- <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
- <polyline points="6 9 6 2 18 2 18 9"></polyline>
- <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
- <rect x="6" y="14" width="12" height="8"></rect>
- </svg>
- Volante
- </button>
- <button type="button" (click)="verAsiento(item.id)" [disabled]="!item.asientoId"
- class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold cursor-pointer rounded-xl transition-all shadow-sm flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed" title="Ver asiento">
- <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
- <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
- <polyline points="14 2 14 8 20 8"></polyline>
- </svg>
- Asiento
- </button>
- </div>
- </td>
- </tr>
- }
+  <table class="ledger-table">
+  <thead>
+  <tr>
+  <th>N° Comprobante</th>
+  <th>Fecha</th>
+  <th>Factura</th>
+  <th>Proveedor</th>
+  <th class="text-right">Monto</th>
+  <th>Medio</th>
+  <th>Referencia</th>
+  <th class="text-center">Acciones</th>
+  </tr>
+  </thead>
+  <tbody>
+  @for (item of pagosData().items; track item.id) {
+  <tr>
+  <td><span class="font-mono font-semibold">{{ item.numero }}</span></td>
+  <td>{{ item.fecha | date:'dd/MM/yyyy' }}</td>
+  <td><span class="font-mono font-semibold">{{ item.numeroFactura }}</span></td>
+  <td>{{ item.contraparteNombre }}</td>
+  <td class="text-right tabular-nums"><span class="font-semibold text-orange-700">{{ item.monto | currency:'':'symbol-narrow':'1.0-0' }}</span></td>
+  <td class="text-slate-600 capitalize">{{ etiquetaMedio(item.medioPago) }}</td>
+  <td class="text-slate-500 font-mono text-xs">{{ item.referencia ?? '—' }}</td>
+  <td class="text-center">
+  <div class="flex items-center justify-center gap-1.5">
+  <button type="button" (click)="imprimirVolante(item)"
+  class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold cursor-pointer rounded-xl transition-all flex items-center gap-1" title="Imprimir volante">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+  <polyline points="6 9 6 2 18 2 18 9"></polyline>
+  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+  <rect x="6" y="14" width="12" height="8"></rect>
+  </svg>
+  Volante
+  </button>
+  <button type="button" (click)="verAsiento(item.id)" [disabled]="!item.asientoId"
+  class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold cursor-pointer rounded-xl transition-all flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed" title="Ver asiento">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+  <polyline points="14 2 14 8 20 8"></polyline>
+  </svg>
+  Asiento
+  </button>
+  </div>
+  </td>
+  </tr>
+  }
 
- @if (pagosData().items.length === 0 && !pagosLoading()) {
- <tr>
- <td colspan="8" class="p-12 text-center">
- <div class="flex flex-col items-center justify-center text-slate-400">
- <p class="text-sm font-medium">No hay pagos registrados</p>
- </div>
- </td>
- </tr>
- }
- </tbody>
- </table>
+  @if (pagosData().items.length === 0 && !pagosLoading()) {
+  <tr>
+  <td colspan="8" class="text-center">
+  <div class="flex flex-col items-center justify-center py-14 text-slate-400">
+  <p class="text-sm font-medium">No hay pagos registrados</p>
+  </div>
+  </td>
+  </tr>
+  }
+  </tbody>
+  </table>
  </div>
 
  @if (pagosData().items.length > 0) {

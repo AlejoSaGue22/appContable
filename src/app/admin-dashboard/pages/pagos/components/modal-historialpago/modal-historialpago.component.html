@@ -56,29 +56,29 @@
 
  <!-- Tabla de movimientos -->
  <div class="overflow-x-auto rounded-lg border border-slate-100">
- <table class="w-full text-sm text-left">
- <thead class="bg-slate-50 border-b border-slate-200">
+ <table class="ledger-table">
+ <thead>
  <tr>
- <th class="px-4 py-2 text-xs font-bold uppercase text-slate-500">N° Comprobante</th>
- <th class="px-4 py-2 text-xs font-bold uppercase text-slate-500">Fecha</th>
- <th class="px-4 py-2 text-xs font-bold uppercase text-slate-500 text-right">Monto</th>
- <th class="px-4 py-2 text-xs font-bold uppercase text-slate-500">Medio de pago</th>
- <th class="px-4 py-2 text-xs font-bold uppercase text-slate-500">Banco</th>
- <th class="px-4 py-2 text-xs font-bold uppercase text-slate-500">Referencia</th>
+ <th>N° Comprobante</th>
+ <th>Fecha</th>
+ <th class="text-right">Monto</th>
+ <th>Medio de pago</th>
+ <th>Banco</th>
+ <th>Referencia</th>
  </tr>
  </thead>
- <tbody class="divide-y divide-slate-100">
+ <tbody>
  @for (pago of historialPagos(); track pago.id) {
- <tr class="hover:bg-slate-50 transition-colors">
- <td class="px-4 py-3 text-slate-600 font-mono font-semibold text-xs">{{ pago.numero }}</td>
- <td class="px-4 py-3 text-slate-600">{{ pago.fecha | date:'dd/MM/yyyy' }}</td>
- <td class="px-4 py-3 text-right font-semibold"
+ <tr>
+ <td class="font-mono font-semibold">{{ pago.numero }}</td>
+ <td>{{ pago.fecha | date:'dd/MM/yyyy' }}</td>
+ <td class="text-right font-semibold"
  [ngClass]="tipo() === 'cobro' ? 'text-green-700' : 'text-gray-900'">
  {{ pago.monto | currency:'':'symbol-narrow':'1.0-0' }}
  </td>
- <td class="px-4 py-3 text-slate-600 capitalize">{{ pago.medioPago }}</td>
- <td class="px-4 py-3 text-slate-400 text-xs font-mono">{{ formatCuentaBancaria(pago.cuentaBancaria) }}</td>
- <td class="px-4 py-3 text-slate-400 text-xs font-mono">{{ pago.referencia ?? '—' }}</td>
+ <td class="capitalize">{{ pago.medioPago }}</td>
+ <td class="text-slate-400 font-mono">{{ formatCuentaBancaria(pago.cuentaBancaria) }}</td>
+ <td class="text-slate-400 font-mono">{{ pago.referencia ?? '—' }}</td>
  </tr>
  }
  </tbody>

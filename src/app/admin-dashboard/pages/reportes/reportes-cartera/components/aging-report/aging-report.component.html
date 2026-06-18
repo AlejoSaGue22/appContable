@@ -29,37 +29,37 @@
 
  <!-- Tabla aging plana -->
  <div class="overflow-x-auto">
- <table class="w-full text-left table-auto text-sm shadow-sm rounded-xl">
+ <table class="ledger-table">
  <thead>
- <tr class="bg-slate-50 border-b border-gray-200">
- <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500">Identificación</th>
- <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500">
+ <tr>
+ <th>Identificación</th>
+ <th>
  {{ vistaActiva() === 'aging-cobrar' ? 'Cliente' : 'Proveedor' }}
  </th>
- <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500">Deuda</th>
- <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500">Saldo a favor</th>
- <th class="p-3 font-sans text-xs font-bold uppercase text-slate-500 text-right">Saldo Cartera</th>
+ <th class="text-right">Deuda</th>
+ <th class="text-right">Saldo a favor</th>
+ <th class="text-right">Saldo Cartera</th>
  </tr>
  </thead>
- <tbody class="divide-y divide-gray-100">
+ <tbody>
  @for (f of reporte().items; track f.identificacion) {
- <tr class="hover:bg-slate-50/80 transition-colors">
- <td class="p-3 text-slate-600 text-xs">{{ f.identificacion }}</td>
- <td class="p-3">
- <span class="font-mono text-xs">{{ f.nombre }}</span>
+ <tr>
+ <td class="text-slate-600">{{ f.identificacion }}</td>
+ <td>
+ <span class="font-mono">{{ f.nombre }}</span>
  </td>
- <td class="p-3 text-slate-700 text-xs">{{ f.deuda | currency:'':'symbol-narrow':'1.0-0' }}</td>
- <td class="p-3 text-slate-500 text-xs">
+ <td class="text-right tabular-nums">{{ f.deuda | currency:'':'symbol-narrow':'1.0-0' }}</td>
+ <td class="text-right tabular-nums text-slate-500">
  {{ f.saldoFavor | currency:'':'symbol-narrow':'1.0-0' }}
  </td>
- <td class="p-3 text-right font-semibold text-slate-900">
+ <td class="text-right tabular-nums font-semibold text-slate-900">
  {{ f.saldoCartera | currency:'':'symbol-narrow':'1.0-0' }}
  </td>
  </tr>
  }
  @if (reporte().items.length === 0) {
  <tr>
- <td colspan="5" class="p-10 text-center text-slate-400 text-sm">
+ <td colspan="5" class="text-center">
  No hay facturas pendientes en este período
  </td>
  </tr>

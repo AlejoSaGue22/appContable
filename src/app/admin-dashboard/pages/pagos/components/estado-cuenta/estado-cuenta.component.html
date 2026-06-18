@@ -82,28 +82,28 @@
  <h4 class="text-xs font-bold uppercase text-slate-500">Facturas Pendientes</h4>
  </div>
  <div class="overflow-x-auto">
- <table class="w-full text-sm text-left">
- <thead class="bg-slate-50/50 border-b border-slate-100">
+ <table class="ledger-table">
+ <thead>
  <tr>
- <th class="px-4 py-2 text-[10px] font-bold uppercase text-slate-400">Factura</th>
- <th class="px-4 py-2 text-[10px] font-bold uppercase text-slate-400 text-center">Emisión</th>
- <th class="px-4 py-2 text-[10px] font-bold uppercase text-slate-400 text-center">Vencimiento</th>
- <th class="px-4 py-2 text-[10px] font-bold uppercase text-slate-400 text-right">Total</th>
- <th class="px-4 py-2 text-[10px] font-bold uppercase text-slate-400 text-right">Pagado</th>
- <th class="px-4 py-2 text-[10px] font-bold uppercase text-slate-400 text-right">Saldo</th>
- <th class="px-4 py-2 text-[10px] font-bold uppercase text-slate-400 text-center">Estado</th>
+ <th>Factura</th>
+ <th class="text-center">Emisión</th>
+ <th class="text-center">Vencimiento</th>
+ <th class="text-right">Total</th>
+ <th class="text-right">Pagado</th>
+ <th class="text-right">Saldo</th>
+ <th class="text-center">Estado</th>
  </tr>
  </thead>
- <tbody class="divide-y divide-slate-50">
+ <tbody>
  @for (f of d.facturas; track f.facturaId) {
- <tr class="hover:bg-slate-50/50 transition-colors">
- <td class="px-4 py-2 font-mono text-xs font-semibold">{{ f.numeroFactura }}</td>
- <td class="px-4 py-2 text-center text-xs text-slate-500">{{ f.fecha | date:'dd/MM/yyyy' }}</td>
- <td class="px-4 py-2 text-center text-xs text-slate-500">{{ f.fechaVencimiento ? (f.fechaVencimiento | date:'dd/MM/yyyy') : '—' }}</td>
- <td class="px-4 py-2 text-right text-xs text-slate-600">{{ f.total | currency:'':'symbol-narrow':'1.0-0' }}</td>
- <td class="px-4 py-2 text-right text-xs text-slate-400">{{ f.totalPagado | currency:'':'symbol-narrow':'1.0-0' }}</td>
- <td class="px-4 py-2 text-right text-xs font-semibold text-slate-800">{{ f.saldoPendiente | currency:'':'symbol-narrow':'1.0-0' }}</td>
- <td class="px-4 py-2 text-center">
+ <tr>
+ <td class="font-mono font-semibold">{{ f.numeroFactura }}</td>
+ <td class="text-center text-slate-500">{{ f.fecha | date:'dd/MM/yyyy' }}</td>
+ <td class="text-center text-slate-500">{{ f.fechaVencimiento ? (f.fechaVencimiento | date:'dd/MM/yyyy') : '—' }}</td>
+ <td class="text-right tabular-nums">{{ f.total | currency:'':'symbol-narrow':'1.0-0' }}</td>
+ <td class="text-right tabular-nums text-slate-400">{{ f.totalPagado | currency:'':'symbol-narrow':'1.0-0' }}</td>
+ <td class="text-right tabular-nums font-semibold">{{ f.saldoPendiente | currency:'':'symbol-narrow':'1.0-0' }}</td>
+ <td class="text-center">
  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold"
  [ngClass]="{
  'bg-blue-100 text-blue-700': f.paymentStatus === 'pendiente',
@@ -131,30 +131,30 @@
  </h4>
  </div>
  <div class="overflow-x-auto">
- <table class="w-full text-sm text-left">
- <thead class="bg-slate-50/50 border-b border-slate-100">
+ <table class="ledger-table">
+ <thead>
  <tr>
- <th class="px-4 py-2 text-[10px] font-bold uppercase text-slate-400">Fecha</th>
- <th class="px-4 py-2 text-[10px] font-bold uppercase text-slate-400">Factura</th>
- <th class="px-4 py-2 text-[10px] font-bold uppercase text-slate-400 text-right">Monto</th>
- <th class="px-4 py-2 text-[10px] font-bold uppercase text-slate-400">Medio</th>
- <th class="px-4 py-2 text-[10px] font-bold uppercase text-slate-400">Referencia</th>
- <th class="px-4 py-2 text-[10px] font-bold uppercase text-slate-400">Cuenta</th>
+ <th>Fecha</th>
+ <th>Factura</th>
+ <th class="text-right">Monto</th>
+ <th>Medio</th>
+ <th>Referencia</th>
+ <th>Cuenta</th>
  </tr>
  </thead>
- <tbody class="divide-y divide-slate-50">
+ <tbody>
  @for (m of d.movimientos; track m.id) {
- <tr class="hover:bg-slate-50/50 transition-colors">
- <td class="px-4 py-2 text-xs text-slate-500">{{ m.fecha | date:'dd/MM/yyyy' }}</td>
- <td class="px-4 py-2 font-mono text-xs font-semibold">{{ m.numeroFactura }}</td>
- <td class="px-4 py-2 text-right text-xs font-bold"
+ <tr>
+ <td class="text-slate-500">{{ m.fecha | date:'dd/MM/yyyy' }}</td>
+ <td class="font-mono font-semibold">{{ m.numeroFactura }}</td>
+ <td class="text-right font-bold"
  [class.text-green-700]="tipo() === 'cliente'"
  [class.text-orange-700]="tipo() === 'proveedor'">
  {{ m.monto | currency:'':'symbol-narrow':'1.0-0' }}
  </td>
- <td class="px-4 py-2 text-xs text-slate-600 capitalize">{{ etiquetaMedio(m.medioPago) }}</td>
- <td class="px-4 py-2 text-xs text-slate-400 font-mono">{{ m.referencia ?? '—' }}</td>
- <td class="px-4 py-2 text-xs text-slate-400">
+ <td class="capitalize">{{ etiquetaMedio(m.medioPago) }}</td>
+ <td class="text-slate-400 font-mono">{{ m.referencia ?? '—' }}</td>
+ <td class="text-slate-400">
  @if (m.cuentaBancaria) {
  {{ m.cuentaBancaria.banco ?? '' }} {{ m.cuentaBancaria.nombre }}
  } @else {

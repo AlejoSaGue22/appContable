@@ -117,82 +117,82 @@
  }
 
  <div class="overflow-x-auto">
- <table class="w-full text-left table-auto shadow-sm rounded-xl">
- <thead>
- <tr class="bg-slate-50 border-b border-gray-200">
- <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 ">N° Comprobante</th>
- <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 ">Tipo</th>
- <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 ">Fecha</th>
- <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 ">Factura</th>
- <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 ">Cliente / Proveedor</th>
- <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 text-right">Monto</th>
- <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 ">Medio</th>
- <th class="p-4 font-sans text-xs font-bold uppercase text-slate-500 ">Referencia</th>
- <th class="p-4 w-40 text-xs border-l border-gray-200 text-center text-slate-500">ACCIONES</th>
- </tr>
- </thead>
- <tbody class="divide-y divide-gray-100">
+  <table class="ledger-table">
+  <thead>
+  <tr>
+  <th>N° Comprobante</th>
+  <th>Tipo</th>
+  <th>Fecha</th>
+  <th>Factura</th>
+  <th>Cliente / Proveedor</th>
+  <th class="text-right">Monto</th>
+  <th>Medio</th>
+  <th>Referencia</th>
+  <th class="text-center">Acciones</th>
+  </tr>
+  </thead>
+  <tbody>
 
- @for (item of rawData().items; track item.id) {
- <tr class="hover:bg-slate-50/80 transition-colors group">
- <td class="p-4 text-xs font-mono font-semibold text-slate-700">{{ item.numero }}</td>
- <td class="p-4">
- <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold"
- [ngClass]="item.tipo === 'cobro'
- ? 'bg-green-100 text-green-700'
- : 'bg-orange-100 text-orange-700'">
- {{ item.tipo === 'cobro' ? 'Cobro' : 'Pago' }}
- </span>
- </td>
- <td class="p-4 text-sm text-slate-600">{{ item.fecha | date:'dd/MM/yyyy' }}</td>
- <td class="p-4">
- <span class="font-mono text-sm font-semibold">{{ item.numeroFactura }}</span>
- </td>
- <td class="p-4 text-sm text-slate-700">{{ item.contraparteNombre }}</td>
- <td class="p-4 text-right">
- <span class="text-sm font-bold"
- [class.text-green-700]="item.tipo === 'cobro'"
- [class.text-orange-700]="item.tipo === 'pago'">
- {{ item.monto | currency:'':'symbol-narrow':'1.0-0' }}
- </span>
- </td>
- <td class="p-4 text-sm text-slate-600 capitalize">{{ etiquetaMedio(item.medioPago) }}</td>
- <td class="p-4 text-sm text-slate-400 font-mono text-xs">{{ item.referencia ?? '—' }}</td>
- <td class="p-4">
- <div class="flex items-center justify-center gap-1.5">
- <button type="button" (click)="imprimirVolante(item)"
- class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold cursor-pointer rounded-xl transition-all shadow-sm flex items-center gap-1"
- title="Imprimir volante">
- <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
- <polyline points="6 9 6 2 18 2 18 9"></polyline>
- <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
- <rect x="6" y="14" width="12" height="8"></rect>
- </svg>
- Volante
- </button>
- <button type="button" (click)="verAsiento(item)"
- [disabled]="!item.asientoId"
- class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold cursor-pointer rounded-xl transition-all shadow-sm flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
- title="Ver asiento contable">
- <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
- <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
- <polyline points="14 2 14 8 20 8"></polyline>
- <line x1="16" y1="13" x2="8" y2="13"></line>
- <line x1="16" y1="17" x2="8" y2="17"></line>
- </svg>
- Asiento
- </button>
- </div>
- </td>
- </tr>
- }
+  @for (item of rawData().items; track item.id) {
+  <tr>
+  <td><span class="font-mono font-semibold">{{ item.numero }}</span></td>
+  <td>
+  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold"
+  [ngClass]="item.tipo === 'cobro'
+  ? 'bg-green-100 text-green-700'
+  : 'bg-orange-100 text-orange-700'">
+  {{ item.tipo === 'cobro' ? 'Cobro' : 'Pago' }}
+  </span>
+  </td>
+  <td class="text-slate-600">{{ item.fecha | date:'dd/MM/yyyy' }}</td>
+  <td>
+  <span class="font-mono font-semibold">{{ item.numeroFactura }}</span>
+  </td>
+  <td>{{ item.contraparteNombre }}</td>
+  <td class="text-right tabular-nums">
+  <span class="font-semibold"
+  [class.text-green-700]="item.tipo === 'cobro'"
+  [class.text-orange-700]="item.tipo === 'pago'">
+  {{ item.monto | currency:'':'symbol-narrow':'1.0-0' }}
+  </span>
+  </td>
+  <td class="text-slate-600 capitalize">{{ etiquetaMedio(item.medioPago) }}</td>
+  <td class="text-slate-500 font-mono text-xs">{{ item.referencia ?? '—' }}</td>
+  <td class="text-center">
+  <div class="flex items-center justify-center gap-1.5">
+  <button type="button" (click)="imprimirVolante(item)"
+  class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold cursor-pointer rounded-xl transition-all flex items-center gap-1"
+  title="Imprimir volante">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+  <polyline points="6 9 6 2 18 2 18 9"></polyline>
+  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+  <rect x="6" y="14" width="12" height="8"></rect>
+  </svg>
+  Volante
+  </button>
+  <button type="button" (click)="verAsiento(item)"
+  [disabled]="!item.asientoId"
+  class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold cursor-pointer rounded-xl transition-all flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
+  title="Ver asiento contable">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+  <polyline points="14 2 14 8 20 8"></polyline>
+  <line x1="16" y1="13" x2="8" y2="13"></line>
+  <line x1="16" y1="17" x2="8" y2="17"></line>
+  </svg>
+  Asiento
+  </button>
+  </div>
+  </td>
+  </tr>
+  }
 
- @if (rawData().items.length === 0 && !loading()) {
- <tr>
- <td colspan="9" class="p-12 text-center">
- <div class="flex flex-col items-center justify-center text-slate-400">
- <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2 opacity-20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
- <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+  @if (rawData().items.length === 0 && !loading()) {
+  <tr>
+  <td colspan="9" class="text-center">
+  <div class="flex flex-col items-center justify-center py-14 text-slate-400">
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2 opacity-20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
  </svg>
  <p class="text-sm font-medium">No hay movimientos registrados</p>
  <p class="text-xs mt-1">Ajusta los filtros o registra un nuevo cobro/pago.</p>

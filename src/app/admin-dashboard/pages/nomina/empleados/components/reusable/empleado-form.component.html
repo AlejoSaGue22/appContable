@@ -1,0 +1,225 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-8">
+
+    <!-- SECCIÓN: Identificación -->
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div class="flex">
+            <div class="w-1.5 bg-blue-600 flex-shrink-0"></div>
+            <div class="flex-1 p-6">
+                <h3 class="text-sm font-bold text-slate-900 mb-1">Identificación</h3>
+                <p class="text-xs text-slate-400 mb-5">Datos básicos de identificación del empleado</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">Tipo Documento <span class="text-red-400">*</span></label>
+                        <select formControlName="tipoDocumento"
+                            class="w-full bg-slate-50/80 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all">
+                            <option value="CC">Cédula de Ciudadanía</option>
+                            <option value="CE">Cédula de Extranjería</option>
+                            <option value="NIT">NIT</option>
+                            <option value="TI">Tarjeta de Identidad</option>
+                            <option value="PP">Pasaporte</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">Número Documento <span class="text-red-400">*</span></label>
+                        <input type="text" formControlName="numeroDocumento" placeholder="1234567890"
+                            class="w-full bg-slate-50/80 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all font-mono">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">Primer Nombre <span class="text-red-400">*</span></label>
+                        <input type="text" formControlName="primerNombre" placeholder="Primer nombre"
+                            class="w-full bg-slate-50/80 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">Segundo Nombre</label>
+                        <input type="text" formControlName="segundoNombre" placeholder="Segundo nombre"
+                            class="w-full bg-slate-50/80 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">Primer Apellido <span class="text-red-400">*</span></label>
+                        <input type="text" formControlName="primerApellido" placeholder="Primer apellido"
+                            class="w-full bg-slate-50/80 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">Segundo Apellido</label>
+                        <input type="text" formControlName="segundoApellido" placeholder="Segundo apellido"
+                            class="w-full bg-slate-50/80 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN: Contacto -->
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div class="flex">
+            <div class="w-1.5 bg-slate-400 flex-shrink-0"></div>
+            <div class="flex-1 p-6">
+                <h3 class="text-sm font-bold text-slate-900 mb-1">Información de Contacto</h3>
+                <p class="text-xs text-slate-400 mb-5">Datos de comunicación y ubicación</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">Correo Electrónico</label>
+                        <input type="email" formControlName="email" placeholder="empleado@empresa.com"
+                            class="w-full bg-slate-50/80 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">Teléfono</label>
+                        <input type="text" formControlName="telefono" placeholder="+57 300 123 4567"
+                            class="w-full bg-slate-50/80 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all">
+                    </div>
+                    <div class="md:col-span-2 space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">Dirección</label>
+                        <input type="text" formControlName="direccion" placeholder="Cra 1 # 2-3, Barrio Centro"
+                            class="w-full bg-slate-50/80 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN: Información Laboral -->
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div class="flex">
+            <div class="w-1.5 bg-teal-600 flex-shrink-0"></div>
+            <div class="flex-1 p-6">
+                <h3 class="text-sm font-bold text-slate-900 mb-1">Información Laboral</h3>
+                <p class="text-xs text-slate-400 mb-5">Detalles del contrato y condiciones laborales</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">Tipo Contrato <span class="text-red-400">*</span></label>
+                        <select formControlName="tipoContrato"
+                            class="w-full bg-slate-50/80 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all">
+                            <option value="FIJO">Término Fijo</option>
+                            <option value="INDEFINIDO">Término Indefinido</option>
+                            <option value="OBRA_LABOR">Obra / Labor</option>
+                            <option value="APRENDIZAJE">Aprendizaje</option>
+                            <option value="PRESTACION">Prestación de Servicios</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">Cargo</label>
+                        <select formControlName="cargoId"
+                            class="w-full bg-slate-50/80 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all">
+                            <option value="">Seleccionar cargo...</option>
+                            @for (c of cargos(); track c.id) {
+                                <option [value]="c.id">{{ c.nombre }}</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">Centro de Costo</label>
+                        <select formControlName="centroCostoId"
+                            class="w-full bg-slate-50/80 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all">
+                            <option value="">Seleccionar centro...</option>
+                            @for (c of centrosCosto(); track c.id) {
+                                <option [value]="c.id">{{ c.nombre }}</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">Salario Base <span class="text-red-400">*</span></label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium">$</span>
+                            <input type="number" formControlName="salarioBase" min="1"
+                                class="w-full bg-slate-50/80 border border-slate-200 rounded-xl pl-8 pr-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all font-mono">
+                        </div>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">Fecha Ingreso <span class="text-red-400">*</span></label>
+                        <input type="date" formControlName="fechaIngreso"
+                            class="w-full bg-slate-50/80 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">Fecha Retiro</label>
+                        <input type="date" formControlName="fechaRetiro"
+                            class="w-full bg-slate-50/80 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all">
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-6 mt-5 pt-5 border-t border-slate-100">
+                    <label class="flex items-center gap-3 cursor-pointer group">
+                        <input type="checkbox" formControlName="salarioIntegral"
+                            class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500/30 cursor-pointer">
+                        <span class="text-sm font-medium text-slate-700 group-hover:text-slate-900 transition-colors">Salario Integral</span>
+                    </label>
+                    <label class="flex items-center gap-3 cursor-pointer group">
+                        <input type="checkbox" formControlName="auxilioTransporte"
+                            class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500/30 cursor-pointer">
+                        <span class="text-sm font-medium text-slate-700 group-hover:text-slate-900 transition-colors">Auxilio de Transporte</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN: Seguridad Social -->
+    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div class="flex">
+            <div class="w-1.5 bg-violet-600 flex-shrink-0"></div>
+            <div class="flex-1 p-6">
+                <h3 class="text-sm font-bold text-slate-900 mb-1">Seguridad Social</h3>
+                <p class="text-xs text-slate-400 mb-5">Entidades de salud, pensión y riesgos laborales</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">EPS <span class="text-red-400">*</span></label>
+                        <select formControlName="epsId"
+                            class="w-full bg-slate-50/80 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all">
+                            <option value="">Seleccionar EPS...</option>
+                            @for (e of entidadesEPS(); track e.id) {
+                                <option [value]="e.id">{{ e.nombre }}</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">AFP <span class="text-red-400">*</span></label>
+                        <select formControlName="afpId"
+                            class="w-full bg-slate-50/80 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all">
+                            <option value="">Seleccionar AFP...</option>
+                            @for (a of entidadesAFP(); track a.id) {
+                                <option [value]="a.id">{{ a.nombre }}</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">Caja Compensación</label>
+                        <select formControlName="ccfId"
+                            class="w-full bg-slate-50/80 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all">
+                            <option value="">Seleccionar CCF...</option>
+                            @for (c of entidadesCCF(); track c.id) {
+                                <option [value]="c.id">{{ c.nombre }}</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="mt-5 space-y-1.5">
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">Nivel de Riesgo ARL</label>
+                    <select formControlName="arlNivelRiesgo"
+                        class="w-full max-w-xs bg-slate-50/80 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all">
+                        <option [value]="1">I - Riesgo Mínimo</option>
+                        <option [value]="2">II - Riesgo Bajo</option>
+                        <option [value]="3">III - Riesgo Medio</option>
+                        <option [value]="4">IV - Riesgo Alto</option>
+                        <option [value]="5">V - Riesgo Máximo</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="flex items-center justify-end gap-4 pt-2">
+        <button type="button" (click)="onCancel()"
+            class="px-6 py-2.5 rounded-xl border-2 border-slate-200 text-slate-600 text-sm font-bold hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-[0.98]">
+            Cancelar
+        </button>
+        <button type="submit" [disabled]="form.invalid || isSubmitting()"
+            class="px-8 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] shadow-sm shadow-blue-200 flex items-center gap-2">
+            @if (isSubmitting()) {
+                <svg class="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                </svg>
+            }
+            {{ editando ? 'Actualizar Empleado' : 'Guardar Empleado' }}
+        </button>
+    </div>
+</form>

@@ -1,21 +1,21 @@
 <div class="relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
  <div class="overflow-x-auto">
- <table class="w-full text-left text-sm text-gray-500 dark:text-gray-400">
- <thead class="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
+ <table class="ledger-table">
+ <thead>
  <tr>
- <th scope="col" class="px-6 py-3">Identificación</th>
- <th scope="col" class="px-6 py-3">Nombre / Razón Social</th>
- <th scope="col" class="px-6 py-3">Contacto</th>
- <th scope="col" class="px-6 py-3">Email</th>
- <th scope="col" class="px-6 py-3">Estado</th>
- <th scope="col" class="px-6 py-3 text-center">Acciones</th>
+ <th>Identificación</th>
+ <th>Nombre / Razón Social</th>
+ <th>Contacto</th>
+ <th>Email</th>
+ <th>Estado</th>
+ <th class="text-center">Acciones</th>
  </tr>
  </thead>
- <tbody class="divide-y divide-gray-50">
+ <tbody>
  @if (clientesData().length === 0) {
  <tr>
- <td colspan="6" class="px-8 py-20 text-center">
- <div class="flex flex-col items-center justify-center">
+ <td colspan="6" class="text-center">
+ <div class="flex flex-col items-center justify-center py-14">
  <div class="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
  <svg class="h-10 w-10 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
@@ -30,16 +30,16 @@
  }
 
  @for (cliente of clientesData(); track cliente.id) {
- <tr class="border-b border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
- <td class="px-6 py-4 font-mono text-xs text-gray-900">
+ <tr>
+ <td class="font-mono">
  <span class="font-medium">{{ cliente.tipoDocumentoRel.abreviatura }}</span> - {{ cliente.numeroDocumento }}
  </td>
- <td class="px-6 py-4">
- <span class="text-gray-900">{{ cliente.razonSocial || (cliente.nombre + ' ' + cliente.apellido) }}</span>
+ <td>
+ <span>{{ cliente.razonSocial || (cliente.nombre + ' ' + cliente.apellido) }}</span>
  </td>
- <td class="px-6 py-4 text-gray-500">{{ cliente.telefono }}</td>
- <td class="px-6 py-4 text-gray-500">{{ cliente.email }}</td>
- <td class="px-6 py-4">
+ <td class="text-slate-500">{{ cliente.telefono }}</td>
+ <td class="text-slate-500">{{ cliente.email }}</td>
+ <td>
  @if (cliente.isActive) {
  <span class="px-2.5 py-1 text-[10px] font-semibold uppercase er bg-emerald-50 text-emerald-600 rounded-lg border 
  border-emerald-100">Activo</span>
@@ -48,7 +48,7 @@
  border-gray-100">Inactivo</span>
  }
  </td>
- <td class="px-6">
+ <td class="text-center">
  <div class="flex items-center justify-center gap-1">
  <button class="inline-flex items-center cursor-pointer rounded-lg p-2 text-sm text-blue-600 hover:bg-blue-50 dark:text-blue-500 dark:hover:bg-gray-700"
  (click)="onViewCliente(cliente)" 

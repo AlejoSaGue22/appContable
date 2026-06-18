@@ -1,57 +1,99 @@
-<div class="fixed top-4 right-4 z-[100] w-full max-w-sm space-y-3 pointer-events-none">
- @for (notification of notifications(); track notification.id) {
- <div class="relative pointer-events-auto bg-white/80 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-100 overflow-hidden animate-slide-in-right"
- role="alert">
- <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b rounded-l-2xl"
- [class]="'from-' + (notification.type === 'success' ? 'green' : notification.type === 'error' ? 'red' : notification.type === 'warning' ? 'amber' : 'blue') + '-500 to-' + (notification.type === 'success' ? 'emerald' : notification.type === 'error' ? 'rose' : notification.type === 'warning' ? 'yellow' : 'indigo') + '-600'">
- </div>
+<div
+  class="fixed top-4 right-4 z-[100] w-full max-w-sm space-y-3 pointer-events-none"
+>
+  @for (notification of notifications(); track notification.id) {
+    <div
+      class="relative pointer-events-auto bg-white/80 backdrop-blur-xl rounded-2xl shadow-lg border border-gray-100 overflow-hidden animate-slide-in-right"
+      role="alert"
+    >
+      <div
+        class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b rounded-l-2xl"
+        [class]="
+          'from-' +
+          (notification.type === 'success'
+            ? 'green'
+            : notification.type === 'error'
+              ? 'red'
+              : notification.type === 'warning'
+                ? 'amber'
+                : 'blue') +
+          '-500 to-' +
+          (notification.type === 'success'
+            ? 'emerald'
+            : notification.type === 'error'
+              ? 'rose'
+              : notification.type === 'warning'
+                ? 'yellow'
+                : 'indigo') +
+          '-600'
+        "
+      ></div>
 
- <div class="flex items-start gap-3 p-4">
- <div class="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center"
- [class.bg-green-100]="notification.type === 'success'"
- [class.bg-red-100]="notification.type === 'error'"
- [class.bg-amber-100]="notification.type === 'warning'"
- [class.bg-blue-100]="notification.type === 'info'"
- [class.text-green-600]="notification.type === 'success'"
- [class.text-red-600]="notification.type === 'error'"
- [class.text-amber-600]="notification.type === 'warning'"
- [class.text-blue-600]="notification.type === 'info'">
- <span [innerHTML]="getNotificationIcon(notification.type)"></span>
- </div>
+      <div class="flex items-start gap-3 p-4">
+        <div
+          class="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center"
+          [class.bg-green-100]="notification.type === 'success'"
+          [class.bg-red-100]="notification.type === 'error'"
+          [class.bg-amber-100]="notification.type === 'warning'"
+          [class.bg-blue-100]="notification.type === 'info'"
+          [class.text-green-600]="notification.type === 'success'"
+          [class.text-red-600]="notification.type === 'error'"
+          [class.text-amber-600]="notification.type === 'warning'"
+          [class.text-blue-600]="notification.type === 'info'"
+        >
+          <span [innerHTML]="getNotificationIcon(notification.type)"></span>
+        </div>
 
- <div class="flex-1 min-w-0">
- @if (notification.title) {
- <p class="text-sm font-bold text-gray-900">{{ notification.title }}</p>
- }
- <p class="text-xs text-gray-500 leading-relaxed">{{ notification.message }}</p>
- </div>
+        <div class="flex-1 min-w-0">
+          @if (notification.title) {
+            <p class="text-sm font-bold text-gray-900">
+              {{ notification.title }}
+            </p>
+          }
+          <p class="text-xs text-gray-500 leading-relaxed">
+            {{ notification.message }}
+          </p>
+        </div>
 
- <button type="button"
- (click)="closeNotification(notification.id)"
- class="flex-shrink-0 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl p-1.5 transition-all cursor-pointer focus:outline-none"
- aria-label="Close">
- <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
- <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
- </svg>
- </button>
- </div>
+        <button
+          type="button"
+          (click)="closeNotification(notification.id)"
+          class="flex-shrink-0 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl p-1.5 transition-all cursor-pointer focus:outline-none"
+          aria-label="Close"
+        >
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
 
- @if (notification.duration && notification.duration > 0) {
- <div class="h-0.5 w-full bg-gray-100">
- <div class="h-full animate-shrink rounded-full"
- [class.bg-gradient-to-r]="true"
- [class.from-green-500]="notification.type === 'success'"
- [class.to-emerald-500]="notification.type === 'success'"
- [class.from-red-500]="notification.type === 'error'"
- [class.to-rose-500]="notification.type === 'error'"
- [class.from-amber-500]="notification.type === 'warning'"
- [class.to-yellow-500]="notification.type === 'warning'"
- [class.from-blue-500]="notification.type === 'info'"
- [class.to-indigo-500]="notification.type === 'info'"
- [style.animation-duration]="(notification.duration || 10000) + 'ms'">
- </div>
- </div>
- }
- </div>
- }
+      @if (notification.duration && notification.duration > 0) {
+        <div class="h-0.5 w-full bg-gray-100">
+          <div
+            class="h-full animate-shrink rounded-full"
+            [class.bg-gradient-to-r]="true"
+            [class.from-green-500]="notification.type === 'success'"
+            [class.to-emerald-500]="notification.type === 'success'"
+            [class.from-red-500]="notification.type === 'error'"
+            [class.to-rose-500]="notification.type === 'error'"
+            [class.from-amber-500]="notification.type === 'warning'"
+            [class.to-yellow-500]="notification.type === 'warning'"
+            [class.from-blue-500]="notification.type === 'info'"
+            [class.to-indigo-500]="notification.type === 'info'"
+            [style.animation-duration]="(notification.duration || 10000) + 'ms'"
+          ></div>
+        </div>
+      }
+    </div>
+  }
 </div>

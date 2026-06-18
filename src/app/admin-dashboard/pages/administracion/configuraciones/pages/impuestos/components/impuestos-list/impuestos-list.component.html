@@ -17,40 +17,40 @@
  </div>
 
  <div class="overflow-x-auto">
- <table class="w-full text-left text-sm">
- <thead class="text-[10px] uppercase text-gray-700">
+ <table class="ledger-table">
+ <thead>
  <tr>
- <th scope="col" class="px-8 py-5">Impuesto</th>
- <th scope="col" class="px-8 py-5">Tipo</th>
- <th scope="col" class="px-8 py-5">Tarifa</th>
- <th scope="col" class="px-8 py-5">Descripción</th>
- <th scope="col" class="px-8 py-5">Estado</th>
- <th scope="col" class="px-8 py-5 text-center">Acciones</th>
+ <th>Impuesto</th>
+ <th>Tipo</th>
+ <th>Tarifa</th>
+ <th>Descripción</th>
+ <th>Estado</th>
+ <th class="text-center">Acciones</th>
  </tr>
  </thead>
- <tbody class="divide-y divide-gray-100">
+ <tbody>
  @for (impuesto of filteredImpuestos(); track impuesto.id) {
- <tr class="transition-all duration-200 group hover:bg-slate-50/50">
- <td class="px-4 py-2">
+ <tr>
+ <td>
  <div class="flex flex-col gap-1.5">
  <span class="text-gray-900">{{ impuesto.nombre }}</span>
  </div>
  </td>
- <td class="px-4 py-2">
+ <td>
  <span class="px-2 py-0.5 bg-slate-50 text-slate-600 text-[10px] rounded uppercase border border-slate-100">
  {{ impuesto.tipo }}
  </span>
  </td>
- <td class="px-4 py-2">
+ <td>
  <div class="flex items-center gap-1">
  <span class="text-sm text-slate-900">{{ impuesto.tarifa }}</span>
  <span class="text-[10px] text-gray-400">%</span>
  </div>
  </td>
- <td class="px-4 py-2">
- <p class="text-sm text-gray-500 line-clamp-2">{{ impuesto.descripcion }}</p>
+ <td>
+ <p class="text-gray-500 line-clamp-2">{{ impuesto.descripcion }}</p>
  </td>
- <td class="px-4 py-2">
+ <td>
  @if (impuesto.activo) {
  <div class="flex items-center gap-1.5">
  <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
@@ -64,7 +64,7 @@
  }
  </td>
  
- <td class="px-4 py-2">
+ <td class="text-right">
  <div class="flex items-center justify-end gap-2">
  <button (click)="onEdit(impuesto)" 
  class="flex items-center justify-center w-9 h-9 rounded-xl cursor-pointer text-slate-600 hover:bg-slate-900 hover:text-white transition-all duration-300" 
@@ -86,8 +86,8 @@
  }
  @if (filteredImpuestos().length === 0) {
  <tr>
- <td colspan="6" class="px-8 py-20 text-center text-gray-400">
- <div class="flex flex-col items-center">
+ <td colspan="6" class="text-center">
+ <div class="flex flex-col items-center py-14">
  <div class="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-4">
  <svg class="w-8 h-8 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />

@@ -25,7 +25,15 @@ export class CuentasContablesList {
  return [...(this.cuentas() || [])].sort((a, b) => a.codigo.localeCompare(b.codigo));
  });
 
- getDerivedLevel(codigo: string): number {
+  childrenMap = computed(() => {
+    const ids = new Set<string>();
+    for (const c of this.cuentas()) {
+      if (c.cuentaPadreId) ids.add(c.cuentaPadreId);
+    }
+    return ids;
+  });
+
+  getDerivedLevel(codigo: string): number {
  const len = codigo.length;
  if (len === 1) return 1;
  if (len === 2) return 2;
@@ -77,10 +85,9 @@ export class CuentasContablesList {
  return this.expandedIds().has(id);
  }
 
- hasChildren(cuenta: GetCuentasContables): boolean {
- 
- return !cuenta.aceptaMovimiento;
- }
+  hasChildren(cuenta: GetCuentasContables): boolean {
+    return this.childrenMap().has(cuenta.id);
+  }
 
  onSelect(cuenta: GetCuentasContables): void {
  const current = new Set(this.expandedIds());

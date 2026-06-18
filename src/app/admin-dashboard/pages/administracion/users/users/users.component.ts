@@ -3,144 +3,161 @@ import { CommonModule, CurrencyPipe, TitleCasePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { tap, firstValueFrom } from 'rxjs';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 
 import { UsersService } from '../services/users.service';
 import { PaginationService } from '@shared/components/pagination/pagination.service';
 import { NotificationService } from '@shared/services/notification.service';
-import { LoaderComponent } from "src/app/utils/components/loader/loader.component";
-import { ErrorPages } from "@shared/components/error-pages/error-pages.component";
+import { LoaderComponent } from 'src/app/utils/components/loader/loader.component';
+import { ErrorPages } from '@shared/components/error-pages/error-pages.component';
 import { modalOpen } from '@shared/interfaces/services.interfaces';
 import { ModalComponents } from '@shared/components/modal.components/modal.components';
 import { PaginationComponent } from '@shared/components/pagination/pagination';
 import { HelpersUtils } from '@utils/helpers.utils';
 import { AuthService } from 'src/app/auth/services/auth.service';
-import { HeaderInput, HeaderTitlePageComponent } from '@dashboard/components/header-title-page/header-title-page.component';
+import {
+  HeaderInput,
+  HeaderTitlePageComponent,
+} from '@dashboard/components/header-title-page/header-title-page.component';
 
 @Component({
- selector: 'app-users',
- imports: [
- CommonModule,
- RouterLink,
- LoaderComponent,
- ErrorPages,
- ModalComponents,
- PaginationComponent,
- ReactiveFormsModule,
- HeaderTitlePageComponent
- ],
- templateUrl: './users.component.html',
- standalone: true
+  selector: 'app-users',
+  imports: [
+    CommonModule,
+    RouterLink,
+    LoaderComponent,
+    ErrorPages,
+    ModalComponents,
+    PaginationComponent,
+    ReactiveFormsModule,
+    HeaderTitlePageComponent,
+  ],
+  templateUrl: './users.component.html',
+  standalone: true,
 })
 export class UsersComponent {
- usersService = inject(UsersService);
- authService = inject(AuthService);
- paginationService = inject(PaginationService);
- notificationService = inject(NotificationService);
+  usersService = inject(UsersService);
+  authService = inject(AuthService);
+  paginationService = inject(PaginationService);
+  notificationService = inject(NotificationService);
 
- headTitle: HeaderInput = {
- title: 'Gestión de Usuarios',
- slog: 'Administra los usuarios y sus permisos en el sistema'
- };
+  headTitle: HeaderInput = {
+    title: 'Gestión de Usuarios',
+    slog: 'Administra los usuarios y sus permisos en el sistema',
+  };
 
- searchTerm = signal<string>('');
- isModalVisible = false;
- isPasswordModalVisible = false;
- userIdToDelete = signal<string>('');
- userIdForPassword = signal<string>('');
+  searchTerm = signal<string>('');
+  isModalVisible = false;
+  isPasswordModalVisible = false;
+  userIdToDelete = signal<string>('');
+  userIdForPassword = signal<string>('');
 
- passwordForm = new FormGroup({
- password: new FormControl('', [Validators.required, Validators.minLength(6)]),
- confirmPassword: new FormControl('', [Validators.required])
- });
+  passwordForm = new FormGroup({
+    password: new FormControl('', [
+      Validators.required,
+      Validators.minLength(6),
+    ]),
+    confirmPassword: new FormControl('', [Validators.required]),
+  });
 
- // Sincronizar búsqueda con delay (debounce)
- searchEffect = effect((onCleanup) => {
- const value = this.searchTerm();
- const timeout = setTimeout(() => {
- // La paginación se resetea vía URL si fuera necesario, 
- // pero por ahora solo disparamos la búsqueda
- }, 500);
- onCleanup(() => clearTimeout(timeout));
- });
+  // Sincronizar búsqueda con delay (debounce)
+  searchEffect = effect((onCleanup) => {
+    const value = this.searchTerm();
+    const timeout = setTimeout(() => {
+      // La paginación se resetea vía URL si fuera necesario,
+      // pero por ahora solo disparamos la búsqueda
+    }, 500);
+    onCleanup(() => clearTimeout(timeout));
+  });
 
- usersResource = rxResource({
- request: () => ({
- page: this.paginationService.currentPage(),
- limit: 10,
- search: this.searchTerm()
- }),
- loader: ({ request }) => this.usersService.getUsers(request).pipe(
- tap((response) => {
- this.paginationService.totalItems.set(response.meta?.total || 0);
- this.paginationService.pageSize.set(response.meta?.totalPages || 10);
- })
- )
- });
+  usersResource = rxResource({
+    request: () => ({
+      page: this.paginationService.currentPage(),
+      limit: 10,
+      search: this.searchTerm(),
+    }),
+    loader: ({ request }) =>
+      this.usersService.getUsers(request).pipe(
+        tap((response) => {
+          this.paginationService.totalItems.set(response.meta?.total || 0);
+          this.paginationService.pageSize.set(response.meta?.totalPages || 10);
+        }),
+      ),
+  });
 
- openDeleteModal(event: modalOpen) {
- this.isModalVisible = event.open;
- this.userIdToDelete.set(event.id);
- }
+  openDeleteModal(event: modalOpen) {
+    this.isModalVisible = event.open;
+    this.userIdToDelete.set(event.id);
+  }
 
- async onDeleteUser() {
- const id = this.userIdToDelete();
- if (!id) return;
+  async onDeleteUser() {
+    const id = this.userIdToDelete();
+    if (!id) return;
 
- const result = await firstValueFrom(this.usersService.deleteUser(id));
- this.isModalVisible = false;
+    const result = await firstValueFrom(this.usersService.deleteUser(id));
+    this.isModalVisible = false;
 
- if (!result.success) {
- this.notificationService.error(
- `Error al eliminar usuario: ${HelpersUtils.getMessageError(result.message)}`,
- 'Error',
- 5000
- );
- return;
- }
+    if (!result.success) {
+      this.notificationService.error(
+        `Error al eliminar usuario: ${HelpersUtils.getMessageError(result.message)}`,
+        'Error',
+        5000,
+      );
+      return;
+    }
 
- this.notificationService.success(
- 'Usuario eliminado correctamente',
- 'Completado',
- 3000
- );
+    this.notificationService.success(
+      'Usuario eliminado correctamente',
+      'Completado',
+      3000,
+    );
 
- // Recargar recurso
- this.usersResource.reload();
- }
+    // Recargar recurso
+    this.usersResource.reload();
+  }
 
- onSearch(value: string) {
- this.searchTerm.set(value);
- }
+  onSearch(value: string) {
+    this.searchTerm.set(value);
+  }
 
- openPasswordModal(id: string) {
- this.userIdForPassword.set(id);
- this.passwordForm.reset();
- this.isPasswordModalVisible = true;
- }
+  openPasswordModal(id: string) {
+    this.userIdForPassword.set(id);
+    this.passwordForm.reset();
+    this.isPasswordModalVisible = true;
+  }
 
- async onChangePassword() {
- if (this.passwordForm.invalid) return;
- 
- const { password, confirmPassword } = this.passwordForm.value;
- if (password !== confirmPassword) {
- this.notificationService.error('Las contraseñas no coinciden', 'Error');
- return;
- }
+  async onChangePassword() {
+    if (this.passwordForm.invalid) return;
 
- const id = this.userIdForPassword();
- const result = await firstValueFrom(this.authService.changePassword(id, password!));
- this.isPasswordModalVisible = false;
+    const { password, confirmPassword } = this.passwordForm.value;
+    if (password !== confirmPassword) {
+      this.notificationService.error('Las contraseñas no coinciden', 'Error');
+      return;
+    }
 
- if (!result.success) {
- this.notificationService.error(
- `Error al cambiar contraseña: ${HelpersUtils.getMessageError(result.message)}`,
- 'Error'
- );
- return;
- }
+    const id = this.userIdForPassword();
+    const result = await firstValueFrom(
+      this.authService.changePassword(id, password!),
+    );
+    this.isPasswordModalVisible = false;
 
- this.notificationService.success(result.message || 'Contraseña actualizada correctamente', 'Completado');
- this.usersResource.reload();
- }
+    if (!result.success) {
+      this.notificationService.error(
+        `Error al cambiar contraseña: ${HelpersUtils.getMessageError(result.message)}`,
+        'Error',
+      );
+      return;
+    }
+
+    this.notificationService.success(
+      result.message || 'Contraseña actualizada correctamente',
+      'Completado',
+    );
+    this.usersResource.reload();
+  }
 }

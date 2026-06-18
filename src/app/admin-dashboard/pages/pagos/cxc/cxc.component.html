@@ -80,80 +80,43 @@
         }
 
         <div class="overflow-x-auto">
-          <table class="w-full text-left table-auto shadow-sm rounded-xl">
+          <table class="ledger-table">
             <thead>
-              <tr class="bg-slate-50 border-b border-gray-200">
-                <th
-                  class="p-4 font-sans text-xs font-bold uppercase text-slate-500"
-                >
-                  Factura
-                </th>
-                <th
-                  class="p-4 font-sans text-xs font-bold uppercase text-slate-500"
-                >
-                  Cliente
-                </th>
-                <th
-                  class="p-4 font-sans text-xs font-bold uppercase text-slate-500 text-center"
-                >
-                  Vencimiento
-                </th>
-                <th
-                  class="p-4 font-sans text-xs font-bold uppercase text-slate-500 text-center"
-                >
-                  Dias
-                </th>
-                <th
-                  class="p-4 font-sans text-xs font-bold uppercase text-slate-500 text-right"
-                >
-                  Total
-                </th>
-                <th
-                  class="p-4 font-sans text-xs font-bold uppercase text-slate-500 text-right"
-                >
-                  Pagado
-                </th>
-                <th
-                  class="p-4 font-sans text-xs font-bold uppercase text-slate-500 text-right"
-                >
-                  Saldo
-                </th>
-                <th
-                  class="p-4 font-sans text-xs font-bold uppercase text-slate-500 text-center"
-                >
-                  Estado
-                </th>
-                <th
-                  class="p-4 w-36 text-xs border-l border-gray-200 text-center text-slate-500"
-                >
-                  ACCIONES
-                </th>
+              <tr>
+                <th>Factura</th>
+                <th>Cliente</th>
+                <th class="text-center">Vencimiento</th>
+                <th class="text-center">Dias</th>
+                <th class="text-right">Total</th>
+                <th class="text-right">Pagado</th>
+                <th class="text-right">Saldo</th>
+                <th class="text-center">Estado</th>
+                <th class="text-center">Acciones</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody>
               @for (item of itemsFiltrados(); track item.facturaId) {
                 <tr
-                  class="hover:bg-slate-50/80 transition-colors group"
                   [class.bg-red-50]="item.paymentStatus === 'vencido'"
                 >
-                  <td class="p-4">
-                    <span class="font-mono text-sm font-semibold">{{
+                  <td>
+                    <span class="font-mono font-semibold">{{
                       item.numeroFactura
                     }}</span>
                   </td>
-                  <td class="p-4">
-                    <span class="text-sm text-slate-700">{{
+                  <td>
+                    <span>{{
                       item.clienteNombre
                     }}</span>
                   </td>
-                  <td class="p-4 text-center">
-                    <span class="text-sm text-slate-600">{{
+                  <td class="text-center">
+                    <span class="text-slate-600">{{
                       item.fechaVencimiento
                         ? (item.fechaVencimiento | date: "dd/MM/yyyy")
                         : "—"
                     }}</span>
                   </td>
-                  <td class="p-4 text-center">
+                  <td class="text-center">
                     @if (item.diasVencida < 0) {
                       <span
                         class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700"
@@ -171,22 +134,22 @@
                       >
                     }
                   </td>
-                  <td class="p-4 text-right text-sm text-slate-600">
-                    {{ item.total | currency: "" : "symbol-narrow" : "1.0-0" }}
+                  <td class="text-right tabular-nums">
+                    <span class="font-semibold text-slate-900">{{ item.total | currency: "" : "symbol-narrow" : "1.0-0" }}</span>
                   </td>
-                  <td class="p-4 text-right text-sm text-slate-400">
-                    {{
+                  <td class="text-right tabular-nums">
+                    <span class="text-slate-500">{{
                       item.totalPagado
                         | currency: "" : "symbol-narrow" : "1.0-0"
-                    }}
+                    }}</span>
                   </td>
-                  <td class="p-4 text-right">
-                    <span class="text-sm text-slate-800">{{
+                  <td class="text-right tabular-nums">
+                    <span class="font-semibold text-slate-900">{{
                       item.saldoPendiente
                         | currency: "" : "symbol-narrow" : "1.0-0"
                     }}</span>
                   </td>
-                  <td class="p-4 text-center">
+                  <td class="text-center">
                     <span
                       class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                       [ngClass]="{
@@ -203,12 +166,12 @@
                       {{ etiquetaEstado(item.paymentStatus) }}
                     </span>
                   </td>
-                  <td class="p-4 text-right">
+                  <td class="text-right">
                     <div class="flex items-center justify-end gap-2">
                       <button
                         type="button"
                         (click)="abrirHistorial(item)"
-                        class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold cursor-pointer rounded-xl transition-all shadow-sm hover:shadow flex items-center gap-1"
+                        class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold cursor-pointer rounded-xl transition-all flex items-center gap-1"
                         title="Ver historial de cobros"
                       >
                         <svg
@@ -227,7 +190,7 @@
                       <button
                         type="button"
                         (click)="abrirCobro(item)"
-                        class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-bold cursor-pointer rounded-xl transition-all shadow-sm hover:shadow flex items-center gap-1"
+                        class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-bold cursor-pointer rounded-xl transition-all flex items-center gap-1"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -249,10 +212,8 @@
 
               @if (itemsFiltrados().length === 0) {
                 <tr>
-                  <td colspan="9" class="p-12 text-center">
-                    <div
-                      class="flex flex-col items-center justify-center text-slate-400"
-                    >
+                  <td colspan="9" class="text-center">
+                    <div class="flex flex-col items-center justify-center py-14 text-slate-400">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         class="h-12 w-12 mb-2 opacity-20"
@@ -419,87 +380,52 @@
         }
 
         <div class="overflow-x-auto">
-          <table class="w-full text-left table-auto shadow-sm rounded-xl">
+          <table class="ledger-table">
             <thead>
-              <tr class="bg-slate-50 border-b border-gray-200">
-                <th
-                  class="p-4 font-sans text-xs font-bold uppercase text-slate-500"
-                >
-                  N° Comprobante
-                </th>
-                <th
-                  class="p-4 font-sans text-xs font-bold uppercase text-slate-500"
-                >
-                  Fecha
-                </th>
-                <th
-                  class="p-4 font-sans text-xs font-bold uppercase text-slate-500"
-                >
-                  Factura
-                </th>
-                <th
-                  class="p-4 font-sans text-xs font-bold uppercase text-slate-500"
-                >
-                  Cliente
-                </th>
-                <th
-                  class="p-4 font-sans text-xs font-bold uppercase text-slate-500 text-right"
-                >
-                  Monto
-                </th>
-                <th
-                  class="p-4 font-sans text-xs font-bold uppercase text-slate-500"
-                >
-                  Medio
-                </th>
-                <th
-                  class="p-4 font-sans text-xs font-bold uppercase text-slate-500"
-                >
-                  Referencia
-                </th>
-                <th
-                  class="p-4 w-40 text-xs border-l border-gray-200 text-center text-slate-500"
-                >
-                  ACCIONES
-                </th>
+              <tr>
+                <th>N° Comprobante</th>
+                <th>Fecha</th>
+                <th>Factura</th>
+                <th>Cliente</th>
+                <th class="text-right">Monto</th>
+                <th>Medio</th>
+                <th>Referencia</th>
+                <th class="text-center">Acciones</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody>
               @for (item of cobrosData().items; track item.id) {
-                <tr class="hover:bg-slate-50/80 transition-colors">
-                  <td
-                    class="p-4 text-xs font-mono font-semibold text-slate-700"
-                  >
-                    {{ item.numero }}
+                <tr>
+                  <td>
+                    <span class="font-mono font-semibold">{{ item.numero }}</span>
                   </td>
-                  <td class="p-4 text-sm text-slate-600">
+                  <td>
                     {{ item.fecha | date: "dd/MM/yyyy" }}
                   </td>
-                  <td class="p-4">
-                    <span class="font-mono text-sm font-semibold">{{
+                  <td>
+                    <span class="font-mono font-semibold">{{
                       item.numeroFactura
                     }}</span>
                   </td>
-                  <td class="p-4 text-sm text-slate-700">
+                  <td>
                     {{ item.contraparteNombre }}
                   </td>
-                  <td class="p-4 text-right">
-                    <span class="text-sm font-bold text-green-700">{{
+                  <td class="text-right tabular-nums">
+                    <span class="font-semibold text-green-700">{{
                       item.monto | currency: "" : "symbol-narrow" : "1.0-0"
                     }}</span>
                   </td>
-                  <td class="p-4 text-sm text-slate-600 capitalize">
+                  <td class="text-slate-600 capitalize">
                     {{ etiquetaMedio(item.medioPago) }}
                   </td>
-                  <td class="p-4 text-sm text-slate-400 font-mono text-xs">
-                    {{ item.referencia ?? "—" }}
-                  </td>
-                  <td class="p-4">
+                  <td class="text-slate-500 font-mono text-xs">
+                    {{ item.referencia ?? "—" }}</td>
+                  <td class="text-center">
                     <div class="flex items-center justify-center gap-1.5">
                       <button
                         type="button"
                         (click)="imprimirVolante(item)"
-                        class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold cursor-pointer rounded-xl transition-all shadow-sm flex items-center gap-1"
+                        class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold cursor-pointer rounded-xl transition-all flex items-center gap-1"
                         title="Imprimir volante"
                       >
                         <svg
@@ -522,7 +448,7 @@
                         type="button"
                         (click)="verAsiento(item.id)"
                         [disabled]="!item.asientoId"
-                        class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold cursor-pointer rounded-xl transition-all shadow-sm flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
+                        class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold cursor-pointer rounded-xl transition-all flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
                         title="Ver asiento"
                       >
                         <svg

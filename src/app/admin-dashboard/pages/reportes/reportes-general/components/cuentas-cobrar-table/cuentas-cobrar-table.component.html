@@ -46,24 +46,24 @@
  }
 
  <div class="overflow-x-auto">
- <table class="w-full text-left text-sm">
- <thead class="bg-gray-50/50 text-[11px] uppercase text-gray-400 border-b border-gray-100">
+ <table class="ledger-table">
+ <thead>
  <tr>
- <th class="px-5 py-4">NIT/ID</th>
- <th class="px-5 py-4">Cliente</th>
- <th class="px-5 py-4 text-right">Deuda</th>
- <th class="px-5 py-4 text-right">Saldo a Favor</th>
- <th class="px-5 py-4 text-right">Saldo Cartera</th>
+ <th>NIT/ID</th>
+ <th>Cliente</th>
+ <th class="text-right">Deuda</th>
+ <th class="text-right">Saldo a Favor</th>
+ <th class="text-right">Saldo Cartera</th>
  </tr>
  </thead>
- <tbody class="divide-y divide-gray-50">
+ <tbody>
  @for (item of data()?.items; track item.identificacion) {
- <tr class="hover:bg-blue-50/30 transition-colors">
- <td class="px-5 py-3.5 text-xs font-mono text-gray-500">{{ item.identificacion }}</td>
- <td class="px-5 py-3.5 text-xs font-medium text-gray-800">{{ item.nombre }}</td>
- <td class="px-5 py-3.5 text-xs text-right font-semibold text-red-600">{{ item.deuda | currency:'':'$':'1.0-0' }}</td>
- <td class="px-5 py-3.5 text-xs text-right text-emerald-600">{{ item.saldoFavor | currency:'':'$':'1.0-0' }}</td>
- <td class="px-5 py-3.5 text-xs text-right font-semibold text-blue-700">{{ item.saldoCartera | currency:'':'$':'1.0-0' }}</td>
+ <tr>
+ <td class="font-mono text-slate-500">{{ item.identificacion }}</td>
+ <td>{{ item.nombre }}</td>
+ <td class="text-right tabular-nums"><span class="font-semibold text-red-600">{{ item.deuda | currency:'':'$':'1.0-0' }}</span></td>
+ <td class="text-right tabular-nums"><span class="font-semibold text-emerald-600">{{ item.saldoFavor | currency:'':'$':'1.0-0' }}</span></td>
+ <td class="text-right tabular-nums"><span class="font-semibold text-blue-700">{{ item.saldoCartera | currency:'':'$':'1.0-0' }}</span></td>
  </tr>
  }
  </tbody>

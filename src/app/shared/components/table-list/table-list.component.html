@@ -1,103 +1,97 @@
 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
- <div class="overflow-x-auto">
- <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 border-b border-gray-50">
- <div class="relative w-full sm:w-72">
- <input
- (keyup)="inputValue.set(txtSearch.value)"
- #txtSearch
- class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 outline-none placeholder:text-slate-400"
- placeholder="Buscar..."
- type="text" />
- <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
- <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
- </svg>
- </div>
+  <div class="overflow-x-auto">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 border-b border-gray-50">
+      <div class="relative w-full sm:w-72">
+        <input
+          (keyup)="inputValue.set(txtSearch.value)"
+          #txtSearch
+          class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 outline-none placeholder:text-slate-400"
+          placeholder="Buscar..."
+          type="text" />
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
+        </svg>
+      </div>
 
- <button class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 active:scale-95 cursor-pointer whitespace-nowrap"
- [routerLink]="rutaLink() + 'new-Item'">
- <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
- <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
- </svg>
- Añadir
- </button>
- </div>
+      <button class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 active:scale-95 cursor-pointer whitespace-nowrap"
+        [routerLink]="rutaLink() + 'new-Item'">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+        </svg>
+        Añadir
+      </button>
+    </div>
 
- <table class="w-full text-left">
- <thead>
- <tr class="sticky top-0 z-10">
- @for (item of columns(); track $index) {
- <th class="px-4 py-3.5 bg-slate-50 border-y border-slate-100">
- <p class="text-xs font-bold uppercase text-slate-500">
- {{ item.header }}
- </p>
- </th>
- }
- @if (hasAction()) {
- <th class="px-4 py-3.5 bg-slate-50 border-y border-slate-100 text-center">
- <p class="text-xs font-bold uppercase text-slate-500">Acciones</p>
- </th>
- }
- </tr>
- </thead>
- <tbody>
- @for (item of dataTableTemp(); track $index) {
- <tr class="hover:bg-slate-50/80 border-b border-slate-50 transition-colors">
- @for (colum of columns(); track $index) {
- <td class="px-4 py-4">
- <p class="text-sm text-slate-800">
- @if (colum?.type == 'number') {
- {{ item[colum.key] | currency : "$" }}
- } @else {
- {{ item[colum.key] | titlecase }}
- }
- </p>
- </td>
- }
- @if (hasAction()) {
- <td class="px-4 py-4">
- <div class="flex items-center justify-center gap-1">
- <button type="button" [routerLink]="rutaLink() + item.id"
- class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all cursor-pointer"
- title="Editar">
- <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
- <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
- </svg>
- </button>
- <button type="button" (click)="openModal(item.id)"
- class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all cursor-pointer"
- title="Eliminar">
- <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
- <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
- </svg>
- </button>
- </div>
- </td>
- }
- </tr>
- }
+    <table class="ledger-table">
+      <thead>
+        <tr>
+          @for (item of columns(); track $index) {
+            <th [class.text-right]="item?.type == 'number'">
+              {{ item.header }}
+            </th>
+          }
+          @if (hasAction()) {
+            <th class="text-center">Acciones</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of dataTableTemp(); track $index) {
+          <tr>
+            @for (colum of columns(); track $index) {
+              <td class="leading-relaxed" [class.text-right]="colum?.type == 'number'" [class.tabular-nums]="colum?.type == 'number'">
+                @if (colum?.type == 'number') {
+                  <span class="font-semibold text-slate-900">{{ item[colum.key] | currency : "$" }}</span>
+                } @else {
+                  <span class="text-slate-700">{{ item[colum.key] | titlecase }}</span>
+                }
+              </td>
+            }
+            @if (hasAction()) {
+              <td class="text-center">
+                <div class="flex items-center justify-center gap-1">
+                  <button type="button" [routerLink]="rutaLink() + item.id"
+                    class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all cursor-pointer"
+                    title="Editar">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                  </button>
+                  <button type="button" (click)="openModal(item.id)"
+                    class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all cursor-pointer"
+                    title="Eliminar">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            }
+          </tr>
+        }
 
- @if (dataTableTemp().length == 0) {
- <tr>
- <td [colSpan]="columns().length + (hasAction() ? 1 : 0)" class="px-4 py-14 text-center">
- <div class="flex flex-col items-center justify-center">
- <div class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mb-3">
- <svg class="w-7 h-7 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
- <path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
- </svg>
- </div>
- <p class="text-sm font-bold text-gray-900">No se encontraron registros</p>
- <p class="mt-1 text-xs text-gray-400">Intenta ajustar los filtros de búsqueda.</p>
- </div>
- </td>
- </tr>
- }
- </tbody>
- </table>
+        @if (dataTableTemp().length == 0) {
+          <tr>
+            <td [colSpan]="columns().length + (hasAction() ? 1 : 0)" class="text-center">
+              <div class="flex flex-col items-center justify-center py-14">
+                <div class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center mb-3">
+                  <svg class="w-7 h-7 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                  </svg>
+                </div>
+                <p class="text-sm font-bold text-gray-900">No se encontraron registros</p>
+                <p class="mt-1 text-xs text-gray-400">Intenta ajustar los filtros de búsqueda.</p>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
 
- @if (dataTableTemp().length > 0) {
- <div class="border-t border-gray-50">
- <app-pagination [length]="dataTableTemp().length" />
- </div>
- }
- </div>
+    @if (dataTableTemp().length > 0) {
+      <div class="border-t border-gray-50">
+        <app-pagination [length]="dataTableTemp().length" />
+      </div>
+    }
+  </div>
 </div>

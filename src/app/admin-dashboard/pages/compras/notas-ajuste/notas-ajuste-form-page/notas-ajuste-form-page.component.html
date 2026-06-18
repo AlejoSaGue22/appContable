@@ -112,37 +112,41 @@
  </div>
  
  <div class="overflow-x-auto">
- <table class="w-full text-left text-sm text-gray-600 dark:text-gray-400">
- <thead class="bg-gray-50 text-xs uppercase text-gray-500 border-b border-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400">
- <tr>
- <th class="px-4 py-2 font-medium">Descripción</th>
- <th class="px-4 py-2 font-medium w-24 text-center">Cant.</th>
- <th class="px-4 py-2 font-medium text-right">V. Unit.</th>
- <th class="px-4 py-2 font-medium w-20 text-center">IVA %</th>
- <th class="px-4 py-2 font-medium w-24 text-center">Desc %</th>
- <th class="px-4 py-2 font-medium text-right">Total</th>
- <th class="px-3 py-2 w-10"></th>
- </tr>
- </thead>
- <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
- @for (item of itemsSeleccionados(); track $index) {
- <tr class="hover:bg-gray-50/50 transition-colors dark:hover:bg-gray-700/50">
- <td class="px-4 py-2">
+  <table class="ledger-table">
+  <thead>
+  <tr>
+  <th>Descripción</th>
+  <th class="text-center">Cant.</th>
+  <th class="text-right">V. Unit.</th>
+  <th class="text-center">IVA %</th>
+  <th class="text-center">Desc %</th>
+  <th class="text-right">Total</th>
+  <th></th>
+  </tr>
+  </thead>
+  <tbody>
+  @for (item of itemsSeleccionados(); track $index) {
+  <tr>
+  <td>
  <input type="text" [value]="item.descripcion" (change)="updateItemField($index, 'descripcion', $any($event.target).value)" 
  class="w-full bg-transparent border-0 border-b border-dashed border-gray-300 focus:ring-0 focus:border-slate-500 px-0 py-1 text-sm dark:text-white dark:border-gray-600" />
  </td>
- <td class="px-4 py-2">
- <input type="number" [value]="item.cantidad" (change)="updateItemQuantity($index, $any($event.target).value)" min="0.01" step="0.01" 
- class="w-full text-center bg-gray-50 border border-gray-200 rounded px-2 py-1 text-sm focus:ring-1 focus:ring-slate-500 focus:bg-white dark:bg-gray-900 dark:border-gray-600 dark:text-white" />
- </td>
- <td class="px-4 py-2">
- <input type="number" [value]="item.valorUnitario" (change)="updateItemField($index, 'valorUnitario', $any($event.target).value)" min="0" step="0.01" 
- class="w-full text-right bg-transparent border-0 border-b border-dashed border-gray-300 focus:ring-0 focus:border-slate-500 px-0 py-1 text-sm dark:text-white dark:border-gray-600" />
- </td>
- <td class="px-4 py-2 text-center text-gray-500">{{ item.porcentajeIVA }}%</td>
- <td class="px-4 py-2 text-center text-gray-500">{{ item.descuento || 0 }}%</td>
- <td class="px-4 py-2 text-right font-medium text-gray-800 dark:text-gray-200">{{ item.total | currency: '' : 'symbol' : '0.0-0' }}</td>
- <td class="px-3 py-2 text-center">
+  <td>
+  <input type="text" [value]="item.descripcion" (change)="updateItemField($index, 'descripcion', $any($event.target).value)" 
+  class="w-full bg-transparent border-0 border-b border-dashed border-gray-300 focus:ring-0 focus:border-slate-500 px-0 py-1 text-sm dark:text-white dark:border-gray-600" />
+  </td>
+  <td>
+  <input type="number" [value]="item.cantidad" (change)="updateItemQuantity($index, $any($event.target).value)" min="0.01" step="0.01" 
+  class="w-full text-center bg-gray-50 border border-gray-200 rounded px-2 py-1 text-sm focus:ring-1 focus:ring-slate-500 focus:bg-white dark:bg-gray-900 dark:border-gray-600 dark:text-white" />
+  </td>
+  <td>
+  <input type="number" [value]="item.valorUnitario" (change)="updateItemField($index, 'valorUnitario', $any($event.target).value)" min="0" step="0.01" 
+  class="w-full text-right bg-transparent border-0 border-b border-dashed border-gray-300 focus:ring-0 focus:border-slate-500 px-0 py-1 text-sm dark:text-white dark:border-gray-600" />
+  </td>
+  <td class="text-center">{{ item.porcentajeIVA }}%</td>
+  <td class="text-center">{{ item.descuento || 0 }}%</td>
+  <td class="text-right tabular-nums"><span class="font-semibold text-slate-900">{{ item.total | currency: '' : 'symbol' : '0.0-0' }}</span></td>
+  <td class="text-center">
  <button type="button" (click)="removeItem($index)" class="text-gray-400 hover:text-red-500 transition-colors cursor-pointer" title="Eliminar ítem">
  <i class="fa-solid fa-times"></i>
  </button>
@@ -151,10 +155,10 @@
  }
  @if (itemsSeleccionados().length === 0) {
  <tr>
- <td colspan="7" class="px-4 py-8 text-center text-gray-500">
- <i class="fa-solid fa-receipt text-2xl mb-2 text-gray-300"></i>
- <p class="text-sm">Selecciona una factura original para cargar sus ítems</p>
- </td>
+  <td colspan="7" class="text-center">
+  <i class="fa-solid fa-receipt text-2xl mb-2 text-gray-300"></i>
+  <p class="text-sm">Selecciona una factura original para cargar sus ítems</p>
+  </td>
  </tr>
  }
  </tbody>

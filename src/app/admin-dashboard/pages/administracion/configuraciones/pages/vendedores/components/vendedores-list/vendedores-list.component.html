@@ -17,27 +17,36 @@
  </div>
 
  <div class="overflow-x-auto">
- <table class="w-full text-left text-sm">
- <thead class="text-[10px] uppercase text-gray-700">
+ <table class="ledger-table">
+ <thead>
  <tr>
- <th scope="col" class="px-8 py-5">Nombre</th>
- <th scope="col" class="px-8 py-5">Apellido</th>
- <th scope="col" class="px-8 py-5">Identificación</th>
- <th scope="col" class="px-8 py-5">Teléfono</th>
- <th scope="col" class="px-8 py-5">Estado</th>
- <th scope="col" class="px-8 py-5 text-center">Acciones</th>
+ <th>Nombre</th>
+ <th>Apellido</th>
+ <th>Identificación</th>
+ <th>Teléfono</th>
+ <th>Estado</th>
+ <th class="text-center">Acciones</th>
  </tr>
  </thead>
- <tbody class="divide-y divide-gray-100">
+ <tbody>
  @for (vendedor of filteredVendedores(); track vendedor.id) {
- <tr class="transition-all duration-200 group hover:bg-slate-50/50">
- <td class="px-4 py-2">
+ <tr>
+ <td>
  <span class="text-gray-900">{{ vendedor.nombre }}</span>
  </td>
- <td class="px-4 py-2">
- <span class="text-gray-900">{{ vendedor.apellido }}</span>
+ <td>
+ <span>{{ vendedor.nombre }}</span>
  </td>
- <td class="px-4 py-2">
+ <td>
+ <span>{{ vendedor.apellido }}</span>
+ </td>
+ <td>
+ <span class="text-slate-600">{{ vendedor.identificacion }}</span>
+ </td>
+ <td>
+ <span class="text-slate-500">{{ vendedor.telefono || '-' }}</span>
+ </td>
+ <td>
  <span class="text-sm text-slate-600">{{ vendedor.identificacion }}</span>
  </td>
  <td class="px-4 py-2">
@@ -57,7 +66,7 @@
  }
  </td>
  
- <td class="px-4 py-2">
+ <td class="text-right">
  <div class="flex items-center justify-end gap-2">
  <button (click)="onEdit(vendedor)" 
  class="flex items-center justify-center w-9 h-9 rounded-xl cursor-pointer text-slate-600 hover:bg-slate-900 hover:text-white transition-all duration-300" 
@@ -79,8 +88,8 @@
  }
  @if (filteredVendedores().length === 0) {
  <tr>
- <td colspan="6" class="px-8 py-20 text-center text-gray-400">
- <div class="flex flex-col items-center">
+ <td colspan="6" class="text-center">
+ <div class="flex flex-col items-center py-14">
  <div class="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-4">
  <svg class="w-8 h-8 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />

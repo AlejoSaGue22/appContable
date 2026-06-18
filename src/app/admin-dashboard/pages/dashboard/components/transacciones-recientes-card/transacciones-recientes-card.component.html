@@ -13,26 +13,26 @@
  </div>
 
  <div class="flex-1 overflow-y-auto">
- <table class="w-full text-sm text-left">
+ <table class="ledger-table">
  <tbody>
  @for (tx of recentTransactions(); track tx.id) {
- <tr class="group hover:bg-gray-50/80 transition-colors border-b border-gray-50 last:border-0">
- <td class="py-4 pr-3">
+ <tr class="border-b border-gray-50 last:border-0">
+ <td>
  <div class="flex flex-col">
  <span class="text-xs font-bold text-gray-700">{{ tx.entidad }}</span>
  <span class="text-[10px] font-medium text-gray-400 uppercase">{{ tx.fecha | date:'dd MMM, yyyy'
  }}</span>
  </div>
  </td>
- <td class="py-4 px-3">
+ <td>
  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide"
  [class.bg-emerald-50]="tx.type === 'venta'" [class.text-emerald-700]="tx.type === 'venta'"
  [class.bg-rose-50]="tx.type === 'compra'" [class.text-rose-700]="tx.type === 'compra'">
  {{ tx.type }}
  </span>
  </td>
- <td class="py-4 pl-3 text-right">
- <span class="text-sm " [class.text-emerald-600]="tx.type === 'venta'"
+ <td class="text-right">
+ <span [class.text-emerald-600]="tx.type === 'venta'"
  [class.text-gray-800]="tx.type === 'compra'">
  {{ tx.type === 'venta' ? '+' : '-' }} {{ tx.total | currency }}
  </span>

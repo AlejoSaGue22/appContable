@@ -1,19 +1,19 @@
 <div class="overflow-x-auto">
- <table class="w-full text-left text-sm text-gray-500 dark:text-gray-400">
- <thead class="bg-gray-50/50 text-xs text-gray-400 border-b border-gray-100">
+ <table class="ledger-table">
+ <thead>
  <tr>
- <th scope="col" class="px-6 py-3">Identificación Cuenta</th>
- <th scope="col" class="px-6 py-3">Tipo Cuenta</th>
- <th scope="col" class="px-6 py-3">Número de Cuenta</th>
- <th scope="col" class="px-6 py-3 text-right">Saldo Actual</th>
- <th scope="col" class="px-6 py-3 text-center">Estado</th>
- <th scope="col" class="px-6 py-3 text-center">Opciones</th>
+ <th>Identificación Cuenta</th>
+ <th>Tipo Cuenta</th>
+ <th>Número de Cuenta</th>
+ <th class="text-right">Saldo Actual</th>
+ <th class="text-center">Estado</th>
+ <th class="text-center">Opciones</th>
  </tr>
  </thead>
- <tbody class="divide-y divide-gray-50">
+ <tbody>
  @for (cuenta of cuentas(); track cuenta.id) {
- <tr class="transition-all duration-200">
- <td class="px-6 py-4">
+ <tr>
+ <td>
  <div class="flex items-center gap-4">
  <div class="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 transition-all duration-300">
  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -27,15 +27,15 @@
  </div>
  </td>
  
- <td class="px-6 py-4 capitalize font-medium">
+ <td>
  {{ cuenta.tipoCuenta }}
  </td>
 
- <td class="px-6 py-4">
- <span class="font-mono text-xs">{{ cuenta.numeroCuenta || 'SIN NÚMERO' }}</span>
+ <td>
+ <span class="font-mono">{{ cuenta.numeroCuenta || 'SIN NÚMERO' }}</span>
  </td>
 
- <td class="px-6 py-4 text-right">
+ <td class="text-right tabular-nums">
  <span class="text-xs" 
  [class.text-red-500]="cuenta.saldoActual < 0" 
  [class.text-gray-900]="cuenta.saldoActual >= 0">
@@ -43,7 +43,7 @@
  </span>
  </td>
 
- <td class="px-6 py-4 text-center">
+ <td class="text-center">
  @if (cuenta.activa) {
  <span class="px-2.5 py-1 text-[10px] font-medium uppercase rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-100">
  ACTIVA
@@ -55,7 +55,7 @@
  }
  </td>
 
- <td class="px-6 py-4 text-center">
+ <td class="text-center">
  <div class="flex items-center justify-center gap-2">
  <button (click)="onEdit(cuenta)" 
  class="inline-flex items-center text-sm text-blue-600 hover:text-blue-900 cursor-pointer"
@@ -76,8 +76,8 @@
 
  @if (cuentas().length === 0) {
  <tr>
- <td colspan="6" class="px-8 py-20 text-center">
- <div class="flex flex-col items-center justify-center">
+ <td colspan="6" class="text-center">
+ <div class="flex flex-col items-center justify-center py-14">
  <div class="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
  <svg class="h-10 w-10 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
