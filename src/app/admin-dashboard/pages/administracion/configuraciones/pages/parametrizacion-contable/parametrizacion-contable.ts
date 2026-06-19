@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { HeaderInput, HeaderTitlePageComponent } from '@dashboard/components/header-title-page/header-title-page.component';
+import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
 import { CuentasContablesService } from '@dashboard/pages/contabilidad/services/cuentas-contables.service';
 import { NotificationService } from '@shared/services/notification.service';
 import { firstValueFrom } from 'rxjs';
@@ -10,14 +11,19 @@ import { ParametrizacionContableService } from './services/parametrizacion-conta
 @Component({
  selector: 'app-parametrizacion-contable',
  standalone: true,
- imports: [CommonModule, ReactiveFormsModule, HeaderTitlePageComponent],
+  imports: [CommonModule, ReactiveFormsModule, HeaderTitlePageComponent, BreadcrumbComponent],
  templateUrl: './parametrizacion-contable.html',
 })
 export class ParametrizacionContable implements OnInit {
- titleHead: HeaderInput = {
- title: 'Parametrización Contable',
- slog: 'Configura las cuentas contables de la empresa'
- };
+  titleHead: HeaderInput = {
+  title: 'Parametrización Contable',
+  slog: 'Configura las cuentas contables de la empresa'
+  };
+
+  breadcrumbItems = [
+    { label: 'Configuración', route: '/panel/admin/settings' },
+    { label: 'Parametrización Contable' },
+  ];
 
  private fb = inject(FormBuilder);
  private parametrizacionService = inject(ParametrizacionContableService);

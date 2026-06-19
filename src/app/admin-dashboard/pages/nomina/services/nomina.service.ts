@@ -10,6 +10,7 @@ import {
  PaginatedResponse
 } from '../interfaces/nomina.interface';
 
+
 @Injectable({ providedIn: 'root' })
 export class NominaService {
  private readonly http = inject(HttpClient);
@@ -119,6 +120,10 @@ export class NominaService {
 
  getTiposContrato(): Observable<any[]> {
  return this.http.get<any[]>(`${this.base}/tipos-contrato`).pipe(catchError(this.handleError));
+ }
+
+ getBancos(): Observable<any[]> {
+ return this.http.get<any[]>(`${environment.baseUrl}/bancos`).pipe(catchError(this.handleError));
  }
 
  // ── Reportes ────────────────────────────────────────────────────

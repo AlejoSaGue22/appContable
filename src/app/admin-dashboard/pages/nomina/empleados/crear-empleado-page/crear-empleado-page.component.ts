@@ -3,14 +3,14 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NominaService } from '../../services/nomina.service';
 import { Empleado } from '../../interfaces/nomina.interface';
-import { EmpleadoFormComponent } from '../components/reusable/empleado-form.component';
+import { EmpleadoWizardComponent } from '../components/wizard/empleado-wizard.component';
 import { HeaderTitlePageComponent } from '@dashboard/components/header-title-page/header-title-page.component';
 import { LoaderService } from '@utils/services/loader.service';
 
 @Component({
     selector: 'app-crear-empleado-page',
     standalone: true,
-    imports: [CommonModule, RouterLink, EmpleadoFormComponent, HeaderTitlePageComponent],
+    imports: [CommonModule, RouterLink, EmpleadoWizardComponent, HeaderTitlePageComponent],
     templateUrl: './crear-empleado-page.component.html',
 })
 export default class CrearEmpleadoPageComponent implements OnInit {

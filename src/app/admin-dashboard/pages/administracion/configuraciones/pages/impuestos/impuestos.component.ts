@@ -10,6 +10,7 @@ import {
   HeaderTitlePageComponent,
   HeaderInput,
 } from '@dashboard/components/header-title-page/header-title-page.component';
+import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
 import { ImpuestosListComponent } from './components/impuestos-list/impuestos-list.component';
 import { ModalComponent } from '@shared/components/modal/modal.component';
 import { ImpuestosService } from './services/impuestos.service';
@@ -27,6 +28,7 @@ import { NotificationService } from '@shared/services/notification.service';
     CommonModule,
     ReactiveFormsModule,
     HeaderTitlePageComponent,
+    BreadcrumbComponent,
     ImpuestosListComponent,
     ModalComponent,
     PaginationComponent,
@@ -44,6 +46,11 @@ export class ImpuestosComponent implements OnInit {
     title: 'Impuestos',
     slog: 'Define los tipos de impuestos y retenciones que aplicas en tus transacciones',
   });
+
+  breadcrumbItems = [
+    { label: 'Configuración', route: '/panel/admin/settings' },
+    { label: 'Impuestos' },
+  ];
 
   impuestos = signal<Impuesto[]>([]);
   cuentas = signal<any[]>([]);
