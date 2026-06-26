@@ -190,7 +190,18 @@ export class EmpleadoWizardComponent implements OnInit {
     }
     this.isSubmitting.set(true);
     this.loader.show();
-    const dto = this.form.value as any;
+    const dto = { ...this.form.value } as any;
+
+    if (dto.arlNivelRiesgo) {
+      dto.arlNivelRiesgo = Number(dto.arlNivelRiesgo);
+    }
+    
+    if (dto.tipoContratoId) {
+      const tipoSel = this.tiposContrato().find(t => t.id === dto.tipoContratoId);
+      if (tipoSel) {
+        dto.tipoContrato = tipoSel.codigo;
+      }
+    }
 
     const emp = this.empleado();
     const request = emp
