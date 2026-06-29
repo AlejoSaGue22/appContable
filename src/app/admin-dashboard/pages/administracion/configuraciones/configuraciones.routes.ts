@@ -4,6 +4,8 @@ import { EmpresaComponent } from "./pages/empresa/empresa.component";
 import { ImpuestosComponent } from "./pages/impuestos/impuestos.component";
 import { VendedoresComponent } from "./pages/vendedores/vendedores.component";
 import { ParametrizacionContable } from "./pages/parametrizacion-contable/parametrizacion-contable";
+import { CargosComponent } from "./pages/cargos/cargos.component";
+import { CentrosCostosComponent } from "./pages/centros-costos/centros-costos.component";
 
 const configuracionesRoutes: Routes = [
  {
@@ -25,6 +27,14 @@ const configuracionesRoutes: Routes = [
  {
  path: 'parametrizacion-contable',
  component: ParametrizacionContable
+ },
+ {
+ path: 'cargos',
+ component: CargosComponent
+ },
+ {
+ path: 'centros-costos',
+ component: CentrosCostosComponent
  },
  {
  path: '**',
