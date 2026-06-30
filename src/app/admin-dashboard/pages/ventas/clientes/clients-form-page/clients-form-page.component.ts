@@ -1,246 +1,311 @@
-import { Component, inject, OnInit, input, output, signal } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { HeaderInput, HeaderTitlePageComponent } from "@dashboard/components/header-title-page/header-title-page.component";
-import { FormErrorLabelComponent } from "src/app/utils/components/form-error-label/form-error-label.component";
+import {
+  HeaderInput,
+  HeaderTitlePageComponent,
+} from '@dashboard/components/header-title-page/header-title-page.component';
+import { FormErrorLabelComponent } from 'src/app/utils/components/form-error-label/form-error-label.component';
 import { ClientesService } from '../../services/clientes.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ClientesInterfaceResponse, ClientesFormInterface } from '@dashboard/interfaces/clientes-interface';
+import {
+  ClientesInterfaceResponse,
+  ClientesFormInterface,
+} from '@dashboard/interfaces/clientes-interface';
 import { firstValueFrom, map, tap } from 'rxjs';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
-import { LoaderComponent } from "src/app/utils/components/loader/loader.component";
-import { ErrorPageComponent } from "src/app/utils/components/error-page/error-page.component";
+import { LoaderComponent } from 'src/app/utils/components/loader/loader.component';
+import { ErrorPageComponent } from 'src/app/utils/components/error-page/error-page.component';
 import { NotificationService } from '@shared/services/notification.service';
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
 import { Municipality } from '@dashboard/interfaces/catalogs-interface';
 import { HelpersUtils } from '@utils/helpers.utils';
-import { ListGroupDropdownComponent } from "@shared/components/list-group-dropdown/list-group-dropdown.component";
-
+import { ListGroupDropdownComponent } from '@shared/components/list-group-dropdown/list-group-dropdown.component';
+import { CuentasContablesService } from '@dashboard/pages/contabilidad/services/cuentas-contables.service';
 
 @Component({
- selector: 'app-clients-form-page',
- imports: [HeaderTitlePageComponent, FormErrorLabelComponent, ReactiveFormsModule, LoaderComponent, ErrorPageComponent, ListGroupDropdownComponent],
- templateUrl: './clients-form-page.component.html',
+  selector: 'app-clients-form-page',
+  imports: [
+    HeaderTitlePageComponent,
+    FormErrorLabelComponent,
+    ReactiveFormsModule,
+    LoaderComponent,
+    ErrorPageComponent,
+    ListGroupDropdownComponent,
+  ],
+  templateUrl: './clients-form-page.component.html',
 })
 export class ClientsFormPageComponent implements OnInit {
+  isModal = input<boolean>(false);
+  saveSuccess = output<ClientesFormInterface>();
+  notificationService = inject(NotificationService);
+  cancel = output<void>();
 
- isModal = input<boolean>(false);
- saveSuccess = output<ClientesFormInterface>();
- notificationService = inject(NotificationService);
- cancel = output<void>();
+  private fb = inject(FormBuilder);
+  clienteService = inject(ClientesService);
+  private cuentasService = inject(CuentasContablesService);
+  router = inject(Router);
+  activateRoute = inject(ActivatedRoute);
+  catalogsStore = inject(CatalogsStore);
+  clienteID = toSignal(
+    this.activateRoute.params.pipe(map((params) => params['id'])),
+  );
+  headTitleCliente: HeaderInput = {
+    title:
+      this.clienteID() && this.clienteID() !== 'new-Item'
+        ? 'Actualizar Cliente'
+        : 'Guardar Cliente',
+    slog:
+      this.clienteID() && this.clienteID() !== 'new-Item'
+        ? 'Actualiza la información del cliente'
+        : 'Registra un nuevo cliente al sistema',
+  };
+  loading = signal<boolean>(false);
 
- private fb = inject(FormBuilder);
- clienteService = inject(ClientesService);
- router = inject(Router);
- activateRoute = inject(ActivatedRoute);
- catalogsStore = inject(CatalogsStore);
- clienteID = toSignal(
- this.activateRoute.params.pipe(map((params) => params['id']))
- );
- headTitleCliente: HeaderInput = { title: (this.clienteID() && this.clienteID() !== 'new-Item' ? 'Actualizar Cliente' :
- 'Guardar Cliente'),
- slog: (this.clienteID() && this.clienteID() !== 'new-Item' ? 'Actualiza la información del cliente' :
- 'Registra un nuevo cliente al sistema') };
- loading = signal<boolean>(false);
+  cuentasContables = signal<any[]>([]);
+  cuentasFiltradas = signal<any[]>([]);
 
- clientsForm = this.fb.group({
- nombre: ['', Validators.required],
- apellido: ['', Validators.required],
- tipoDocumento: ['', Validators.required],
- numeroDocumento: ['', Validators.required],
- tipoPersona: ['', Validators.required],
- razonSocial: ['', Validators.required],
- direccion: ['', Validators.required],
- ciudad: ['', Validators.required],
- telefono: [''],
- email: [''],
- observacion: [''],
- tributo: ['', Validators.required],
- // responsableFiscal: [''],
- dv: [''],
- })
+  clientsForm = this.fb.group({
+    nombre: ['', Validators.required],
+    apellido: ['', Validators.required],
+    tipoDocumento: ['', Validators.required],
+    numeroDocumento: ['', Validators.required],
+    tipoPersona: ['', Validators.required],
+    razonSocial: ['', Validators.required],
+    direccion: ['', Validators.required],
+    ciudad: ['', Validators.required],
+    telefono: [''],
+    email: [''],
+    observacion: [''],
+    tributo: ['', Validators.required],
+    dv: [''],
+    cuentaContableId: [null],
+  });
 
- getCityName() {
- const id = this.clientsForm.get('ciudad')?.value;
- if (!id) return '';
- const city = this.catalogsStore.municipalities().find(m => m.id == id);
- return city ? `${city.name} - ${city.department}` : '';
- }
+  getCityName() {
+    const id = this.clientsForm.get('ciudad')?.value;
+    if (!id) return '';
+    const city = this.catalogsStore.municipalities().find((m) => m.id == id);
+    return city ? `${city.name} - ${city.department}` : '';
+  }
 
- onCitySelect(city: Municipality) {
- this.clientsForm.patchValue({ ciudad: city.id });
- }
+  onCitySelect(city: Municipality) {
+    this.clientsForm.patchValue({ ciudad: city.id });
+  }
 
+  clienteIdResource = rxResource({
+    request: () => {
+      if (this.isModal()) {
+        return null;
+      }
+      return { id: this.clienteID() };
+    },
+    loader: ({ request }) => {
+      if (!request) {
+        return this.clienteService.getClientesById('new-Item');
+      }
 
- clienteIdResource = rxResource({
- request: () => {
- if (this.isModal()) {
- return null;
- }
- return { id: this.clienteID() };
- },
- loader: ({ request }) => {
- if (!request) {
- return this.clienteService.getClientesById('new-Item');
- }
+      return this.clienteService
+        .getClientesById(request.id)
+        .pipe(tap((el) => this.clientsForm.reset(el)));
+    },
+  });
 
- return this.clienteService.getClientesById(request.id).pipe(
- tap((el) => this.clientsForm.reset(el))
- );
- }
- })
+  async ngOnInit() {
+    this.clientsForm.get('tipoPersona')?.valueChanges.subscribe((value) => {
+      if (!value) return;
+      this.toggleValidations(value);
+    });
 
- ngOnInit() {
- this.clientsForm.get('tipoPersona')?.valueChanges.subscribe(value => {
- if (!value) return;
- this.toggleValidations(value);
- });
+    this.clientsForm.get('tipoDocumento')?.valueChanges.subscribe((value) => {
+      this.handleTipoDocumentoChange(value);
+    });
 
- this.clientsForm.get('tipoDocumento')?.valueChanges.subscribe(value => {
- this.handleTipoDocumentoChange(value);
- });
+    this.clientsForm.get('numeroDocumento')?.valueChanges.subscribe((value) => {
+      if (this.clientsForm.get('tipoDocumento')?.value == '6') {
+        this.updateDV(value);
+      }
+    });
 
- this.clientsForm.get('numeroDocumento')?.valueChanges.subscribe(value => {
- if (this.clientsForm.get('tipoDocumento')?.value == '6') {
- this.updateDV(value);
- }
- });
+    if (this.isModal()) {
+      this.clientsForm.reset();
+      this.headTitleCliente.title = 'Crear Cliente';
+      this.headTitleCliente.slog = 'Registra un nuevo cliente al sistema';
+    }
 
- if (this.isModal()) {
- this.clientsForm.reset();
- this.headTitleCliente.title = 'Crear Cliente';
- this.headTitleCliente.slog = 'Registra un nuevo cliente al sistema';
- }
- }
+    try {
+      const accounts = await firstValueFrom(
+        this.cuentasService.getCuentasContables(),
+      );
+      this.cuentasContables.set(accounts);
+      this.cuentasFiltradas.set(
+        accounts.filter(
+          (c: any) => c.aceptaMovimiento && c.codigo.startsWith('13'),
+        ),
+      );
+    } catch (e) {
+      console.error('Error al cargar cuentas contables', e);
+    }
+  }
 
- toggleValidations(tipo: string) {
- const nombreControl = this.clientsForm.get('nombre');
- const apellidoControl = this.clientsForm.get('apellido');
- const razonSocialControl = this.clientsForm.get('razonSocial');
+  getCuentaContableDisplay() {
+    const id = this.clientsForm.get('cuentaContableId')?.value;
+    if (!id) return '';
+    const account = this.cuentasContables().find((c) => c.id === id);
+    return account ? `${account.codigo} - ${account.nombre}` : '';
+  }
 
- if (tipo === 'PN') {
- nombreControl?.setValidators([Validators.required]);
- apellidoControl?.setValidators([Validators.required]);
- razonSocialControl?.clearValidators();
+  onCuentaSelect(account: any) {
+    this.clientsForm.patchValue({ cuentaContableId: account.id });
+  }
 
- } else if (tipo === 'PJ') {
- // Si el tipo es 'juridica', se requiere 'razonSocial'
- razonSocialControl?.setValidators([Validators.required]);
- nombreControl?.clearValidators();
- apellidoControl?.clearValidators();
- }
+  toggleValidations(tipo: string) {
+    const nombreControl = this.clientsForm.get('nombre');
+    const apellidoControl = this.clientsForm.get('apellido');
+    const razonSocialControl = this.clientsForm.get('razonSocial');
 
- nombreControl?.updateValueAndValidity();
- apellidoControl?.updateValueAndValidity();
- razonSocialControl?.updateValueAndValidity();
- }
+    if (tipo === 'PN') {
+      nombreControl?.setValidators([Validators.required]);
+      apellidoControl?.setValidators([Validators.required]);
+      razonSocialControl?.clearValidators();
+    } else if (tipo === 'PJ') {
+      // Si el tipo es 'juridica', se requiere 'razonSocial'
+      razonSocialControl?.setValidators([Validators.required]);
+      nombreControl?.clearValidators();
+      apellidoControl?.clearValidators();
+    }
 
+    nombreControl?.updateValueAndValidity();
+    apellidoControl?.updateValueAndValidity();
+    razonSocialControl?.updateValueAndValidity();
+  }
 
- async onSubmit() {
- const isValid = this.clientsForm.valid;
- this.clientsForm.markAllAsTouched();
+  async onSubmit() {
+    const isValid = this.clientsForm.valid;
+    this.clientsForm.markAllAsTouched();
 
- if (!isValid) {
- this.notificationService.error('Formulario incompleto', 'Error');
- return;
- }
+    if (!isValid) {
+      this.notificationService.error('Formulario incompleto', 'Error');
+      return;
+    }
 
- this.loading.set(true);
+    this.loading.set(true);
 
- try {
+    try {
+      const formValue = {
+        ...this.clientsForm.value,
+        telefono: this.clientsForm.get('telefono')?.value?.toString(),
+      };
 
- const formValue = {
- ...this.clientsForm.value,
- telefono: this.clientsForm.get("telefono")?.value?.toString()
- };
+      if (this.clienteID() == 'new-Item' || this.isModal()) {
+        const client = await firstValueFrom(
+          this.clienteService.agregarCliente(
+            formValue as Partial<ClientesFormInterface>,
+          ),
+        );
 
- if (this.clienteID() == 'new-Item' || this.isModal()) {
- const client = await firstValueFrom(this.clienteService.agregarCliente(formValue as Partial<ClientesFormInterface>));
+        if (client.success == false) {
+          this.notificationService.error(
+            `Hubo un error al guardar el cliente ${HelpersUtils.getMessageError(client.message)}`,
+            'Error',
+          );
+          return;
+        }
 
- if (client.success == false) {
+        this.notificationService.success(
+          'Cliente guardado exitosamente',
+          'Éxito',
+        );
 
- this.notificationService.error(`Hubo un error al guardar el cliente ${HelpersUtils.getMessageError(client.message)}`, 'Error');
- return;
- }
+        if (this.isModal()) {
+          this.saveSuccess.emit(client.data);
+        } else {
+          await this.router.navigateByUrl('/panel/ventas/clients');
+        }
+      } else {
+        const clientUpdate = await firstValueFrom(
+          this.clienteService.actualizarClientes(
+            this.clienteID(),
+            formValue as Partial<ClientesFormInterface>,
+          ),
+        );
 
- this.notificationService.success("Cliente guardado exitosamente", 'Éxito');
+        if (clientUpdate.success == false) {
+          this.notificationService.error(
+            `Hubo un error al guardar el cliente ${HelpersUtils.getMessageError(clientUpdate.message)}`,
+            'Error',
+          );
+          return;
+        }
 
- if (this.isModal()) {
- this.saveSuccess.emit(client.data);
- } else {
- await this.router.navigateByUrl('/panel/ventas/clients');
- }
+        this.notificationService.success(
+          'Cliente actualizado exitosamente',
+          'Éxito',
+        );
+        await this.router.navigateByUrl('/panel/ventas/clients');
+      }
+    } catch (error: any) {
+      this.notificationService.error(error.message, 'Error');
+    } finally {
+      this.loading.set(false);
+    }
+  }
 
- } else {
- const clientUpdate = await firstValueFrom(
- this.clienteService.actualizarClientes(this.clienteID(), formValue as Partial<ClientesFormInterface>)
- );
+  async onCancel() {
+    if (this.isModal()) {
+      this.cancel.emit();
+    } else {
+      await this.router.navigateByUrl('/panel/ventas/clients');
+    }
+    this.clientsForm.reset();
+  }
 
- if (clientUpdate.success == false) {
- this.notificationService.error(`Hubo un error al guardar el cliente ${HelpersUtils.getMessageError(clientUpdate.message)}`, 'Error');
- return;
- }
+  private handleTipoDocumentoChange(tipo: string | null | undefined) {
+    const dvControl = this.clientsForm.get('dv');
+    if (tipo === '6') {
+      // NIT
+      dvControl?.setValidators([Validators.required]);
+      this.updateDV(this.clientsForm.get('numeroDocumento')?.value);
+    } else {
+      dvControl?.clearValidators();
+      dvControl?.setValue('');
+    }
+    dvControl?.updateValueAndValidity();
+  }
 
- this.notificationService.success("Cliente actualizado exitosamente", 'Éxito');
- await this.router.navigateByUrl('/panel/ventas/clients');
- }
+  private updateDV(nit: string | null | undefined) {
+    if (!nit) {
+      this.clientsForm.get('dv')?.setValue('');
+      return;
+    }
+    const dv = this.calculateDV(nit);
+    console.log('dv', dv);
+    this.clientsForm.get('dv')?.setValue(dv);
+  }
 
- } catch (error: any) {
- this.notificationService.error(error.message, 'Error');
- } finally {
- this.loading.set(false);
- }
+  private calculateDV(nit: string): string {
+    const cleanNit = nit.replace(/\D/g, ''); // Solo números
+    const vpri = [3, 7, 13, 17, 19, 23, 29, 37, 41, 43, 47, 53, 59, 67, 71];
+    const z = cleanNit.length;
+    let x = 0;
+    let y = 0;
 
- }
+    for (let i = 0; i < z; i++) {
+      y = parseInt(cleanNit.substring(i, i + 1));
+      x += y * vpri[z - 1 - i];
+    }
 
- async onCancel() {
- if (this.isModal()) {
- this.cancel.emit();
- } else {
- await this.router.navigateByUrl('/panel/ventas/clients');
- }
- this.clientsForm.reset();
- }
-
- private handleTipoDocumentoChange(tipo: string | null | undefined) {
- const dvControl = this.clientsForm.get('dv');
- if (tipo === '6') { // NIT
- dvControl?.setValidators([Validators.required]);
- this.updateDV(this.clientsForm.get('numeroDocumento')?.value);
- } else {
- dvControl?.clearValidators();
- dvControl?.setValue('');
- }
- dvControl?.updateValueAndValidity();
- }
-
- private updateDV(nit: string | null | undefined) {
- if (!nit) {
- this.clientsForm.get('dv')?.setValue('');
- return;
- }
- const dv = this.calculateDV(nit);
- console.log('dv',dv);
- this.clientsForm.get('dv')?.setValue(dv);
- }
-
- private calculateDV(nit: string): string {
- const cleanNit = nit.replace(/\D/g, ''); // Solo números
- const vpri = [3, 7, 13, 17, 19, 23, 29, 37, 41, 43, 47, 53, 59, 67, 71];
- const z = cleanNit.length;
- let x = 0;
- let y = 0;
-
- for (let i = 0; i < z; i++) {
- y = parseInt(cleanNit.substring(i, i + 1));
- x += y * vpri[z - 1 - i];
- }
-
- y = x % 11;
- if (y > 1) {
- return (11 - y).toString();
- } else {
- return y.toString();
- }
- }
-
+    y = x % 11;
+    if (y > 1) {
+      return (11 - y).toString();
+    } else {
+      return y.toString();
+    }
+  }
 }

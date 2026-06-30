@@ -13,6 +13,7 @@ export class TableBancoComponent {
  cuentas = input<CuentaBancaria[]>([]);
  openEditModal = output<CuentaBancaria>();
  deleteCuenta = output<string>();
+ toggleStatus = output<string>();
 
  onEdit(cuenta: CuentaBancaria) {
  this.openEditModal.emit(cuenta);
@@ -20,6 +21,10 @@ export class TableBancoComponent {
 
  onDelete(id: string) {
  this.deleteCuenta.emit(id);
+ }
+
+ onToggleStatus(id: string) {
+ this.toggleStatus.emit(id);
  }
 
  }

@@ -1,260 +1,325 @@
-import { Component, inject, OnInit, signal, input, output } from '@angular/core';
+import {
+  Component,
+  inject,
+  OnInit,
+  signal,
+  input,
+  output,
+} from '@angular/core';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { HeaderInput, HeaderTitlePageComponent } from "@dashboard/components/header-title-page/header-title-page.component";
-import { FormErrorLabelComponent } from "src/app/utils/components/form-error-label/form-error-label.component";
+import {
+  HeaderInput,
+  HeaderTitlePageComponent,
+} from '@dashboard/components/header-title-page/header-title-page.component';
+import { FormErrorLabelComponent } from 'src/app/utils/components/form-error-label/form-error-label.component';
 import { NotificationService } from '@shared/services/notification.service';
 import { LoaderService } from '@utils/services/loader.service';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { firstValueFrom, map, of, tap } from 'rxjs';
 import { ProveedoresInterface } from '@dashboard/interfaces/proveedores-interface';
 import { ProveedoresService } from '../../services/proveedores.service';
-import { LoaderComponent } from "@utils/components/loader/loader.component";
+import { LoaderComponent } from '@utils/components/loader/loader.component';
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
 import { HelpersUtils } from '@utils/helpers.utils';
-import { ListGroupDropdownComponent } from "@shared/components/list-group-dropdown/list-group-dropdown.component";
+import { ListGroupDropdownComponent } from '@shared/components/list-group-dropdown/list-group-dropdown.component';
 import { Municipality } from '@dashboard/interfaces/catalogs-interface';
+import { CuentasContablesService } from '@dashboard/pages/contabilidad/services/cuentas-contables.service';
 
 @Component({
- selector: 'app-proveedores-forms-page',
- imports: [CommonModule, ReactiveFormsModule, HeaderTitlePageComponent, FormErrorLabelComponent, LoaderComponent, ListGroupDropdownComponent],
- templateUrl: './proveedores-forms-page.component.html',
- standalone: true
+  selector: 'app-proveedores-forms-page',
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    HeaderTitlePageComponent,
+    FormErrorLabelComponent,
+    LoaderComponent,
+    ListGroupDropdownComponent,
+  ],
+  templateUrl: './proveedores-forms-page.component.html',
+  standalone: true,
 })
 export class ProveedoresFormsPageComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  notificationService = inject(NotificationService);
+  loaderService = inject(LoaderService);
+  router = inject(Router);
+  activatedRoute = inject(ActivatedRoute);
+  private proveedoresService = inject(ProveedoresService);
+  private cuentasService = inject(CuentasContablesService);
+  catalogsStore = inject(CatalogsStore);
 
- private fb = inject(FormBuilder);
- notificationService = inject(NotificationService);
- loaderService = inject(LoaderService);
- router = inject(Router);
- activatedRoute = inject(ActivatedRoute);
- private proveedoresService = inject(ProveedoresService);
- catalogsStore = inject(CatalogsStore);
+  headTitle: HeaderInput = {
+    title: 'Gestión de Proveedor',
+    slog: 'Registra o actualiza la información de tus proveedores',
+  };
 
- 
- headTitle: HeaderInput = {
- title: 'Gestión de Proveedor',
- slog: 'Registra o actualiza la información de tus proveedores'
- }
- 
- 
- isModal = input<boolean>(false);
- saveSuccess = output<ProveedoresInterface>();
- cancel = output<void>();
- loading = signal<boolean>(false);
+  isModal = input<boolean>(false);
+  saveSuccess = output<ProveedoresInterface>();
+  cancel = output<void>();
+  loading = signal<boolean>(false);
 
- proveedorId = toSignal(
- this.activatedRoute.params.pipe(
- map((param) => param['id'])
- )
- );
+  cuentasContables = signal<any[]>([]);
+  cuentasFiltradas = signal<any[]>([]);
 
- formProveedor = this.fb.group({
- tipoDocumento: ['', Validators.required],
- identificacion: ['', Validators.required],
- tipoPersona: ['', Validators.required],
- nombre: ['', Validators.required],
- apellido: ['', Validators.required],
- razonSocial: ['', Validators.required],
- dv: [''],
- email: ['', [Validators.required, Validators.email]],
- telefono: ['', Validators.required],
- direccion: [''],
- ciudad: [''],
- nombreContacto: [''],
- telefonoContacto: [''],
- observaciones: [''],
- // estado: ['A']
- });
+  proveedorId = toSignal(
+    this.activatedRoute.params.pipe(map((param) => param['id'])),
+  );
 
- getCityName() {
- const id = this.formProveedor.get('ciudad')?.value;
- if (!id) return '';
- const city = this.catalogsStore.municipalities().find((m: Municipality) => m.id == id);
- return city ? `${city.name} - ${city.department}` : '';
- }
+  formProveedor = this.fb.group({
+    tipoDocumento: ['', Validators.required],
+    identificacion: ['', Validators.required],
+    tipoPersona: ['', Validators.required],
+    nombre: ['', Validators.required],
+    apellido: ['', Validators.required],
+    razonSocial: ['', Validators.required],
+    dv: [''],
+    email: ['', [Validators.required, Validators.email]],
+    telefono: ['', Validators.required],
+    direccion: [''],
+    ciudad: [''],
+    nombreContacto: [''],
+    telefonoContacto: [''],
+    observaciones: [''],
+    cuentaContableId: [null],
+  });
 
- onCitySelect(city: Municipality) {
- this.formProveedor.patchValue({ ciudad: city.id });
- }
+  getCityName() {
+    const id = this.formProveedor.get('ciudad')?.value;
+    if (!id) return '';
+    const city = this.catalogsStore
+      .municipalities()
+      .find((m: Municipality) => m.id == id);
+    return city ? `${city.name} - ${city.department}` : '';
+  }
 
- ngOnInit(): void {
- if (this.proveedorId() && this.proveedorId() !== 'new-Item') {
- this.loadProveedor(this.proveedorId());
- this.headTitle.title = 'Editar Proveedor';
- } else {
- this.headTitle.title = 'Nuevo Proveedor';
- }
+  onCitySelect(city: Municipality) {
+    this.formProveedor.patchValue({ ciudad: city.id });
+  }
 
- if (this.isModal()) {
- this.formProveedor.reset();
- }
+  async ngOnInit() {
+    if (this.proveedorId() && this.proveedorId() !== 'new-Item') {
+      this.loadProveedor(this.proveedorId());
+      this.headTitle.title = 'Editar Proveedor';
+    } else {
+      this.headTitle.title = 'Nuevo Proveedor';
+    }
 
- this.formProveedor.get('tipoPersona')?.valueChanges.subscribe(value => {
- if (!value) return;
- this.toggleValidations(value);
- });
+    if (this.isModal()) {
+      this.formProveedor.reset();
+    }
 
- this.formProveedor.get('tipoDocumento')?.valueChanges.subscribe(value => {
- this.handleTipoDocumentoChange(value);
- });
+    this.formProveedor.get('tipoPersona')?.valueChanges.subscribe((value) => {
+      if (!value) return;
+      this.toggleValidations(value);
+    });
 
- this.formProveedor.get('identificacion')?.valueChanges.subscribe(value => {
- if (this.formProveedor.get('tipoDocumento')?.value == '6') {
- this.updateDV(value);
- }
- });
- }
+    this.formProveedor.get('tipoDocumento')?.valueChanges.subscribe((value) => {
+      this.handleTipoDocumentoChange(value);
+    });
 
- toggleValidations(tipo: string) {
- const nombreControl = this.formProveedor.get('nombre');
- const apellidoControl = this.formProveedor.get('apellido');
- const razonSocialControl = this.formProveedor.get('razonSocial');
+    this.formProveedor
+      .get('identificacion')
+      ?.valueChanges.subscribe((value) => {
+        if (this.formProveedor.get('tipoDocumento')?.value == '6') {
+          this.updateDV(value);
+        }
+      });
 
- if (tipo === 'PN') {
- nombreControl?.setValidators([Validators.required]);
- apellidoControl?.setValidators([Validators.required]);
- razonSocialControl?.clearValidators();
+    try {
+      const accounts = await firstValueFrom(
+        this.cuentasService.getCuentasContables(),
+      );
+      this.cuentasContables.set(accounts);
+      this.cuentasFiltradas.set(
+        accounts.filter(
+          (c: any) => c.aceptaMovimiento && c.codigo.startsWith('22'),
+        ),
+      );
+    } catch (e) {
+      console.error('Error al cargar cuentas contables', e);
+    }
+  }
 
- } else if (tipo === 'PJ') {
- razonSocialControl?.setValidators([Validators.required]);
- nombreControl?.clearValidators();
- apellidoControl?.clearValidators();
- }
+  getCuentaContableDisplay() {
+    const id = this.formProveedor.get('cuentaContableId')?.value;
+    if (!id) return '';
+    const account = this.cuentasContables().find((c) => c.id === id);
+    return account ? `${account.codigo} - ${account.nombre}` : '';
+  }
 
- nombreControl?.updateValueAndValidity();
- apellidoControl?.updateValueAndValidity();
- razonSocialControl?.updateValueAndValidity();
- }
+  onCuentaSelect(account: any) {
+    this.formProveedor.patchValue({ cuentaContableId: account.id });
+  }
 
- private handleTipoDocumentoChange(tipo: string | null | undefined) {
- const dvControl = this.formProveedor.get('dv');
- if (tipo == '6') { // NIT
- dvControl?.setValidators([Validators.required]);
- this.updateDV(this.formProveedor.get('identificacion')?.value);
- } else {
- dvControl?.clearValidators();
- dvControl?.setValue('');
- }
- dvControl?.updateValueAndValidity();
- }
+  toggleValidations(tipo: string) {
+    const nombreControl = this.formProveedor.get('nombre');
+    const apellidoControl = this.formProveedor.get('apellido');
+    const razonSocialControl = this.formProveedor.get('razonSocial');
 
- private updateDV(nit: string | null | undefined) {
- if (!nit) {
- this.formProveedor.get('dv')?.setValue('');
- return;
- }
- const dv = this.calculateDV(nit);
- this.formProveedor.get('dv')?.setValue(dv);
- }
+    if (tipo === 'PN') {
+      nombreControl?.setValidators([Validators.required]);
+      apellidoControl?.setValidators([Validators.required]);
+      razonSocialControl?.clearValidators();
+    } else if (tipo === 'PJ') {
+      razonSocialControl?.setValidators([Validators.required]);
+      nombreControl?.clearValidators();
+      apellidoControl?.clearValidators();
+    }
 
- private calculateDV(nit: string): string {
- const cleanNit = nit.replace(/\D/g, ''); // Solo números
- const vpri = [3, 7, 13, 17, 19, 23, 29, 37, 41, 43, 47, 53, 59, 67, 71];
- const z = cleanNit.length;
- let x = 0;
- let y = 0;
+    nombreControl?.updateValueAndValidity();
+    apellidoControl?.updateValueAndValidity();
+    razonSocialControl?.updateValueAndValidity();
+  }
 
- for (let i = 0; i < z; i++) {
- y = parseInt(cleanNit.substring(i, i + 1));
- x += y * vpri[z - 1 - i];
- }
+  private handleTipoDocumentoChange(tipo: string | null | undefined) {
+    const dvControl = this.formProveedor.get('dv');
+    if (tipo == '6') {
+      // NIT
+      dvControl?.setValidators([Validators.required]);
+      this.updateDV(this.formProveedor.get('identificacion')?.value);
+    } else {
+      dvControl?.clearValidators();
+      dvControl?.setValue('');
+    }
+    dvControl?.updateValueAndValidity();
+  }
 
- y = x % 11;
- if (y > 1) {
- return (11 - y).toString();
- } else {
- return y.toString();
- }
- }
+  private updateDV(nit: string | null | undefined) {
+    if (!nit) {
+      this.formProveedor.get('dv')?.setValue('');
+      return;
+    }
+    const dv = this.calculateDV(nit);
+    this.formProveedor.get('dv')?.setValue(dv);
+  }
 
- proveedorIdResource = rxResource({
- request: () => {
- if (this.isModal()) return null;
+  private calculateDV(nit: string): string {
+    const cleanNit = nit.replace(/\D/g, ''); // Solo números
+    const vpri = [3, 7, 13, 17, 19, 23, 29, 37, 41, 43, 47, 53, 59, 67, 71];
+    const z = cleanNit.length;
+    let x = 0;
+    let y = 0;
 
- return { id: this.proveedorId() }
- },
- loader: ({ request }) => {
- if (!request) {
- this.formProveedor.reset();
- return of(null);
- }
- return this.proveedoresService.getProveedoresById(request.id).pipe(
- tap((el) => this.loadProveedor(el))
- )
- }
- })
+    for (let i = 0; i < z; i++) {
+      y = parseInt(cleanNit.substring(i, i + 1));
+      x += y * vpri[z - 1 - i];
+    }
 
- loadProveedor(proveedor: ProveedoresInterface) {
- this.loaderService.show();
- this.formProveedor.patchValue(proveedor);
- // this.formProveedor.get("estado")?.setValue(proveedor.isActive ? 'A' : 'I');
- this.loaderService.hide();
- }
+    y = x % 11;
+    if (y > 1) {
+      return (11 - y).toString();
+    } else {
+      return y.toString();
+    }
+  }
 
- async onSubmit() {
- const valid = this.formProveedor.valid
- if (!valid) {
- this.formProveedor.markAllAsTouched();
- this.notificationService.error('Por favor revise los campos obligatorios', 'Formulario Inválido');
- return;
- }
+  proveedorIdResource = rxResource({
+    request: () => {
+      if (this.isModal()) return null;
 
- this.loaderService.show();
- this.loading.set(true); 
+      return { id: this.proveedorId() };
+    },
+    loader: ({ request }) => {
+      if (!request) {
+        this.formProveedor.reset();
+        return of(null);
+      }
+      return this.proveedoresService
+        .getProveedoresById(request.id)
+        .pipe(tap((el) => this.loadProveedor(el)));
+    },
+  });
 
- try {
- const formValue = {
- ...this.formProveedor.value,
- telefono: this.formProveedor.get("telefono")?.value?.toString()
- }
+  loadProveedor(proveedor: ProveedoresInterface) {
+    this.loaderService.show();
+    this.formProveedor.patchValue(proveedor);
+    // this.formProveedor.get("estado")?.setValue(proveedor.isActive ? 'A' : 'I');
+    this.loaderService.hide();
+  }
 
- if (this.proveedorId() == 'new-Item' || this.isModal()) {
- const client = await firstValueFrom(this.proveedoresService.createProveedor(formValue as Partial<ProveedoresInterface>));
+  async onSubmit() {
+    const valid = this.formProveedor.valid;
+    if (!valid) {
+      this.formProveedor.markAllAsTouched();
+      this.notificationService.error(
+        'Por favor revise los campos obligatorios',
+        'Formulario Inválido',
+      );
+      return;
+    }
 
- this.loaderService.hide();
- if (client.success == false) {
- this.notificationService.error(`Hubo un error al guardar el proveedor ${HelpersUtils.getMessageError(client.message)}`, 'Error');
- return;
- }
+    this.loaderService.show();
+    this.loading.set(true);
 
+    try {
+      const formValue = {
+        ...this.formProveedor.value,
+        telefono: this.formProveedor.get('telefono')?.value?.toString(),
+      };
 
- this.notificationService.success("Proveedor guardado exitosamente", 'Éxito');
+      if (this.proveedorId() == 'new-Item' || this.isModal()) {
+        const client = await firstValueFrom(
+          this.proveedoresService.createProveedor(
+            formValue as Partial<ProveedoresInterface>,
+          ),
+        );
 
- if (this.isModal()) {
- this.saveSuccess.emit(client.data);
- } else {
- await this.router.navigateByUrl('/panel/compras/proveedores');
- }
+        this.loaderService.hide();
+        if (client.success == false) {
+          this.notificationService.error(
+            `Hubo un error al guardar el proveedor ${HelpersUtils.getMessageError(client.message)}`,
+            'Error',
+          );
+          return;
+        }
 
- } else {
- const client = await firstValueFrom(this.proveedoresService.updateProveedor(this.proveedorId(), formValue as Partial<ProveedoresInterface>));
+        this.notificationService.success(
+          'Proveedor guardado exitosamente',
+          'Éxito',
+        );
 
- if (client.success == false) {
- this.notificationService.error(`Hubo un error al guardar el proveedor ${HelpersUtils.getMessageError(client.message)}`, 'Error');
- return;
- }
+        if (this.isModal()) {
+          this.saveSuccess.emit(client.data);
+        } else {
+          await this.router.navigateByUrl('/panel/compras/proveedores');
+        }
+      } else {
+        const client = await firstValueFrom(
+          this.proveedoresService.updateProveedor(
+            this.proveedorId(),
+            formValue as Partial<ProveedoresInterface>,
+          ),
+        );
 
+        if (client.success == false) {
+          this.notificationService.error(
+            `Hubo un error al guardar el proveedor ${HelpersUtils.getMessageError(client.message)}`,
+            'Error',
+          );
+          return;
+        }
 
- this.notificationService.success("Proveedor actualizado exitosamente", 'Éxito');
- await this.router.navigateByUrl('/panel/compras/proveedores');
- }
+        this.notificationService.success(
+          'Proveedor actualizado exitosamente',
+          'Éxito',
+        );
+        await this.router.navigateByUrl('/panel/compras/proveedores');
+      }
+    } catch (error: any) {
+      this.notificationService.error(error.message, 'Error');
+    } finally {
+      this.loaderService.hide();
+      this.loading.set(false);
+    }
+  }
 
- } catch (error: any) {
- this.notificationService.error(error.message, 'Error');
- } finally {
- this.loaderService.hide();
- this.loading.set(false);
- }
-
- }
-
- onCancel() {
- if (this.isModal()) {
- this.cancel.emit();
- } else {
- this.router.navigate(['/panel/compras/proveedores']);
- }
- }
+  onCancel() {
+    if (this.isModal()) {
+      this.cancel.emit();
+    } else {
+      this.router.navigate(['/panel/compras/proveedores']);
+    }
+  }
 }
