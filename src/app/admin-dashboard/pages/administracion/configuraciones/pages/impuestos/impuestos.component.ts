@@ -20,6 +20,7 @@ import { firstValueFrom } from 'rxjs';
 import { PaginationComponent } from '@shared/components/pagination/pagination';
 import { PaginationService } from '@shared/components/pagination/pagination.service';
 import { NotificationService } from '@shared/services/notification.service';
+import { LoaderComponent } from "@utils/components/loader/loader.component";
 
 @Component({
   selector: 'app-config-impuestos',
@@ -32,6 +33,7 @@ import { NotificationService } from '@shared/services/notification.service';
     ImpuestosListComponent,
     ModalComponent,
     PaginationComponent,
+    LoaderComponent
   ],
   templateUrl: './impuestos.component.html',
 })

@@ -1,138 +1,233 @@
-<header-title-page [titleHead]="headTitle()" />
-<app-breadcrumb [items]="breadcrumbItems" class="block px-4 sm:px-6 lg:px-8" />
+@if (loading()) {
+  <app-loader />
+}
 
-<div class="w-full px-4 sm:px-6 lg:px-8 py-8 space-y-6">
- <div class="max-w-7xl mx-auto">
- <!-- Actions Bar -->
- <div class="flex justify-end items-center mb-4">
- <button (click)="openNew()" class="inline-flex items-center px-4 py-2 bg-slate-900 cursor-pointer border border-transparent rounded-xl font-bold text-xs text-white hover:bg-slate-800 active:bg-slate-950 focus:outline-none focus:border-slate-950 focus:ring focus:ring-slate-300 disabled:opacity-25 transition-all shadow-lg shadow-slate-200">
- <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
- Nuevo Impuesto
- </button>
- </div>
+@if (!loading()) {
+  <header-title-page [titleHead]="headTitle()" />
+  <app-breadcrumb
+    [items]="breadcrumbItems"
+    class="block px-4 sm:px-6 lg:px-8"
+  />
 
- <!-- Taxes Table -->
- <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
- <app-impuestos-list 
- [impuestos]="impuestos()" 
- (edit)="onEdit($event)"
- (deleted)="loadData()"
- />
-
- <app-pagination [length]="impuestos().length" />
- </div>
- </div>
-</div>
-
+  <div class="w-full px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <div class="max-w-7xl mx-auto">
+      <!-- Actions Bar -->
+      <div class="flex justify-end items-center mb-4">
+        <button
+          (click)="openNew()"
+          class="inline-flex items-center px-4 py-2 bg-slate-900 cursor-pointer border border-transparent rounded-xl font-bold text-xs text-white hover:bg-slate-800 active:bg-slate-950 focus:outline-none focus:border-slate-950 focus:ring focus:ring-slate-300 disabled:opacity-25 transition-all shadow-lg shadow-slate-200"
+        >
+          <svg
+            class="w-4 h-4 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2.5"
+              d="M12 4v16m8-8H4"
+            />
+          </svg>
+          Nuevo Impuesto
+        </button>
+      </div>
+      <div
+        class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+      >
+        <app-impuestos-list
+          [impuestos]="impuestos()"
+          (edit)="onEdit($event)"
+          (deleted)="loadData()"
+        />
+        <app-pagination [length]="impuestos().length" />
+      </div>
+    </div>
+  </div>
+}
 <!-- Tax Modal -->
-<app-modal [(visible)]="modalVisible" [title]="isEditing() ? 'Editar Impuesto' : 'Nuevo Impuesto'" width="max-w-2xl">
- <form [formGroup]="taxForm" (ngSubmit)="save()" class="space-y-6">
- <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
- <!-- Name -->
- <div class="md:col-span-2">
- <label class="block text-xs font-medium text-gray-500 mb-2">Nombre del Impuesto *</label>
- <input type="text" formControlName="nombre" placeholder="Ej. IVA 19%"
- class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all">
- </div>
+<app-modal
+  [(visible)]="modalVisible"
+  [title]="isEditing() ? 'Editar Impuesto' : 'Nuevo Impuesto'"
+  width="max-w-2xl"
+>
+  <form [formGroup]="taxForm" (ngSubmit)="save()" class="space-y-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Name -->
+      <div class="md:col-span-2">
+        <label class="block text-xs font-medium text-gray-500 mb-2"
+          >Nombre del Impuesto *</label
+        >
+        <input
+          type="text"
+          formControlName="nombre"
+          placeholder="Ej. IVA 19%"
+          class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all"
+        />
+      </div>
 
- <!-- Type -->
- <div>
- <label class="block text-xs font-medium text-gray-500 mb-2">Tipo *</label>
- <select formControlName="tipo" 
- class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all appearance-none">
- <option value="IVA">IVA</option>
- <option value="Retencion">Retención</option>
- <option value="ICA">ICA</option>
- <option value="Otros">Otros</option>
- </select>
- </div>
+      <!-- Type -->
+      <div>
+        <label class="block text-xs font-medium text-gray-500 mb-2"
+          >Tipo *</label
+        >
+        <select
+          formControlName="tipo"
+          class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all appearance-none"
+        >
+          <option value="IVA">IVA</option>
+          <option value="Retencion">Retención</option>
+          <option value="ICA">ICA</option>
+          <option value="Otros">Otros</option>
+        </select>
+      </div>
 
- <!-- Rate -->
- <div>
- <label class="block text-xs font-medium text-gray-500 mb-2">Tarifa (%) *</label>
- <div class="relative">
- <input type="number" formControlName="tarifa" step="0.01"
- class="w-full appearance-none px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all">
- <span class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 font-bold">%</span>
- </div>
- </div>
+      <!-- Rate -->
+      <div>
+        <label class="block text-xs font-medium text-gray-500 mb-2"
+          >Tarifa (%) *</label
+        >
+        <div class="relative">
+          <input
+            type="number"
+            formControlName="tarifa"
+            step="0.01"
+            class="w-full appearance-none px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all"
+          />
+          <span
+            class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 font-bold"
+            >%</span
+          >
+        </div>
+      </div>
 
- <!-- Description -->
- <div class="md:col-span-2">
- <label class="block text-xs font-medium text-gray-500 mb-2">Descripción</label>
- <textarea formControlName="descripcion" rows="3"
- class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all resize-none"></textarea>
- </div>
- </div>
+      <!-- Description -->
+      <div class="md:col-span-2">
+        <label class="block text-xs font-medium text-gray-500 mb-2"
+          >Descripción</label
+        >
+        <textarea
+          formControlName="descripcion"
+          rows="3"
+          class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all resize-none"
+        ></textarea>
+      </div>
+    </div>
 
- <!-- Advanced Options Toggle -->
- <div class="pt-4 border-t border-gray-100">
- <button type="button" (click)="toggleAdvanced()" class="flex items-center cursor-pointer text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">
- <svg class="w-4 h-4 mr-2 transform transition-transform" [class.rotate-180]="showAdvanced()" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
- Opciones avanzadas (Configuración Contable)
- </button>
+    <!-- Advanced Options Toggle -->
+    <div class="pt-4 border-t border-gray-100">
+      <button
+        type="button"
+        (click)="toggleAdvanced()"
+        class="flex items-center cursor-pointer text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors"
+      >
+        <svg
+          class="w-4 h-4 mr-2 transform transition-transform"
+          [class.rotate-180]="showAdvanced()"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+        Opciones avanzadas (Configuración Contable)
+      </button>
 
- @if(showAdvanced()) {
- <div class="mt-6 space-y-6 animate-fade-in">
- <!-- <div class="flex items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100 mb-6">
- <input type="checkbox" formControlName="isAcreditable" class="w-4 h-4 text-slate-900 border-gray-300 rounded focus:ring-slate-500">
- <label class="text-xs font-medium text-gray-500">Impuesto acreditable / descontable</label>
- <svg class="w-4 h-4 text-slate-400 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24" title="Indica si este impuesto puede ser usado como crédito fiscal en las compras."><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
- </div> -->
+      @if (showAdvanced()) {
+        <div class="mt-6 space-y-6 animate-fade-in">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Accounts Mapping -->
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-2"
+                >Cuenta Ventas</label
+              >
+              <select
+                formControlName="cuentaVentasId"
+                class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-xs outline-none focus:border-slate-500 transition-all"
+              >
+                <option [ngValue]="null">Seleccionar cuenta...</option>
+                @for (c of cuentasFiltradas(); track c.id) {
+                  <option [value]="c.id">
+                    {{ c.codigo }} - {{ c.nombre }}
+                  </option>
+                }
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-2"
+                >Cuenta Compras</label
+              >
+              <select
+                formControlName="cuentaComprasId"
+                class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-xs outline-none focus:border-slate-500 transition-all"
+              >
+                <option [ngValue]="null">Seleccionar cuenta...</option>
+                @for (c of cuentasFiltradas(); track c.id) {
+                  <option [value]="c.id">
+                    {{ c.codigo }} - {{ c.nombre }}
+                  </option>
+                }
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-2"
+                >Cuenta Devoluciones Ventas</label
+              >
+              <select
+                formControlName="cuentaDevVentasId"
+                class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-xs outline-none focus:border-slate-500 transition-all"
+              >
+                <option [ngValue]="null">Seleccionar cuenta...</option>
+                @for (c of cuentasFiltradas(); track c.id) {
+                  <option [value]="c.id">
+                    {{ c.codigo }} - {{ c.nombre }}
+                  </option>
+                }
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-2"
+                >Cuenta Devoluciones Compras</label
+              >
+              <select
+                formControlName="cuentaDevComprasId"
+                class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-xs outline-none focus:border-slate-500 transition-all"
+              >
+                <option [ngValue]="null">Seleccionar cuenta...</option>
+                @for (c of cuentasFiltradas(); track c.id) {
+                  <option [value]="c.id">
+                    {{ c.codigo }} - {{ c.nombre }}
+                  </option>
+                }
+              </select>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
 
- <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
- <!-- Accounts Mapping -->
- <div>
- <label class="block text-xs font-medium text-gray-500 mb-2">Cuenta Ventas</label>
- <select formControlName="cuentaVentasId" class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-xs outline-none focus:border-slate-500 transition-all">
- <option [ngValue]="null">Seleccionar cuenta...</option>
- @for(c of cuentasFiltradas(); track c.id) {
- <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
- }
- </select>
- </div>
- <div>
- <label class="block text-xs font-medium text-gray-500 mb-2">Cuenta Compras</label>
- <select formControlName="cuentaComprasId" class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-xs outline-none focus:border-slate-500 transition-all">
- <option [ngValue]="null">Seleccionar cuenta...</option>
- @for(c of cuentasFiltradas(); track c.id) {
- <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
- }
- </select>
- </div>
- <div>
- <label class="block text-xs font-medium text-gray-500 mb-2">Cuenta Devoluciones Ventas</label>
- <select formControlName="cuentaDevVentasId" class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-xs outline-none focus:border-slate-500 transition-all">
- <option [ngValue]="null">Seleccionar cuenta...</option>
- @for(c of cuentasFiltradas(); track c.id) {
- <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
- }
- </select>
- </div>
- <div>
- <label class="block text-xs font-medium text-gray-500 mb-2">Cuenta Devoluciones Compras</label>
- <select formControlName="cuentaDevComprasId" class="w-full px-4 py-2 bg-white border border-gray-200 rounded-lg text-xs outline-none focus:border-slate-500 transition-all">
- <option [ngValue]="null">Seleccionar cuenta...</option>
- @for(c of cuentasFiltradas(); track c.id) {
- <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
- }
- </select>
- </div>
- </div>
- </div>
- }
- </div>
-
- <!-- Footer Actions -->
- <div class="flex justify-end gap-3 pt-6 border-t border-gray-100">
- <button type="button" (click)="modalVisible.set(false)" 
- class="px-6 py-2.5 border border-gray-200 rounded-xl text-sm font-medium cursor-pointer text-gray-500 hover:bg-gray-50 transition-all">
- Cancelar
- </button>
- <button type="submit" [disabled]="taxForm.invalid"
- class="px-8 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-bold cursor-pointer hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-slate-200">
- {{ isEditing() ? 'Actualizar Impuesto' : 'Guardar Impuesto' }}
- </button>
- </div>
- </form>
+    <!-- Footer Actions -->
+    <div class="flex justify-end gap-3 pt-6 border-t border-gray-100">
+      <button
+        type="button"
+        (click)="modalVisible.set(false)"
+        class="px-6 py-2.5 border border-gray-200 rounded-xl text-sm font-medium cursor-pointer text-gray-500 hover:bg-gray-50 transition-all"
+      >
+        Cancelar
+      </button>
+      <button
+        type="submit"
+        [disabled]="taxForm.invalid"
+        class="px-8 py-2.5 bg-slate-900 text-white rounded-xl text-sm font-bold cursor-pointer hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-slate-200"
+      >
+        {{ isEditing() ? "Actualizar Impuesto" : "Guardar Impuesto" }}
+      </button>
+    </div>
+  </form>
 </app-modal>

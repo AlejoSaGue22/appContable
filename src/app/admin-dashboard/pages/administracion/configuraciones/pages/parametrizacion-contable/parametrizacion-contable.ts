@@ -57,6 +57,24 @@ export class ParametrizacionContable implements OnInit {
     );
   });
 
+  cuentasFiltradasCaja = computed(() => {
+    return this.cuentas().filter(
+      (c) => c.aceptaMovimiento && c.codigo.startsWith('1105'),
+    );
+  });
+
+  cuentasFiltradasBancos = computed(() => {
+    return this.cuentas().filter(
+      (c) => c.aceptaMovimiento && c.codigo.startsWith('1110'),
+    );
+  });
+
+  cuentasFiltradasGastosCxP = computed(() => {
+    return this.cuentas().filter(
+      (c) => c.aceptaMovimiento && c.codigo.startsWith('23'),
+    );
+  });
+
   isSaving = signal<boolean>(false);
 
   paramForm: FormGroup = this.fb.group({
@@ -65,6 +83,9 @@ export class ParametrizacionContable implements OnInit {
     cuentaPagarProveedoresId: [null],
     cuentaDevolucionesProveedoresId: [null],
     cuentaDevolucionIvaComprasId: [null],
+    cuentaCajaDefectoId: [null],
+    cuentaBancosDefectoId: [null],
+    cuentaPagarGastosId: [null],
   });
 
   ngOnInit(): void {
@@ -93,6 +114,9 @@ export class ParametrizacionContable implements OnInit {
             config.cuentaDevolucionesProveedoresId || null,
           cuentaDevolucionIvaComprasId:
             config.cuentaDevolucionIvaComprasId || null,
+          cuentaCajaDefectoId: config.cuentaCajaDefectoId || null,
+          cuentaBancosDefectoId: config.cuentaBancosDefectoId || null,
+          cuentaPagarGastosId: config.cuentaPagarGastosId || null,
         });
       }
     } catch (error) {

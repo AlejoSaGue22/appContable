@@ -33,8 +33,8 @@ export class ConfiguracionMenuComponent {
         'Configura la información de tu empresa y adapta el sistema a tu negocio.',
       options: [
         { label: 'Datos de Empresa', route: 'empresa' },
-        { label: 'Usuarios y Permisos', route: 'usuarios' },
-        { label: 'Mi perfil', route: 'perfil' },
+        // { label: 'Usuarios y Permisos', route: 'usuarios' },
+        // { label: 'Mi perfil', route: 'perfil' },
         { label: 'Centros de costos', route: 'centros-costos' },
         { label: 'Cargos', route: 'cargos' },
       ],
@@ -45,11 +45,11 @@ export class ConfiguracionMenuComponent {
       description:
         'Configura la información que se mostrará en tus facturas y procesos de venta.',
       options: [
-        { label: 'Términos de pago', route: 'terminos-pago' },
-        { label: 'Numeraciones', route: 'numeraciones' },
-        { label: 'Configuración de documentos', route: 'config-documentos' },
+        // { label: 'Términos de pago', route: 'terminos-pago' },
+        // { label: 'Numeraciones', route: 'numeraciones' },
+        // { label: 'Configuración de documentos', route: 'config-documentos' },
         { label: 'Vendedores', route: 'vendedores' },
-        { label: 'Propinas', route: 'propinas' },
+        // { label: 'Propinas', route: 'propinas' },
       ],
     },
     {
@@ -70,7 +70,7 @@ export class ConfiguracionMenuComponent {
       options: [
         { label: 'Impuestos (IVA/ICO)', route: 'impuestos' },
         { label: 'Retenciones', route: 'retenciones' },
-        { label: 'Configuración avanzada', route: 'config-avanzada-impuestos' },
+        // { label: 'Configuración avanzada', route: 'config-avanzada-impuestos' },
       ],
     },
     {
