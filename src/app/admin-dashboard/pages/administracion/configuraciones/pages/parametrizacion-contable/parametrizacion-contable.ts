@@ -59,13 +59,13 @@ export class ParametrizacionContable implements OnInit {
 
   cuentasFiltradasCaja = computed(() => {
     return this.cuentas().filter(
-      (c) => c.aceptaMovimiento && c.codigo.startsWith('1105'),
+      (c) => c.aceptaMovimiento && c.codigo.startsWith('110'),
     );
   });
 
   cuentasFiltradasBancos = computed(() => {
     return this.cuentas().filter(
-      (c) => c.aceptaMovimiento && c.codigo.startsWith('1110'),
+      (c) => c.aceptaMovimiento && c.codigo.startsWith('11'),
     );
   });
 

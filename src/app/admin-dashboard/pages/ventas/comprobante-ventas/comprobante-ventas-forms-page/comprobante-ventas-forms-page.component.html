@@ -144,12 +144,11 @@
                             </label>
                             <div class="relative">
                                 <select class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded 
- pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm
- focus:shadow-md cursor-pointer" formControlName="cuentaBancariaId">
+                                                pl-3 pr-8 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-400 shadow-sm
+                                                focus:shadow-md cursor-pointer" formControlName="cuentaBancariaId">
                                     <option value="">Seleccionar Banco o Caja</option>
                                     @for (cuenta of cuentasBancarias(); track cuenta.id) {
-                                    <option [value]="cuenta.id">{{ cuenta.tipoCuenta }} - {{ cuenta.banco?.nombre ||
-                                        cuenta.nombre }} - {{ cuenta.nombre }}</option>
+                                    <option [value]="cuenta.id">{{ cuenta.nombre }}</option>
                                     }
                                 </select>
                             </div>
@@ -314,7 +313,7 @@
                                                 }
                                             </div>
                                         </td>
-                                        <td class="tabular-nums">{{ item.quantity }}</td>
+                                        <td class="text-right tabular-nums">{{ item.quantity }}</td>
                                         <td class="text-right tabular-nums">{{ item.unitPrice | currency }}</td>
                                         @if (tipoFacturaSignal() !== 'ESTANDAR') {
                                         <td class="text-right tabular-nums">{{ item.iva }}%</td>
