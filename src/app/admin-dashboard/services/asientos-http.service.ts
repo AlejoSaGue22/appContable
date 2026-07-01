@@ -20,4 +20,8 @@ export class AsientosHttpService {
  reintentarAsientoCompra(compraId: string): Observable<any> {
  return this.http.post(`${environment.baseUrl}/facturas-compras/${compraId}/reintentar-asiento`, {});
  }
+
+ getPreview(tipo: string, id: string): Observable<any> {
+ return this.http.get<any>(`${this.base}/preview/${tipo}/${id}`);
+ }
 }

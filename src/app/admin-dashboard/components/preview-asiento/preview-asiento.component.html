@@ -1,0 +1,160 @@
+<div class="w-full bg-white border border-slate-100 rounded-2xl shadow-xs overflow-hidden transition-all duration-300 hover:shadow-md mb-6">
+  <!-- Accordion Header -->
+  <button 
+    (click)="toggleOpen()" 
+    class="w-full flex flex-col md:flex-row md:items-center justify-between p-4 bg-slate-50/50 hover:bg-slate-50/80 transition-colors text-left focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+  >
+    <div class="flex items-center gap-3">
+      <!-- Icon Book -->
+      <div class="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+      </div>
+      <div>
+        <h4 class="text-sm font-semibold text-slate-800">Vista Previa del Asiento Contable</h4>
+        <p class="text-xs text-slate-500">Simulación del asiento que se generará al emitir/guardar el documento</p>
+      </div>
+    </div>
+
+    <!-- Badges & Controls -->
+    <div class="flex items-center gap-3 mt-3 md:mt-0">
+      @if (loading()) {
+        <span class="flex items-center gap-1 text-xs text-indigo-600 bg-indigo-50 font-medium px-2.5 py-1 rounded-full animate-pulse">
+          <svg class="animate-spin h-3 w-3 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Simulando...
+        </span>
+      }
+
+      @if (previewData(); as data) {
+        <span class="text-xs px-2.5 py-1 rounded-full font-medium" 
+              [ngClass]="data.estaBalanceado ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'">
+          Partida Doble: {{ data.estaBalanceado ? 'OK' : 'Desbalanceado' }}
+        </span>
+        <span class="text-xs text-slate-600 font-semibold bg-slate-100 px-2.5 py-1 rounded-full">
+          Total: {{ data.totalDebito | currency:'USD':'symbol':'1.0-2' }}
+        </span>
+      }
+
+      <!-- Arrow icon -->
+      <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        class="h-5 w-5 text-slate-400 transform transition-transform duration-200" 
+        [ngClass]="{'rotate-180': isOpen()}"
+        fill="none" 
+        viewBox="0 0 24 24" 
+        stroke="currentColor"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+      </svg>
+    </div>
+  </button>
+
+  <!-- Accordion Content -->
+  @if (isOpen()) {
+    <div class="border-t border-slate-100 p-4 transition-all duration-300">
+      
+      <!-- Error Message -->
+      @if (errorMsg()) {
+        <div class="bg-rose-50 border-l-4 border-rose-500 p-4 rounded-r-lg mb-2">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-rose-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-rose-700">{{ errorMsg() }}</p>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Helper: document not saved/new -->
+      @if (!documentId || documentId === 'new' || documentId === 'new-Item') {
+        <div class="flex flex-col items-center justify-center py-6 text-center text-slate-400">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-slate-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p class="text-sm font-medium">Guarda el borrador del documento para generar la vista previa contable.</p>
+          <p class="text-xs text-slate-400 mt-1">La simulación en memoria requiere registrar la cabecera y el detalle en el servidor.</p>
+        </div>
+      } @else if (!previewData() && !loading() && !errorMsg()) {
+        <!-- Fallback loading state -->
+        <div class="flex justify-center items-center py-6">
+          <span class="text-sm text-slate-400">Ningún dato cargado.</span>
+        </div>
+      }
+
+      <!-- Simulation Table -->
+      @if (previewData(); as data) {
+        <div class="overflow-x-auto rounded-xl border border-slate-100 bg-white">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-100">
+                <th class="p-3 text-xs font-semibold uppercase tracking-wider text-slate-600">Código</th>
+                <th class="p-3 text-xs font-semibold uppercase tracking-wider text-slate-600">Cuenta Contable</th>
+                <th class="p-3 text-xs font-semibold uppercase tracking-wider text-slate-600 text-right">Débito</th>
+                <th class="p-3 text-xs font-semibold uppercase tracking-wider text-slate-600 text-right">Crédito</th>
+                <th class="p-3 text-xs font-semibold uppercase tracking-wider text-slate-600">Tercero</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-50 text-sm text-slate-700">
+              @for (detalle of data.detalles; track $index) {
+                <tr class="hover:bg-slate-50/50 transition-colors">
+                  <td class="p-3 font-mono text-xs text-slate-500 font-semibold">{{ detalle.cuentaCodigo }}</td>
+                  <td class="p-3 font-medium">
+                    <div>
+                      <span>{{ detalle.cuentaNombre }}</span>
+                      @if (detalle.concepto) {
+                        <span class="block text-[10px] text-slate-400 font-normal leading-tight mt-0.5">{{ detalle.concepto }}</span>
+                      }
+                    </div>
+                  </td>
+                  <td class="p-3 text-right font-mono font-semibold" 
+                      [ngClass]="detalle.debito > 0 ? 'text-emerald-600' : 'text-slate-300'">
+                    {{ detalle.debito > 0 ? (detalle.debito | currency:'USD':'symbol':'1.0-2') : '$0' }}
+                  </td>
+                  <td class="p-3 text-right font-mono font-semibold" 
+                      [ngClass]="detalle.credito > 0 ? 'text-indigo-600' : 'text-slate-300'">
+                    {{ detalle.credito > 0 ? (detalle.credito | currency:'USD':'symbol':'1.0-2') : '$0' }}
+                  </td>
+                  <td class="p-3 text-xs text-slate-500">
+                    {{ detalle.terceroNombre || 'Sin Tercero Asignado' }}
+                  </td>
+                </tr>
+              }
+            </tbody>
+            <tfoot>
+              <!-- Summary Row -->
+              <tr class="bg-slate-50/80 font-semibold text-slate-800 border-t-2 border-slate-100">
+                <td colspan="2" class="p-3 text-right">Totales:</td>
+                <td class="p-3 text-right font-mono text-emerald-700 bg-emerald-50/40">
+                  {{ data.totalDebito | currency:'USD':'symbol':'1.0-2' }}
+                </td>
+                <td class="p-3 text-right font-mono text-indigo-700 bg-indigo-50/40">
+                  {{ data.totalCredito | currency:'USD':'symbol':'1.0-2' }}
+                </td>
+                <td class="p-3 text-xs">
+                  @if (!data.estaBalanceado) {
+                    <span class="text-rose-600 font-bold">Diferencia: {{ data.diferencia | currency:'USD':'symbol':'1.0-2' }}</span>
+                  } @else {
+                    <span class="text-emerald-600 font-semibold flex items-center gap-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                      </svg>
+                      Balanceado
+                    </span>
+                  }
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      }
+    </div>
+  }
+</div>

@@ -6,6 +6,7 @@ import {
   TipoFactura,
   InvoiceStatus,
 } from './../../../../interfaces/documento-venta-interface';
+import { PreviewAsientoComponent } from '@dashboard/components/preview-asiento/preview-asiento.component';
 import {
   AfterContentInit,
   Component,
@@ -57,6 +58,7 @@ import { CuentaBancaria } from '@dashboard/pages/contabilidad/interfaces/cuenta-
     ModalComponent,
     ClientsFormPageComponent,
     ProductosServiciosFormsComponent,
+    PreviewAsientoComponent,
   ],
   templateUrl: './comprobante-ventas-forms-page.component.html',
 })
@@ -93,6 +95,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   cuentasBancarias = signal<CuentaBancaria[]>([]);
   loading = signal<boolean>(false);
   minDate = signal<string>(new Date().toISOString().substring(0, 10));
+  refreshAsientoTrigger = signal<number>(0);
 
   invoiceID = toSignal(
     this.activateRoute.params.pipe(map((param) => param['id'])),
@@ -295,7 +298,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     description: [''],
     quantity: [1, [Validators.required, Validators.min(1)]],
     unitPrice: [0, [Validators.required, Validators.min(0)]],
-    iva: [0, [Validators.min(0), Validators.max(100)]],
+    iva: [0],
     iva_valor: [0],
     discount: [0, [Validators.min(0), Validators.max(100)]],
     descuento_valor: [0],
@@ -332,8 +335,8 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       discount: valores.discount ?? 0,
       valor_discount: valores.discount
         ? this.productosItemsForm.value.quantity! *
-          this.productosItemsForm.value.unitPrice! *
-          (valores.discount! / 100)
+        this.productosItemsForm.value.unitPrice! *
+        (valores.discount! / 100)
         : 0,
       total: valorItemTotal,
     };
@@ -513,9 +516,9 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
 
     if (this.invoiceID() == 'new-Item') {
       this.ventaServices.createInvoice(invoiceData).subscribe((response) => {
-        this.loaderservice.hide();
         if (response.success == false) {
           this.loading.set(false);
+          this.loaderservice.hide();
           this.notificacionService.error(
             `Ocurrio un problema al crear la factura ${HelpersUtils.getMessageError(response.message)}`,
             'Error',
@@ -531,7 +534,17 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
 
         setTimeout(() => {
           this.loading.set(false);
-          this.router.navigateByUrl('/panel/ventas/comprobantes');
+          this.loaderservice.hide();
+          if (saveAsDraft) {
+            const invoiceId = response.data?.id || (response as any).id;
+            if (invoiceId) {
+              this.router.navigate(['/panel/ventas/comprobantes', invoiceId]);
+            } else {
+              this.router.navigateByUrl('/panel/ventas/comprobantes');
+            }
+          } else {
+            this.router.navigateByUrl('/panel/ventas/comprobantes');
+          }
         }, 800);
       });
     } else {
@@ -568,7 +581,11 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
 
           setTimeout(() => {
             this.loaderservice.hide();
-            this.router.navigateByUrl('/panel/ventas/comprobantes');
+            if (saveAsDraft) {
+              this.refreshAsientoTrigger.update(v => v + 1);
+            } else {
+              this.router.navigateByUrl('/panel/ventas/comprobantes');
+            }
           }, 800);
         });
     }

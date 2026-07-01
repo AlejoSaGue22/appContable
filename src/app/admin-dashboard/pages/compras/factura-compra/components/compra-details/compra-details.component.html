@@ -232,6 +232,14 @@
                   }}</span>
                 }
 
+                @if (compra()!.cuentaBancaria) {
+                  <span class="text-gray-500">Cuenta:</span>
+                  <span class="font-medium text-gray-800">
+                    {{ compra()!.cuentaBancaria?.nombre }} |
+                    {{ compra()!.cuentaBancaria?.numeroCuenta }}
+                  </span>
+                }
+
                 @if (compra()!.formaPago === "CREDITO") {
                   <span class="text-gray-500">Estado pago:</span>
                   <span

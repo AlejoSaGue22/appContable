@@ -15,6 +15,7 @@ import { NotasAjusteService } from '../../services/notas-ajuste.service';
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
 import { ConceptosNotaCredito, ConceptosNotaDebito, NotaAjusteItem, NotaAjuste } from "../../../../interfaces/notas-ajuste-interface";
 import { GetFacturaRequest, FormaPago } from '@dashboard/interfaces/documento-venta-interface';
+import { PreviewAsientoComponent } from '@dashboard/components/preview-asiento/preview-asiento.component';
 
 @Component({
  selector: 'app-notas-ajuste-form-page',
@@ -25,7 +26,8 @@ import { GetFacturaRequest, FormaPago } from '@dashboard/interfaces/documento-ve
  FormErrorLabelComponent, 
  RouterLink, 
  CurrencyPipe,
- ListGroupDropdownComponent
+ ListGroupDropdownComponent,
+ PreviewAsientoComponent
  ],
  templateUrl: './notas-ajuste-form-page.component.html',
 })
@@ -58,6 +60,7 @@ export class NotasAjusteFormPageComponent implements OnInit {
  facturasDisponibles = signal<GetFacturaRequest[]>([]);
  itemsSeleccionados = signal<NotaAjusteItem[]>([]);
  facturaSeleccionada = signal<GetFacturaRequest | null>(null);
+ refreshAsientoTrigger = signal<number>(0);
 
  // Computed signals for payment logic
  facturaEsCredito = computed(() => this.facturaSeleccionada()?.formaPago === FormaPago.CREDITO);
@@ -370,7 +373,15 @@ export class NotasAjusteFormPageComponent implements OnInit {
  this.loaderService.hide();
  if (res.success) {
  this.notificationService.success('Nota guardada con éxito', 'Completado');
- this.router.navigate(['/panel/ventas/notas-ajuste']);
+ if (isDraft) {
+    if (this.notaId() === 'new' || !this.notaId()) {
+      this.router.navigate(['/panel/ventas/notas-ajuste', res.data.id]);
+    } else {
+      this.refreshAsientoTrigger.update(v => v + 1);
+    }
+  } else {
+    this.router.navigate(['/panel/ventas/notas-ajuste']);
+  }
  } else {
  const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
  this.notificationService.error(message || 'Error al guardar la nota', 'Error');

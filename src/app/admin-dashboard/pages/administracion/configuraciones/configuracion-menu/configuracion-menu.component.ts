@@ -42,8 +42,7 @@ export class ConfiguracionMenuComponent {
     {
       title: 'Facturación',
       icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
-      description:
-        'Configura la información que se mostrará en tus facturas y procesos de venta.',
+      description: 'Configura la información que se mostrará en tus facturas y procesos de venta.',
       options: [
         // { label: 'Términos de pago', route: 'terminos-pago' },
         // { label: 'Numeraciones', route: 'numeraciones' },
@@ -55,8 +54,7 @@ export class ConfiguracionMenuComponent {
     {
       title: 'Plantillas de impresión',
       icon: 'M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z',
-      description:
-        'Administra los diseños y formatos de impresión de tus documentos.',
+      description: 'Administra los diseños y formatos de impresión de tus documentos.',
       options: [
         { label: 'Plantillas de Factura', route: 'plantillas' },
         { label: 'Formatos de Comprobante', route: 'formatos' },
@@ -65,8 +63,7 @@ export class ConfiguracionMenuComponent {
     {
       title: 'Impuestos',
       icon: 'M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z',
-      description:
-        'Define aquí los tipos de impuestos y retenciones que aplicas a tus facturas.',
+      description: 'Define aquí los tipos de impuestos y retenciones que aplicas a tus facturas.',
       options: [
         { label: 'Impuestos (IVA/ICO)', route: 'impuestos' },
         { label: 'Retenciones', route: 'retenciones' },
@@ -76,8 +73,7 @@ export class ConfiguracionMenuComponent {
     {
       title: 'Contabilidad',
       icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-      description:
-        'Define opciones avanzadas para el manejo de tu contabilidad.',
+      description: 'Define opciones avanzadas para el manejo de tu contabilidad.',
       options: [
         // { label: 'Actualizar registros contables', route: 'actualizar-registros' },
         {
@@ -93,14 +89,10 @@ export class ConfiguracionMenuComponent {
     {
       title: 'Notificaciones y correos',
       icon: 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
-      description:
-        'Configura las plantillas, las notificaciones del sistema y las de facturas.',
+      description: 'Configura las plantillas, las notificaciones del sistema y las de facturas.',
       options: [
         { label: 'Notificaciones de cobro', route: 'notificaciones-cobro' },
-        {
-          label: 'Plantillas de correos y WhatsApp',
-          route: 'plantillas-comunicacion',
-        },
+        { label: 'Plantillas de correos y WhatsApp', route: 'plantillas-comunicacion' },
         { label: 'Preferencias de correo', route: 'preferencias-correo' },
       ],
     },

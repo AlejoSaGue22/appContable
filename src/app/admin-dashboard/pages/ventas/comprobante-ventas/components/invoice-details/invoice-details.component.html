@@ -298,6 +298,14 @@
                   }}</span>
                 }
 
+                @if (factura()!.cuentaBancaria) {
+                  <span class="text-gray-500">Cuenta:</span>
+                  <span class="font-medium text-gray-800">
+                    {{ factura()!.cuentaBancaria.nombre }} |
+                    {{ factura()!.cuentaBancaria.numeroCuenta }}
+                  </span>
+                }
+
                 @if (factura()!.vendedor) {
                   <span class="text-gray-500">Vendedor:</span>
                   <span class="font-medium text-gray-800">{{

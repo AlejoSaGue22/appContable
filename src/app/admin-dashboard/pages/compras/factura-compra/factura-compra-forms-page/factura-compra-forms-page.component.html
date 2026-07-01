@@ -258,7 +258,7 @@
                 <path d="M12 7v10M7 12h10" />
               </g>
             </svg>
-            Detalle de Productos / Servicios
+            Detalle de Conceptos
           </h3>
           <div class="bg-white overflow-hidden">
             <div class="p-6">
@@ -268,7 +268,7 @@
               >
                 <div class="md:col-span-3">
                   <app-list-group-dropdown
-                    title="Producto / Servicio"
+                    title="Conceptos"
                     [dataList]="productosList()"
                     [labelKey]="['nombre', 'codigo']"
                     formControlName="producto"
@@ -276,7 +276,8 @@
                       productosItemsForm.patchValue({ producto: $event })
                     "
                     (createOption)="openProductModal()"
-                  ></app-list-group-dropdown>
+                  >
+                  </app-list-group-dropdown>
                 </div>
 
                 <div class="md:col-span-2">
@@ -391,8 +392,8 @@
                   <table class="ledger-table">
                     <thead>
                       <tr>
-                        <th>Producto</th>
-                        <th class="text-right">Cant.</th>
+                        <th>Concepto</th>
+                        <th>Cant.</th>
                         <th class="text-right">Precio U.</th>
                         <th class="text-right">Desc.</th>
                         <th class="text-right">IVA</th>
@@ -414,8 +415,7 @@
                                 <span
                                   class="text-xs text-slate-500 italic mt-0.5 max-w-[200px] truncate"
                                   [title]="item.value.descripcion"
-                                >
-                                  {{ item.value.descripcion }}
+                                  >{{ item.value.descripcion }}
                                 </span>
                               }
                             </div>
@@ -627,4 +627,13 @@
       ></app-productos-compra-forms>
     </app-modal>
   </form>
+
+  <!-- Vista Previa del Asiento Contable (Simulación) -->
+  <div class="mt-8">
+    <app-preview-asiento 
+      [documentId]="facturaId() || 'new'" 
+      [documentType]="'FACTURA_COMPRA'"
+      [refreshTrigger]="refreshAsientoTrigger()">
+    </app-preview-asiento>
+  </div>
 </div>
