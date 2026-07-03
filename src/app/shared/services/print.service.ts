@@ -45,8 +45,8 @@ export class PrintService {
   // ──────────────────────────────────────────────────────────────────────
   // IMPRIMIR ASIENTO CONTABLE
   // ──────────────────────────────────────────────────────────────────────
-  printAsientoContable(asientos: any[], facturaRef: string): void {
-    const html = this.buildAsientoHtml(asientos, facturaRef);
+  printAsientoContable(asientos: any[], facturaRef: string, tercero: string): void {
+    const html = this.buildAsientoHtml(asientos, facturaRef, tercero);
     this.openPrintWindow(html, `Asiento ${facturaRef}`);
   }
 
@@ -104,22 +104,16 @@ export class PrintService {
   // PRIVATE — Construir HTML de Factura
   // ══════════════════════════════════════════════════════════════════════
   private buildInvoiceHtml(f: GetFacturaRequest): string {
-    const tipoLabel =
-      f.tipoFactura === 'ELECTRONICA'
-        ? 'FACTURA ELECTRÓNICA DE VENTA'
-        : 'FACTURA DE VENTA';
-    const clienteNombre =
-      f.client.razonSocial || `${f.client.nombre} ${f.client.apellido}`;
+    const tipoLabel = f.tipoFactura === 'ELECTRONICA'
+      ? 'FACTURA ELECTRÓNICA DE VENTA'
+      : 'FACTURA DE VENTA';
+    const clienteNombre = f.client.razonSocial || `${f.client.nombre} ${f.client.apellido}`;
     const tipoDocLabel = f.client.tipoDocumentoRel?.abreviatura || 'CC/NIT';
     const fechaGen = this.formatDateTimePrint(f.createdAt);
-    const fechaVal = f.fechaEnvioDIAN
-      ? this.formatDateTimePrint(f.fechaEnvioDIAN)
-      : fechaGen;
+    const fechaVal = f.fechaEnvioDIAN ? this.formatDateTimePrint(f.fechaEnvioDIAN) : fechaGen;
     const fechaVenc = f.fechaVencimiento || f.fecha;
 
-    const itemsRows = f.items
-      .map(
-        (item, i) => `
+    const itemsRows = f.items.map((item, i) => `
  <tr>
  <td style="text-align:center;padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#64748b;">${i + 1}</td>
  <td style="padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:9px;font-family:'Courier New',monospace;color:#475569;">${item.articulo?.codigo || ''}</td>
@@ -131,28 +125,21 @@ export class PrintService {
  <td style="text-align:right;padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#1e293b;">${this.fmt(item.total)}</td>
  </tr>
  `,
-      )
-      .join('');
+    ).join('');
 
-    const qrBlock = f.qrCode
-      ? `<td style="width:100px;text-align:center;vertical-align:top;padding:6px;">
+    const qrBlock = f.qrCode ? `<td style="width:100px;text-align:center;vertical-align:top;padding:6px;">
  <img src="${f.qrCode}" alt="QR DIAN" style="width:88px;height:88px;"/>
- </td>`
-      : '';
+ </td>` : '';
 
-    const cufeSection = f.cufe
-      ? `<tr><td colspan="2" style="padding:6px 0;">
+    const cufeSection = f.cufe ? `<tr><td colspan="2" style="padding:6px 0;">
  <div style="background:#f8fafc;border:1px solid #cbd5e1;padding:6px 10px;font-size:10px;color:#000000;word-break:break-all;text-align:center;">
  CUFE: ${f.cufe}
  </div>
- </td></tr>`
-      : '';
+ </td></tr>` : '';
 
-    const formaPagoLabel =
-      f.formaPago === 'CONTADO' ? 'Pago de contado' : 'Pago a crédito';
+    const formaPagoLabel = f.formaPago === 'CONTADO' ? 'Pago de contado' : 'Pago a crédito';
     const metodoPagoLabel = f.metodoPagoRel?.nombre || f.metodoPago || '—';
-    const tipoOpLabel =
-      f.tipoFactura === 'ELECTRONICA' ? 'Electrónica' : 'Estándar';
+    const tipoOpLabel = f.tipoFactura === 'ELECTRONICA' ? 'Electrónica' : 'Estándar';
 
     return `<!DOCTYPE html>
 <html lang="es">
@@ -301,22 +288,20 @@ export class PrintService {
  <td style="padding:6px 12px;font-size:10px;color:#475569;border-bottom:1px solid #f1f5f9;">Base Imponible</td>
  <td style="padding:6px 12px;font-size:10px;color:#1e293b;text-align:right;border-bottom:1px solid #f1f5f9;">${this.fmt(f.subtotal)}</td>
  </tr>
- ${
-   f.iva > 0
-     ? `<tr>
+ ${f.iva > 0
+        ? `<tr>
  <td style="padding:6px 12px;font-size:10px;color:#475569;border-bottom:1px solid #f1f5f9;">IVA</td>
  <td style="padding:6px 12px;font-size:10px;color:#1e293b;text-align:right;border-bottom:1px solid #f1f5f9;">${this.fmt(f.iva)}</td>
  </tr>`
-     : ''
- }
- ${
-   f.descuento > 0
-     ? `<tr>
+        : ''
+      }
+ ${f.descuento > 0
+        ? `<tr>
  <td style="padding:6px 12px;font-size:10px;color:#475569;border-bottom:1px solid #f1f5f9;">Descuento global(-)</td>
  <td style="padding:6px 12px;font-size:10px;color:#dc2626;text-align:right;border-bottom:1px solid #f1f5f9;">-${this.fmt(f.descuento)}</td>
  </tr>`
-     : ''
- }
+        : ''
+      }
  <tr>
  <td style="padding:6px 12px;font-size:10px;color:#475569;border-bottom:1px solid #f1f5f9;">Recargo global(+)</td>
  <td style="padding:6px 12px;font-size:10px;color:#1e293b;text-align:right;border-bottom:1px solid #f1f5f9;">${this.fmt(0)}</td>
@@ -390,65 +375,65 @@ export class PrintService {
   // ══════════════════════════════════════════════════════════════════════
   // PRIVATE — Construir HTML de Asiento Contable
   // ══════════════════════════════════════════════════════════════════════
-  private buildAsientoHtml(asientos: any[], facturaRef: string): string {
+  private buildAsientoHtml(asientos: any[], facturaRef: string, tercero: string): string {
     const asientosHtml = asientos
       .map((asiento) => {
         const detallesRows = asiento.detalles
           .map(
             (d: any) => `
- <tr>
- <td class="tercero">${d.tercero || '—'}</td>
- <td>${d.cuenta?.nombre || '—'}</td>
- <td>${d.descripcion || '—'}</td>
- <td class="right debito">${d.debito > 0 ? this.fmt(d.debito) : ''}</td>
- <td class="right credito">${d.credito > 0 ? this.fmt(d.credito) : ''}</td>
- </tr>
- `,
+            <tr>
+            <td class="tercero">${tercero}</td>
+            <td>${d.cuenta?.nombre || '—'}</td>
+            <td>${d.descripcion || '—'}</td>
+            <td class="right debito">${d.debito > 0 ? this.fmt(d.debito) : ''}</td>
+            <td class="right credito">${d.credito > 0 ? this.fmt(d.credito) : ''}</td>
+            </tr>
+            `,
           )
           .join('');
 
         return `
- <div class="asiento-card">
- <!-- Header -->
- <div class="asiento-header">
- <div class="header-side">Asiento contable</div>
- <div class="header-center">
- <div class="empresa">${this.empresa.nombre}</div>
- <div class="fecha-section">
- <strong>FECHA</strong>
- <span class="fecha-value">${this.formatDatePrint(asiento.fecha)}</span>
- <span class="fecha-hint">(DD/MM/AAAA)</span>
- </div>
- </div>
- <div class="header-side right-side">
- <span class="label-sm">Asiento contable</span>
- <span class="numero">No. ${asiento.numero || facturaRef}</span>
- </div>
- </div>
+            <div class="asiento-card">
+            <!-- Header -->
+            <div class="asiento-header">
+            <div class="header-side">Asiento contable</div>
+            <div class="header-center">
+            <div class="empresa">${this.empresa.nombre}</div>
+            <div class="fecha-section">
+            <strong>FECHA</strong>
+            <span class="fecha-value">${this.formatDatePrint(asiento.fecha)}</span>
+            <span class="fecha-hint">(DD/MM/AAAA)</span>
+            </div>
+            </div>
+            <div class="header-side right-side">
+            <span class="label-sm">Asiento contable</span>
+            <span class="numero">No. ${asiento.numero || facturaRef}</span>
+            </div>
+            </div>
 
- <!-- Table -->
- <table class="asiento-table">
- <thead>
- <tr>
- <th class="col-tercero">TERCERO</th>
- <th class="col-cuenta">CUENTA CONTABLE</th>
- <th class="col-desc">DESCRIPCIÓN</th>
- <th class="col-debito">DÉBITO</th>
- <th class="col-credito">CRÉDITO</th>
- </tr>
- </thead>
- <tbody>
- ${detallesRows}
- </tbody>
- <tfoot>
- <tr class="total-row">
- <td colspan="3" class="total-label">Total</td>
- <td class="right total-debito">${this.fmt(asiento.totalDebito)}</td>
- <td class="right total-credito">${this.fmt(asiento.totalCredito)}</td>
- </tr>
- </tfoot>
- </table>
- </div>
+            <!-- Table -->
+            <table class="asiento-table">
+            <thead>
+            <tr>
+            <th class="col-tercero">TERCERO</th>
+            <th class="col-cuenta">CUENTA CONTABLE</th>
+            <th class="col-desc">DESCRIPCIÓN</th>
+            <th class="col-debito">DÉBITO</th>
+            <th class="col-credito">CRÉDITO</th>
+            </tr>
+            </thead>
+            <tbody>
+            ${detallesRows}
+            </tbody>
+            <tfoot>
+            <tr class="total-row">
+            <td colspan="3" class="total-label">Total</td>
+            <td class="right total-debito">${this.fmt(asiento.totalDebito)}</td>
+            <td class="right total-credito">${this.fmt(asiento.totalCredito)}</td>
+            </tr>
+            </tfoot>
+            </table>
+            </div>
  `;
       })
       .join('<div class="page-break"></div>');
@@ -533,16 +518,12 @@ export class PrintService {
   // PRIVATE — Construir HTML de Factura de Compra
   // ══════════════════════════════════════════════════════════════════════
   private buildPurchaseInvoiceHtml(c: FacturaCompraResponse): string {
-    const proveedorNombre =
-      c.proveedor.razonSocial?.trim() || c.proveedor.nombre?.trim() || '—';
+    const proveedorNombre = c.proveedor.razonSocial?.trim() || c.proveedor.nombre?.trim() || '—';
     const proveedorNit = c.proveedor.identificacion || '—';
     const fechaGen = this.formatDateTimePrint(c.createdAt);
     const fechaVenc = c.fechaVencimiento || c.fecha;
 
-    const itemsRows = c.items
-      .map(
-        (item, i) => `
- <tr>
+    const itemsRows = c.items.map((item, i) => `<tr>
  <td style="text-align:center;padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#64748b;">${i + 1}</td>
  <td style="padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:9px;font-family:'Courier New',monospace;color:#475569;">${item.articulo?.codigo || ''}</td>
  <td style="padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#334155;">${item.descripcion || item.articulo?.nombre || ''}</td>
@@ -551,13 +532,9 @@ export class PrintService {
  <td style="text-align:center;padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#334155;">${item.descuento || 0}</td>
  <td style="text-align:center;padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#334155;">${item.porcentajeIva || 0}%</td>
  <td style="text-align:right;padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#1e293b;font-weight:600;">${this.fmt(item.itemTotal || 0)}</td>
- </tr>
- `,
-      )
-      .join('');
+ </tr>`).join('');
 
-    const formaPagoLabel =
-      c.formaPago === 'CONTADO' ? 'Pago de contado' : 'Pago a crédito';
+    const formaPagoLabel = c.formaPago === 'CONTADO' ? 'Pago de contado' : 'Pago a crédito';
     const metodoPagoLabel = c.metodoPagoRel?.nombre || c.metodoPago || '—';
 
     return `<!DOCTYPE html>
@@ -652,14 +629,13 @@ export class PrintService {
  <td style="padding:3px 0;font-size:10px;font-weight:600;color:#64748b;">Fecha factura:</td>
  <td style="padding:3px 0;font-size:10px;font-weight:500;color:#334155;text-align:right;">${this.formatDatePrint(c.fecha)}</td>
  </tr>
- ${
-   c.fechaVencimiento
-     ? `<tr>
+ ${c.fechaVencimiento
+        ? `<tr>
  <td style="padding:3px 0;font-size:10px;font-weight:600;color:#64748b;">Fecha de vencimiento:</td>
  <td style="padding:3px 0;font-size:10px;font-weight:500;color:#334155;text-align:right;">${this.formatDatePrint(fechaVenc)}</td>
  </tr>`
-     : ''
- }
+        : ''
+      }
  <tr>
  <td style="padding:3px 0;font-size:10px;font-weight:600;color:#64748b;">Estado:</td>
  <td style="padding:3px 0;font-size:10px;font-weight:600;color:#334155;text-align:right;text-transform:capitalize;">${c.estado}</td>
@@ -710,22 +686,20 @@ export class PrintService {
  <td style="padding:6px 12px;font-size:10px;color:#475569;border-bottom:1px solid #f1f5f9;">Base Imponible</td>
  <td style="padding:6px 12px;font-size:10px;color:#1e293b;text-align:right;border-bottom:1px solid #f1f5f9;">${this.fmt(c.subtotal)}</td>
  </tr>
- ${
-   c.iva > 0
-     ? `<tr>
+ ${c.iva > 0
+        ? `<tr>
  <td style="padding:6px 12px;font-size:10px;color:#475569;border-bottom:1px solid #f1f5f9;">IVA</td>
  <td style="padding:6px 12px;font-size:10px;color:#1e293b;text-align:right;border-bottom:1px solid #f1f5f9;">${this.fmt(c.iva)}</td>
  </tr>`
-     : ''
- }
- ${
-   c.descuento > 0
-     ? `<tr>
+        : ''
+      }
+ ${c.descuento > 0
+        ? `<tr>
  <td style="padding:6px 12px;font-size:10px;color:#475569;border-bottom:1px solid #f1f5f9;">Descuento global(-)</td>
  <td style="padding:6px 12px;font-size:10px;color:#dc2626;text-align:right;border-bottom:1px solid #f1f5f9;">-${this.fmt(c.descuento)}</td>
  </tr>`
-     : ''
- }
+        : ''
+      }
  <tr>
  <td style="padding:8px 12px;font-size:11px;font-weight:800;color:#000000;background:#efefef;">Total Compra</td>
  <td style="padding:8px 12px;font-size:12px;color:#000000;text-align:right;background:#efefef;font-weight:800;">${this.fmt(c.total)}</td>
@@ -763,16 +737,15 @@ export class PrintService {
  <tr>
  <td style="padding:0 0 4px;font-size:10px;color:#000000;">${this.fmt(c.total)}</td>
  </tr>
- ${
-   c.fechaVencimiento
-     ? `<tr>
+ ${c.fechaVencimiento
+        ? `<tr>
  <td style="padding:2px 0;font-size:10px;font-weight:800;color:#000000;">Fecha de vencimiento</td>
  </tr>
  <tr>
  <td style="padding:0 0 4px;font-size:10px;color:#000000;">${this.formatDatePrint(fechaVenc)}</td>
  </tr>`
-     : ''
- }
+        : ''
+      }
  </table>
  </td>
  </tr>
@@ -984,14 +957,13 @@ export class PrintService {
  <td style="padding:6px 12px;font-size:10px;color:#475569;border-bottom:1px solid #f1f5f9;">IVA</td>
  <td style="padding:6px 12px;font-size:10px;color:#1e293b;text-align:right;border-bottom:1px solid #f1f5f9;">${this.fmt(n.iva)}</td>
  </tr>
- ${
-   n.descuento > 0
-     ? `<tr>
+ ${n.descuento > 0
+        ? `<tr>
  <td style="padding:6px 12px;font-size:10px;color:#475569;border-bottom:1px solid #f1f5f9;">Descuento</td>
  <td style="padding:6px 12px;font-size:10px;color:#dc2626;text-align:right;border-bottom:1px solid #f1f5f9;">-${this.fmt(n.descuento)}</td>
  </tr>`
-     : ''
- }
+        : ''
+      }
  <tr>
  <td style="padding:8px 12px;font-size:11px;font-weight:500;color:#000000;background:#efefef;">Total Ajuste</td>
  <td style="padding:8px 12px;font-size:12px;color:#000000;text-align:right;background:#efefef;font-weight:500;">${this.fmt(n.total)}</td>
@@ -1021,57 +993,45 @@ export class PrintService {
   // PRIVATE — Construir HTML de Nota de Ajuste Compra
   // ══════════════════════════════════════════════════════════════════════
   private buildAdjustmentNoteCompraHtml(n: NotaAjusteCompra): string {
-    const tipoLabel =
-      n.tipo === 'credito' ? 'NOTA CRÉDITO COMPRA' : 'NOTA DÉBITO COMPRA';
-    const proveedorNombre =
-      n.proveedor?.razonSocial?.trim() || n.proveedor?.nombre?.trim() || '—';
+    const tipoLabel = n.tipo === 'credito' ? 'NOTA CRÉDITO COMPRA' : 'NOTA DÉBITO COMPRA';
+    const proveedorNombre = n.proveedor?.razonSocial?.trim() || n.proveedor?.nombre?.trim() || '—';
     const proveedorNit = n.proveedor?.identificacion || '—';
     const fechaGen = this.formatDateTimePrint(n.createdAt);
-    const facturaRef =
-      n.facturaOriginal?.numeroFacturaProveedor ||
-      n.facturaOriginalNumero ||
-      '—';
+    const facturaRef = n.facturaOriginal?.numeroFacturaProveedor || n.facturaOriginalNumero || '—';
 
-    const itemsRows = n.items
-      .map(
-        (item, i) => `
- <tr>
- <td style="text-align:center;padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#64748b;">${i + 1}</td>
- <td style="padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:9px;font-family:'Courier New',monospace;color:#475569;">${item.articulo?.codigo || ''}</td>
- <td style="padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#334155;">${item.descripcion || item.articulo?.nombre || ''}</td>
- <td style="text-align:right;padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#334155;">${this.fmt(item.valorUnitario)}</td>
- <td style="text-align:center;padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#334155;">${item.cantidad}</td>
- <td style="text-align:center;padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#334155;">${item.descuento || 0}</td>
- <td style="text-align:center;padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#334155;">${item.porcentajeIVA || 0}%</td>
- <td style="text-align:right;padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#1e293b;font-weight:600;">${this.fmt(item.total || 0)}</td>
- </tr>
- `,
-      )
-      .join('');
+    const itemsRows = n.items.map((item, i) => `<tr>
+              <td style="text-align:center;padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#64748b;">${i + 1}</td>
+              <td style="padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:9px;font-family:'Courier New',monospace;color:#475569;">${item.articulo?.codigo || ''}</td>
+              <td style="padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#334155;">${item.descripcion || item.articulo?.nombre || ''}</td>
+              <td style="text-align:right;padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#334155;">${this.fmt(item.valorUnitario)}</td>
+              <td style="text-align:center;padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#334155;">${item.cantidad}</td>
+              <td style="text-align:center;padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#334155;">${item.descuento || 0}</td>
+              <td style="text-align:center;padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#334155;">${item.porcentajeIVA || 0}%</td>
+              <td style="text-align:right;padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#1e293b;font-weight:600;">${this.fmt(item.total || 0)}</td>
+              </tr>`).join('');
 
     return `<!DOCTYPE html>
-<html lang="es">
-<head>
- <meta charset="UTF-8"/>
- <title>${tipoLabel} ${n.prefijo || ''}${n.numeroCompleto || n.id}</title>
- <style>
- @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
- * { margin:0; padding:0; box-sizing:border-box; }
- body { font-family:system-ui,-apple-system,'Segoe UI',sans-serif; font-size:11px; color:#1e293b; background:#fff; }
+    <html lang="es">
+      <head>
+      <meta charset="UTF-8"/>
+      <title>${tipoLabel} ${n.prefijo || ''}${n.numeroCompleto || n.id}</title>
+      <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+      * { margin:0; padding:0; box-sizing:border-box; }
+      body { font-family:system-ui,-apple-system,'Segoe UI',sans-serif; font-size:11px; color:#1e293b; background:#fff; }
 
- @media print {
- @page { margin:0; size:A4; }
- body { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
- table { page-break-inside:avoid; }
- thead { display:table-header-group; }
- }
- </style>
-</head>
-<body>
-
-<table cellpadding="0" cellspacing="0" style="width:210mm;min-height:297mm;margin:0 auto;border-collapse:collapse;">
-<tr>
- <td style="vertical-align:top;padding:28px 36px 20px 20px;">
+      @media print {
+      @page { margin:0; size:A4; }
+      body { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+      table { page-break-inside:avoid; }
+      thead { display:table-header-group; }
+      }
+      </style>
+      </head>
+      <body>
+      <table cellpadding="0" cellspacing="0" style="width:210mm;min-height:297mm;margin:0 auto;border-collapse:collapse;">
+      <tr>
+      <td style="vertical-align:top;padding:28px 36px 20px 20px;">
 
  <!-- ═══════ HEADER ═══════ -->
  <table cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:16px;">
@@ -1190,14 +1150,13 @@ export class PrintService {
  <td style="padding:6px 12px;font-size:10px;color:#475569;border-bottom:1px solid #f1f5f9;">IVA</td>
  <td style="padding:6px 12px;font-size:10px;color:#1e293b;text-align:right;border-bottom:1px solid #f1f5f9;">${this.fmt(n.iva)}</td>
  </tr>
- ${
-   n.descuento > 0
-     ? `<tr>
+ ${n.descuento > 0
+        ? `<tr>
  <td style="padding:6px 12px;font-size:10px;color:#475569;border-bottom:1px solid #f1f5f9;">Descuento</td>
  <td style="padding:6px 12px;font-size:10px;color:#dc2626;text-align:right;border-bottom:1px solid #f1f5f9;">-${this.fmt(n.descuento)}</td>
  </tr>`
-     : ''
- }
+        : ''
+      }
  <tr>
  <td style="padding:8px 12px;font-size:11px;font-weight:500;color:#000000;background:#efefef;">Total Ajuste</td>
  <td style="padding:8px 12px;font-size:12px;color:#000000;text-align:right;background:#efefef;font-weight:500;">${this.fmt(n.total)}</td>
@@ -1217,7 +1176,7 @@ export class PrintService {
 </table>
 
 </body>
-</html>`;
+    </html>`;
   }
 
   // ══════════════════════════════════════════════════════════════════════
