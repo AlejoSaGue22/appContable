@@ -159,7 +159,7 @@ export class InvoiceDetailsComponent {
             [InvoiceStatus.ACCEPTED]: 'Aceptada',
             [InvoiceStatus.REJECTED]: 'Rechazada',
             [InvoiceStatus.PAID]: 'Pagada',
-            [InvoiceStatus.CANCELLED]: 'Cancelada',
+            [InvoiceStatus.CANCELLED]: 'Anulada',
             [InvoiceStatus.ISSUED]: 'Emitida',
             [InvoiceStatus.ERROR_ASIENTO]: 'Error Asiento'
         };

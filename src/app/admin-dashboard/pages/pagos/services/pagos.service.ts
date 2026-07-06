@@ -195,4 +195,33 @@ export class PagosHttpService {
             .get<PagoResponseDto<EstadoCuentaProveedorResponse>>(`${this.base}/pagos/estado-cuenta/proveedor-por-documento`, { params })
             .pipe(map(r => r.data));
     }
+
+    // ── Nuevos métodos de pagos flexibles ────────────────────────────────
+    getFacturasPendientesCliente(clienteId: string): Observable<any[]> {
+        return this.http
+            .get<PagoResponseDto<any[]>>(`${this.base}/pagos/facturas-pendientes/cliente/${clienteId}`)
+            .pipe(map(r => r.data));
+    }
+
+    getFacturasPendientesProveedor(proveedorId: string): Observable<any[]> {
+        return this.http
+            .get<PagoResponseDto<any[]>>(`${this.base}/pagos/facturas-pendientes/proveedor/${proveedorId}`)
+            .pipe(map(r => r.data));
+    }
+
+    registrarCobroMultiple(dto: any): Observable<any> {
+        return this.http.post<any>(`${this.base}/pagos/cxc/cobro-multiple`, dto);
+    }
+
+    registrarPagoMultiple(dto: any): Observable<any> {
+        return this.http.post<any>(`${this.base}/pagos/cxp/pago-multiple`, dto);
+    }
+
+    registrarOtrosIngresos(dto: any): Observable<any> {
+        return this.http.post<any>(`${this.base}/pagos/otros-ingresos`, dto);
+    }
+
+    registrarOtrosEgresos(dto: any): Observable<any> {
+        return this.http.post<any>(`${this.base}/pagos/otros-egresos`, dto);
+    }
 }

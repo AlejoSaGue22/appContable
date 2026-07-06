@@ -1,4 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import {
@@ -40,6 +41,7 @@ import { TabsComponent, TabItem } from '@shared/components/tabs/tabs.component';
   standalone: true,
   imports: [
     CommonModule,
+    RouterLink,
     ReactiveFormsModule,
     RegistrarPagoModalComponent,
     ModalComponent,
@@ -64,7 +66,7 @@ export class CxcComponent implements OnInit {
   activeTab = signal<string>('facturas');
   tabItems: TabItem[] = [
     { id: 'facturas', label: 'Facturas Pendientes' },
-    { id: 'cobros', label: 'Cobros Realizados' },
+    { id: 'cobros', label: 'Pagos Realizados' },
     { id: 'estado-cuenta', label: 'Estado de Cuenta' },
   ];
 
@@ -131,14 +133,14 @@ export class CxcComponent implements OnInit {
   volanteVisible = false;
   volanteItem = signal<MovimientoItem | null>(null);
 
-  constructor(private svc: PagosHttpService) {}
+  constructor(private svc: PagosHttpService) { }
 
   ngOnInit(): void {
     this.cargar();
-    this.filtroEstado.valueChanges.subscribe(() => {});
+    this.filtroEstado.valueChanges.subscribe(() => { });
     this.filtroTexto.valueChanges
       .pipe(debounceTime(250), distinctUntilChanged())
-      .subscribe(() => {});
+      .subscribe(() => { });
   }
 
   cambiarTab(tab: string): void {

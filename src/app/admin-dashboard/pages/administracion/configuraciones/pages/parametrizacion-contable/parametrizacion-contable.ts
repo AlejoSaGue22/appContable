@@ -9,6 +9,7 @@ import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.co
 import { CuentasContablesService } from '@dashboard/pages/contabilidad/services/cuentas-contables.service';
 import { NotificationService } from '@shared/services/notification.service';
 import { firstValueFrom } from 'rxjs';
+// import { LoaderService } from '@utils/services/loader.service';
 import { ParametrizacionContableService } from './services/parametrizacion-contable.service';
 
 @Component({
@@ -39,6 +40,7 @@ export class ParametrizacionContable implements OnInit {
   private notificationService = inject(NotificationService);
 
   cuentas = signal<any[]>([]);
+  isLoading = signal<boolean>(true);
   cuentasFiltradasClientes = computed(() => {
     return this.cuentas().filter(
       (c) => c.aceptaMovimiento && c.codigo.startsWith('13'),
@@ -93,17 +95,14 @@ export class ParametrizacionContable implements OnInit {
   }
 
   async loadData() {
+    this.isLoading.set(true);
     try {
       // Cargar cuentas contables
-      const cuentasData = await firstValueFrom(
-        this.cuentasService.getCuentasContables(),
-      );
+      const cuentasData = await firstValueFrom(this.cuentasService.getCuentasContables());
       this.cuentas.set(cuentasData);
 
       // Cargar configuración actual
-      const config = await firstValueFrom(
-        this.parametrizacionService.getConfiguracion(),
-      );
+      const config = await firstValueFrom(this.parametrizacionService.getConfiguracion());
       if (config) {
         this.paramForm.patchValue({
           cuentaCobrarClientesId: config.cuentaCobrarClientesId || null,
@@ -121,6 +120,8 @@ export class ParametrizacionContable implements OnInit {
       }
     } catch (error) {
       this.notificationService.error('Error al cargar la información', 'Error');
+    } finally {
+      this.isLoading.set(false);
     }
   }
 

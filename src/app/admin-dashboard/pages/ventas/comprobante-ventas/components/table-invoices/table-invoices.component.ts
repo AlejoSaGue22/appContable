@@ -1,16 +1,16 @@
 import {
-  Component,
-  computed,
-  input,
-  output,
-  signal,
-  effect,
+    Component,
+    computed,
+    input,
+    output,
+    signal,
+    effect,
 } from '@angular/core';
 import {
-  FacturaVenta,
-  GetFacturaRequest,
-  InvoiceFilters,
-  InvoiceStatus,
+    FacturaVenta,
+    GetFacturaRequest,
+    InvoiceFilters,
+    InvoiceStatus,
 } from '@dashboard/interfaces/documento-venta-interface';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -18,216 +18,216 @@ import { PaginationComponent } from '@shared/components/pagination/pagination';
 import { CurrencyPipe, TitleCasePipe } from '@angular/common';
 
 @Component({
-  selector: 'app-table-invoices',
-  imports: [
-    RouterLink,
-    FormsModule,
-    PaginationComponent,
-    CurrencyPipe,
-    TitleCasePipe,
-  ],
-  templateUrl: './table-invoices.component.html',
+    selector: 'app-table-invoices',
+    imports: [
+        RouterLink,
+        FormsModule,
+        PaginationComponent,
+        CurrencyPipe,
+        TitleCasePipe,
+    ],
+    templateUrl: './table-invoices.component.html',
 })
 export class TableInvoices {
-  invoiceData = input.required<GetFacturaRequest[]>();
+    invoiceData = input.required<GetFacturaRequest[]>();
 
-  // Input for active filters to restore state if component is recreated
-  activeFilters = input<InvoiceFilters>({});
+    // Input for active filters to restore state if component is recreated
+    activeFilters = input<InvoiceFilters>({});
 
-  // Output events
-  filterChange = output<InvoiceFilters>();
-  emitir = output<string>();
-  emitirEstandar = output<string>();
-  anular = output<string>();
-  retry = output<string>();
-  delete = output<string>();
-  downloadPDF = output<string>();
-  downloadXML = output<string>();
+    // Output events
+    filterChange = output<InvoiceFilters>();
+    emitir = output<string>();
+    emitirEstandar = output<string>();
+    anular = output<string>();
+    retry = output<string>();
+    delete = output<string>();
+    downloadPDF = output<string>();
+    downloadXML = output<string>();
 
-  // Filter signals
-  clientName = signal<string>('');
-  status = signal<string>('');
-  tipoFactura = signal<string>('');
-  numeroFactura = signal<string>('');
-  dianStatus = signal<string>('');
-  startDate = signal<string>('');
-  endDate = signal<string>('');
+    // Filter signals
+    clientName = signal<string>('');
+    status = signal<string>('');
+    tipoFactura = signal<string>('');
+    numeroFactura = signal<string>('');
+    dianStatus = signal<string>('');
+    startDate = signal<string>('');
+    endDate = signal<string>('');
 
-  activeFiltersCount = computed(() => {
-    let count = 0;
-    if (this.clientName()) count++;
-    if (this.status()) count++;
-    if (this.tipoFactura()) count++;
-    if (this.numeroFactura()) count++;
-    if (this.dianStatus()) count++;
-    if (this.startDate()) count++;
-    if (this.endDate()) count++;
-    return count;
-  });
-
-  showFilters = signal<boolean>(false);
-
-  constructor() {
-    effect(
-      () => {
-        const filters = this.activeFilters();
-        this.clientName.set(filters.clientName ?? '');
-        this.status.set(filters.status ?? '');
-        this.tipoFactura.set(filters.tipoFactura ?? '');
-        this.numeroFactura.set(filters.numeroFactura ?? '');
-        this.dianStatus.set(filters.dianStatus ?? '');
-        this.startDate.set(filters.startDate ?? '');
-        this.endDate.set(filters.endDate ?? '');
-
-        // Show filters panel if any extended filter is active
-        if (
-          filters.status ||
-          filters.tipoFactura ||
-          filters.numeroFactura ||
-          filters.dianStatus ||
-          filters.startDate ||
-          filters.endDate
-        ) {
-          this.showFilters.set(true);
-        }
-      },
-      { allowSignalWrites: true },
-    );
-  }
-
-  toggleFilters(): void {
-    this.showFilters.update((v) => !v);
-  }
-
-  get invoiceDataArray(): GetFacturaRequest[] {
-    const data = this.invoiceData();
-
-    return Array.isArray(data) ? data : [data];
-  }
-
-  readonly statuses = [
-    { value: '', label: 'Todos los estados' },
-    { value: InvoiceStatus.DRAFT, label: 'Borrador' },
-    { value: InvoiceStatus.PENDING_DIAN, label: 'Pendiente DIAN' },
-    { value: InvoiceStatus.ACCEPTED, label: 'Aceptada' },
-    { value: InvoiceStatus.REJECTED, label: 'Rechazada' },
-    { value: InvoiceStatus.PAID, label: 'Pagada' },
-    { value: InvoiceStatus.CANCELLED, label: 'Cancelada' },
-    { value: InvoiceStatus.ISSUED, label: 'Emitida' },
-    { value: InvoiceStatus.ERROR_ASIENTO, label: 'Error Asiento' },
-  ];
-
-  readonly tiposFactura = [
-    { value: '', label: 'Todos los tipos' },
-    { value: 'ELECTRONICA', label: 'Electrónica' },
-    { value: 'ESTANDAR', label: 'Estándar' },
-  ];
-
-  readonly dianStatuses = [
-    { value: '', label: 'Todos los estados DIAN' },
-    { value: 'pending', label: 'Pendiente' },
-    { value: 'sent', label: 'Enviada' },
-    { value: 'processing', label: 'Procesando' },
-    { value: 'accepted', label: 'Aceptada' },
-    { value: 'rejected', label: 'Rechazada' },
-    { value: 'cancelled', label: 'Anulada' },
-  ];
-
-  applyFilters(): void {
-    const filters: InvoiceFilters = {};
-
-    if (this.clientName()) filters.clientName = this.clientName();
-    if (this.status()) filters.status = this.status();
-    if (this.tipoFactura()) filters.tipoFactura = this.tipoFactura();
-    if (this.numeroFactura()) filters.numeroFactura = this.numeroFactura();
-    if (this.dianStatus()) filters.dianStatus = this.dianStatus();
-    if (this.startDate()) filters.startDate = this.startDate();
-    if (this.endDate()) filters.endDate = this.endDate();
-
-    this.filterChange.emit(filters);
-  }
-
-  clearFilters(): void {
-    this.clientName.set('');
-    this.status.set('');
-    this.tipoFactura.set('');
-    this.numeroFactura.set('');
-    this.dianStatus.set('');
-    this.startDate.set('');
-    this.endDate.set('');
-
-    this.filterChange.emit({});
-  }
-
-  getStatusClass(status: InvoiceStatus): string {
-    const classes: Record<InvoiceStatus, string> = {
-      [InvoiceStatus.DRAFT]: 'bg-gray-100 text-gray-800 border-gray-200',
-      [InvoiceStatus.PENDING_DIAN]: 'bg-yellow-100 text-yellow-800',
-      [InvoiceStatus.ACCEPTED]:
-        'bg-green-100 text-green-800 bg-emerald-50 text-emerald-600 border-emerald-100',
-      [InvoiceStatus.REJECTED]: 'bg-red-50 text-red-500 border-red-100',
-      [InvoiceStatus.PAID]: 'bg-blue-100 text-blue-800',
-      [InvoiceStatus.CANCELLED]: 'bg-red-50 text-red-500 border-red-100',
-      [InvoiceStatus.ISSUED]: 'bg-blue-100 text-blue-800',
-      [InvoiceStatus.ERROR_ASIENTO]: 'bg-red-100 text-red-800 border-red-100',
-    };
-    return classes[status];
-  }
-
-  getStatusLabel(status: InvoiceStatus): string {
-    const labels: Record<InvoiceStatus, string> = {
-      [InvoiceStatus.DRAFT]: 'Borrador',
-      [InvoiceStatus.PENDING_DIAN]: 'Pendiente DIAN',
-      [InvoiceStatus.ACCEPTED]: 'Aceptada',
-      [InvoiceStatus.REJECTED]: 'Rechazada',
-      [InvoiceStatus.PAID]: 'Pagada',
-      [InvoiceStatus.CANCELLED]: 'Cancelada',
-      [InvoiceStatus.ISSUED]: 'Emitida',
-      [InvoiceStatus.ERROR_ASIENTO]: 'Error Asiento',
-    };
-    return labels[status];
-  }
-
-  formatDate(date: string | Date): string {
-    if (!date) return '—';
-    // Evitar que JS reste un día al interpretar YYYY-MM-DD como UTC
-    const dateObj =
-      typeof date === 'string' && date.includes('-') && !date.includes('T')
-        ? new Date(date.replace(/-/g, '\/'))
-        : new Date(date);
-
-    return dateObj.toLocaleDateString('es-CO', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+    activeFiltersCount = computed(() => {
+        let count = 0;
+        if (this.clientName()) count++;
+        if (this.status()) count++;
+        if (this.tipoFactura()) count++;
+        if (this.numeroFactura()) count++;
+        if (this.dianStatus()) count++;
+        if (this.startDate()) count++;
+        if (this.endDate()) count++;
+        return count;
     });
-  }
 
-  onEmitir(id: string): void {
-    this.emitir.emit(id);
-  }
+    showFilters = signal<boolean>(false);
 
-  onEmitirEstandar(id: string): void {
-    this.emitirEstandar.emit(id);
-  }
+    constructor() {
+        effect(
+            () => {
+                const filters = this.activeFilters();
+                this.clientName.set(filters.clientName ?? '');
+                this.status.set(filters.status ?? '');
+                this.tipoFactura.set(filters.tipoFactura ?? '');
+                this.numeroFactura.set(filters.numeroFactura ?? '');
+                this.dianStatus.set(filters.dianStatus ?? '');
+                this.startDate.set(filters.startDate ?? '');
+                this.endDate.set(filters.endDate ?? '');
 
-  onRetry(id: string): void {
-    this.retry.emit(id);
-  }
+                // Show filters panel if any extended filter is active
+                if (
+                    filters.status ||
+                    filters.tipoFactura ||
+                    filters.numeroFactura ||
+                    filters.dianStatus ||
+                    filters.startDate ||
+                    filters.endDate
+                ) {
+                    this.showFilters.set(true);
+                }
+            },
+            { allowSignalWrites: true },
+        );
+    }
 
-  onAnular(id: string): void {
-    this.anular.emit(id);
-  }
+    toggleFilters(): void {
+        this.showFilters.update((v) => !v);
+    }
 
-  onDelete(id: string): void {
-    this.delete.emit(id);
-  }
+    get invoiceDataArray(): GetFacturaRequest[] {
+        const data = this.invoiceData();
 
-  onDownloadPDF(id: string): void {
-    this.downloadPDF.emit(id);
-  }
+        return Array.isArray(data) ? data : [data];
+    }
 
-  onDownloadXML(id: string): void {
-    this.downloadXML.emit(id);
-  }
+    readonly statuses = [
+        { value: '', label: 'Todos los estados' },
+        { value: InvoiceStatus.DRAFT, label: 'Borrador' },
+        { value: InvoiceStatus.PENDING_DIAN, label: 'Pendiente DIAN' },
+        { value: InvoiceStatus.ACCEPTED, label: 'Aceptada' },
+        { value: InvoiceStatus.REJECTED, label: 'Rechazada' },
+        { value: InvoiceStatus.PAID, label: 'Pagada' },
+        { value: InvoiceStatus.CANCELLED, label: 'Anulada' },
+        { value: InvoiceStatus.ISSUED, label: 'Emitida' },
+        { value: InvoiceStatus.ERROR_ASIENTO, label: 'Error Asiento' },
+    ];
+
+    readonly tiposFactura = [
+        { value: '', label: 'Todos los tipos' },
+        { value: 'ELECTRONICA', label: 'Electrónica' },
+        { value: 'ESTANDAR', label: 'Estándar' },
+    ];
+
+    readonly dianStatuses = [
+        { value: '', label: 'Todos los estados DIAN' },
+        { value: 'pending', label: 'Pendiente' },
+        { value: 'sent', label: 'Enviada' },
+        { value: 'processing', label: 'Procesando' },
+        { value: 'accepted', label: 'Aceptada' },
+        { value: 'rejected', label: 'Rechazada' },
+        { value: 'cancelled', label: 'Anulada' },
+    ];
+
+    applyFilters(): void {
+        const filters: InvoiceFilters = {};
+
+        if (this.clientName()) filters.clientName = this.clientName();
+        if (this.status()) filters.status = this.status();
+        if (this.tipoFactura()) filters.tipoFactura = this.tipoFactura();
+        if (this.numeroFactura()) filters.numeroFactura = this.numeroFactura();
+        if (this.dianStatus()) filters.dianStatus = this.dianStatus();
+        if (this.startDate()) filters.startDate = this.startDate();
+        if (this.endDate()) filters.endDate = this.endDate();
+
+        this.filterChange.emit(filters);
+    }
+
+    clearFilters(): void {
+        this.clientName.set('');
+        this.status.set('');
+        this.tipoFactura.set('');
+        this.numeroFactura.set('');
+        this.dianStatus.set('');
+        this.startDate.set('');
+        this.endDate.set('');
+
+        this.filterChange.emit({});
+    }
+
+    getStatusClass(status: InvoiceStatus): string {
+        const classes: Record<InvoiceStatus, string> = {
+            [InvoiceStatus.DRAFT]: 'bg-gray-100 text-gray-800 border-gray-200',
+            [InvoiceStatus.PENDING_DIAN]: 'bg-yellow-100 text-yellow-800',
+            [InvoiceStatus.ACCEPTED]:
+                'bg-green-100 text-green-800 bg-emerald-50 text-emerald-600 border-emerald-100',
+            [InvoiceStatus.REJECTED]: 'bg-red-50 text-red-500 border-red-100',
+            [InvoiceStatus.PAID]: 'bg-blue-100 text-blue-800',
+            [InvoiceStatus.CANCELLED]: 'bg-red-50 text-red-500 border-red-100',
+            [InvoiceStatus.ISSUED]: 'bg-blue-100 text-blue-800',
+            [InvoiceStatus.ERROR_ASIENTO]: 'bg-red-100 text-red-800 border-red-100',
+        };
+        return classes[status];
+    }
+
+    getStatusLabel(status: InvoiceStatus): string {
+        const labels: Record<InvoiceStatus, string> = {
+            [InvoiceStatus.DRAFT]: 'Borrador',
+            [InvoiceStatus.PENDING_DIAN]: 'Pendiente DIAN',
+            [InvoiceStatus.ACCEPTED]: 'Aceptada',
+            [InvoiceStatus.REJECTED]: 'Rechazada',
+            [InvoiceStatus.PAID]: 'Pagada',
+            [InvoiceStatus.CANCELLED]: 'Anulada',
+            [InvoiceStatus.ISSUED]: 'Emitida',
+            [InvoiceStatus.ERROR_ASIENTO]: 'Error Asiento',
+        };
+        return labels[status];
+    }
+
+    formatDate(date: string | Date): string {
+        if (!date) return '—';
+        // Evitar que JS reste un día al interpretar YYYY-MM-DD como UTC
+        const dateObj =
+            typeof date === 'string' && date.includes('-') && !date.includes('T')
+                ? new Date(date.replace(/-/g, '\/'))
+                : new Date(date);
+
+        return dateObj.toLocaleDateString('es-CO', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+        });
+    }
+
+    onEmitir(id: string): void {
+        this.emitir.emit(id);
+    }
+
+    onEmitirEstandar(id: string): void {
+        this.emitirEstandar.emit(id);
+    }
+
+    onRetry(id: string): void {
+        this.retry.emit(id);
+    }
+
+    onAnular(id: string): void {
+        this.anular.emit(id);
+    }
+
+    onDelete(id: string): void {
+        this.delete.emit(id);
+    }
+
+    onDownloadPDF(id: string): void {
+        this.downloadPDF.emit(id);
+    }
+
+    onDownloadXML(id: string): void {
+        this.downloadXML.emit(id);
+    }
 }

@@ -1,4 +1,5 @@
 import { Component, inject, signal, computed } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -20,7 +21,7 @@ import { TabsComponent, TabItem } from '@shared/components/tabs/tabs.component';
 @Component({
  selector: 'app-cxp',
  standalone: true,
- imports: [CommonModule, ReactiveFormsModule, RegistrarPagoModalComponent, ModalComponent, HeaderTitlePageComponent, ModalHistorialpagoComponent,
+ imports: [CommonModule, RouterLink, ReactiveFormsModule, RegistrarPagoModalComponent, ModalComponent, HeaderTitlePageComponent, ModalHistorialpagoComponent,
  TarjetasResumenPagos, PaginationComponent, ModalAsientoContableComponent, VolantePagoComponent, EstadoCuentaComponent, TabsComponent],
  templateUrl: './cxp.component.html',
 })

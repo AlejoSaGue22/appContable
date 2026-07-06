@@ -1,0 +1,346 @@
+<header-title-page [titleHead]="headTitle()" />
+
+<div class="w-full space-y-6 animate-fade-in pb-12">
+  <!-- Botón regresar -->
+  <div class="flex items-center justify-between">
+    <a routerLink="/panel/pagos/cxc"
+      class="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl shadow-sm transition-all cursor-pointer">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+        stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      Regresar al listado
+    </a>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="guardar()" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Panel Principal (Formulario y Detalles) -->
+    <div class="lg:col-span-2 space-y-6">
+
+      <!-- Cabecera / Info del Recibo -->
+      <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 space-y-4">
+        <h3 class="text-lg font-bold text-slate-800 border-b pb-2 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z" />
+          </svg>
+          Información General
+        </h3>
+
+        <!-- Toggle Modo de Cobro -->
+        <div class="grid grid-cols-2 gap-2 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+          <button type="button" (click)="cambiarModo('factura')" [class.bg-white]="modoCobro() === 'factura'"
+            [class.text-green-700]="modoCobro() === 'factura'" [class.shadow-sm]="modoCobro() === 'factura'"
+            [class.bg-transparent]="modoCobro() !== 'factura'" [class.text-slate-500]="modoCobro() !== 'factura'"
+            class="py-2.5 text-sm font-bold rounded-lg cursor-pointer transition-all flex items-center justify-center gap-1.5 border-0 focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2" />
+            </svg>
+            Pago a Factura
+          </button>
+          <button type="button" (click)="cambiarModo('otros')" [class.bg-white]="modoCobro() === 'otros'"
+            [class.text-green-700]="modoCobro() === 'otros'" [class.shadow-sm]="modoCobro() === 'otros'"
+            [class.bg-transparent]="modoCobro() !== 'otros'" [class.text-slate-500]="modoCobro() !== 'otros'"
+            class="py-2.5 text-sm font-bold rounded-lg cursor-pointer transition-all flex items-center justify-center gap-1.5 border-0 focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
+            </svg>
+            Otros Conceptos (Sin Factura)
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Cliente -->
+          <div class="flex flex-col">
+            <label class="text-xs font-bold text-slate-500 uppercase mb-1">Cliente</label>
+            <div class="relative">
+              <app-list-group-dropdown
+                title=""
+                [dataList]="clientes()"
+                [labelKey]="['nombreDisplay', 'numeroDocumento']"
+                [valueInput]="clienteSearch()"
+                [searchable]="false"
+                (objectSelect)="onClienteSeleccionado($event)" />
+            </div>
+            @if (form.get('terceroId')?.touched && form.get('terceroId')?.errors?.['required'] && modoCobro() === 'factura') {
+              <span class="text-red-500 text-xs mt-1">El cliente es obligatorio</span>
+            }
+          </div>
+
+          <!-- Fecha -->
+          <div class="flex flex-col">
+            <label class="text-xs font-bold text-slate-500 uppercase mb-1">Fecha</label>
+            <input type="date" formControlName="fecha"
+              class="text-sm bg-white border border-slate-200 rounded-xl py-2.5 px-3 focus:outline-none focus:ring-4 focus:ring-green-500/5 focus:border-green-500/50 shadow-sm transition-all" />
+          </div>
+
+          <!-- Medio de Pago -->
+          <div class="flex flex-col">
+            <label class="text-xs font-bold text-slate-500 uppercase mb-1">Medio de Pago</label>
+            <select formControlName="metodoPagoId"
+              class="text-sm bg-white border border-slate-200 rounded-xl py-2.5 px-3 focus:outline-none focus:ring-4 focus:ring-green-500/5 focus:border-green-500/50 shadow-sm cursor-pointer transition-all">
+              <option value="">-- Seleccione Método de Pago --</option>
+              @for (method of catalogsStore.paymentMethods(); track method.id) {
+                <option [value]="method.id">{{ method.nombre }}</option>
+              }
+            </select>
+            @if (form.get('metodoPagoId')?.touched && form.get('metodoPagoId')?.errors?.['required']) {
+              <span class="text-red-500 text-xs mt-1">El medio de pago es obligatorio</span>
+            }
+          </div>
+
+          <!-- Cuenta Bancaria -->
+          @if (mostrarBanco) {
+          <div class="flex flex-col">
+            <label class="text-xs font-bold text-slate-500 uppercase mb-1">Cuenta Bancaria</label>
+            <select formControlName="cuentaBancariaId"
+              class="text-sm bg-white border border-slate-200 rounded-xl py-2.5 px-3 focus:outline-none focus:ring-4 focus:ring-green-500/5 focus:border-green-500/50 shadow-sm cursor-pointer transition-all">
+              <option value="">-- Seleccione Cuenta --</option>
+              @for (cb of cuentasBancarias(); track cb.id) {
+              <option [value]="cb.id">{{ cb.nombre }} ({{ cb.numeroCuenta }})</option>
+              }
+            </select>
+            @if (form.get('cuentaBancariaId')?.touched && form.get('cuentaBancariaId')?.errors?.['required']) {
+            <span class="text-red-500 text-xs mt-1">La cuenta bancaria es obligatoria</span>
+            }
+          </div>
+          }
+        </div>
+      </div>
+
+      <!-- Detalle 1: Pago a Facturas -->
+      @if (modoCobro() === 'factura') {
+      <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 space-y-4">
+        <div class="flex justify-between items-center border-b pb-2">
+          <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            Facturas Pendientes
+          </h3>
+          <span class="text-xs bg-slate-100 border border-slate-200 text-slate-600 px-3 py-1 rounded-full font-bold">
+            {{ facturasPendientes().length }} Encontradas
+          </span>
+        </div>
+
+        @if (facturasLoading()) {
+        <div class="flex justify-center items-center py-8">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+        </div>
+        } @else if (facturasPendientes().length === 0) {
+        <div class="text-center py-8 text-slate-400">
+          <p class="text-sm font-medium">Seleccione un cliente para ver sus facturas de crédito pendientes.</p>
+        </div>
+        } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200">
+                <th class="py-3 px-4 font-bold text-xs uppercase text-slate-500 text-center w-12">#</th>
+                <th class="py-3 px-4 font-bold text-xs uppercase text-slate-500">Factura</th>
+                <th class="py-3 px-4 font-bold text-xs uppercase text-slate-500 text-right">Total</th>
+                <th class="py-3 px-4 font-bold text-xs uppercase text-slate-500 text-right">Saldo</th>
+                <th class="py-3 px-4 font-bold text-xs uppercase text-slate-500 text-center w-36">Monto Abono</th>
+              </tr>
+            </thead>
+            <tbody formArrayName="detalles">
+              @for (ctrl of detallesFormArray.controls; track ctrl; let i = $index) {
+              <tr [formGroupName]="i" class="border-b border-slate-100 hover:bg-slate-50/50 transition-colors">
+                <td class="py-3 px-4 text-center">
+                  <input type="checkbox" formControlName="seleccionada" (change)="toggleFacturaSeleccion(i)"
+                    class="h-4.5 w-4.5 rounded border-slate-300 text-green-600 focus:ring-green-500 cursor-pointer" />
+                </td>
+                <td class="py-3 px-4 font-mono font-semibold text-slate-800">
+                  {{ ctrl.get('comprobante')?.value }}
+                </td>
+                <td class="py-3 px-4 text-right tabular-nums text-slate-500">
+                  {{ ctrl.get('total')?.value | currency: "" : "symbol-narrow" : "1.0-0" }}
+                </td>
+                <td class="py-3 px-4 text-right tabular-nums font-semibold text-slate-900">
+                  {{ ctrl.get('saldoPendiente')?.value | currency: "" : "symbol-narrow" : "1.0-0" }}
+                </td>
+                <td class="py-3 px-4">
+                  <div class="relative">
+                    <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">$</span>
+                    <input type="number" formControlName="monto"
+                      [attr.disabled]="!ctrl.get('seleccionada')?.value ? true : null"
+                      class="w-full pl-6 pr-2 py-1.5 text-right font-mono font-semibold text-sm bg-white border border-slate-200 rounded-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-green-500/10 focus:border-green-500/50 disabled:bg-slate-50 disabled:text-slate-400" />
+                  </div>
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        }
+      </div>
+      }
+
+      <!-- Detalle 2: Otros Conceptos -->
+      @if (modoCobro() === 'otros') {
+      <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 space-y-4">
+        <div class="flex justify-between items-center border-b pb-2">
+          <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
+            </svg>
+            Líneas del Movimiento
+          </h3>
+          <button type="button" (click)="agregarConceptoLinea()"
+            class="flex items-center gap-1 px-3 py-1.5 text-xs font-bold bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 rounded-xl transition-all cursor-pointer">
+            + Agregar Línea
+          </button>
+        </div>
+
+        <div class="space-y-4" formArrayName="conceptos">
+          @for (ctrl of conceptosFormArray.controls; track ctrl; let i = $index) {
+          <div [formGroupName]="i"
+            class="bg-slate-50 rounded-xl border border-slate-200/60 p-4 space-y-3 relative animate-fade-in">
+            <!-- Botón eliminar línea -->
+            @if (conceptosFormArray.length > 1) {
+            <button type="button" (click)="eliminarConceptoLinea(i)"
+              class="absolute top-3 right-3 text-slate-400 hover:text-red-500 transition-all border-0 bg-transparent cursor-pointer"
+              title="Eliminar línea">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0 1 16.138 21H7.862a2 2 0 0 1-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v3M4 7h16" />
+              </svg>
+            </button>
+            }
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <!-- Cuenta Contable -->
+              <div class="flex flex-col md:col-span-1">
+                <label class="text-xs font-bold text-slate-500 mb-1">Cuenta PUC (Auxiliar)</label>
+                <select formControlName="cuentaContableId"
+                  class="text-sm bg-white border border-slate-200 rounded-xl py-2 px-3 focus:outline-none focus:ring-4 focus:ring-green-500/5 focus:border-green-500/50 shadow-sm cursor-pointer transition-all">
+                  <option value="">-- Seleccione Cuenta --</option>
+                  @for (c of cuentasContables(); track c.id) {
+                  <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
+                  }
+                </select>
+              </div>
+
+              <!-- Concepto / Descripción -->
+              <div class="flex flex-col md:col-span-2">
+                <label class="text-xs font-bold text-slate-500 mb-1">Concepto / Descripción</label>
+                <input type="text" formControlName="concepto" placeholder="Ej: Cobro de asesoría técnica..."
+                  class="text-sm bg-white border border-slate-200 rounded-xl py-2 px-3 focus:outline-none focus:ring-4 focus:ring-green-500/5 focus:border-green-500/50 shadow-sm transition-all" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 items-end">
+              <!-- Cantidad -->
+              <div class="flex flex-col">
+                <label class="text-xs font-bold text-slate-500 mb-1">Cantidad</label>
+                <input type="number" formControlName="cantidad"
+                  class="text-sm bg-white border border-slate-200 rounded-xl py-1.5 px-3 focus:outline-none focus:ring-4 focus:ring-green-500/5 focus:border-green-500/50 shadow-sm transition-all" />
+              </div>
+
+              <!-- Valor Unitario -->
+              <div class="flex flex-col">
+                <label class="text-xs font-bold text-slate-500 mb-1">Valor Unitario</label>
+                <div class="relative">
+                  <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">$</span>
+                  <input type="number" formControlName="valorUnitario"
+                    class="w-full pl-6 pr-2 py-1.5 text-right text-sm bg-white border border-slate-200 rounded-xl shadow-sm focus:outline-none focus:ring-4 focus:ring-green-500/5 focus:border-green-500/50 transition-all" />
+                </div>
+              </div>
+
+              <!-- Impuesto -->
+              <div class="flex flex-col">
+                <label class="text-xs font-bold text-slate-500 mb-1">Impuesto (IVA)</label>
+                <select formControlName="impuestoId" (change)="onImpuestoCambio(i)"
+                  class="text-sm bg-white border border-slate-200 rounded-xl py-1.5 px-2 focus:outline-none focus:ring-4 focus:ring-green-500/5 focus:border-green-500/50 shadow-sm cursor-pointer transition-all">
+                  <option value="">Exento / Sin Impuesto</option>
+                  @for (imp of impuestos(); track imp.id) {
+                  <option [value]="imp.id">{{ imp.nombre }} ({{ imp.tarifa }}%)</option>
+                  }
+                </select>
+              </div>
+
+              <!-- Total Línea -->
+              <div class="flex flex-col">
+                <label class="text-xs font-bold text-slate-500 mb-1">Total</label>
+                <input type="text" formControlName="total"
+                  class="text-sm font-semibold bg-slate-200 border-none rounded-xl py-1.5 px-3 text-right text-slate-700 font-mono" />
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+      }
+    </div>
+
+    <!-- Panel Lateral: Resumen Totales y Guardado -->
+    <div class="lg:col-span-1 space-y-6">
+      <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 space-y-6 sticky top-6">
+        <h3 class="text-lg font-bold text-slate-800 border-b pb-2 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
+          </svg>
+          Resumen
+        </h3>
+
+        <!-- Total Box -->
+        <div class="bg-green-50/50 rounded-2xl border border-green-100 p-5 text-center space-y-1">
+          <span class="text-xs font-bold text-green-700 uppercase tracking-wider">Total Recibido</span>
+          <h2 class="text-3xl font-black text-green-800 tracking-tight tabular-nums">
+            {{ totalGeneral | currency: "" : "symbol-narrow" : "1.0-0" }}
+          </h2>
+        </div>
+
+        <div class="space-y-4">
+          <!-- Referencia -->
+          <div class="flex flex-col">
+            <label class="text-xs font-bold text-slate-500 uppercase mb-1">Referencia / N° Transacción</label>
+            <input type="text" formControlName="referencia" placeholder="Ej: Transacción N° 981273"
+              class="text-sm bg-white border border-slate-200 rounded-xl py-2 px-3 focus:outline-none focus:ring-4 focus:ring-green-500/5 focus:border-green-500/50 shadow-sm transition-all" />
+          </div>
+
+          <!-- Notas -->
+          <div class="flex flex-col">
+            <label class="text-xs font-bold text-slate-500 uppercase mb-1">Notas / Observaciones</label>
+            <textarea formControlName="notas" rows="3" placeholder="Observación del recaudo..."
+              class="text-sm bg-white border border-slate-200 rounded-xl py-2 px-3 focus:outline-none focus:ring-4 focus:ring-green-500/5 focus:border-green-500/50 shadow-sm transition-all resize-none"></textarea>
+          </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="space-y-2 pt-2">
+          <button type="submit" [disabled]="submitting() || totalGeneral === 0"
+            class="w-full flex items-center justify-center gap-2 px-6 py-3 font-black text-sm bg-green-600 hover:bg-green-700 text-white rounded-xl shadow-lg hover:shadow-xl shadow-green-600/20 hover:shadow-green-600/30 active:scale-[0.98] transition-all border-none cursor-pointer disabled:opacity-50 disabled:pointer-events-none">
+            @if (submitting()) {
+            <div class="animate-spin rounded-full h-4.5 w-4.5 border-b-2 border-white"></div>
+            Guardando...
+            } @else {
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+            </svg>
+            Guardar Recibo de Caja
+            }
+          </button>
+
+          <a routerLink="/pagos/cxc"
+            class="w-full flex items-center justify-center gap-2 px-6 py-3 font-bold text-sm bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 rounded-xl transition-all cursor-pointer text-center no-underline border border-slate-200/50">
+            Cancelar
+          </a>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

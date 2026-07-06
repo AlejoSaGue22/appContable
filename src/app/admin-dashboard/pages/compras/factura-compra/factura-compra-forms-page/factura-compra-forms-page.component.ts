@@ -87,6 +87,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     productosList = signal<GetProductosDetalle[]>([]);
     cuentasBancarias = signal<CuentaBancaria[]>([]);
     refreshAsientoTrigger = signal<number>(0);
+    factura = signal<FacturaCompra | null>(null);
 
     formCompra = this.fb.group({
         proveedor: ['', Validators.required],
@@ -211,6 +212,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
             next: (factura) => {
                 if (factura.success) {
                     const invoice = factura.data.data[0]!;
+                    this.factura.set(invoice);
 
                     while (this.items.length > 0) {
                         this.items.removeAt(0);

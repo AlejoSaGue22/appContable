@@ -196,17 +196,21 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     this.ventaServices.getInvoiceById(id).subscribe({
       next: (response) => {
         const invoice = response.data[0];
+        const cliente = invoice.client;
+        const nombreDisplay = cliente.razonSocial?.trim()
+          ? cliente.razonSocial
+          : `${cliente.nombre || ''} ${cliente.apellido || ''}`.trim();
+        const abreviatura = cliente.tipoDocumentoRel?.abreviatura || '';
 
         this.formVentas.patchValue({
           cliente: invoice.clientId,
           tipoFactura: invoice.tipoFactura || '',
-          tipoDocumento: invoice.client.tipoDocumento,
-          identificacion:
-            invoice.client.tipoDocumentoRel.abreviatura +
-            ' - ' +
-            invoice.client.numeroDocumento,
-          clienteSearch: invoice.client.nombre + ' ' + invoice.client.apellido,
-          contacto: invoice.client.email,
+          tipoDocumento: cliente.tipoDocumento,
+          identificacion: abreviatura
+            ? `${abreviatura} - ${cliente.numeroDocumento}`
+            : cliente.numeroDocumento,
+          clienteSearch: nombreDisplay,
+          contacto: cliente.email,
           vendedor: invoice.vendedor,
           canal: invoice.canalVenta,
           fecha: invoice.fecha,
@@ -321,7 +325,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
 
     const nuevoItemConId = {
       ...valores,
-      id: crypto.randomUUID(),
+      id: this.generateUUID(),
       subtotal:
         this.productosItemsForm.value.quantity! *
         this.productosItemsForm.value.unitPrice!,
@@ -344,6 +348,17 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     this.productSeleccionados().push(nuevoItemConId);
     this.calcularTotal();
     this.reiniciarProducto();
+  }
+
+  generateUUID(): string {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID();
+    }
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0;
+      const v = c === 'x' ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
   }
 
   getIvaTarifa(ivaValue: any): number {
