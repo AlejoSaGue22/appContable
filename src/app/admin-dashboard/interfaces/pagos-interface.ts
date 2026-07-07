@@ -2,7 +2,7 @@
 
 export type PaymentStatus = 'pendiente' | 'parcial' | 'pagado' | 'vencido';
 export type MedioPago = 'caja' | 'banco' | 'transferencia' | 'cheque';
-export type TipoPago = 'cobro' | 'pago';
+export type TipoPago = 'cobro' | 'pago' | 'otro_ingreso' | 'otro_egreso';
 
 // ── Envelope genérico del backend ──────────────────────────────────────────
 

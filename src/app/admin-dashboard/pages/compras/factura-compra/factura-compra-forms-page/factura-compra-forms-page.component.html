@@ -164,84 +164,88 @@
     </div>
 
     <!-- Sección: Anticipos y Cuentas por Pagar (Cruce) -->
-    @if (formCompra.get('proveedor')?.value) {
+    @if (formCompra.get('proveedor')?.value && (anticiposDisponibles().length > 0 || anticiposAsociados().length > 0)) {
     <div class="bg-white rounded-xl shadow-lg overflow-hidden mt-6">
       <div class="p-6">
         <h3 class="text-lg font-medium text-slate-700 border-gray-300 border-b pb-2 mb-4 flex items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           Cruce de Anticipos al Proveedor
         </h3>
 
-        <!-- Anticipos Disponibles -->
-        @if (anticiposDisponibles().length > 0 || anticiposAsociados().length > 0) {
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Panel Izquierdo: Disponibles para Cruzar -->
-            <div class="border border-slate-100 rounded-lg p-4 bg-slate-50/50">
-              <h4 class="text-sm font-semibold text-slate-600 mb-3">Anticipos Entregados</h4>
-              @if (anticiposDisponibles().length === 0) {
-                <p class="text-xs text-slate-400 italic">No hay más anticipos disponibles para este proveedor.</p>
-              } @else {
-                <div class="space-y-3 max-h-48 overflow-y-auto pr-1">
-                  @for (ant of anticiposDisponibles(); track ant.id) {
-                    <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-100 shadow-sm hover:shadow transition duration-200">
-                      <div class="flex items-center space-x-3">
-                        <input type="checkbox" (change)="toggleAnticipo(ant, $event)" [disabled]="obtenerSaldoPendienteAntesAnticipos() <= 0" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer" />
-                        <div>
-                          <span class="text-xs font-bold text-slate-700 block">{{ ant.numero }}</span>
-                          <span class="text-[10px] text-slate-400">Fecha: {{ ant.fecha | date:'yyyy-MM-dd' }}</span>
-                        </div>
-                      </div>
-                      <div class="text-right">
-                        <span class="text-xs font-semibold text-indigo-600 block">{{ ant.saldoDisponible | currency }}</span>
-                        <span class="text-[10px] text-slate-400">Original: {{ ant.montoOriginal | currency }}</span>
-                      </div>
-                    </div>
-                  }
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Panel Izquierdo: Disponibles para Cruzar -->
+          <div class="border border-slate-100 rounded-lg p-4 bg-slate-50/50">
+            <h4 class="text-sm font-semibold text-slate-600 mb-3">Anticipos Entregados</h4>
+            @if (anticiposDisponibles().length === 0) {
+            <p class="text-xs text-slate-400 italic">No hay más anticipos disponibles para este proveedor.</p>
+            } @else {
+            <div class="space-y-3 max-h-48 overflow-y-auto pr-1">
+              @for (ant of anticiposDisponibles(); track ant.id) {
+              <div
+                class="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-100 shadow-sm hover:shadow transition duration-200">
+                <div class="flex items-center space-x-3">
+                  <input type="checkbox" (change)="toggleAnticipo(ant, $event)"
+                    [disabled]="obtenerSaldoPendienteAntesAnticipos() <= 0"
+                    class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer" />
+                  <div>
+                    <span class="text-xs font-bold text-slate-700 block">{{ ant.numero }}</span>
+                    <span class="text-[10px] text-slate-400">Fecha: {{ ant.fecha | date:'yyyy-MM-dd' }}</span>
+                  </div>
                 </div>
+                <div class="text-right">
+                  <span class="text-xs font-semibold text-blue-600 block">{{ ant.saldoDisponible | currency }}</span>
+                  <span class="text-[10px] text-slate-400">Original: {{ ant.montoOriginal | currency }}</span>
+                </div>
+              </div>
               }
             </div>
-
-            <!-- Panel Derecho: Aplicados a la Compra -->
-            <div class="border border-indigo-50 rounded-lg p-4 bg-indigo-50/20">
-              <h4 class="text-sm font-semibold text-indigo-950 mb-3 flex justify-between items-center">
-                <span>Anticipos Aplicados a la Factura</span>
-                <span class="bg-indigo-100 text-indigo-800 text-[10px] px-2 py-0.5 rounded-full font-bold">
-                  Total: {{ obtenerMontoTotalAnticipos() | currency }}
-                </span>
-              </h4>
-              @if (anticiposAsociados().length === 0) {
-                <p class="text-xs text-slate-400 italic">Marca un anticipo de la lista de disponibles para aplicarlo a esta factura.</p>
-              } @else {
-                <div class="space-y-3">
-                  @for (asoc of anticiposAsociados(); track asoc.anticipoId) {
-                    <div class="p-3 bg-white rounded-lg border border-indigo-100 shadow-sm flex flex-col space-y-2">
-                      <div class="flex justify-between items-center">
-                        <span class="text-xs font-bold text-slate-800">{{ asoc.numero }}</span>
-                        <button type="button" (click)="desasociarAnticipo(asoc)" class="text-red-500 hover:text-red-700 text-xs transition duration-200">
-                          Quitar
-                        </button>
-                      </div>
-                      <div class="grid grid-cols-2 gap-4 items-center">
-                        <div>
-                          <span class="text-[10px] text-slate-400 block">Saldo Disponible</span>
-                          <span class="text-xs font-medium text-slate-700">{{ asoc.saldoDisponible | currency }}</span>
-                        </div>
-                        <div>
-                          <label class="text-[10px] text-slate-400 block mb-1">Monto a Aplicar</label>
-                          <input type="number" [value]="asoc.montoAplicado" (input)="cambiarMontoAplicado(asoc, $event)" [max]="asoc.saldoDisponible" class="w-full bg-slate-50 text-slate-700 text-xs border border-slate-200 rounded px-2 py-1 focus:outline-none focus:border-indigo-400 text-right font-semibold" />
-                        </div>
-                      </div>
-                    </div>
-                  }
-                </div>
-              }
-            </div>
+            }
           </div>
-        } @else {
-          <p class="text-xs text-slate-400 italic">No existen anticipos registrados o disponibles para este proveedor.</p>
-        }
+
+          <!-- Panel Derecho: Aplicados a la Compra -->
+          <div class="border border-blue-50 rounded-lg p-4 bg-blue-50/20">
+            <h4 class="text-sm font-semibold text-blue-950 mb-3 flex justify-between items-center">
+              <span>Anticipos Aplicados a la Factura</span>
+              <span class="bg-blue-100 text-blue-500 text-[10px] px-2 py-0.5 rounded-full font-bold">
+                Total: {{ obtenerMontoTotalAnticipos() | currency }}
+              </span>
+            </h4>
+            @if (anticiposAsociados().length === 0) {
+            <p class="text-xs text-slate-400 italic">Marca un anticipo de la lista de disponibles para aplicarlo a esta
+              factura.</p>
+            } @else {
+            <div class="space-y-3">
+              @for (asoc of anticiposAsociados(); track asoc.anticipoId) {
+              <div class="p-3 bg-white rounded-lg border border-blue-100 shadow-sm flex flex-col space-y-2">
+                <div class="flex justify-between items-center">
+                  <span class="text-xs font-bold text-slate-800">{{ asoc.numero }}</span>
+                  <button type="button" (click)="desasociarAnticipo(asoc)"
+                    class="text-red-500 hover:text-red-700 text-xs transition duration-200">
+                    Quitar
+                  </button>
+                </div>
+                <div class="grid grid-cols-2 gap-4 items-center">
+                  <div>
+                    <span class="text-[10px] text-slate-400 block">Saldo Disponible</span>
+                    <span class="text-xs font-medium text-slate-700">{{ asoc.saldoDisponible | currency }}</span>
+                  </div>
+                  <div>
+                    <label class="text-[10px] text-slate-400 block mb-1">Monto a Aplicar</label>
+                    <input type="number" [value]="asoc.montoAplicado" (input)="cambiarMontoAplicado(asoc, $event)"
+                      [max]="asoc.saldoDisponible"
+                      class="w-full bg-slate-50 text-slate-700 text-xs border border-slate-200 rounded px-2 py-1 focus:outline-none focus:border-blue-400 text-right font-semibold" />
+                  </div>
+                </div>
+              </div>
+              }
+            </div>
+            }
+          </div>
+        </div>
       </div>
     </div>
     }

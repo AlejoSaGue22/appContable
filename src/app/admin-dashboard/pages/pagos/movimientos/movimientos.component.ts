@@ -13,122 +13,126 @@ import { ModalAsientoContableComponent } from '../components/modal-asiento-conta
 import { VolantePagoComponent } from '../components/volante-pago/volante-pago.component';
 
 @Component({
- selector: 'app-movimientos',
- standalone: true,
- imports: [
- CommonModule,
- ReactiveFormsModule,
- HeaderTitlePageComponent,
- PaginationComponent,
- ModalComponent,
- ModalAsientoContableComponent,
- VolantePagoComponent,
- ],
- templateUrl: './movimientos.component.html',
+    selector: 'app-movimientos',
+    standalone: true,
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        HeaderTitlePageComponent,
+        PaginationComponent,
+        ModalComponent,
+        ModalAsientoContableComponent,
+        VolantePagoComponent,
+    ],
+    templateUrl: './movimientos.component.html',
 })
 export class MovimientosComponent {
- private svc = inject(PagosHttpService);
- private paginationService = inject(PaginationService);
+    private svc = inject(PagosHttpService);
+    private paginationService = inject(PaginationService);
 
- headTitle = signal<HeaderInput>({
- title: 'Movimientos Financieros',
- slog: 'Historial global de cobros recibidos y pagos enviados',
- });
+    headTitle = signal<HeaderInput>({
+        title: 'Movimientos Financieros',
+        slog: 'Historial global de cobros recibidos y pagos enviados',
+    });
 
- rawData = signal<MovimientosResponse>({
- items: [],
- resumen: { totalCobros: 0, totalPagos: 0, neto: 0 },
- meta: { page: 1, limit: 20, total: 0, totalPages: 1 },
- });
- loading = signal(false);
+    rawData = signal<MovimientosResponse>({
+        items: [],
+        resumen: { totalCobros: 0, totalPagos: 0, neto: 0 },
+        meta: { page: 1, limit: 20, total: 0, totalPages: 1 },
+    });
+    loading = signal(false);
 
- filtroTexto = new FormControl('');
- filtroTipo = new FormControl<TipoPago | ''>('');
- filtroMedio = new FormControl<MedioPago | ''>('');
- filtroFechaInicio = new FormControl('');
- filtroFechaFin = new FormControl('');
+    filtroTexto = new FormControl('');
+    filtroTipo = new FormControl<TipoPago | ''>('');
+    filtroMedio = new FormControl<MedioPago | ''>('');
+    filtroFechaInicio = new FormControl('');
+    filtroFechaFin = new FormControl('');
 
- textoSignal = toSignal(
- this.filtroTexto.valueChanges.pipe(
- startWith(''),
- debounceTime(300),
- distinctUntilChanged(),
- map(v => v?.trim() ?? ''),
- ),
- );
- tipoSignal = toSignal(this.filtroTipo.valueChanges.pipe(startWith('')));
- medioSignal = toSignal(this.filtroMedio.valueChanges.pipe(startWith('')));
+    textoSignal = toSignal(
+        this.filtroTexto.valueChanges.pipe(
+            startWith(''),
+            debounceTime(300),
+            distinctUntilChanged(),
+            map(v => v?.trim() ?? ''),
+        ),
+    );
+    tipoSignal = toSignal(this.filtroTipo.valueChanges.pipe(startWith('')));
+    medioSignal = toSignal(this.filtroMedio.valueChanges.pipe(startWith('')));
 
- resumen = computed(() => this.rawData().resumen);
+    resumen = computed(() => this.rawData().resumen);
 
- constructor() {
- this.cargar();
- }
+    constructor() {
+        this.cargar();
+    }
 
- cargar(): void {
- this.loading.set(true);
- this.svc
- .getMovimientos({
- tipo: this.filtroTipo.value || undefined,
- medioPago: this.filtroMedio.value || undefined,
- busqueda: this.filtroTexto.value?.trim() || undefined,
- fechaInicio: this.filtroFechaInicio.value || undefined,
- fechaFin: this.filtroFechaFin.value || undefined,
- page: this.paginationService.currentPage(),
- limit: 20,
- })
- .subscribe({
- next: res => {
- this.rawData.set(res);
- this.loading.set(false);
- this.paginationService.totalItems.set(res.meta.total);
- this.paginationService.pageSize.set(res.meta.totalPages);
- },
- error: () => this.loading.set(false),
- });
- }
+    cargar(): void {
+        this.loading.set(true);
+        this.svc
+            .getMovimientos({
+                tipo: this.filtroTipo.value || undefined,
+                medioPago: this.filtroMedio.value || undefined,
+                busqueda: this.filtroTexto.value?.trim() || undefined,
+                fechaInicio: this.filtroFechaInicio.value || undefined,
+                fechaFin: this.filtroFechaFin.value || undefined,
+                page: this.paginationService.currentPage(),
+                limit: 20,
+            })
+            .subscribe({
+                next: res => {
+                    this.rawData.set(res);
+                    this.loading.set(false);
+                    this.paginationService.totalItems.set(res.meta.total);
+                    this.paginationService.pageSize.set(res.meta.totalPages);
+                },
+                error: () => this.loading.set(false),
+            });
+    }
 
- limpiarFiltros(): void {
- this.filtroTexto.setValue('', { emitEvent: false });
- this.filtroTipo.setValue('', { emitEvent: false });
- this.filtroMedio.setValue('', { emitEvent: false });
- this.filtroFechaInicio.setValue('', { emitEvent: false });
- this.filtroFechaFin.setValue('', { emitEvent: false });
- this.cargar();
- }
+    limpiarFiltros(): void {
+        this.filtroTexto.setValue('', { emitEvent: false });
+        this.filtroTipo.setValue('', { emitEvent: false });
+        this.filtroMedio.setValue('', { emitEvent: false });
+        this.filtroFechaInicio.setValue('', { emitEvent: false });
+        this.filtroFechaFin.setValue('', { emitEvent: false });
+        this.cargar();
+    }
 
- // ── Modal Asiento Contable ──────────────────────────────────────────────
- asientoVisible = false;
- asientoPagoId = signal<string | null>(null);
+    // ── Modal Asiento Contable ──────────────────────────────────────────────
+    asientoVisible = false;
+    asientoPagoId = signal<string | null>(null);
 
- verAsiento(item: MovimientoItem): void {
- if (!item.asientoId) return;
- this.asientoPagoId.set(item.id);
- this.asientoVisible = true;
- }
+    verAsiento(item: MovimientoItem): void {
+        if (!item.asientoId) return;
+        this.asientoPagoId.set(item.id);
+        this.asientoVisible = true;
+    }
 
- // ── Volante de Pago ─────────────────────────────────────────────────────
- volanteVisible = false;
- volanteItem = signal<MovimientoItem | null>(null);
+    // ── Volante de Pago ─────────────────────────────────────────────────────
+    volanteVisible = false;
+    volanteItem = signal<MovimientoItem | null>(null);
 
- imprimirVolante(item: MovimientoItem): void {
- this.volanteItem.set(item);
- this.volanteVisible = true;
- }
+    imprimirVolante(item: MovimientoItem): void {
+        this.volanteItem.set(item);
+        this.volanteVisible = true;
+    }
 
- etiquetaMedio(medio: MedioPago): string {
- const labels: Record<MedioPago, string> = {
- caja: 'Caja',
- banco: 'Banco',
- transferencia: 'Transferencia',
- cheque: 'Cheque',
- };
- return labels[medio] ?? medio;
- }
+    etiquetaMedio(medio: MedioPago): string {
+        const labels: Record<MedioPago, string> = {
+            caja: 'Caja',
+            banco: 'Banco',
+            transferencia: 'Transferencia',
+            cheque: 'Cheque',
+        };
+        return labels[medio] ?? medio;
+    }
 
- formatCuentaBancaria(item: MovimientoItem): string {
- if (!item.cuentaBancaria) return '—';
- const banco = item.cuentaBancaria.banco?.nombre ?? '';
- return `${banco} - ${item.cuentaBancaria.numeroCuenta}`;
- }
+    formatCuentaBancaria(item: MovimientoItem): string {
+        if (!item.cuentaBancaria) return '—';
+        const banco = item.cuentaBancaria.banco?.nombre ?? '';
+        return `${banco} - ${item.cuentaBancaria.numeroCuenta}`;
+    }
+
+    isIngreso(tipo: TipoPago | string): boolean {
+        return tipo === 'cobro' || tipo === 'otro_ingreso';
+    }
 }

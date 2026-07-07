@@ -257,28 +257,28 @@ export class FacturaCompraFormsPageComponent implements OnInit {
 
                     // Cargar anticipos cruzados/aplicados a esta factura
                     this.facturaService.getAplicacionesAnticipo(id).subscribe({
-                      next: (appRes) => {
-                        const apps = appRes.data || [];
-                        this.anticiposAsociados.set(apps.map((app: any) => ({
-                          anticipoId: app.anticipoId,
-                          numero: app.anticipo?.numero || '',
-                          montoOriginal: app.anticipo?.montoOriginal || 0,
-                          saldoDisponible: app.anticipo?.saldoDisponible || 0,
-                          montoAplicado: app.montoAplicado
-                        })));
-                        
-                        // Cargar también todos los disponibles para el proveedor
-                        if (invoice.proveedorId) {
-                          this.cargarAnticiposDisponibles(invoice.proveedorId);
+                        next: (appRes) => {
+                            const apps = appRes.data || [];
+                            this.anticiposAsociados.set(apps.map((app: any) => ({
+                                anticipoId: app.anticipoId,
+                                numero: app.anticipo?.numero || '',
+                                montoOriginal: app.anticipo?.montoOriginal || 0,
+                                saldoDisponible: app.anticipo?.saldoDisponible || 0,
+                                montoAplicado: app.montoAplicado
+                            })));
+
+                            // Cargar también todos los disponibles para el proveedor
+                            if (invoice.proveedorId) {
+                                this.cargarAnticiposDisponibles(invoice.proveedorId);
+                            }
+                            this.loaderService.hide();
+                        },
+                        error: (err) => {
+                            if (invoice.proveedorId) {
+                                this.cargarAnticiposDisponibles(invoice.proveedorId);
+                            }
+                            this.loaderService.hide();
                         }
-                        this.loaderService.hide();
-                      },
-                      error: (err) => {
-                        if (invoice.proveedorId) {
-                          this.cargarAnticiposDisponibles(invoice.proveedorId);
-                        }
-                        this.loaderService.hide();
-                      }
                     });
                 }
             },
@@ -447,8 +447,6 @@ export class FacturaCompraFormsPageComponent implements OnInit {
             }))
         };
 
-        // Log removed
-
         if (this.facturaId() == 'new') {
             this.facturaService.createFacturaCompra(invoiceData).subscribe((response) => {
                 this.loading.set(false);
@@ -571,7 +569,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         if (isChecked) {
             const saldoPendienteFactura = this.obtenerSaldoPendienteAntesAnticipos();
             const montoSugerido = Math.min(anticipo.saldoDisponible, saldoPendienteFactura);
-            
+
             this.anticiposAsociados.update(list => [...list, {
                 anticipoId: anticipo.id,
                 numero: anticipo.numero,
@@ -596,11 +594,11 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     cambiarMontoAplicado(asoc: any, event: Event) {
         const inputVal = Number((event.target as HTMLInputElement).value) || 0;
         let finalVal = Math.min(inputVal, asoc.saldoDisponible);
-        
+
         const otrosAnticiposSuma = this.anticiposAsociados()
             .filter(a => a.anticipoId !== asoc.anticipoId)
             .reduce((sum, a) => sum + a.montoAplicado, 0);
-            
+
         const maxValPermitido = Math.max(0, this.totales.facturaTotal - otrosAnticiposSuma);
         finalVal = Math.min(finalVal, maxValPermitido);
 
