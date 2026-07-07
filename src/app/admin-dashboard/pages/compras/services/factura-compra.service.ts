@@ -87,4 +87,12 @@ export class FacturaCompraService {
  )
  }
 
+ getAnticiposDisponibles(proveedorId: string): Observable<any> {
+ return this.http.get<any>(`${baseUrl}/pagos/anticipos-disponibles/proveedor/${proveedorId}`);
+ }
+
+ getAplicacionesAnticipo(facturaId: string): Observable<any> {
+ return this.http.get<any>(`${baseUrl}/pagos/aplicaciones/factura-compra/${facturaId}`);
+ }
+
 }

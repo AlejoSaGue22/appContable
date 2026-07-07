@@ -88,6 +88,8 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     cuentasBancarias = signal<CuentaBancaria[]>([]);
     refreshAsientoTrigger = signal<number>(0);
     factura = signal<FacturaCompra | null>(null);
+    anticiposDisponibles = signal<any[]>([]);
+    anticiposAsociados = signal<{ anticipoId: string; numero: string; montoOriginal: number; saldoDisponible: number; montoAplicado: number }[]>([]);
 
     formCompra = this.fb.group({
         proveedor: ['', Validators.required],
@@ -252,12 +254,36 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                     this.totales.subtotal = invoice.subtotal;
                     this.totales.totalIVA = invoice.iva;
                     this.totales.descuentoTotal = invoice.descuento;
+
+                    // Cargar anticipos cruzados/aplicados a esta factura
+                    this.facturaService.getAplicacionesAnticipo(id).subscribe({
+                      next: (appRes) => {
+                        const apps = appRes.data || [];
+                        this.anticiposAsociados.set(apps.map((app: any) => ({
+                          anticipoId: app.anticipoId,
+                          numero: app.anticipo?.numero || '',
+                          montoOriginal: app.anticipo?.montoOriginal || 0,
+                          saldoDisponible: app.anticipo?.saldoDisponible || 0,
+                          montoAplicado: app.montoAplicado
+                        })));
+                        
+                        // Cargar también todos los disponibles para el proveedor
+                        if (invoice.proveedorId) {
+                          this.cargarAnticiposDisponibles(invoice.proveedorId);
+                        }
+                        this.loaderService.hide();
+                      },
+                      error: (err) => {
+                        if (invoice.proveedorId) {
+                          this.cargarAnticiposDisponibles(invoice.proveedorId);
+                        }
+                        this.loaderService.hide();
+                      }
+                    });
                 }
             },
             error: (error) => {
                 this.notificationService.error('Error al cargar los datos de la factura de compra', error);
-            },
-            complete: () => {
                 this.loaderService.hide();
             }
 
@@ -392,7 +418,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         const factura = this.formCompra.value;
         const items = this.formCompra.controls.items.value;
 
-        const invoiceData: Partial<FacturaCompra> = {
+        const invoiceData: any = {
             isDraft,
             proveedorId: factura.proveedor!,
             fecha: factura.fechaEmision!,
@@ -415,7 +441,10 @@ export class FacturaCompraFormsPageComponent implements OnInit {
             descuento: this.totales.descuentoTotal,
             iva: this.totales.totalIVA,
             total: this.totales.facturaTotal,
-            // retenciones: this.totales.retenciones,
+            anticiposAsociados: this.anticiposAsociados().map(a => ({
+                anticipoId: a.anticipoId,
+                montoAplicado: a.montoAplicado
+            }))
         };
 
         // Log removed
@@ -514,7 +543,82 @@ export class FacturaCompraFormsPageComponent implements OnInit {
             email: newProvider.email,
         });
 
+        // Resetear asociados anteriores al cambiar de proveedor
+        this.anticiposAsociados.set([]);
+
+        if (newProvider.id) {
+            this.cargarAnticiposDisponibles(newProvider.id);
+        }
+
         this.closeProviderModal();
+    }
+
+    cargarAnticiposDisponibles(proveedorId: string) {
+        this.facturaService.getAnticiposDisponibles(proveedorId).subscribe({
+            next: (res) => {
+                const asociadosIds = this.anticiposAsociados().map(a => a.anticipoId);
+                const disponibles = (res.data || []).filter((a: any) => !asociadosIds.includes(a.id));
+                this.anticiposDisponibles.set(disponibles);
+            },
+            error: (err) => {
+                this.notificationService.error('Error al cargar anticipos del proveedor', err);
+            }
+        });
+    }
+
+    toggleAnticipo(anticipo: any, event: Event) {
+        const isChecked = (event.target as HTMLInputElement).checked;
+        if (isChecked) {
+            const saldoPendienteFactura = this.obtenerSaldoPendienteAntesAnticipos();
+            const montoSugerido = Math.min(anticipo.saldoDisponible, saldoPendienteFactura);
+            
+            this.anticiposAsociados.update(list => [...list, {
+                anticipoId: anticipo.id,
+                numero: anticipo.numero,
+                montoOriginal: anticipo.montoOriginal,
+                saldoDisponible: anticipo.saldoDisponible,
+                montoAplicado: montoSugerido > 0 ? montoSugerido : 0
+            }]);
+            this.anticiposDisponibles.update(list => list.filter(a => a.id !== anticipo.id));
+        }
+    }
+
+    desasociarAnticipo(asoc: any) {
+        this.anticiposDisponibles.update(list => [...list, {
+            id: asoc.anticipoId,
+            numero: asoc.numero,
+            montoOriginal: asoc.montoOriginal,
+            saldoDisponible: asoc.saldoDisponible
+        }]);
+        this.anticiposAsociados.update(list => list.filter(a => a.anticipoId !== asoc.anticipoId));
+    }
+
+    cambiarMontoAplicado(asoc: any, event: Event) {
+        const inputVal = Number((event.target as HTMLInputElement).value) || 0;
+        let finalVal = Math.min(inputVal, asoc.saldoDisponible);
+        
+        const otrosAnticiposSuma = this.anticiposAsociados()
+            .filter(a => a.anticipoId !== asoc.anticipoId)
+            .reduce((sum, a) => sum + a.montoAplicado, 0);
+            
+        const maxValPermitido = Math.max(0, this.totales.facturaTotal - otrosAnticiposSuma);
+        finalVal = Math.min(finalVal, maxValPermitido);
+
+        this.anticiposAsociados.update(list => list.map(a => {
+            if (a.anticipoId === asoc.anticipoId) {
+                return { ...a, montoAplicado: finalVal };
+            }
+            return a;
+        }));
+    }
+
+    obtenerSaldoPendienteAntesAnticipos(): number {
+        const sumaAplicados = this.anticiposAsociados().reduce((sum, a) => sum + a.montoAplicado, 0);
+        return Math.max(0, this.totales.facturaTotal - sumaAplicados);
+    }
+
+    obtenerMontoTotalAnticipos(): number {
+        return this.anticiposAsociados().reduce((sum, a) => sum + a.montoAplicado, 0);
     }
 
 

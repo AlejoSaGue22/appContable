@@ -1,4 +1,4 @@
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, DatePipe } from '@angular/common';
 import {
   FacturaVenta,
   FormaPago,
@@ -43,7 +43,7 @@ import { CatalogsStore } from '@dashboard/services/catalogs.store';
 import { HelpersUtils } from '@utils/helpers.utils';
 import { CuentasBancariasService } from '@dashboard/pages/contabilidad/services/cuentas-bancarias.service';
 import { CuentaBancaria } from '@dashboard/pages/contabilidad/interfaces/cuenta-bancaria.interface';
-
+ 
 @Component({
   selector: 'app-comprobante-ventas-forms-page',
   standalone: true,
@@ -52,6 +52,7 @@ import { CuentaBancaria } from '@dashboard/pages/contabilidad/interfaces/cuenta-
     ReactiveFormsModule,
     ListGroupDropdownComponent,
     CurrencyPipe,
+    DatePipe,
 
     FormErrorLabelComponent,
     RouterLink,
@@ -96,6 +97,8 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   loading = signal<boolean>(false);
   minDate = signal<string>(new Date().toISOString().substring(0, 10));
   refreshAsientoTrigger = signal<number>(0);
+  anticiposDisponibles = signal<any[]>([]);
+  anticiposAsociados = signal<{ anticipoId: string; numero: string; montoOriginal: number; saldoDisponible: number; montoAplicado: number }[]>([]);
 
   invoiceID = toSignal(
     this.activateRoute.params.pipe(map((param) => param['id'])),
@@ -223,7 +226,32 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
         this.factura.set(invoice as any);
         this.productSeleccionados.set(invoice.items as ItemFactura[]);
         this.calcularTotal();
-        this.loaderservice.hide();
+
+        // Cargar anticipos cruzados/aplicados a esta factura
+        this.ventaServices.getAplicacionesAnticipo(id).subscribe({
+          next: (appRes) => {
+            const apps = appRes.data || [];
+            this.anticiposAsociados.set(apps.map((app: any) => ({
+              anticipoId: app.anticipoId,
+              numero: app.anticipo?.numero || '',
+              montoOriginal: app.anticipo?.montoOriginal || 0,
+              saldoDisponible: app.anticipo?.saldoDisponible || 0,
+              montoAplicado: app.montoAplicado
+            })));
+            
+            // Cargar también todos los disponibles para el cliente
+            if (invoice.clientId) {
+              this.cargarAnticiposDisponibles(invoice.clientId);
+            }
+            this.loaderservice.hide();
+          },
+          error: (err) => {
+            if (invoice.clientId) {
+              this.cargarAnticiposDisponibles(invoice.clientId);
+            }
+            this.loaderservice.hide();
+          }
+        });
       },
       error: (err) => {
         this.loading.set(false);
@@ -434,6 +462,81 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
         ? `${abreviatura} - ${cliente.numeroDocumento}`
         : cliente.numeroDocumento,
     });
+
+    // Resetear asociados anteriores al cambiar de cliente
+    this.anticiposAsociados.set([]);
+
+    if (cliente.id) {
+      this.cargarAnticiposDisponibles(cliente.id);
+    }
+  }
+
+  cargarAnticiposDisponibles(clienteId: string) {
+    this.ventaServices.getAnticiposDisponibles(clienteId).subscribe({
+      next: (res) => {
+        const asociadosIds = this.anticiposAsociados().map(a => a.anticipoId);
+        const disponibles = (res.data || []).filter((a: any) => !asociadosIds.includes(a.id));
+        this.anticiposDisponibles.set(disponibles);
+      },
+      error: (err) => {
+        this.notificacionService.error('Error al cargar anticipos del cliente', err);
+      }
+    });
+  }
+
+  toggleAnticipo(anticipo: any, event: Event) {
+    const isChecked = (event.target as HTMLInputElement).checked;
+    if (isChecked) {
+      const saldoPendienteFactura = this.obtenerSaldoPendienteAntesAnticipos();
+      const montoSugerido = Math.min(anticipo.saldoDisponible, saldoPendienteFactura);
+      
+      this.anticiposAsociados.update(list => [...list, {
+        anticipoId: anticipo.id,
+        numero: anticipo.numero,
+        montoOriginal: anticipo.montoOriginal,
+        saldoDisponible: anticipo.saldoDisponible,
+        montoAplicado: montoSugerido > 0 ? montoSugerido : 0
+      }]);
+      this.anticiposDisponibles.update(list => list.filter(a => a.id !== anticipo.id));
+    }
+  }
+
+  desasociarAnticipo(asoc: any) {
+    this.anticiposDisponibles.update(list => [...list, {
+      id: asoc.anticipoId,
+      numero: asoc.numero,
+      montoOriginal: asoc.montoOriginal,
+      saldoDisponible: asoc.saldoDisponible
+    }]);
+    this.anticiposAsociados.update(list => list.filter(a => a.anticipoId !== asoc.anticipoId));
+  }
+
+  cambiarMontoAplicado(asoc: any, event: Event) {
+    const inputVal = Number((event.target as HTMLInputElement).value) || 0;
+    let finalVal = Math.min(inputVal, asoc.saldoDisponible);
+    
+    const otrosAnticiposSuma = this.anticiposAsociados()
+      .filter(a => a.anticipoId !== asoc.anticipoId)
+      .reduce((sum, a) => sum + a.montoAplicado, 0);
+      
+    const maxValPermitido = Math.max(0, this.totales.facturaTotal - otrosAnticiposSuma);
+    finalVal = Math.min(finalVal, maxValPermitido);
+
+    this.anticiposAsociados.update(list => list.map(a => {
+      if (a.anticipoId === asoc.anticipoId) {
+        return { ...a, montoAplicado: finalVal };
+      }
+      return a;
+    }));
+  }
+
+  obtenerSaldoPendienteAntesAnticipos(): number {
+    const sumaAplicados = this.anticiposAsociados().reduce((sum, a) => sum + a.montoAplicado, 0);
+    return Math.max(0, this.totales.facturaTotal - sumaAplicados);
+  }
+
+  obtenerMontoTotalAnticipos(): number {
+    return this.anticiposAsociados().reduce((sum, a) => sum + a.montoAplicado, 0);
   }
 
   onProductoSeleccionado(producto: Partial<GetProductosDetalle>) {
@@ -502,7 +605,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     const valueFormFactura = this.formVentas.value;
     const productos = this.productSeleccionados();
 
-    const invoiceData: Partial<FacturaVenta> = {
+    const invoiceData: any = {
       clientId: valueFormFactura.cliente!,
       vendedor: valueFormFactura.vendedor!,
       canalVenta: valueFormFactura.canal!,
@@ -527,6 +630,10 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       descuento: this.totales.descuentoTotal,
       total: this.totales.facturaTotal,
       saveAsDraft: saveAsDraft,
+      anticiposAsociados: this.anticiposAsociados().map(a => ({
+        anticipoId: a.anticipoId,
+        montoAplicado: a.montoAplicado
+      }))
     };
 
     if (this.invoiceID() == 'new-Item') {

@@ -8,116 +8,122 @@ import { environment } from 'src/app/environments/environment';
 const baseUrl = environment.baseUrl;
 
 @Injectable({
- providedIn: 'root'
+  providedIn: 'root'
 })
 export class ComprobantesVentasService {
 
- private http = inject(HttpClient);
+  private http = inject(HttpClient);
 
- getComprobanteVentas(options: Options & InvoiceFilters): Observable<ComprobanteVentaResponse> {
- const { limit = 10, page = 1, status, noStatus, type, clientName, startDate, endDate, tipoFactura, numeroFactura, dianStatus } = options;
+  getComprobanteVentas(options: Options & InvoiceFilters): Observable<ComprobanteVentaResponse> {
+    const { limit = 10, page = 1, status, noStatus, type, clientName, startDate, endDate, tipoFactura, numeroFactura, dianStatus } = options;
 
- const params: any = { limit, page };
+    const params: any = { limit, page };
 
- if (status) params.status = status;
- if (noStatus) params.noStatus = noStatus;
- if (type) params.type = type;
- if (clientName) params.clientName = clientName;
- if (startDate) params.startDate = startDate;
- if (endDate) params.endDate = endDate;
- if (tipoFactura) params.tipoFactura = tipoFactura;
- if (numeroFactura) params.numeroFactura = numeroFactura;
- if (dianStatus) params.dianStatus = dianStatus;
+    if (status) params.status = status;
+    if (noStatus) params.noStatus = noStatus;
+    if (type) params.type = type;
+    if (clientName) params.clientName = clientName;
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+    if (tipoFactura) params.tipoFactura = tipoFactura;
+    if (numeroFactura) params.numeroFactura = numeroFactura;
+    if (dianStatus) params.dianStatus = dianStatus;
 
- return this.http.get<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas`, {
- params
- }).pipe(
- delay(800)
- )
- }
+    return this.http.get<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas`, {
+      params
+    }).pipe(
+      delay(800)
+    )
+  }
 
- createInvoice(invoice: Partial<FacturaVenta>) {
+  createInvoice(invoice: Partial<FacturaVenta>) {
+    return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas`, invoice).pipe(
+      map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+    );
+  }
 
- return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas`, invoice).pipe(
- map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
- catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
- );
+  updateInvoice(id: string, invoice: Partial<FacturaVenta>) {
+    return this.http.patch<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}`, invoice).pipe(
+      map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+    );
+  }
 
- }
+  getInvoiceById(id: string) {
+    return this.http.get<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}`)
+  }
 
- updateInvoice(id: string, invoice: Partial<FacturaVenta>) {
- return this.http.patch<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}`, invoice).pipe(
- map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
- catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
- );
- }
+  emitirInvoice(id: string) {
+    return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/emitir`, {}).pipe(
+      map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+    ); 
+  }
 
- getInvoiceById(id: string) {
- return this.http.get<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}`)
- }
+  emitirEstandarInvoice(id: string) {
+    return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/emitir-estandar`, {}).pipe(
+      map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+    );
+  }
 
- emitirInvoice(id: string) {
- return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/emitir`, {}).pipe(
- map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
- catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
- ); 
- }
+  anularInvoice(id: string, motivo: string) {
+    return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/anular`, { motivo }).pipe(
+      map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+    );
+  }
 
- emitirEstandarInvoice(id: string) {
- return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/emitir-estandar`, {}).pipe(
- map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
- catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
- );
- }
+  retryInvoice(id: string) {
+    return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/reintentar`, {}).pipe(
+      map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+    );
+  }
 
- anularInvoice(id: string, motivo: string) {
- return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/anular`, { motivo }).pipe(
- map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
- catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
- );
- }
+  deleteInvoice(id: string) {
+    return this.http.delete<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}`).pipe(
+      map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+    );
+  }
 
- retryInvoice(id: string) {
- return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/reintentar`, {}).pipe(
- map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
- catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
- );
- }
+  registrarPago(id: string, pagoData: any) {
+    return this.http.patch<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/pago`, pagoData).pipe(
+      map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+    );
+  }
 
- deleteInvoice(id: string) {
- return this.http.delete<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}`).pipe(
- map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
- catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
- );
- }
+  downloadPDF(id: string): Observable<Blob> {
+    return this.http.get(`${baseUrl}/facturas-ventas/${id}/pdf`, { responseType: 'blob' });
+  }
 
- registrarPago(id: string, pagoData: any) {
- return this.http.patch<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/pago`, pagoData).pipe(
- map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
- catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
- );
- }
+  downloadXML(id: string): Observable<Blob> {
+    return this.http.get(`${baseUrl}/facturas-ventas/${id}/xml`, { responseType: 'blob' });
+  }
 
- downloadPDF(id: string): Observable<Blob> {
- return this.http.get(`${baseUrl}/facturas-ventas/${id}/pdf`, { responseType: 'blob' });
- }
+  reintentarAsiento(id: string) {
+    return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/reintentar-asiento`, {}).pipe(
+      map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+    );
+  }
 
- downloadXML(id: string): Observable<Blob> {
- return this.http.get(`${baseUrl}/facturas-ventas/${id}/xml`, { responseType: 'blob' });
- }
+  sendEmail(id: string, email: string) {
+    return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/enviar-email`, { email }).pipe(
+      map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+    );
+  }
 
- reintentarAsiento(id: string) {
- return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/reintentar-asiento`, {}).pipe(
- map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
- catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
- );
- }
+  getAnticiposDisponibles(clienteId: string): Observable<any> {
+    return this.http.get<any>(`${baseUrl}/pagos/anticipos-disponibles/cliente/${clienteId}`);
+  }
 
- sendEmail(id: string, email: string) {
- return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/enviar-email`, { email }).pipe(
- map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
- catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
- );
- }
+  getAplicacionesAnticipo(facturaId: string): Observable<any> {
+    return this.http.get<any>(`${baseUrl}/pagos/aplicaciones/factura-venta/${facturaId}`);
+  }
 
 }
