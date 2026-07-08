@@ -107,6 +107,38 @@ export class MovimientosComponent {
         this.asientoVisible = true;
     }
 
+    // ── Anulación de Pagos ──────────────────────────────────────────────────
+    anularVisible = false;
+    anularLoading = signal(false);
+    paymentToAnul = signal<MovimientoItem | null>(null);
+    motivoAnulacionCtrl = new FormControl('');
+
+    abrirModalAnular(item: MovimientoItem): void {
+        this.paymentToAnul.set(item);
+        this.motivoAnulacionCtrl.setValue('');
+        this.anularVisible = true;
+    }
+
+    confirmarAnular(): void {
+        const item = this.paymentToAnul();
+        const motivo = this.motivoAnulacionCtrl.value?.trim();
+        if (!item || !motivo) return;
+
+        this.anularLoading.set(true);
+        this.svc.anularPago(item.id, motivo).subscribe({
+            next: () => {
+                this.anularLoading.set(false);
+                this.anularVisible = false;
+                alert('El pago ha sido anulado exitosamente.');
+                this.cargar();
+            },
+            error: (err) => {
+                this.anularLoading.set(false);
+                alert(err?.error?.message || 'Error al intentar anular el pago.');
+            }
+        });
+    }
+
     // ── Volante de Pago ─────────────────────────────────────────────────────
     volanteVisible = false;
     volanteItem = signal<MovimientoItem | null>(null);

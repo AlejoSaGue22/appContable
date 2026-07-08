@@ -306,6 +306,8 @@ export interface MovimientoItem {
  } | null;
  creadoPor: string;
  createdAt: string;
+ estado?: 'activo' | 'anulado';
+ motivoAnulacion?: string | null;
 }
 
 export interface MovimientosResponse {

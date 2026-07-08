@@ -224,4 +224,8 @@ export class PagosHttpService {
     registrarOtrosEgresos(dto: any): Observable<any> {
         return this.http.post<any>(`${this.base}/pagos/otros-egresos`, dto);
     }
+
+    anularPago(pagoId: string, motivo: string): Observable<PagoResponseDto<unknown>> {
+        return this.http.patch<PagoResponseDto<unknown>>(`${this.base}/pagos/${pagoId}/anular`, { motivo });
+    }
 }
