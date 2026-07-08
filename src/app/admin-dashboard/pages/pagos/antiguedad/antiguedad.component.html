@@ -2,248 +2,250 @@
 
 <div class="w-full space-y-6">
 
- <!-- Selector de vista (Cobrar / Pagar) -->
- <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
- <div class="flex border-b border-gray-200">
- <button type="button"
- (click)="vistaActiva.set('cobrar')"
- class="flex-1 py-3.5 text-sm font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
- [ngClass]="vistaActiva() === 'cobrar'
+    <!-- Selector de vista (Cobrar / Pagar) -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="flex border-b border-gray-200">
+            <button type="button" (click)="vistaActiva.set('cobrar')"
+                class="flex-1 py-3.5 text-sm font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                [ngClass]="vistaActiva() === 'cobrar'
  ? 'bg-green-50 text-green-700 border-b-2 border-green-500'
  : 'text-slate-500 hover:bg-slate-50'">
- <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none"
- stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
- <line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline>
- </svg>
- Cartera por Cobrar
- @if (agingCobrar()?.totales?.total) {
- <span class="px-2 py-0.5 rounded-full text-xs bg-green-100 text-green-700">
- {{ agingCobrar()!.totales.total | currency:'':'symbol-narrow':'1.0-0' }}
- </span>
- }
- </button>
- <button type="button"
- (click)="vistaActiva.set('pagar')"
- class="flex-1 py-3.5 text-sm font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
- [ngClass]="vistaActiva() === 'pagar'
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <polyline points="19 12 12 19 5 12"></polyline>
+                </svg>
+                Cartera por Cobrar
+                @if (agingCobrar()?.totales?.total) {
+                <span class="px-2 py-0.5 rounded-full text-xs bg-green-100 text-green-700">
+                    {{ agingCobrar()!.totales.total | currency:'':'symbol-narrow':'1.0-0' }}
+                </span>
+                }
+            </button>
+            <button type="button" (click)="vistaActiva.set('pagar')"
+                class="flex-1 py-3.5 text-sm font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                [ngClass]="vistaActiva() === 'pagar'
  ? 'bg-orange-50 text-orange-700 border-b-2 border-orange-500'
  : 'text-slate-500 hover:bg-slate-50'">
- <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none"
- stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
- <line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline>
- </svg>
- Deuda por Pagar
- @if (agingPagar()?.totales?.total) {
- <span class="px-2 py-0.5 rounded-full text-xs bg-orange-100 text-orange-700">
- {{ agingPagar()!.totales.total | currency:'':'symbol-narrow':'1.0-0' }}
- </span>
- }
- </button>
- </div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="19" x2="12" y2="5"></line>
+                    <polyline points="5 12 12 5 19 12"></polyline>
+                </svg>
+                Deuda por Pagar
+                @if (agingPagar()?.totales?.total) {
+                <span class="px-2 py-0.5 rounded-full text-xs bg-orange-100 text-orange-700">
+                    {{ agingPagar()!.totales.total | currency:'':'symbol-narrow':'1.0-0' }}
+                </span>
+                }
+            </button>
+        </div>
 
- <!-- Contenido activo -->
- <div class="p-6">
- @if ((vistaActiva() === 'cobrar' && loadingCobrar()) || (vistaActiva() === 'pagar' && loadingPagar())) {
- <div class="w-full h-1 bg-blue-100 rounded-full mb-6 overflow-hidden">
- <div class="h-full bg-blue-500 rounded-full animate-pulse w-3/4"></div>
- </div>
- }
+        <!-- Contenido activo -->
+        <div class="p-6">
+            @if ((vistaActiva() === 'cobrar' && loadingCobrar()) || (vistaActiva() === 'pagar' && loadingPagar())) {
+            <div class="w-full h-1 bg-blue-100 rounded-full mb-6 overflow-hidden">
+                <div class="h-full bg-blue-500 rounded-full animate-pulse w-3/4"></div>
+            </div>
+            }
 
- @let reporte = reporteFiltrado();
- @let labelContraparte = vistaActiva() === 'cobrar' ? 'Cliente' : 'Proveedor';
+            @let reporte = reporteFiltrado();
+            @let labelContraparte = vistaActiva() === 'cobrar' ? 'Cliente' : 'Proveedor';
 
- <!-- Barra de herramientas (Filtros y Acciones) -->
- @if (agingCobrar() || agingPagar()) {
- <div class="mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
- <div class="relative w-full md:w-96">
- <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
- <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
- <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
- </svg>
- </span>
- <input type="text"
- [value]="searchQuery()"
- (input)="searchQuery.set($any($event.target).value)"
- [placeholder]="'Buscar ' + labelContraparte + '...'"
- class="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-lg leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all">
- </div>
+            <!-- Barra de herramientas (Filtros y Acciones) -->
+            @if (agingCobrar() || agingPagar()) {
+            <div class="mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
+                <div class="relative w-full md:w-96">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </span>
+                    <input type="text" [value]="searchQuery()" (input)="searchQuery.set($any($event.target).value)"
+                        [placeholder]="'Buscar ' + labelContraparte + '...'"
+                        class="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-lg leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all">
+                </div>
 
- <div class="flex items-center gap-2 w-full md:w-auto">
- <button type="button" 
- (click)="expandAll()"
- class="flex-1 md:flex-none px-4 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors cursor-pointer">
- Expandir Todo
- </button>
+                <div class="flex items-center gap-2 w-full md:w-auto">
+                    <button type="button" (click)="expandAll()"
+                        class="flex-1 md:flex-none px-4 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors cursor-pointer">
+                        Expandir Todo
+                    </button>
 
- <button type="button" 
- (click)="collapseAll()"
- class="flex-1 md:flex-none px-4 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors cursor-pointer">
- Contraer Todo
- </button>
- </div>
- </div>
- }
+                    <button type="button" (click)="collapseAll()"
+                        class="flex-1 md:flex-none px-4 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors cursor-pointer">
+                        Contraer Todo
+                    </button>
+                </div>
+            </div>
+            }
 
- @if (reporte) {
- <div class="mb-8">
- <h3 class="text-sm font-semibold text-slate-600 uppercase mb-4">
- Distribución por Antigüedad
- </h3>
- <div class="space-y-3">
- @for (b of buckets; track b.key) {
- <div class="flex items-center gap-3">
- <span class="w-20 text-right text-xs text-slate-500 flex-shrink-0">{{ b.label }}</span>
- <div class="flex-1 h-6 bg-slate-100 rounded-full overflow-hidden">
- <div class="h-full rounded-full transition-all duration-500 flex items-center pl-2"
- [style.width.%]="pct(reporte!.totales[b.key], reporte!.totales.total)"
- [ngClass]="b.bgClass">
- @if (pct(reporte!.totales[b.key], reporte!.totales.total) > 10) {
- <span class="text-xs font-semibold text-white">
- {{ pct(reporte!.totales[b.key], reporte!.totales.total) }}%
- </span>
- }
- </div>
- </div>
- <span class="w-36 text-right text-xs font-semibold flex-shrink-0"
- [ngClass]="b.textClass">
- {{ reporte!.totales[b.key] | currency:'':'symbol-narrow':'1.0-0' }}
- </span>
- </div>
- }
- </div>
- <div class="mt-4 flex justify-end border-t border-gray-100 pt-3">
- <span class="text-sm text-slate-500 mr-3">Total:</span>
- <span class="text-sm font-bold text-slate-800">
- {{ reporte!.totales.total | currency:'':'symbol-narrow':'1.0-0' }}
- </span>
- </div>
- </div>
+            @if (reporte) {
+            <div class="mb-8">
+                <h3 class="text-sm font-semibold text-slate-600 uppercase mb-4">
+                    Distribución por Antigüedad
+                </h3>
+                <div class="space-y-3">
+                    @for (b of buckets; track b.key) {
+                    <div class="flex items-center gap-3">
+                        <span class="w-20 text-right text-xs text-slate-500 flex-shrink-0">{{ b.label }}</span>
+                        <div class="flex-1 h-6 bg-slate-100 rounded-full overflow-hidden">
+                            <div class="h-full rounded-full transition-all duration-500 flex items-center pl-2"
+                                [style.width.%]="pct(reporte!.totales[b.key], reporte!.totales.total)"
+                                [ngClass]="b.bgClass">
+                                @if (pct(reporte!.totales[b.key], reporte!.totales.total) > 10) {
+                                <span class="text-xs font-semibold text-white">
+                                    {{ pct(reporte!.totales[b.key], reporte!.totales.total) }}%
+                                </span>
+                                }
+                            </div>
+                        </div>
+                        <span class="w-36 text-right text-xs font-semibold flex-shrink-0" [ngClass]="b.textClass">
+                            {{ reporte!.totales[b.key] | currency:'':'symbol-narrow':'1.0-0' }}
+                        </span>
+                    </div>
+                    }
+                </div>
+                <div class="mt-4 flex justify-end border-t border-gray-100 pt-3">
+                    <span class="text-sm text-slate-500 mr-3">Total:</span>
+                    <span class="text-sm font-bold text-slate-800">
+                        {{ reporte!.totales.total | currency:'':'symbol-narrow':'1.0-0' }}
+                    </span>
+                </div>
+            </div>
 
- <!-- Tabla de totales por contraparte -->
- <h3 class="text-sm font-semibold text-slate-600 uppercase mb-4">
- Detalle por {{ labelContraparte }}
- </h3>
- <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
- <div class="overflow-y-auto max-h-[70vh] relative">
- <table class="ledger-table">
- <thead class="sticky top-0 z-20">
- <tr>
- <th>{{ labelContraparte }}</th>
- @for (b of buckets; track b.key) {
- <th class="text-right"
- [ngClass]="b.textClass">{{ b.label }}</th>
- }
- <th class="text-right">Total</th>
- </tr>
- </thead>
- <tbody>
- @for (grupo of reporte!.grupos; track grupo.contraparteId) {
- <tr class="cursor-pointer"
- (click)="toggleGrupo(grupo.contraparteId)">
- <td>
- <div class="flex items-center gap-2">
- <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-slate-400 transition-transform"
- [class.rotate-90]="gruposAbiertos().has(grupo.contraparteId)"
- viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
- <polyline points="9 18 15 12 9 6"></polyline>
- </svg>
- <span class="font-medium text-slate-800">{{ grupo.contraparteNombre }}</span>
- <span class="text-xs bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">
- {{ grupo.facturas.length }} fact.
- </span>
- </div>
- </td>
- @for (b of buckets; track b.key) {
- <td class="text-right tabular-nums">
- @if (grupo[b.key] > 0) {
- <span class="font-semibold" [ngClass]="b.textClass">
- {{ grupo[b.key] | currency:'':'symbol-narrow':'1.0-0' }}
- </span>
- } @else {
- <span class="text-slate-300 text-xs">—</span>
- }
- </td>
- }
- <td class="text-right tabular-nums font-bold text-slate-800">
- {{ grupo.total | currency:'':'symbol-narrow':'1.0-0' }}
- </td>
- </tr>
+            <!-- Tabla de totales por contraparte -->
+            <h3 class="text-sm font-semibold text-slate-600 uppercase mb-4">
+                Detalle por {{ labelContraparte }}
+            </h3>
+            <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+                <div class="overflow-y-auto max-h-[70vh] relative">
+                    <table class="ledger-table">
+                        <thead class="sticky top-0 z-20">
+                            <tr>
+                                <th>{{ labelContraparte }}</th>
+                                @for (b of buckets; track b.key) {
+                                <th class="text-right" [ngClass]="b.textClass">{{ b.label }}</th>
+                                }
+                                <th class="text-right">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (grupo of reporte!.grupos; track grupo.contraparteId) {
+                            <tr class="cursor-pointer" (click)="toggleGrupo(grupo.contraparteId)">
+                                <td>
+                                    <div class="flex items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg"
+                                            class="h-3.5 w-3.5 text-slate-400 transition-transform"
+                                            [class.rotate-90]="gruposAbiertos().has(grupo.contraparteId)"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="9 18 15 12 9 6"></polyline>
+                                        </svg>
+                                        <span class="font-medium text-slate-800">{{ grupo.contraparteNombre }}</span>
+                                        <span class="text-xs bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">
+                                            {{ grupo.facturas.length }} fact.
+                                        </span>
+                                    </div>
+                                </td>
+                                @for (b of buckets; track b.key) {
+                                <td class="text-right tabular-nums">
+                                    @if (grupo[b.key] > 0) {
+                                    <span class="font-semibold" [ngClass]="b.textClass">
+                                        {{ grupo[b.key] | currency:'':'symbol-narrow':'1.0-0' }}
+                                    </span>
+                                    } @else {
+                                    <span class="text-slate-300 text-xs">—</span>
+                                    }
+                                </td>
+                                }
+                                <td class="text-right tabular-nums font-bold text-slate-800">
+                                    {{ grupo.total | currency:'':'symbol-narrow':'1.0-0' }}
+                                </td>
+                            </tr>
 
- <!-- Filas de detalle expandibles -->
- @if (gruposAbiertos().has(grupo.contraparteId)) {
- @for (f of grupo.facturas; track f.id) {
- <tr class="bg-slate-50/60 border-l-2 border-blue-200">
- <td class="pl-10">
- <span class="font-mono font-semibold text-blue-600">{{ f.numero }}</span>
- <span class="text-slate-400 ml-2">{{ f.emision | date:'dd/MM/yyyy' }}</span>
- </td>
- @for (b of buckets; track b.key) {
- <td class="text-right tabular-nums">
- @if (f.bucket === b.key) {
- <span class="font-semibold" [ngClass]="b.textClass">
- {{ f.saldo | currency:'':'symbol-narrow':'1.0-0' }}
- </span>
- } @else {
- <span class="text-slate-200">—</span>
- }
- </td>
- }
- <td class="text-right tabular-nums">
- <div class="flex items-center justify-end gap-2">
- <span class="text-xs font-bold text-slate-700">
- {{ f.saldo | currency:'':'symbol-narrow':'1.0-0' }}
- </span>
- <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium"
- [ngClass]="{
+                            <!-- Filas de detalle expandibles -->
+                            @if (gruposAbiertos().has(grupo.contraparteId)) {
+                            @for (f of grupo.facturas; track f.id) {
+                            <tr class="bg-slate-50/60 border-l-2 border-blue-200">
+                                <td class="pl-10">
+                                    <a [routerLink]="vistaActiva() === 'cobrar' ? ['/panel/ventas/comprobantes', f.id, 'details'] : ['/panel/compras/purchases', f.id, 'details']"
+                                        class="font-mono font-semibold text-blue-600 hover:text-blue-800 hover:underline cursor-pointer">
+                                        {{ f.numero }}
+                                    </a>
+                                    <span class="text-slate-400 ml-2">{{ f.emision | date:'dd/MM/yyyy' }}</span>
+                                </td>
+                                @for (b of buckets; track b.key) {
+                                <td class="text-right tabular-nums">
+                                    @if (f.bucket === b.key) {
+                                    <span class="font-semibold" [ngClass]="b.textClass">
+                                        {{ f.saldo | currency:'':'symbol-narrow':'1.0-0' }}
+                                    </span>
+                                    } @else {
+                                    <span class="text-slate-200">—</span>
+                                    }
+                                </td>
+                                }
+                                <td class="text-right tabular-nums">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <span class="text-xs font-bold text-slate-700">
+                                            {{ f.saldo | currency:'':'symbol-narrow':'1.0-0' }}
+                                        </span>
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium"
+                                            [ngClass]="{
  'bg-blue-100 text-blue-600': f.paymentStatus === 'pendiente',
  'bg-amber-100 text-amber-600': f.paymentStatus === 'parcial',
  'bg-red-100 text-red-600': f.paymentStatus === 'vencido',
  'bg-green-100 text-green-600': f.paymentStatus === 'pagado'
  }">
- @if (f.diasVencida > 0) { +{{ f.diasVencida }}d }
- @else { {{ f.diasVencida * -1 }}d }
- </span>
- </div>
- </td>
- </tr>
- }
- }
- }
+                                            @if (f.diasVencida > 0) { +{{ f.diasVencida }}d }
+                                            @else { {{ f.diasVencida * -1 }}d }
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+                            }
+                            }
+                            }
 
- <!-- Fila de totales sticky footer -->
- <tr class="bg-slate-100 font-bold sticky bottom-0 z-10 shadow-[0_-2px_4px_rgba(0,0,0,0.05)]">
- <td class="uppercase text-slate-600">TOTAL CARTERA</td>
- @for (b of buckets; track b.key) {
- <td class="text-right tabular-nums">
- <span class="font-bold" [ngClass]="b.textClass">
- {{ reporte!.totales[b.key] | currency:'':'symbol-narrow':'1.0-0' }}
- </span>
- </td>
- }
- <td class="text-right tabular-nums text-slate-900">
- {{ reporte!.totales.total | currency:'':'symbol-narrow':'1.0-0' }}
- </td>
- </tr>
+                            <!-- Fila de totales sticky footer -->
+                            <tr
+                                class="bg-slate-100 font-bold sticky bottom-0 z-10 shadow-[0_-2px_4px_rgba(0,0,0,0.05)]">
+                                <td class="uppercase text-slate-600">TOTAL CARTERA</td>
+                                @for (b of buckets; track b.key) {
+                                <td class="text-right tabular-nums">
+                                    <span class="font-bold" [ngClass]="b.textClass">
+                                        {{ reporte!.totales[b.key] | currency:'':'symbol-narrow':'1.0-0' }}
+                                    </span>
+                                </td>
+                                }
+                                <td class="text-right tabular-nums text-slate-900">
+                                    {{ reporte!.totales.total | currency:'':'symbol-narrow':'1.0-0' }}
+                                </td>
+                            </tr>
 
- </tbody>
- </table>
- </div>
- </div>
- }
- @else {
- @if (!loadingCobrar() && !loadingPagar()) {
- <div class="p-20 text-center animate-fade-in">
- <div class="text-slate-300 mb-4 flex justify-center">
- <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
- <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
- </svg>
- </div>
- <h3 class="text-lg font-bold text-slate-700">Sin datos registrados</h3>
- <p class="text-slate-500">Aún no hay facturas pendientes en este periodo.</p>
- </div>
- }
- }
- </div>
- </div>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            }
+            @else {
+            @if (!loadingCobrar() && !loadingPagar()) {
+            <div class="p-20 text-center animate-fade-in">
+                <div class="text-slate-300 mb-4 flex justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                </div>
+                <h3 class="text-lg font-bold text-slate-700">Sin datos registrados</h3>
+                <p class="text-slate-500">Aún no hay facturas pendientes en este periodo.</p>
+            </div>
+            }
+            }
+        </div>
+    </div>
 
 </div>

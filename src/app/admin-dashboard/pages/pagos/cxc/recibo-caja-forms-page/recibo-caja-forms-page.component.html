@@ -59,16 +59,13 @@
           <div class="flex flex-col">
             <label class="text-xs font-bold text-slate-500 uppercase mb-1">Cliente</label>
             <div class="relative">
-              <app-list-group-dropdown
-                title=""
-                [dataList]="clientes()"
-                [labelKey]="['nombreDisplay', 'numeroDocumento']"
-                [valueInput]="clienteSearch()"
-                [searchable]="false"
+              <app-list-group-dropdown title="" [dataList]="clientes()"
+                [labelKey]="['nombreDisplay', 'numeroDocumento']" [valueInput]="clienteSearch()" [searchable]="false"
                 (objectSelect)="onClienteSeleccionado($event)" />
             </div>
-            @if (form.get('terceroId')?.touched && form.get('terceroId')?.errors?.['required'] && modoCobro() === 'factura') {
-              <span class="text-red-500 text-xs mt-1">El cliente es obligatorio</span>
+            @if (form.get('terceroId')?.touched && form.get('terceroId')?.errors?.['required'] && modoCobro() ===
+            'factura') {
+            <span class="text-red-500 text-xs mt-1">El cliente es obligatorio</span>
             }
           </div>
 
@@ -86,16 +83,15 @@
               class="text-sm bg-white border border-slate-200 rounded-xl py-2.5 px-3 focus:outline-none focus:ring-4 focus:ring-green-500/5 focus:border-green-500/50 shadow-sm cursor-pointer transition-all">
               <option value="">-- Seleccione Método de Pago --</option>
               @for (method of catalogsStore.paymentMethods(); track method.id) {
-                <option [value]="method.id">{{ method.nombre }}</option>
+              <option [value]="method.id">{{ method.nombre }}</option>
               }
             </select>
             @if (form.get('metodoPagoId')?.touched && form.get('metodoPagoId')?.errors?.['required']) {
-              <span class="text-red-500 text-xs mt-1">El medio de pago es obligatorio</span>
+            <span class="text-red-500 text-xs mt-1">El medio de pago es obligatorio</span>
             }
           </div>
 
           <!-- Cuenta Bancaria -->
-          @if (mostrarBanco) {
           <div class="flex flex-col">
             <label class="text-xs font-bold text-slate-500 uppercase mb-1">Cuenta Bancaria</label>
             <select formControlName="cuentaBancariaId"
@@ -109,7 +105,6 @@
             <span class="text-red-500 text-xs mt-1">La cuenta bancaria es obligatoria</span>
             }
           </div>
-          }
         </div>
       </div>
 
@@ -221,7 +216,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <!-- Cuenta Contable -->
               <div class="flex flex-col md:col-span-1">
-                <label class="text-xs font-bold text-slate-500 mb-1">Cuenta PUC (Auxiliar)</label>
+                <label class="text-xs font-bold text-slate-500 mb-1">Cuenta contable</label>
                 <select formControlName="cuentaContableId"
                   class="text-sm bg-white border border-slate-200 rounded-xl py-2 px-3 focus:outline-none focus:ring-4 focus:ring-green-500/5 focus:border-green-500/50 shadow-sm cursor-pointer transition-all">
                   <option value="">-- Seleccione Cuenta --</option>

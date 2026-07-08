@@ -178,7 +178,7 @@ export class CxcComponent implements OnInit {
     this.cobrosLoading.set(true);
     this.svc
       .getMovimientos({
-        tipo: 'cobro',
+        tipo: 'cobro,otro_ingreso',
         busqueda: this.cobrosFiltroTexto.value?.trim() || undefined,
         page: this.paginationService.currentPage(),
         limit: 10,

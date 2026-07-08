@@ -52,15 +52,6 @@
           <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div>
               <label class="block mb-2 text-sm text-slate-600">
-                Teléfono
-              </label>
-              <input
-                class="w-full bg-transparent text-slate-700 text-sm border rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
-                formControlName="telefono" readonly type="text" />
-            </div>
-
-            <div>
-              <label class="block mb-2 text-sm text-slate-600">
                 N° Factura Proveedor <span class="text-red-500">*</span>
               </label>
               <input
@@ -68,6 +59,17 @@
                 formControlName="referencia" placeholder="Ej: FE-1234" type="text" />
 
               <form-error-label [errorType]="formCompra.get('referencia')!" />
+            </div>
+
+            <div>
+              <label class="block mb-2 text-sm text-slate-600">
+                Fecha Emisión <span class="text-red-500">*</span>
+              </label>
+              <input
+                class="w-full bg-transparent text-slate-700 text-sm border rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
+                formControlName="fechaEmision" type="date" />
+
+              <form-error-label [errorType]="formCompra.get('fechaEmision')!" />
             </div>
 
             <div>
@@ -138,17 +140,6 @@
               <form-error-label [errorType]="formCompra.get('fechaVencimiento')!" />
             </div>
             }
-
-            <div>
-              <label class="block mb-2 text-sm text-slate-600">
-                Fecha Emisión <span class="text-red-500">*</span>
-              </label>
-              <input
-                class="w-full bg-transparent text-slate-700 text-sm border rounded-md px-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
-                formControlName="fechaEmision" type="date" />
-
-              <form-error-label [errorType]="formCompra.get('fechaEmision')!" />
-            </div>
           </div>
 
           <div class="mt-4">

@@ -32,7 +32,7 @@ export class MovimientosComponent {
 
     headTitle = signal<HeaderInput>({
         title: 'Movimientos Financieros',
-        slog: 'Historial global de cobros recibidos y pagos enviados',
+        slog: 'Consulta el historial de ingresos y egresos registrados.',
     });
 
     rawData = signal<MovimientosResponse>({

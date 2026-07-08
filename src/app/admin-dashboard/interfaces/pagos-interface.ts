@@ -324,7 +324,7 @@ export interface MovimientosResponse {
 }
 
 export interface MovimientosFiltros {
- tipo?: TipoPago;
+ tipo?: TipoPago | string;
  fechaInicio?: string;
  fechaFin?: string;
  medioPago?: MedioPago;

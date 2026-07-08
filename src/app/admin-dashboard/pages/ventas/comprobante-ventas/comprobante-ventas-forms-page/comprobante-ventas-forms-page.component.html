@@ -200,7 +200,8 @@
         </div>
 
         <!-- Sección: Anticipos y Cuentas por Cobrar (Cruce) -->
-        @if (formVentas.get('cliente')?.value && (anticiposDisponibles().length > 0 || anticiposAsociados().length > 0)) {
+        @if (formVentas.get('cliente')?.value && (anticiposDisponibles().length > 0 || anticiposAsociados().length > 0))
+        {
         <div class="bg-white rounded-xl shadow-lg overflow-hidden mt-6">
             <div class="p-6">
                 <h3 class="text-lg font-medium text-slate-700 border-gray-300 border-b pb-2 mb-4 flex items-center">

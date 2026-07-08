@@ -117,7 +117,7 @@ export class CxpComponent {
  cargarPagos(): void {
  this.pagosLoading.set(true);
  this.svc.getMovimientos({
- tipo: 'pago',
+ tipo: 'pago,otro_egreso',
  busqueda: this.pagosFiltroTexto.value?.trim() || undefined,
  page: this.paginationService.currentPage(),
  limit: 10,
