@@ -1,0 +1,256 @@
+<header-title-page [titleHead]="headTitle()" />
+<app-breadcrumb [items]="breadcrumbItems" class="block px-4 sm:px-6 lg:px-8" />
+
+<div class="p-4 sm:p-6 lg:p-8 animate-fade-in relative">
+  @if (loading()) {
+  <div class="absolute inset-0 bg-white/60 backdrop-blur-sm z-25 flex flex-col items-center justify-center gap-3">
+    <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-slate-900"></div>
+    <p class="text-sm text-slate-500 font-medium">Cargando datos del comprobante...</p>
+  </div>
+  }
+
+  <div class="max-w-7xl mx-auto space-y-6">
+    <form [formGroup]="form" class="space-y-6">
+      
+      <!-- Ficha Cabecera -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+        <h3 class="text-sm font-bold uppercase text-slate-900 border-b border-slate-100 pb-2 mb-4">Información General</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Tipo de Comprobante <span class="text-red-500">*</span></label>
+            <select formControlName="tipoComprobanteId"
+              class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white outline-none transition-all"
+              [class.border-red-300]="form.get('tipoComprobanteId')?.invalid && form.get('tipoComprobanteId')?.touched">
+              <option value="" disabled>Seleccione un tipo...</option>
+              @for (tipo of tiposComprobantes(); track tipo.id) {
+              <option [value]="tipo.id">{{ tipo.codigo }} - {{ tipo.nombre }}</option>
+              }
+            </select>
+            @if (form.get('tipoComprobanteId')?.invalid && form.get('tipoComprobanteId')?.touched) {
+            <p class="mt-1 text-xs text-red-500">Debe seleccionar un tipo de comprobante.</p>
+            }
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Fecha de Documento <span class="text-red-500">*</span></label>
+            <input type="date" formControlName="fechaDocumento"
+              class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all font-mono"
+              [class.border-red-300]="form.get('fechaDocumento')?.invalid && form.get('fechaDocumento')?.touched">
+            @if (form.get('fechaDocumento')?.invalid && form.get('fechaDocumento')?.touched) {
+            <p class="mt-1 text-xs text-red-500">La fecha del documento es requerida.</p>
+            }
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Consecutivo / Número</label>
+            <div class="px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-lg font-mono font-bold text-slate-800">
+              {{ consecutivo() }}
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-700 mb-1">Observaciones / Concepto General</label>
+          <textarea formControlName="observaciones" rows="2"
+            class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none text-sm"
+            placeholder="Describa brevemente la finalidad de este comprobante..."></textarea>
+        </div>
+      </div>
+
+      <!-- Ficha de Movimientos Ledger -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+          <h3 class="text-sm font-bold uppercase text-slate-900">Detalle del Comprobante (Movimientos)</h3>
+          @if (estado() === 'BORRADOR') {
+          <button type="button" (click)="agregarLinea()"
+            class="inline-flex items-center px-3 py-1.5 text-xs font-semibold rounded-lg text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-colors">
+            + Agregar Línea
+          </button>
+          }
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left border-collapse min-w-[1000px]">
+            <thead class="bg-slate-50 text-slate-500 uppercase border-b border-slate-200 font-bold">
+              <tr>
+                <th class="px-4 py-3 w-1/4">Cuenta PUC <span class="text-red-500">*</span></th>
+                <th class="px-4 py-3 w-1/4">Descripción / Concepto</th>
+                <th class="px-4 py-3">Tercero (Cliente/Prov.)</th>
+                @if (centrosCostos().length > 0) {
+                <th class="px-4 py-3">C. Costo</th>
+                }
+                <th class="px-4 py-3">Ref. Doc. @if (requiereRefDoc()) { <span class="text-red-500">*</span> }</th>
+                <th class="px-4 py-3 text-right w-40">Débito <span class="text-red-500">*</span></th>
+                <th class="px-4 py-3 text-right w-40">Crédito <span class="text-red-500">*</span></th>
+                @if (estado() === 'BORRADOR') {
+                <th class="px-4 py-3 text-center w-24">Acción</th>
+                }
+              </tr>
+            </thead>
+            <tbody formArrayName="detalles" class="divide-y divide-slate-100 font-medium">
+              @for (lineCtrl of detallesFormArray.controls; track $index; let i = $index) {
+              <tr [formGroupName]="i" class="hover:bg-slate-50/30">
+                <!-- Cuenta -->
+                <td class="px-2 py-3">
+                  <select formControlName="cuentaContableId" (change)="onCuentaCambio(i)"
+                    class="w-full px-2 py-1.5 border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white font-mono text-[11px] font-bold">
+                    <option value="" disabled>Seleccione cuenta...</option>
+                    @for (cta of cuentasContables(); track cta.id) {
+                    <option [value]="cta.id">{{ cta.codigo }} - {{ cta.nombre }}</option>
+                    }
+                  </select>
+                </td>
+
+                <!-- Concepto -->
+                <td class="px-2 py-3">
+                  <input type="text" formControlName="descripcion"
+                    class="w-full px-2 py-1.5 border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 outline-none text-[11px]"
+                    placeholder="Concepto de línea">
+                </td>
+
+                <!-- Tercero (Cliente / Proveedor) -->
+                <td class="px-2 py-3">
+                  @if (requiereTercero(i)) {
+                  <div class="space-y-1">
+                    <select formControlName="clienteId"
+                      class="w-full px-2 py-1 border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 bg-white text-[10px]">
+                      <option value="">-- Cliente --</option>
+                      @for (cli of clientes(); track cli.id) {
+                      <option [value]="cli.id">{{ cli.nombreDisplay }}</option>
+                      }
+                    </select>
+                    <select formControlName="proveedorId"
+                      class="w-full px-2 py-1 border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 bg-white text-[10px]">
+                      <option value="">-- Proveedor --</option>
+                      @for (prv of proveedores(); track prv.id) {
+                      <option [value]="prv.id">{{ prv.nombreDisplay }}</option>
+                      }
+                    </select>
+                  </div>
+                  } @else {
+                  <span class="text-slate-400 block text-center">-</span>
+                  }
+                </td>
+
+                <!-- Centro de Costo -->
+                @if (centrosCostos().length > 0) {
+                <td class="px-2 py-3">
+                  @if (requiereCentro(i)) {
+                  <select formControlName="centroCostoId"
+                    class="w-full px-2 py-1.5 border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 bg-white text-[10px]">
+                    <option value="">Seleccione centro...</option>
+                    @for (cc of centrosCostos(); track cc.id) {
+                    <option [value]="cc.id">{{ cc.codigo }} - {{ cc.nombre }}</option>
+                    }
+                  </select>
+                  } @else {
+                  <span class="text-slate-400 block text-center">-</span>
+                  }
+                </td>
+                }
+
+                <!-- Ref Doc -->
+                <td class="px-2 py-3">
+                  <input type="text" formControlName="documentoReferencia"
+                    class="w-full px-2 py-1.5 border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 outline-none text-[11px] font-mono"
+                    [placeholder]="requiereRefDoc() ? 'Requerido' : 'Opcional'">
+                </td>
+
+                <!-- Debito -->
+                <td class="px-2 py-3">
+                  <input type="number" formControlName="debito"
+                    class="w-full px-2 py-1.5 border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 outline-none text-right font-mono font-bold text-slate-900"
+                    placeholder="0">
+                </td>
+
+                <!-- Credito -->
+                <td class="px-2 py-3">
+                  <input type="number" formControlName="credito"
+                    class="w-full px-2 py-1.5 border border-slate-200 rounded focus:ring-1 focus:ring-blue-500 outline-none text-right font-mono font-bold text-slate-900"
+                    placeholder="0">
+                </td>
+
+                <!-- Acciones -->
+                @if (estado() === 'BORRADOR') {
+                <td class="px-2 py-3 text-center">
+                  <div class="flex items-center justify-center gap-1">
+                    <button type="button" (click)="cuadrarAsiento(i)"
+                      class="p-1 text-slate-600 hover:bg-slate-100 rounded" title="Cuadrar contra diferencia">
+                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                      </svg>
+                    </button>
+                    <button type="button" (click)="eliminarLinea(i)"
+                      class="p-1 text-rose-600 hover:bg-rose-50 rounded" title="Eliminar línea">
+                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
+                </td>
+                }
+              </tr>
+              }
+            </tbody>
+
+            <!-- Footer Totales -->
+            <tfoot class="bg-slate-50 font-bold border-t border-slate-200 text-slate-900">
+              <tr class="text-right">
+                <td [attr.colspan]="centrosCostos().length > 0 ? 5 : 4" class="px-4 py-3 uppercase text-xs">Suma Totales</td>
+                <td class="px-4 py-3 font-mono text-emerald-700 text-sm">{{ totalDebitos | currency }}</td>
+                <td class="px-4 py-3 font-mono text-blue-700 text-sm">{{ totalCreditos | currency }}</td>
+                @if (estado() === 'BORRADOR') {
+                <td></td>
+                }
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- Balance Indicator Bar -->
+        <div class="px-6 py-4 border-t border-slate-100 flex items-center justify-between text-sm"
+          [ngClass]="estaBalanceado ? 'bg-emerald-50 text-emerald-800' : 'bg-rose-50 text-rose-800'">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full" [ngClass]="estaBalanceado ? 'bg-emerald-500' : 'bg-rose-500'"></span>
+            <span>
+              {{ estaBalanceado ? 'Asiento Cuadrado. Listo para contabilizar.' : 'Asiento Descuadrado. Las sumas de débito y crédito deben coincidir.' }}
+            </span>
+          </div>
+          <div class="font-mono font-bold">
+            Diferencia: {{ diferencia | currency }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <button type="button" routerLink="/panel/contabilidad/comprobantes"
+          class="px-5 py-2.5 border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 transition-colors w-full sm:w-auto justify-center inline-flex">
+          Volver al listado
+        </button>
+
+        <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+          @if (estado() === 'BORRADOR') {
+          <button type="button" (click)="guardarBorrador()" [disabled]="submitting()"
+            class="px-5 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 bg-white hover:bg-slate-100 transition-colors w-full sm:w-auto justify-center inline-flex disabled:opacity-50">
+            Guardar Borrador
+          </button>
+
+          <button type="button" (click)="guardarYContabilizar()" [disabled]="submitting() || !estaBalanceado"
+            class="px-5 py-2.5 border border-transparent rounded-xl text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 transition-colors w-full sm:w-auto justify-center inline-flex disabled:opacity-50 disabled:cursor-not-allowed">
+            Guardar y Contabilizar
+          </button>
+          
+          @if (isEditing()) {
+          <button type="button" (click)="contabilizarComprobante()" [disabled]="submitting() || !estaBalanceado"
+            class="px-5 py-2.5 border border-transparent rounded-xl text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors w-full sm:w-auto justify-center inline-flex disabled:opacity-50 disabled:cursor-not-allowed">
+            Contabilizar
+          </button>
+          }
+          }
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

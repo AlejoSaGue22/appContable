@@ -6,6 +6,7 @@ import { VendedoresComponent } from "./pages/vendedores/vendedores.component";
 import { ParametrizacionContable } from "./pages/parametrizacion-contable/parametrizacion-contable";
 import { CargosComponent } from "./pages/cargos/cargos.component";
 import { CentrosCostosComponent } from "./pages/centros-costos/centros-costos.component";
+import { TipoComprobantesComponent } from "./pages/tipo-comprobantes/tipo-comprobantes.component";
 
 const configuracionesRoutes: Routes = [
  {
@@ -35,6 +36,10 @@ const configuracionesRoutes: Routes = [
  {
  path: 'centros-costos',
  component: CentrosCostosComponent
+ },
+ {
+ path: 'tipos-comprobantes',
+ component: TipoComprobantesComponent
  },
  {
  path: '**',
