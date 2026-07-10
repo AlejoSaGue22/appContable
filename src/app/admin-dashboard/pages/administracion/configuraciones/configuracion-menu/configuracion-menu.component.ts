@@ -82,7 +82,7 @@ export class ConfiguracionMenuComponent {
         },
         // { label: 'Cierre contable de resultados', route: 'cierre-contable' },
         // { label: 'Configurar información exógena', route: 'exogena' },
-        // { label: 'Tipos de Comprobantes', route: 'tipos-comprobantes' },
+        { label: 'Tipos de Comprobantes', route: 'tipos-comprobantes' },
         // { label: 'Numeraciones contables', route: 'numeraciones-contables' },
       ],
     },

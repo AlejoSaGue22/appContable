@@ -260,11 +260,14 @@
 <app-modal [(visible)]="anularVisible" title="Anular Pago / Recibo" width="max-w-md">
     <div class="space-y-4 p-1">
         <p class="text-sm text-slate-600">
-            ¿Está seguro de que desea anular el comprobante <strong class="font-mono">{{ paymentToAnul()?.numero }}</strong> por valor de <strong>{{ paymentToAnul()?.monto | currency:'':'symbol-narrow':'1.0-0' }}</strong>? Esta acción no se puede deshacer y generará un contra-asiento contable de reverso.
+            ¿Está seguro de que desea anular el comprobante <strong class="font-mono">{{ paymentToAnul()?.numero
+                }}</strong> por valor de <strong>{{ paymentToAnul()?.monto | currency:'':'symbol-narrow':'1.0-0'
+                }}</strong>? Esta acción no se puede deshacer y generará un contra-asiento contable de reverso.
         </p>
-        
+
         <div>
-            <label class="block mb-2 text-sm font-semibold text-slate-700">Motivo de Anulación <span class="text-red-500">*</span></label>
+            <label class="block mb-2 text-sm font-semibold text-slate-700">Motivo de Anulación <span
+                    class="text-red-500">*</span></label>
             <textarea [formControl]="motivoAnulacionCtrl"
                 class="w-full bg-transparent text-slate-700 text-sm border rounded-xl px-3 py-2 focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
                 rows="3" placeholder="Escriba el motivo detallado de la anulación..."></textarea>
@@ -275,7 +278,8 @@
                 class="px-4 py-2 border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 transition-all text-xs cursor-pointer">
                 Cancelar
             </button>
-            <button type="button" (click)="confirmarAnular()" [disabled]="!motivoAnulacionCtrl.value?.trim() || anularLoading()"
+            <button type="button" (click)="confirmarAnular()"
+                [disabled]="!motivoAnulacionCtrl.value?.trim() || anularLoading()"
                 class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl transition-all text-xs cursor-pointer disabled:opacity-50">
                 {{ anularLoading() ? 'Anulando...' : 'Confirmar Anulación' }}
             </button>
