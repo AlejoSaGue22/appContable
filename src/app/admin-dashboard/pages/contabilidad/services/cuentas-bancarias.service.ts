@@ -21,19 +21,11 @@ export class CuentasBancariasService {
   private readonly base = `${environment.baseUrl}/cuentas-bancarias`;
   private readonly banksUrl = `${environment.baseUrl}/bancos`;
 
-  getCuentasBancos(
-    options: Options & { estado?: 'activo' | 'inactivo' | 'todos' },
-  ): Observable<ResponseCuentasBancarias> {
+  getCuentasBancos(options: Options & { estado?: 'activo' | 'inactivo' | 'todos' }): Observable<ResponseCuentasBancarias> {
     const { offset = 0, limit = 10, search = '', estado } = options;
 
-    const params: any = {
-      offset,
-      limit,
-      search,
-    };
-    if (estado) {
-      params.estado = estado;
-    }
+    const params: any = { offset, limit, search };
+    if (estado) params.estado = estado;
 
     return this.http
       .get<ResponseCuentasBancarias>(this.base, {

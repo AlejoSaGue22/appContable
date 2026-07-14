@@ -2,12 +2,14 @@ import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { ComprobantesService } from '../../services/comprobantes.service';
 import { TipoComprobanteService } from '../../../administracion/configuraciones/pages/tipo-comprobantes/services/tipo-comprobante.service';
 import { CuentasContablesService } from '@dashboard/pages/contabilidad/services/cuentas-contables.service';
 import { ClientesService } from '../../../ventas/services/clientes.service';
 import { ProveedoresService } from '../../../compras/services/proveedores.service';
 import { CentrosCostosService } from '../../../administracion/configuraciones/pages/centros-costos/services/centros-costos.service';
+import { NominaService } from '../../../nomina/services/nomina.service';
 import { HeaderTitlePageComponent, HeaderInput } from '@dashboard/components/header-title-page/header-title-page.component';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
 import { NotificationService } from '@shared/services/notification.service';
@@ -37,6 +39,7 @@ export class ComprobanteFormComponent implements OnInit {
   private clientesService = inject(ClientesService);
   private proveedoresService = inject(ProveedoresService);
   private centrosCostosService = inject(CentrosCostosService);
+  private nominaService = inject(NominaService);
 
   public headTitle = signal<HeaderInput>({
     title: 'Nuevo Comprobante Contable',
@@ -57,6 +60,7 @@ export class ComprobanteFormComponent implements OnInit {
   public cuentasContables = signal<any[]>([]);
   public clientes = signal<any[]>([]);
   public proveedores = signal<any[]>([]);
+  public terceros = signal<any[]>([]);
   public centrosCostos = signal<any[]>([]);
 
   breadcrumbItems = [
@@ -108,22 +112,39 @@ export class ComprobanteFormComponent implements OnInit {
       this.cuentasContables.set(res.filter((c: any) => c.aceptaMovimiento && c.isActive));
     });
 
-    this.clientesService.getClientes({ limit: 200, offset: 0 }).subscribe((res: any) => {
-      this.clientes.set(
-        (res.clientes || []).map((c: any) => ({
-          id: c.id,
-          nombreDisplay: c.razonSocial?.trim() ? c.razonSocial : `${c.nombre || ''} ${c.apellido || ''}`.trim(),
-        })),
-      );
-    });
-
-    this.proveedoresService.getProveedores({ limit: 200, offset: 0 }).subscribe((res: any) => {
-      this.proveedores.set(
-        (res.proveedores || []).map((p: any) => ({
-          id: p.id,
-          nombreDisplay: p.razonSocial?.trim() ? p.razonSocial : `${p.nombre || ''} ${p.apellido || ''}`.trim(),
-        })),
-      );
+    forkJoin({
+      clientes: this.clientesService.getClientes({ limit: 1000, offset: 0 }),
+      proveedores: this.proveedoresService.getProveedores({ limit: 1000, offset: 0 }),
+      entidades: this.nominaService.getEntidadesSeguridad(),
+    }).subscribe({
+      next: ({ clientes, proveedores, entidades }) => {
+        const list: any[] = [];
+        (clientes.clientes || []).forEach((c: any) => {
+          list.push({
+            id: c.id,
+            nombreDisplay: `${c.razonSocial?.trim() ? c.razonSocial : `${c.nombre || ''} ${c.apellido || ''}`.trim()} (Cliente)`,
+            tipo: 'CLIENTE',
+          });
+        });
+        (proveedores.proveedores || []).forEach((p: any) => {
+          list.push({
+            id: p.id,
+            nombreDisplay: `${p.razonSocial?.trim() ? p.razonSocial : `${p.nombre || ''} ${p.apellido || ''}`.trim()} (Proveedor)`,
+            tipo: 'PROVEEDOR',
+          });
+        });
+        (entidades || []).forEach((e: any) => {
+          list.push({
+            id: e.id,
+            nombreDisplay: `${e.nombre} (${e.tipo})`,
+            tipo: 'SEGURIDAD_SOCIAL',
+          });
+        });
+        this.terceros.set(list);
+      },
+      error: (err) => {
+        this.toastService.error('Error al cargar la lista unificada de terceros.');
+      }
     });
 
     this.centrosCostosService.loadCentrosCostos().subscribe((res) => {
@@ -172,13 +193,24 @@ export class ComprobanteFormComponent implements OnInit {
   }
 
   agregarLinea(data?: any): void {
+    let terceroUnionId = '';
+    if (data?.clienteId) {
+      terceroUnionId = data.clienteId;
+    } else if (data?.proveedorId) {
+      terceroUnionId = data.proveedorId;
+    } else if (data?.entidadSSId) {
+      terceroUnionId = data.entidadSSId;
+    }
+
     const group = this.fb.group({
       cuentaContableId: [data?.cuentaContableId || '', [Validators.required]],
       descripcion: [data?.descripcion || ''],
       debito: [Number(data?.debito || 0), [Validators.required, Validators.min(0)]],
       credito: [Number(data?.credito || 0), [Validators.required, Validators.min(0)]],
+      terceroUnionId: [terceroUnionId],
       clienteId: [data?.clienteId || ''],
       proveedorId: [data?.proveedorId || ''],
+      entidadSSId: [data?.entidadSSId || ''],
       centroCostoId: [data?.centroCostoId || ''],
       documentoReferencia: [data?.documentoReferencia || ''],
     });
@@ -203,8 +235,10 @@ export class ComprobanteFormComponent implements OnInit {
     if (cuenta) {
       // Si la cuenta es de gastos (5) o costos (6) y no tiene centro de costo, podríamos advertir
       if (!cuenta.requiereTercero) {
+        group.get('terceroUnionId')?.setValue('');
         group.get('clienteId')?.setValue('');
         group.get('proveedorId')?.setValue('');
+        group.get('entidadSSId')?.setValue('');
       }
       if (!cuenta.requiereCentroCostos && !cuenta.codigo.startsWith('5') && !cuenta.codigo.startsWith('6')) {
         group.get('centroCostoId')?.setValue('');
@@ -215,7 +249,9 @@ export class ComprobanteFormComponent implements OnInit {
   requiereTercero(index: number): boolean {
     const group = this.detallesFormArray.at(index);
     const cuentaId = group.get('cuentaContableId')?.value;
-    const cuenta = this.cuentasContables().find((c) => c.id === cuentaId);
+    console.log("CuentaID: ", cuentaId);
+    const cuenta = this.cuentasContables().find((c) => c.id == cuentaId);
+    console.log("Cuenta: ", cuenta);
     return cuenta ? cuenta.requiereTercero : false;
   }
 
@@ -263,7 +299,7 @@ export class ComprobanteFormComponent implements OnInit {
   cuadrarAsiento(index: number): void {
     const group = this.detallesFormArray.at(index);
     const dif = this.totalDebitos - this.totalCreditos;
-    
+
     // Si débito es mayor, necesitamos agregar un crédito para balancear
     if (dif > 0) {
       const currentCredito = Number(group.get('credito')?.value || 0);
@@ -294,13 +330,29 @@ export class ComprobanteFormComponent implements OnInit {
     this.submitting.set(true);
     const payload = this.form.getRawValue();
 
-    // Limpiar campos null/vacíos
-    payload.detalles = payload.detalles.map((d: any) => ({
-      ...d,
-      clienteId: d.clienteId || null,
-      proveedorId: d.proveedorId || null,
-      centroCostoId: d.centroCostoId || null,
-    }));
+    // Limpiar campos null/vacíos y mapear terceroUnionId
+    payload.detalles = payload.detalles.map((d: any) => {
+      let clienteId = null;
+      let proveedorId = null;
+      let entidadSSId = null;
+
+      if (d.terceroUnionId) {
+        const t = this.terceros().find(x => x.id === d.terceroUnionId);
+        if (t) {
+          if (t.tipo === 'CLIENTE') clienteId = t.id;
+          else if (t.tipo === 'PROVEEDOR') proveedorId = t.id;
+          else if (t.tipo === 'SEGURIDAD_SOCIAL') entidadSSId = t.id;
+        }
+      }
+
+      return {
+        ...d,
+        clienteId,
+        proveedorId,
+        entidadSSId,
+        centroCostoId: d.centroCostoId || null,
+      };
+    });
 
     if (this.isEditing() && this.id()) {
       this.service.update(this.id()!, payload).subscribe({
@@ -363,12 +415,28 @@ export class ComprobanteFormComponent implements OnInit {
     this.submitting.set(true);
     const payload = this.form.getRawValue();
 
-    payload.detalles = payload.detalles.map((d: any) => ({
-      ...d,
-      clienteId: d.clienteId || null,
-      proveedorId: d.proveedorId || null,
-      centroCostoId: d.centroCostoId || null,
-    }));
+    payload.detalles = payload.detalles.map((d: any) => {
+      let clienteId = null;
+      let proveedorId = null;
+      let entidadSSId = null;
+
+      if (d.terceroUnionId) {
+        const t = this.terceros().find(x => x.id === d.terceroUnionId);
+        if (t) {
+          if (t.tipo === 'CLIENTE') clienteId = t.id;
+          else if (t.tipo === 'PROVEEDOR') proveedorId = t.id;
+          else if (t.tipo === 'SEGURIDAD_SOCIAL') entidadSSId = t.id;
+        }
+      }
+
+      return {
+        ...d,
+        clienteId,
+        proveedorId,
+        entidadSSId,
+        centroCostoId: d.centroCostoId || null,
+      };
+    });
 
     if (this.isEditing() && this.id()) {
       this.service.update(this.id()!, payload).subscribe({

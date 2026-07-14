@@ -510,13 +510,17 @@
 
     <!-- Modals -->
     <app-modal [(visible)]="isProviderModalVisible" title="Crear Nuevo Proveedor" width="max-w-4xl">
-      <app-proveedores-forms-page [isModal]="true" (saveSuccess)="onProviderSaved($event)"
-        (cancel)="closeProviderModal()"></app-proveedores-forms-page>
+      @if (isProviderModalVisible()) {
+        <app-proveedores-forms-page [isModal]="true" (saveSuccess)="onProviderSaved($event)"
+          (cancel)="closeProviderModal()"></app-proveedores-forms-page>
+      }
     </app-modal>
 
     <app-modal [(visible)]="isProductModalVisible" title="Crear Nuevo Articulo" width="max-w-4xl">
-      <app-productos-servicios-forms [isModal]="true" (saveSuccess)="onProductSaved($event)"
-        (cancel)="closeProductModal()"></app-productos-servicios-forms>
+      @if (isProductModalVisible()) {
+        <app-productos-servicios-forms [isModal]="true" (saveSuccess)="onProductSaved($event)"
+          (cancel)="closeProductModal()"></app-productos-servicios-forms>
+      }
     </app-modal>
   </form>
 

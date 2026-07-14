@@ -185,7 +185,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         this.productosItemsForm.get('tipoConcepto')?.valueChanges.subscribe((tipo) => {
             const prodCtrl = this.productosItemsForm.get('producto');
             const cuentaCtrl = this.productosItemsForm.get('cuentaContable');
-            
+
             if (tipo === 'PRODUCTO' || tipo === 'ACTIVO_FIJO') {
                 prodCtrl?.setValidators([Validators.required]);
                 cuentaCtrl?.clearValidators();
@@ -197,7 +197,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
             cuentaCtrl?.setValue(null);
             prodCtrl?.updateValueAndValidity();
             cuentaCtrl?.updateValueAndValidity();
-            
+
             this.productosItemsForm.patchValue({
                 unitPrice: 0,
                 iva: '',
@@ -243,7 +243,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         this.loaderService.show();
         forkJoin({
             proveedores: this.proveedoresServicios.getProveedores({ limit: 1000, offset: 0 }),
-            productos: this.productoServicios.getProductos({ limit: 1000, offset: 0, venta_compra: 'costo' }),
+            productos: this.productoServicios.getProductos({ limit: 1000, offset: 0 }),
             cuentas: this.cuentasService.getCuentasContables()
         }).subscribe({
             next: ({ proveedores, productos, cuentas }) => {
@@ -364,7 +364,8 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         if (!ivaValue) return 0;
         if (typeof ivaValue === 'number') return ivaValue;
         const impuesto = this.catalogsStore.impuestos().find(i => i.id == ivaValue);
-        const tarifa = impuesto?.tarifa ? parseInt(impuesto.tarifa) : 0
+        const tarifa = impuesto?.tarifa ? parseInt(impuesto.tarifa) : 0;
+
         return tarifa;
     }
 
@@ -418,7 +419,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         });
 
         this.items.push(newItem);
-        
+
         const currentTipo = itemVal.tipoConcepto;
         this.productosItemsForm.reset({
             tipoConcepto: currentTipo,
@@ -431,7 +432,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
             descripcion: '',
             total: 0
         });
-        
+
         this.calculateItemTotal();
         this.calcularTotal();
     }
