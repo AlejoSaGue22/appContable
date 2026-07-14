@@ -258,13 +258,44 @@
           <div class="bg-white overflow-hidden">
             <div class="p-6">
               <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end mb-6" [formGroup]="productosItemsForm">
-                <div class="md:col-span-3">
-                  <app-list-group-dropdown title="Conceptos" [dataList]="productosList()"
+                <div class="md:col-span-2">
+                  <label class="block text-xs font-medium text-gray-700 mb-1">Tipo Concepto *</label>
+                  <select
+                    class="w-full bg-white text-slate-700 text-sm border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 cursor-pointer py-[9px]"
+                    formControlName="tipoConcepto">
+                    <option value="PRODUCTO">Producto</option>
+                    <option value="ACTIVO_FIJO">Activo Fijo</option>
+                    <option value="CUENTA">Compra / Gasto</option>
+                  </select>
+                </div>
+
+                @if (productosItemsForm.get('tipoConcepto')?.value === 'PRODUCTO') {
+                <div class="md:col-span-2">
+                  <app-list-group-dropdown title="Productos creados" [dataList]="productosCreados()"
                     [labelKey]="['nombre', 'codigo']" formControlName="producto" (objectSelect)="
-                      productosItemsForm.patchValue({ producto: $event })
-                    " (createOption)="openProductModal()">
+                        productosItemsForm.patchValue({ producto: $event })
+                      " (createOption)="openProductModal()">
                   </app-list-group-dropdown>
                 </div>
+                }
+                @if (productosItemsForm.get('tipoConcepto')?.value === 'ACTIVO_FIJO') {
+                <div class="md:col-span-2">
+                  <app-list-group-dropdown title="Activos Fijos creados" [dataList]="activosFijosCreados()"
+                    [labelKey]="['nombre', 'codigo']" formControlName="producto" (objectSelect)="
+                        productosItemsForm.patchValue({ producto: $event })
+                      " (createOption)="openProductModal()">
+                  </app-list-group-dropdown>
+                </div>
+                }
+                @if (productosItemsForm.get('tipoConcepto')?.value === 'CUENTA') {
+                <div class="md:col-span-2">
+                  <app-list-group-dropdown title="Plan de Cuentas" [dataList]="cuentasContables()"
+                    [labelKey]="['codigo', 'nombre']" formControlName="cuentaContable" (objectSelect)="
+                        productosItemsForm.patchValue({ cuentaContable: $event })
+                      " [searchable]="false">
+                  </app-list-group-dropdown>
+                </div>
+                }
 
                 <div class="md:col-span-2">
                   <label class="block text-xs font-medium text-gray-700 mb-1">Descripción</label>
@@ -303,7 +334,7 @@
                     class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm" />
                 </div>
 
-                <div class="md:col-span-2">
+                <div class="md:col-span-1">
                   <label class="block text-xs font-medium text-gray-700 mb-1">Total</label>
                   <div
                     class="px-2 py-[9px] bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 border-l-4 border-l-blue-500 overflow-hidden text-ellipsis whitespace-nowrap">
@@ -483,9 +514,9 @@
         (cancel)="closeProviderModal()"></app-proveedores-forms-page>
     </app-modal>
 
-    <app-modal [(visible)]="isProductModalVisible" title="Crear Nuevo Producto/Servicio" width="max-w-4xl">
-      <app-productos-compra-forms [isModal]="true" (saveSuccess)="onProductSaved($event)"
-        (cancel)="closeProductModal()"></app-productos-compra-forms>
+    <app-modal [(visible)]="isProductModalVisible" title="Crear Nuevo Articulo" width="max-w-4xl">
+      <app-productos-servicios-forms [isModal]="true" (saveSuccess)="onProductSaved($event)"
+        (cancel)="closeProductModal()"></app-productos-servicios-forms>
     </app-modal>
   </form>
 

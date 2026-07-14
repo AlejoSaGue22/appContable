@@ -115,6 +115,9 @@ export class CompraDetailsComponent implements OnInit {
             GASTO: 'Registro de Compra',
             PAGO_PROVEEDOR: 'Pago a Proveedor',
             ANULACION_FACTURA_COMPRA: 'Anulación de Compra',
+            CRUCE_ANTICIPO: 'Cruce de Anticipo',
+            ANULACION_COMPROBANTE: 'Anulación Cruce de Anticipo',
+            ANULACION_CRUCE_ANTICIPO: 'Anulación Cruce de Anticipo',
         };
         return map[tipo] ?? tipo;
     }

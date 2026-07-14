@@ -9,7 +9,6 @@ import { NotificationService } from '@shared/services/notification.service';
 import { LoaderService } from '@utils/services/loader.service';
 import { ModalComponent } from '@shared/components/modal/modal.component';
 import { ProveedoresFormsPageComponent } from '../../proveedores/proveedores-forms-page/proveedores-forms-page.component';
-import { ProductosCompraFormsComponent } from '../../productos-compra/productos-compra-forms/productos-compra-forms.component';
 import { forkJoin, map } from 'rxjs';
 import { ProveedoresService } from '../../services/proveedores.service';
 import { ProductosService } from '@dashboard/pages/ventas/services/productos.service';
@@ -25,6 +24,9 @@ import { PreviewAsientoComponent } from '@dashboard/components/preview-asiento/p
 import { LoaderComponent } from "@utils/components/loader/loader.component";
 import { CuentasBancariasService } from '@dashboard/pages/contabilidad/services/cuentas-bancarias.service';
 import { CuentaBancaria } from '@dashboard/pages/contabilidad/interfaces/cuenta-bancaria.interface';
+import { ProductosServiciosFormsComponent } from '@dashboard/pages/articulos/productos-servicios-forms/productos-servicios-forms.component';
+import { CuentasContablesService } from '@dashboard/pages/contabilidad/services/cuentas-contables.service';
+import { GetCuentasContables } from '@dashboard/pages/contabilidad/interfaces/cuentas-contables.interface';
 
 @Component({
     selector: 'app-factura-compra-forms-page',
@@ -38,7 +40,7 @@ import { CuentaBancaria } from '@dashboard/pages/contabilidad/interfaces/cuenta-
         ListGroupDropdownComponent,
         ModalComponent,
         ProveedoresFormsPageComponent,
-        ProductosCompraFormsComponent,
+        ProductosServiciosFormsComponent,
         PreviewAsientoComponent,
     ],
     providers: [
@@ -59,6 +61,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     loaderService = inject(LoaderService);
     proveedoresServicios = inject(ProveedoresService);
     productoServicios = inject(ProductosService);
+    cuentasService = inject(CuentasContablesService);
     router = inject(Router);
     activatedRoute = inject(ActivatedRoute);
     catalogsStore = inject(CatalogsStore);
@@ -85,11 +88,27 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     // Mock Data Signals
     proveedoresList = signal<ProveedoresRequest[]>([]);
     productosList = signal<GetProductosDetalle[]>([]);
+    cuentasContables = signal<GetCuentasContables[]>([]);
     cuentasBancarias = signal<CuentaBancaria[]>([]);
     refreshAsientoTrigger = signal<number>(0);
     factura = signal<FacturaCompra | null>(null);
     anticiposDisponibles = signal<any[]>([]);
     anticiposAsociados = signal<{ anticipoId: string; numero: string; montoOriginal: number; saldoDisponible: number; montoAplicado: number }[]>([]);
+
+    // Computed signals for filtering articles
+    productosCreados = computed(() => {
+        return this.productosList().filter(art => {
+            const catCode = art.categoriaArticulo?.codigo || '';
+            return catCode !== 'activos-fijos';
+        });
+    });
+
+    activosFijosCreados = computed(() => {
+        return this.productosList().filter(art => {
+            const catCode = art.categoriaArticulo?.codigo || '';
+            return catCode === 'activos-fijos';
+        });
+    });
 
     formCompra = this.fb.group({
         proveedor: ['', Validators.required],
@@ -140,11 +159,13 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     minDate = signal<string>(new Date().toISOString().substring(0, 10));
 
     productosItemsForm = this.fb.group({
-        producto: [{ id: '', nombre: '' }, Validators.required],
+        tipoConcepto: ['PRODUCTO', Validators.required],
+        producto: [null as GetProductosDetalle | null, Validators.required],
+        cuentaContable: [null as any],
         quantity: [1, [Validators.required, Validators.min(1)]],
         descripcion: [''],
         unitPrice: [0, [Validators.required, Validators.min(0)]],
-        iva: [0],
+        iva: ['' as any],
         discount: [0, [Validators.min(0), Validators.max(100)]],
         total: [0]
     });
@@ -160,15 +181,44 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         this.getProveedoresAndProductos();
         this.getCuentasBancarias();
 
+        // React to concept type changes
+        this.productosItemsForm.get('tipoConcepto')?.valueChanges.subscribe((tipo) => {
+            const prodCtrl = this.productosItemsForm.get('producto');
+            const cuentaCtrl = this.productosItemsForm.get('cuentaContable');
+            
+            if (tipo === 'PRODUCTO' || tipo === 'ACTIVO_FIJO') {
+                prodCtrl?.setValidators([Validators.required]);
+                cuentaCtrl?.clearValidators();
+            } else {
+                cuentaCtrl?.setValidators([Validators.required]);
+                prodCtrl?.clearValidators();
+            }
+            prodCtrl?.setValue(null);
+            cuentaCtrl?.setValue(null);
+            prodCtrl?.updateValueAndValidity();
+            cuentaCtrl?.updateValueAndValidity();
+            
+            this.productosItemsForm.patchValue({
+                unitPrice: 0,
+                iva: '',
+                quantity: 1,
+                discount: 0,
+                descripcion: '',
+                total: 0
+            }, { emitEvent: false });
+            this.calculateItemTotal();
+        });
+
         // React to product selection to auto-fill price and tax
         this.productosItemsForm.get('producto')?.valueChanges.subscribe((prod: GetProductosDetalle | any) => {
-            if (prod) {
+            const tipo = this.productosItemsForm.get('tipoConcepto')?.value;
+            if (prod && (tipo === 'PRODUCTO' || tipo === 'ACTIVO_FIJO')) {
                 this.productosItemsForm.patchValue({
                     unitPrice: prod.precio,
                     iva: prod.impuestoId,
                     quantity: 1,
                     discount: 0,
-                    descripcion: prod.descripcion
+                    descripcion: prod.descripcion || ''
                 });
                 this.calculateItemTotal();
             }
@@ -192,12 +242,14 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     getProveedoresAndProductos() {
         this.loaderService.show();
         forkJoin({
-            proveedores: this.proveedoresServicios.getProveedores({ limit: 10, offset: 0 }),
-            productos: this.productoServicios.getProductos({ limit: 10, offset: 0, venta_compra: 'costo' })
+            proveedores: this.proveedoresServicios.getProveedores({ limit: 1000, offset: 0 }),
+            productos: this.productoServicios.getProductos({ limit: 1000, offset: 0, venta_compra: 'costo' }),
+            cuentas: this.cuentasService.getCuentasContables()
         }).subscribe({
-            next: ({ proveedores, productos }) => {
+            next: ({ proveedores, productos, cuentas }) => {
                 this.proveedoresList.set(proveedores.proveedores);
                 this.productosList.set(productos.articulos);
+                this.cuentasContables.set(cuentas.filter(c => c.aceptaMovimiento && c.isActive));
             },
             error: (error) => {
                 this.notificationService.error('Error al cargar los datos de la factura de compra', error);
@@ -220,20 +272,38 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                         this.items.removeAt(0);
                     }
 
-                    invoice.items.forEach((item: ItemFacturaResponse) => {
-                        this.addItem();
-                        this.items.at(this.items.length - 1)?.patchValue({
-                            productoId: item.articuloId,
-                            productoNombre: item.articulo?.nombre,
-                            cantidad: item.quantity,
-                            precioUnitario: item.unitPrice,
-                            iva: item.porcentajeIva,
-                            impuestoId: item.impuestoId || '',
-                            descuento: item.descuento,
-                            subtotal: item.valorSubtotal,
-                            total: item.itemTotal,
-                            descripcion: item.descripcion || ''
+                    invoice.items.forEach((item: ItemFacturaResponse | any) => {
+                        let tipoConceptoVal = 'PRODUCTO';
+                        let nombreDisplay = item.articulo?.nombre || '';
+                        let prodId = item.articuloId || null;
+                        let cuentaId = item.cuentaContableId || null;
+
+                        if (item.cuentaContableId || item.cuentaContable) {
+                            tipoConceptoVal = 'CUENTA';
+                            const cuenta = item.cuentaContable || item.cuenta;
+                            nombreDisplay = cuenta ? `${cuenta.codigo} · ${cuenta.nombre}` : '';
+                        } else {
+                            const isAsset = item.articulo?.categoriaArticulo?.codigo === 'activos-fijos';
+                            if (isAsset) {
+                                tipoConceptoVal = 'ACTIVO_FIJO';
+                            }
+                        }
+
+                        const newItem = this.fb.group({
+                            tipoConcepto: [tipoConceptoVal],
+                            productoId: [prodId],
+                            cuentaContableId: [cuentaId],
+                            productoNombre: [nombreDisplay],
+                            cantidad: [item.quantity],
+                            precioUnitario: [item.unitPrice],
+                            iva: [item.porcentajeIva],
+                            impuestoId: [item.impuestoId || ''],
+                            descuento: [item.descuento],
+                            subtotal: [item.valorSubtotal],
+                            total: [item.itemTotal],
+                            descripcion: [item.descripcion || '']
                         });
+                        this.items.push(newItem);
                     });
 
                     this.formCompra.patchValue({
@@ -320,23 +390,50 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         const subtotal = (itemVal.quantity || 0) * (itemVal.unitPrice || 0);
         const tarifa = this.getIvaTarifa(itemVal.iva);
 
+        let nombreDisplay = '';
+        let productoIdVal: string | null = null;
+        let cuentaContableIdVal: string | null = null;
+
+        if (itemVal.tipoConcepto === 'PRODUCTO' || itemVal.tipoConcepto === 'ACTIVO_FIJO') {
+            nombreDisplay = itemVal.producto?.nombre || '';
+            productoIdVal = itemVal.producto?.id || null;
+        } else if (itemVal.tipoConcepto === 'CUENTA') {
+            nombreDisplay = itemVal.cuentaContable ? `${itemVal.cuentaContable.codigo} · ${itemVal.cuentaContable.nombre}` : '';
+            cuentaContableIdVal = itemVal.cuentaContable?.id || null;
+        }
+
         const newItem = this.fb.group({
-            productoId: [itemVal.producto?.id],
-            productoNombre: [itemVal.producto?.nombre],
+            tipoConcepto: [itemVal.tipoConcepto],
+            productoId: [productoIdVal],
+            cuentaContableId: [cuentaContableIdVal],
+            productoNombre: [nombreDisplay],
             cantidad: [itemVal.quantity],
             precioUnitario: [itemVal.unitPrice],
             iva: [tarifa],
             impuestoId: [itemVal.iva],
             descuento: [itemVal.discount],
             subtotal: [subtotal],
-            total: [itemVal.total]
+            total: [itemVal.total],
+            descripcion: [itemVal.descripcion || '']
         });
 
         this.items.push(newItem);
-        this.productosItemsForm.reset({ producto: { id: '', nombre: '' }, quantity: 1, unitPrice: 0, iva: 0, discount: 0, total: 0 });
+        
+        const currentTipo = itemVal.tipoConcepto;
+        this.productosItemsForm.reset({
+            tipoConcepto: currentTipo,
+            producto: null,
+            cuentaContable: null,
+            quantity: 1,
+            unitPrice: 0,
+            iva: '',
+            discount: 0,
+            descripcion: '',
+            total: 0
+        });
+        
         this.calculateItemTotal();
         this.calcularTotal();
-
     }
 
     removeItem(index: number) {
@@ -430,6 +527,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
             cuentaBancariaId: factura.cuentaBancariaId || '',
             items: items.map((item: any) => ({
                 articuloId: item.productoId,
+                cuentaContableId: item.cuentaContableId,
                 quantity: item.cantidad,
                 unitPrice: item.precioUnitario,
                 iva: item.iva,

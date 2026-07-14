@@ -116,6 +116,9 @@ export class InvoiceDetailsComponent {
             COBRO: 'Cobro CxC',
             ANULACION_FACTURA_VENTA: 'Anulación',
             PAGO_FACTURA_VENTA: 'Cobro',
+            CRUCE_ANTICIPO: 'Cruce de Anticipo',
+            ANULACION_COMPROBANTE: 'Anulación Cruce de Anticipo',
+            ANULACION_CRUCE_ANTICIPO: 'Anulación Cruce de Anticipo',
         };
         return map[tipo] ?? tipo;
     }

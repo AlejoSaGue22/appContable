@@ -123,4 +123,10 @@ export class ComprobantesComponent implements OnInit {
       },
     });
   }
+
+  getAsientosList(): any[] {
+    const val = this.previewAsiento();
+    if (!val) return [];
+    return Array.isArray(val) ? val : [val];
+  }
 }

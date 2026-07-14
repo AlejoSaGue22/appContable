@@ -125,7 +125,7 @@
                 <table class="ledger-table">
                     <thead>
                         <tr>
-                            <th>N° Comprobante</th>
+                            <th>Numero</th>
                             <th>Tipo</th>
                             <th>Fecha</th>
                             <th>Factura</th>
@@ -185,7 +185,6 @@
                                             </path>
                                             <rect x="6" y="14" width="12" height="8"></rect>
                                         </svg>
-                                        Volante
                                     </button>
                                     <button type="button" (click)="verAsiento(item)" [disabled]="!item.asientoId"
                                         class="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold cursor-pointer rounded-xl transition-all flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
@@ -197,7 +196,6 @@
                                             <line x1="16" y1="13" x2="8" y2="13"></line>
                                             <line x1="16" y1="17" x2="8" y2="17"></line>
                                         </svg>
-                                        Asiento
                                     </button>
                                     @if (item.estado !== 'anulado') {
                                     <button type="button" (click)="abrirModalAnular(item)"
@@ -209,7 +207,6 @@
                                             <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
                                             <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
                                         </svg>
-                                        Anular
                                     </button>
                                     }
                                 </div>
@@ -243,7 +240,7 @@
 </div>
 
 <!-- Modal Asiento Contable -->
-<app-modal [(visible)]="asientoVisible" title="Asiento Contable" width="max-w-3xl">
+<app-modal [(visible)]="asientoVisible" title="Asiento Contable" size="xl">
     @if (asientoPagoId()) {
     <app-modal-asiento-contable [pagoId]="asientoPagoId()!" />
     }

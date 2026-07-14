@@ -215,15 +215,11 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <!-- Cuenta Contable -->
-              <div class="flex flex-col md:col-span-1">
+              <div class="flex flex-col md:col-span-1 relative">
                 <label class="text-xs font-bold text-slate-500 mb-1">Cuenta PUC (Auxiliar)</label>
-                <select formControlName="cuentaContableId"
-                  class="text-sm bg-white border border-slate-200 rounded-xl py-2 px-3 focus:outline-none focus:ring-4 focus:ring-orange-500/5 focus:border-orange-500/50 shadow-sm cursor-pointer transition-all">
-                  <option value="">-- Seleccione Cuenta --</option>
-                  @for (c of cuentasContables(); track c.id) {
-                  <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
-                  }
-                </select>
+                <app-list-group-dropdown title="" [dataList]="cuentasContables()" [labelKey]="['codigo', 'nombre']"
+                  [valueInput]="getCuentaContableDisplay(i)" [searchable]="false"
+                  (objectSelect)="onCuentaSelect($event, i)" />
               </div>
 
               <!-- Concepto / Descripción -->

@@ -1,107 +1,114 @@
 @if (loading()) {
- <div class="flex items-center justify-center py-10 text-slate-400">
- <svg class="h-6 w-6 animate-spin mr-2" fill="none" viewBox="0 0 24 24">
- <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
- <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
- </svg>
- Cargando asiento contable...
- </div>
+<div class="flex items-center justify-center py-10 text-slate-400">
+    <svg class="h-6 w-6 animate-spin mr-2" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+        </path>
+    </svg>
+    Cargando asiento contable...
+</div>
 
 } @else if (error()) {
- <div class="flex flex-col items-center justify-center py-10 text-red-400">
- <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <circle cx="12" cy="12" r="10"></circle>
- <line x1="15" y1="9" x2="9" y2="15"></line>
- <line x1="9" y1="9" x2="15" y2="15"></line>
- </svg>
- <p class="text-sm font-medium">Error al cargar el asiento contable</p>
- </div>
+<div class="flex flex-col items-center justify-center py-10 text-red-400">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-2 opacity-50" fill="none" stroke="currentColor"
+        viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="15" y1="9" x2="9" y2="15"></line>
+        <line x1="9" y1="9" x2="15" y2="15"></line>
+    </svg>
+    <p class="text-sm font-medium">Error al cargar el asiento contable</p>
+</div>
 
 } @else if (!data()?.asiento) {
- <div class="flex flex-col items-center justify-center py-10 text-amber-500">
- <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
- <line x1="12" y1="9" x2="12" y2="13"></line>
- <line x1="12" y1="17" x2="12.01" y2="17"></line>
- </svg>
- <p class="text-sm font-medium">Este pago no tiene asiento contable generado</p>
- <p class="text-xs mt-1 text-slate-400">El asiento pudo haber fallado durante el registro.</p>
- </div>
+<div class="flex flex-col items-center justify-center py-10 text-amber-500">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-2 opacity-50" fill="none" stroke="currentColor"
+        viewBox="0 0 24 24">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+        <line x1="12" y1="9" x2="12" y2="13"></line>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+    </svg>
+    <p class="text-sm font-medium">Este pago no tiene asiento contable generado</p>
+    <p class="text-xs mt-1 text-slate-400">El asiento pudo haber fallado durante el registro.</p>
+</div>
 
 } @else {
 
- <!-- Info del pago -->
- <div class="flex items-center gap-4 p-3 mb-4 rounded-lg bg-blue-50 border border-blue-100">
- <div class="flex-1 min-w-0">
- <p class="text-xs font-semibold uppercase text-slate-500">Pago / Cobro</p>
- <p class="text-sm font-bold text-slate-700">{{ data()!.pago.numeroFactura }}</p>
- </div>
- <div class="text-right">
- <p class="text-xs text-slate-500">Monto</p>
- <p class="text-base font-bold text-blue-700">{{ data()!.pago.monto | currency:'':'symbol-narrow':'1.0-0' }}</p>
- </div>
- <div class="text-right">
- <p class="text-xs text-slate-500">Fecha</p>
- <p class="text-sm font-semibold text-slate-600">{{ data()!.pago.fecha | date:'dd/MM/yyyy' }}</p>
- </div>
- </div>
+<!-- Info del pago -->
+<div class="flex items-center gap-4 p-3 mb-4 rounded-lg bg-blue-50 border border-blue-100">
+    <div class="flex-1 min-w-0">
+        <p class="text-xs font-semibold uppercase text-slate-500">Pago / Cobro</p>
+        <p class="text-sm font-bold text-slate-700">{{ data()!.pago.numeroFactura }}</p>
+    </div>
+    <div class="text-right">
+        <p class="text-xs text-slate-500">Monto</p>
+        <p class="text-base font-bold text-blue-700">{{ data()!.pago.monto | currency:'':'symbol-narrow':'1.0-0' }}</p>
+    </div>
+    <div class="text-right">
+        <p class="text-xs text-slate-500">Fecha</p>
+        <p class="text-sm font-semibold text-slate-600">{{ data()!.pago.fecha | date:'dd/MM/yyyy' }}</p>
+    </div>
+</div>
 
- <!-- Info del asiento -->
- <div class="mb-4">
- <div class="flex items-center gap-3 mb-2">
- <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
- {{ tipoLabel }}
- </span>
- <span class="text-sm text-slate-500">Asiento #{{ data()!.asiento!.numero }}</span>
- <span class="text-sm text-slate-400">|</span>
- <span class="text-sm text-slate-500">{{ data()!.asiento!.fecha | date:'dd/MM/yyyy' }}</span>
- </div>
- @if (data()!.asiento!.descripcion) {
- <p class="text-xs text-slate-400 italic">{{ data()!.asiento!.descripcion }}</p>
- }
- </div>
+<!-- Info del asiento -->
+<div class="mb-4">
+    <div class="flex items-center gap-3 mb-2">
+        <span
+            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
+            {{ tipoLabel }}
+        </span>
+        <span class="text-sm text-slate-500">Asiento #{{ data()!.asiento!.numero }}</span>
+        <span class="text-sm text-slate-400">|</span>
+        <span class="text-sm text-slate-500">{{ data()!.asiento!.fecha | date:'dd/MM/yyyy' }}</span>
+    </div>
+    @if (data()!.asiento!.descripcion) {
+    <p class="text-xs text-slate-400 italic">{{ data()!.asiento!.descripcion }}</p>
+    }
+</div>
 
- <!-- Tabla de detalles -->
- <div class="overflow-x-auto rounded-lg border border-slate-100">
- <table class="ledger-table">
- <thead>
- <tr>
- <th>Codigo</th>
- <th>Cuenta</th>
- <th class="text-right">Debito</th>
- <th class="text-right">Credito</th>
- </tr>
- </thead>
- <tbody>
- @for (det of data()!.detalles; track det.id) {
- <tr>
- <td class="font-mono text-slate-500">{{ det.cuentaCodigo }}</td>
- <td>{{ det.cuentaNombre }}</td>
- <td class="text-right font-semibold"
- [class.text-blue-700]="Number(det.debito) > 0"
- [class.text-slate-300]="Number(det.debito) === 0">
- {{ det.debito | currency:'':'symbol-narrow':'1.0-0' }}
- </td>
- <td class="px-4 py-3 text-right font-semibold"
- [class.text-purple-700]="Number(det.credito) > 0"
- [class.text-slate-300]="Number(det.credito) === 0">
- {{ det.credito | currency:'':'symbol-narrow':'1.0-0' }}
- </td>
- </tr>
- }
- </tbody>
- <tfoot class="bg-slate-50 border-t-2 border-slate-200">
- <tr>
- <td colspan="2" class="text-xs font-bold uppercase text-slate-600">Totales</td>
- <td class="text-right font-bold text-blue-700">{{ totalDebito | currency:'':'symbol-narrow':'1.0-0' }}</td>
- <td class="text-right font-bold text-purple-700">{{ totalCredito | currency:'':'symbol-narrow':'1.0-0' }}</td>
- </tr>
- </tfoot>
- </table>
- </div>
+<!-- Tabla de detalles -->
+<div class="overflow-x-auto rounded-lg border border-slate-100">
+    <table class="ledger-table">
+        <thead>
+            <tr>
+                <th>Codigo</th>
+                <th>Cuenta</th>
+                <th>Descripcion</th>
+                <th class="text-right">Debito</th>
+                <th class="text-right">Credito</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (det of data()!.detalles; track det.id) {
+            <tr>
+                <td class="font-mono text-slate-500">{{ det.cuentaCodigo }}</td>
+                <td>{{ det.cuentaNombre }}</td>
+                <td>{{ det.descripcion }}</td>
+                <td class="text-right font-semibold" [class.text-blue-700]="Number(det.debito) > 0"
+                    [class.text-slate-300]="Number(det.debito) === 0">
+                    {{ det.debito | currency:'':'symbol-narrow':'1.0-0' }}
+                </td>
+                <td class="px-4 py-3 text-right font-semibold" [class.text-purple-700]="Number(det.credito) > 0"
+                    [class.text-slate-300]="Number(det.credito) === 0">
+                    {{ det.credito | currency:'':'symbol-narrow':'1.0-0' }}
+                </td>
+            </tr>
+            }
+        </tbody>
+        <tfoot class="bg-slate-50 border-t-2 border-slate-200">
+            <tr>
+                <td colspan="3" class="text-xs font-bold uppercase text-slate-600">Totales</td>
+                <td class="text-right font-bold text-blue-700">{{ totalDebito | currency:'':'symbol-narrow':'1.0-0' }}
+                </td>
+                <td class="text-right font-bold text-purple-700">{{ totalCredito | currency:'':'symbol-narrow':'1.0-0'
+                    }}</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
 
- @if (data()!.asiento!.referencia) {
- <p class="mt-3 text-xs text-slate-400">Referencia: {{ data()!.asiento!.referencia }}</p>
- }
+@if (data()!.asiento!.referencia) {
+<p class="mt-3 text-xs text-slate-400">Referencia: {{ data()!.asiento!.referencia }}</p>
+}
 
 }

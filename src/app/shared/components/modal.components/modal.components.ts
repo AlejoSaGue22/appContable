@@ -10,6 +10,16 @@ import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 export class ModalComponents implements OnInit, OnDestroy {
   visible = input<boolean>(true);
   visibleChange = output<boolean>();
+  title = input<string>('');
+  size = input<'sm' | 'md' | 'lg' | 'xl' | 'full'>('xl');
+
+  sizeClass = {
+    sm: 'max-w-md',
+    md: 'max-w-2xl',
+    lg: 'max-w-4xl',
+    xl: 'max-w-6xl',
+    full: 'max-w-[90vw]',
+  };
 
   modalActive = linkedSignal(() => this.visible());
 

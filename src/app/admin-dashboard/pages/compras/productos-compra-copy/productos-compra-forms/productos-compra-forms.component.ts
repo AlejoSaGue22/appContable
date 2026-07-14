@@ -1,40 +1,40 @@
-import { Component, inject, input, output } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators, ɵInternalFormsSharedModule } from '@angular/forms';
+import { Component, inject, input, output, OnInit } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HeaderInput, HeaderTitlePageComponent } from "@dashboard/components/header-title-page/header-title-page.component";
-import { firstValueFrom, map, tap } from 'rxjs';
-import { ProductosService } from '../../services/productos.service';
+import { firstValueFrom, map, of, tap } from 'rxjs';
 import { ArticulosInterface } from '@dashboard/interfaces/productos-interface';
 import { FormErrorLabelComponent } from "src/app/utils/components/form-error-label/form-error-label.component";
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { LoaderComponent } from "src/app/utils/components/loader/loader.component";
 import { NotificationService } from '@shared/services/notification.service';
+import { ProductosService } from '@dashboard/pages/ventas/services/productos.service';
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
-import { HelpersUtils } from '@utils/helpers.utils';
 
 @Component({
- selector: 'app-productos-servicios-forms',
+ selector: 'app-productos-compra-forms',
  imports: [HeaderTitlePageComponent, ReactiveFormsModule, FormErrorLabelComponent, LoaderComponent],
- templateUrl: './productos-servicios-forms.component.html',
+ templateUrl: './productos-compra-forms.component.html',
 })
-export class ProductosServiciosFormsComponent {
+export class ProductosCompraFormsComponent implements OnInit {
+
+ headTitle: HeaderInput = {
+ title: 'Registra un articulo de compra',
+ slog: 'Gestiona la información de tus articulos de compra'
+ }
+
+ private fb = inject(FormBuilder);
+ productoServicios = inject(ProductosService);
+ notificacionService = inject(NotificationService);
+ router = inject(Router);
+ activateRoute = inject(ActivatedRoute);
+ catalogsStore = inject(CatalogsStore);
 
  isModal = input<boolean>(false);
  saveSuccess = output<any>();
  cancel = output<void>();
-
-
- headTitle: HeaderInput = {
- title: 'Registra un servicio o producto',
- slog: 'Gestiona la información de servicios y productos'
- }
-
- private fb = inject(FormBuilder);
- private productoServicios = inject(ProductosService);
- private notificacionService = inject(NotificationService);
- private router = inject(Router);
- private activateRoute = inject(ActivatedRoute);
- catalogsStore = inject(CatalogsStore);
+ 
+ categorias = inject(ProductosService).categorias().filter((c) => c.tipo == 'costo' || c.tipo == 'gasto');
 
  formProductos = this.fb.group({
  categoria: ['', Validators.required],
@@ -44,13 +44,9 @@ export class ProductosServiciosFormsComponent {
  impuesto: ['', Validators.required],
  isInventariable: [true],
  // retencion: ['', Validators.required],
-
- precioventa: this.fb.group({
- precio1: ['', [Validators.pattern(/^\d+(\.\d{1,2})?$/)]],
- precio2: ['', [Validators.pattern(/^\d+(\.\d{1,2})?$/)]]
- }),
+ precio_referencial: ['', [Validators.pattern(/^\d+(\.\d{1,2})?$/)]],
  observacion: ['']
- });
+ })
 
  constructor() {
  this.formProductos.get('categoria')?.valueChanges.subscribe((categoriaId) => {
@@ -65,35 +61,34 @@ export class ProductosServiciosFormsComponent {
  });
  }
 
+ ngOnInit(): void {
+ if (this.isModal()) {
+ this.formProductos.reset();
+ }
+ }
+
  productosID = toSignal(
  this.activateRoute.params.pipe(map((param) => param['id']))
  );
- categorias = inject(ProductosService).categorias().filter((c) => c.tipo == 'venta' || c.tipo == 'servicio' );
 
  productoIdRxResourse = rxResource({
  request: () => {
- // Solo cargar si NO está en modo modal
- if (this.isModal()) {
- return null;
- }
+ if (this.isModal()) return null;
  return { id: this.productosID() };
  },
  loader: ({ request }) => {
  if (!request) {
- // Si no hay request (modo modal), retornar un observable vacío
- return this.productoServicios.getProductoByID('new-Item');
+ this.formProductos.reset();
+ return of(null);
  }
  return this.productoServicios.getProductoByID(request.id).pipe(
  tap((p) => {
  this.formProductos.reset(p);
- this.formProductos.get('precioventa')?.setValue({
- precio1: p.precio,
- precio2: p.precioventa2
- });
+ this.formProductos.get('precio_referencial')?.setValue(p.precio);
  const isInv = p.isInventariable !== undefined ? p.isInventariable : (p.afectaInventario !== undefined ? p.afectaInventario : true);
  this.formProductos.get('isInventariable')?.setValue(isInv);
  })
- );
+ )
  }
  });
 
@@ -103,30 +98,24 @@ export class ProductosServiciosFormsComponent {
  console.log(this.formProductos.value)
 
  if (!valid) {
- this.notificacionService.error(
- `Formulario incompleto`,
- 'Error',
- 5000
- );
+ this.notificacionService.error(`Formulario incompleto`,'Error', 5000);
  return
  }
 
  const rawValue = this.formProductos.getRawValue();
- const { precioventa, ...restValue } = rawValue;
+ const { precio_referencial, ...restValue } = rawValue;
  const formValue = {
  ...restValue,
- precio: precioventa?.precio1,
- precioventa2: precioventa?.precio2
+ precio: precio_referencial,
  };
-
  try {
 
- if (this.productosID() == 'new-Item') {
+ if (this.productosID() == 'new-Item' || this.isModal()) {
  const product = await firstValueFrom(this.productoServicios.agregarProducto(formValue as Partial<ArticulosInterface>));
 
  if (product.success == false) {
  this.notificacionService.error(
- `Hubo un error al guardar el producto ${HelpersUtils.getMessageError(product.message)}`,
+ `Hubo un error al guardar el producto ${product.message}`,
  'Error',
  5000
  );
@@ -142,7 +131,7 @@ export class ProductosServiciosFormsComponent {
  if (this.isModal()) {
  this.saveSuccess.emit(product.data);
  } else {
- await this.router.navigateByUrl('/panel/ventas/products_services');
+ await this.router.navigateByUrl('/panel/compras/articles');
  }
 
  } else {
@@ -152,37 +141,34 @@ export class ProductosServiciosFormsComponent {
 
  if (product.success == false) {
  this.notificacionService.error(
- `Hubo un error al guardar este item ${HelpersUtils.getMessageError(product.message)}`,
+ `Hubo un error al guardar este item ${product.message}`,
  'Error',
  5000
  );
  return;
  }
 
+
  this.notificacionService.success(
  'Producto actualizado correctamente',
  'Completado!',
  3000
  );
- await this.router.navigateByUrl('/panel/ventas/products_services');
+ await this.router.navigateByUrl('/panel/compras/articles');
 
  }
 
  } catch (error: any) {
- this.notificacionService.error(
- `Hubo un error al realizar la operacion ${HelpersUtils.getMessageError(error.message)}`,
- 'Error',
- 5000
- );
+ alert(error.message)
  }
  }
 
  async onCancel() {
- this.formProductos.reset();
  if (this.isModal()) {
  this.cancel.emit();
  } else {
- await this.router.navigateByUrl('/panel/ventas/products_services');
+ this.formProductos.reset();
+ await this.router.navigateByUrl('/panel/compras/articles');
  }
  }
 

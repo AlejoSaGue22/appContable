@@ -254,6 +254,19 @@ export class ComprobanteEgresoFormsPageComponent implements OnInit {
     }
   }
 
+  getCuentaContableDisplay(index: number): string {
+    const group = this.conceptosFormArray.at(index);
+    const id = group.get('cuentaContableId')?.value;
+    if (!id) return '';
+    const account = this.cuentasContables().find((c) => c.id === id);
+    return account ? `${account.codigo} - ${account.nombre}` : '';
+  }
+
+  onCuentaSelect(account: any, index: number): void {
+    const group = this.conceptosFormArray.at(index);
+    group.patchValue({ cuentaContableId: account.id });
+  }
+
   onImpuestoCambio(index: number): void {
     const group = this.conceptosFormArray.at(index);
     const impId = group.get('impuestoId')?.value;

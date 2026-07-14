@@ -38,12 +38,12 @@ import { ComprobantesVentasService } from '../../services/comprobantes-ventas.se
 import { LoaderService } from '@utils/services/loader.service';
 import { ModalComponent } from '@shared/components/modal/modal.component';
 import { ClientsFormPageComponent } from '../../clientes/clients-form-page/clients-form-page.component';
-import { ProductosServiciosFormsComponent } from '../../productos-servicios/productos-servicios-forms/productos-servicios-forms.component';
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
 import { HelpersUtils } from '@utils/helpers.utils';
 import { CuentasBancariasService } from '@dashboard/pages/contabilidad/services/cuentas-bancarias.service';
 import { CuentaBancaria } from '@dashboard/pages/contabilidad/interfaces/cuenta-bancaria.interface';
- 
+import { ProductosServiciosFormsComponent } from '@dashboard/pages/articulos/productos-servicios-forms/productos-servicios-forms.component';
+
 @Component({
   selector: 'app-comprobante-ventas-forms-page',
   standalone: true,
@@ -53,7 +53,6 @@ import { CuentaBancaria } from '@dashboard/pages/contabilidad/interfaces/cuenta-
     ListGroupDropdownComponent,
     CurrencyPipe,
     DatePipe,
-
     FormErrorLabelComponent,
     RouterLink,
     ModalComponent,
@@ -238,7 +237,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
               saldoDisponible: app.anticipo?.saldoDisponible || 0,
               montoAplicado: app.montoAplicado
             })));
-            
+
             // Cargar también todos los disponibles para el cliente
             if (invoice.clientId) {
               this.cargarAnticiposDisponibles(invoice.clientId);
@@ -272,7 +271,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     cuentaBancariaId: [''],
     fechaVencimiento: [''],
     fecha: ['', Validators.required],
-    canal: ['1', Validators.required],
+    canal: ['', Validators.required],
     tipoFactura: [TipoFactura.STANDARD, Validators.required],
     productos: [[]],
   });
@@ -489,7 +488,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     if (isChecked) {
       const saldoPendienteFactura = this.obtenerSaldoPendienteAntesAnticipos();
       const montoSugerido = Math.min(anticipo.saldoDisponible, saldoPendienteFactura);
-      
+
       this.anticiposAsociados.update(list => [...list, {
         anticipoId: anticipo.id,
         numero: anticipo.numero,
@@ -514,11 +513,11 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   cambiarMontoAplicado(asoc: any, event: Event) {
     const inputVal = Number((event.target as HTMLInputElement).value) || 0;
     let finalVal = Math.min(inputVal, asoc.saldoDisponible);
-    
+
     const otrosAnticiposSuma = this.anticiposAsociados()
       .filter(a => a.anticipoId !== asoc.anticipoId)
       .reduce((sum, a) => sum + a.montoAplicado, 0);
-      
+
     const maxValPermitido = Math.max(0, this.totales.facturaTotal - otrosAnticiposSuma);
     finalVal = Math.min(finalVal, maxValPermitido);
 
