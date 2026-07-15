@@ -36,7 +36,13 @@ export class ImpuestosFormsComponent implements OnInit {
   cuentasFiltradas = computed(() => {
     return this.cuentas().filter(
       (c) =>
-        c.aceptaMovimiento
+        c.aceptaMovimiento &&
+        (c.codigo.startsWith('1355') ||
+          c.codigo.startsWith('24') ||
+          c.codigo.startsWith('2365') ||
+          c.codigo.startsWith('2367') ||
+          c.codigo.startsWith('2368') ||
+          c.codigo.startsWith('2370'))
     );
   });
 

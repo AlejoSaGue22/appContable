@@ -247,7 +247,11 @@ export class FacturaCompraFormsPageComponent implements OnInit {
             cuentas: this.cuentasService.getCuentasContables()
         }).subscribe({
             next: ({ proveedores, productos, cuentas }) => {
-                this.proveedoresList.set(proveedores.proveedores);
+                const mappedProveedores = (proveedores.proveedores || []).map((p: any) => ({
+                    ...p,
+                    fullName: p.razonSocial?.trim() || `${p.nombre || ''} ${p.apellido || ''}`.trim()
+                }));
+                this.proveedoresList.set(mappedProveedores);
                 this.productosList.set(productos.articulos);
                 this.cuentasContables.set(cuentas.filter(c => c.aceptaMovimiento && c.isActive));
             },
@@ -306,12 +310,17 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                         this.items.push(newItem);
                     });
 
+                    const prov = invoice.proveedor;
+                    const providerName = prov ? (prov.razonSocial?.trim() || `${prov.nombre || ''} ${prov.apellido || ''}`.trim()) : '';
+                    const abrev = prov?.tipoDocumentoRel?.abreviatura || '';
+                    const ident = prov ? (abrev ? `${abrev} - ${prov.identificacion}` : prov.identificacion) : '';
+
                     this.formCompra.patchValue({
-                        proveedorSearch: invoice.proveedor?.nombre,
+                        proveedorSearch: providerName,
                         proveedor: invoice.proveedorId,
-                        numeroIdentificacion: invoice.proveedor?.identificacion,
-                        email: invoice.proveedor?.email,
-                        telefono: invoice.proveedor?.telefono,
+                        numeroIdentificacion: ident,
+                        email: prov?.email,
+                        telefono: prov?.telefono,
                         fechaEmision: invoice.fecha,
                         fechaVencimiento: invoice.fechaVencimiento,
                         formaPago: invoice.formaPago,
@@ -559,11 +568,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                     return;
                 }
 
-                this.notificationService.success(
-                    'Factura creada con exito',
-                    'Accion Completada',
-                    5000
-                );
+                this.notificationService.success('Factura creada con exito', 'Accion Completada', 5000);
 
 
                 setTimeout(() => {
@@ -578,7 +583,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                     } else {
                         this.router.navigateByUrl('/panel/compras/purchases');
                     }
-                }, 800);
+                }, 200);
             });
 
         } else {
@@ -589,8 +594,9 @@ export class FacturaCompraFormsPageComponent implements OnInit {
 
     updateFactura(id: string, data: Partial<FacturaCompra>, isDraft: boolean) {
         this.facturaService.updateFacturaCompra(id, data).subscribe((response) => {
-            this.loading.set(false);
             if (response.success == false) {
+                this.loading.set(false);
+                this.loaderService.hide();
                 this.notificationService.error(
                     `Ocurrio un problema al actualizar la factura ${HelpersUtils.getMessageError(response.message)}`,
                     'Error',
@@ -599,20 +605,38 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                 return;
             }
 
-            this.notificationService.success(
-                'Factura actualizada con exito',
-                'Accion Completada',
-                5000
-            );
-
-            setTimeout(() => {
-                this.loaderService.hide();
-                if (isDraft) {
+            if (isDraft) {
+                this.loading.set(false);
+                this.notificationService.success(
+                    'Borrador actualizado con éxito',
+                    'Acción Completada',
+                    5000
+                );
+                setTimeout(() => {
+                    this.loaderService.hide();
                     this.refreshAsientoTrigger.update(v => v + 1);
-                } else {
+                }, 200);
+            } else {
+                this.loaderService.show('Registrando factura de compra...');
+                this.facturaService.registrarFacturaCompra(id).subscribe((regRes) => {
+                    this.loading.set(false);
+                    this.loaderService.hide();
+                    if (regRes.success == false) {
+                        this.notificationService.error(
+                            `La factura se guardó pero ocurrió un problema al registrarla: ${HelpersUtils.getMessageError(regRes.message)}`,
+                            'Advertencia',
+                            5000
+                        );
+                        return;
+                    }
+                    this.notificationService.success(
+                        'Factura registrada con éxito',
+                        'Acción Completada',
+                        5000
+                    );
                     this.router.navigateByUrl('/panel/compras/purchases');
-                }
-            }, 800);
+                });
+            }
         });
     }
 
@@ -626,9 +650,20 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     }
 
     onProviderSaved(newProvider: any) {
-        this.proveedoresList.update(list => [...list, newProvider]);
+        const fullName = newProvider.razonSocial?.trim() || `${newProvider.nombre || ''} ${newProvider.apellido || ''}`.trim();
+        const providerWithFullName = {
+            ...newProvider,
+            fullName
+        };
 
-        const nombreDisplay = newProvider.nombre?.trim() || newProvider.razonSocial?.trim() || '';
+        this.proveedoresList.update(list => {
+            if (list.some(p => p.id === newProvider.id)) {
+                return list;
+            }
+            return [...list, providerWithFullName];
+        });
+
+        const nombreDisplay = fullName;
         const abreviatura = newProvider.tipoDocumentoRel?.abreviatura || '';
 
         this.formCompra.patchValue({

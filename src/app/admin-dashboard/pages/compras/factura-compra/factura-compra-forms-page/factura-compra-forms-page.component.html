@@ -479,8 +479,9 @@
       <div class="flex justify-end gap-3 pt-2 border-t border-gray-100">
         <button type="button" routerLink="/panel/compras/purchases"
           class="rounded-lg border border-gray-300 cursor-pointer bg-white px-5 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all">
-          Cancelar
+          Regresar
         </button>
+        @if (facturaId() === 'new' || factura()?.estado === 'borrador') {
         <button type="button" [disabled]="loading()" (click)="onSubmit(true)"
           class="rounded-lg border border-gray-300 cursor-pointer bg-white px-5 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
           @if (loading()) {
@@ -493,6 +494,7 @@
           }
           {{ loading() ? "Guardando..." : "Guardar Borrador" }}
         </button>
+        }
         <button type="submit" [disabled]="loading()" (click)="onSubmit(false)"
           class="inline-flex items-center justify-center rounded-lg cursor-pointer bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
           @if (loading()) {
@@ -503,7 +505,7 @@
             </path>
           </svg>
           }
-          {{ loading() ? "Guardando..." : "Guardar Factura" }}
+          {{ loading() ? "Guardando..." : (facturaId() === 'new' || factura()?.estado === 'borrador' ? "Guardar y Registrar" : "Guardar Cambios") }}
         </button>
       </div>
     </form>
@@ -511,15 +513,15 @@
     <!-- Modals -->
     <app-modal [(visible)]="isProviderModalVisible" title="Crear Nuevo Proveedor" width="max-w-4xl">
       @if (isProviderModalVisible()) {
-        <app-proveedores-forms-page [isModal]="true" (saveSuccess)="onProviderSaved($event)"
-          (cancel)="closeProviderModal()"></app-proveedores-forms-page>
+      <app-proveedores-forms-page [isModal]="true" (saveSuccess)="onProviderSaved($event)"
+        (cancel)="closeProviderModal()"></app-proveedores-forms-page>
       }
     </app-modal>
 
     <app-modal [(visible)]="isProductModalVisible" title="Crear Nuevo Articulo" width="max-w-4xl">
       @if (isProductModalVisible()) {
-        <app-productos-servicios-forms [isModal]="true" (saveSuccess)="onProductSaved($event)"
-          (cancel)="closeProductModal()"></app-productos-servicios-forms>
+      <app-productos-servicios-forms [isModal]="true" (saveSuccess)="onProductSaved($event)"
+        (cancel)="closeProductModal()"></app-productos-servicios-forms>
       }
     </app-modal>
   </form>
