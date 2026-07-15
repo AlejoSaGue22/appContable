@@ -13,6 +13,7 @@ import { NominaService } from '../../../nomina/services/nomina.service';
 import { HeaderTitlePageComponent, HeaderInput } from '@dashboard/components/header-title-page/header-title-page.component';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
 import { NotificationService } from '@shared/services/notification.service';
+import { FormErrorLabelComponent } from '@utils/components/form-error-label/form-error-label.component';
 import { EstadoComprobante } from '../../interfaces/comprobantes.interface';
 
 @Component({
@@ -24,6 +25,7 @@ import { EstadoComprobante } from '../../interfaces/comprobantes.interface';
     RouterLink,
     HeaderTitlePageComponent,
     BreadcrumbComponent,
+    FormErrorLabelComponent,
   ],
   templateUrl: './comprobante-form.component.html',
 })

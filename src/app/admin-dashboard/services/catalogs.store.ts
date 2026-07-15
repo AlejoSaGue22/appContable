@@ -24,6 +24,7 @@ export class CatalogsStore {
         conceptsNotes: [],
         impuestos: [],
         vendedores: [],
+        tiposActivo: [],
         loading: false,
         error: null
     });
@@ -48,6 +49,7 @@ export class CatalogsStore {
     conceptsNotes = computed(() => this.state().conceptsNotes);
     impuestos = computed(() => this.state().impuestos);
     vendedores = computed(() => this.state().vendedores);
+    tiposActivo = computed(() => this.state().tiposActivo);
     loading = computed(() => this.state().loading);
     error = computed(() => this.state().error);
 
@@ -65,9 +67,10 @@ export class CatalogsStore {
             unitsMeasure: this.catalogsService.findAllUnitsMeasure(),
             conceptsNotes: this.catalogsService.findAllConceptsNotes(),
             impuestos: this.catalogsService.findAllImpuestos(),
-            vendedores: this.catalogsService.findAllVendedores()
+            vendedores: this.catalogsService.findAllVendedores(),
+            tiposActivo: this.catalogsService.findAllTiposActivo()
         }).pipe(
-            tap(({ categoriesArticles, documentTypes, paymentMethods, salesChannels, unitsMeasure, municipalities, conceptsNotes, impuestos, vendedores }) => {
+            tap(({ categoriesArticles, documentTypes, paymentMethods, salesChannels, unitsMeasure, municipalities, conceptsNotes, impuestos, vendedores, tiposActivo }) => {
                 this.state.set({
                     categoriesArticles: categoriesArticles.categoriesArticles,
                     documentTypes,
@@ -78,6 +81,7 @@ export class CatalogsStore {
                     conceptsNotes,
                     impuestos,
                     vendedores,
+                    tiposActivo,
                     loading: false,
                     error: null
                 });
@@ -105,6 +109,7 @@ export class CatalogsStore {
             conceptsNotes: [],
             impuestos: [],
             vendedores: [],
+            tiposActivo: [],
             loading: false,
             error: null
         });

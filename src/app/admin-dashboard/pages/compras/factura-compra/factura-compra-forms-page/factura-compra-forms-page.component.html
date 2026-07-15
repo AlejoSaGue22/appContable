@@ -338,10 +338,7 @@
                   <label class="block text-xs font-medium text-gray-700 mb-1">Total</label>
                   <div
                     class="px-2 py-[9px] bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-900 border-l-4 border-l-blue-500 overflow-hidden text-ellipsis whitespace-nowrap">
-                    {{
-                    productosItemsForm.get("total")?.value
-                    | currency: "" : "symbol" : "1.0-0"
-                    }}
+                    {{ productosItemsForm.get("total")?.value | currency: "" : "symbol" : "1.0-0" }}
                   </div>
                 </div>
 
@@ -505,7 +502,8 @@
             </path>
           </svg>
           }
-          {{ loading() ? "Guardando..." : (facturaId() === 'new' || factura()?.estado === 'borrador' ? "Guardar y Registrar" : "Guardar Cambios") }}
+          {{ loading() ? "Guardando..." : (facturaId() === 'new' || factura()?.estado === 'borrador' ? "Guardar y
+          Registrar" : "Guardar Cambios") }}
         </button>
       </div>
     </form>

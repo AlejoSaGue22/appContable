@@ -121,7 +121,7 @@ export class ProductosServiciosFormsComponent {
 
         try {
 
-            if (this.productosID() == 'new-Item') {
+            if (this.isModal() || this.productosID() == 'new-Item') {
                 const product = await firstValueFrom(this.productoServicios.agregarProducto(formValue as Partial<ArticulosInterface>));
 
                 if (product.success == false) {

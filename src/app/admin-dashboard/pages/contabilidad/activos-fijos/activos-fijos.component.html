@@ -1,0 +1,340 @@
+@if (activosResource.hasValue() && !activosResource.isLoading()) {
+<div class="space-y-6 animate-fade-in">
+  <header-title-page [titleHead]="headTitle">
+    <div actions class="flex gap-2">
+      <button (click)="activosResource.reload()"
+        class="inline-flex items-center justify-center cursor-pointer px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold rounded-xl transition-all active:scale-95 group">
+        <svg class="mr-2 h-4 w-4 transition-transform group-hover:rotate-180 duration-500" fill="none"
+          stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        Actualizar
+      </button>
+
+      <button (click)="openDepreciarModal()"
+        class="inline-flex items-center justify-center cursor-pointer px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-all shadow-lg active:scale-95 group">
+        <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+        </svg>
+        Depreciar Periodo
+      </button>
+
+      <button (click)="navigateToCreate()"
+        class="inline-flex items-center justify-center cursor-pointer px-6 py-2.5 bg-gray-900 hover:bg-black text-white text-sm font-semibold rounded-xl transition-all shadow-lg active:scale-95 group">
+        <svg class="mr-2 h-4 w-4 transition-transform group-hover:rotate-90" fill="none" stroke="currentColor"
+          viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
+        </svg>
+        Nuevo Activo Fijo
+      </button>
+    </div>
+  </header-title-page>
+
+  <!-- Table Card -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-500">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="border-b border-gray-100 bg-gray-50 text-gray-500 text-xs uppercase">
+            <th class="px-6 py-4">Código</th>
+            <th class="px-6 py-4">Nombre / Adquisición</th>
+            <th class="px-6 py-4">Vida Útil (Meses)</th>
+            <th class="px-6 py-4">Valor Compra</th>
+            <th class="px-6 py-4">Depr. Acumulada</th>
+            <th class="px-6 py-4">Valor Libros</th>
+            <th class="px-6 py-4">Estado</th>
+            <th class="px-6 py-4 text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100 text-sm text-gray-700">
+          @for (activo of activos(); track activo.id) {
+          <tr class="hover:bg-gray-50 transition-colors group">
+            <td class="px-6 py-4 font-mono font-bold text-blue-600">
+              {{ activo.codigo }}
+            </td>
+            <td class="px-6 py-4">
+              <div class="font-bold text-gray-900">{{ activo.nombre }}</div>
+              <div class="text-xs text-blue-500 font-medium">{{ activo.tipoActivo }}</div>
+              <div class="text-xs text-gray-400">Adq: {{ activo.fechaAdquisicion | date:'dd/MM/yyyy' }}</div>
+            </td>
+            <td class="px-6 py-4">
+              {{ activo.vidaUtilMeses }} meses
+            </td>
+            <td class="px-6 py-4 font-medium">
+              {{ activo.valorAdquisicion | currency:'USD':'symbol':'1.2-2' }}
+            </td>
+            <td class="px-6 py-4 text-red-500 font-medium">
+              {{ activo.depreciacionAcumulada | currency:'USD':'symbol':'1.2-2' }}
+            </td>
+            <td class="px-6 py-4 text-green-600 font-bold">
+              {{ activo.valorLibros | currency:'USD':'symbol':'1.2-2' }}
+            </td>
+            <td class="px-6 py-4">
+              <span
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider"
+                [ngClass]="{
+                    'bg-green-50 text-green-700': activo.estado === 'ACTIVO',
+                    'bg-blue-50 text-blue-700': activo.estado === 'DEPRECIADO',
+                    'bg-gray-100 text-gray-700': activo.estado === 'RETIRADO',
+                    'bg-orange-50 text-orange-700': activo.estado === 'VENDIDO'
+                  }">
+                {{ activo.estado }}
+              </span>
+            </td>
+            <td class="px-6 py-4 text-right">
+              <div class="flex justify-end gap-2">
+                <button (click)="navigateToEdit(activo)" title="Editar Activo"
+                  class="p-2 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-all cursor-pointer">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
+
+                <button (click)="openDetailsModal(activo)" title="Ver Historial / Detalles"
+                  class="p-2 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-all cursor-pointer">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                </button>
+
+                @if (activo.estado === 'ACTIVO' || activo.estado === 'DEPRECIADO') {
+                <button (click)="openRetirarModal(activo)" title="Retirar / Dar de baja"
+                  class="p-2 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-all cursor-pointer">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                  </svg>
+                </button>
+                }
+              </div>
+            </td>
+          </tr>
+          } @empty {
+          <tr>
+            <td colspan="8" class="text-center py-12 text-gray-400">
+              <svg class="mx-auto h-12 w-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+              No hay activos fijos registrados en el sistema.
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+}
+
+@if (activosResource.isLoading()) {
+<div class="flex flex-col justify-center items-center h-80 space-y-4">
+  <app-loader />
+  <p class="text-sm font-medium text-gray-400 animate-pulse">Cargando activos fijos...</p>
+</div>
+}
+
+<!-- Modal de Depreciación Masiva -->
+<app-modal [(visible)]="isDepreciarModalOpen" title="Depreciar Periodo" size="md">
+  <form (ngSubmit)="onSubmitDepreciar()" class="p-6 space-y-4">
+    <p class="text-sm text-gray-500">
+      Este proceso ejecutará el cálculo de depreciación por el método de línea recta para todos los activos fijos
+      elegibles. Se generarán automáticamente los asientos contables debidos.
+    </p>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Año</label>
+        <select [(ngModel)]="depreciarForm.anio" name="anio" required
+          class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+          <option [value]="2025">2025</option>
+          <option [value]="2026">2026</option>
+          <option [value]="2027">2027</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Mes</label>
+        <select [(ngModel)]="depreciarForm.mes" name="mes" required
+          class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+          <option [value]="1">Enero</option>
+          <option [value]="2">Febrero</option>
+          <option [value]="3">Marzo</option>
+          <option [value]="4">Abril</option>
+          <option [value]="5">Mayo</option>
+          <option [value]="6">Junio</option>
+          <option [value]="7">Julio</option>
+          <option [value]="8">Agosto</option>
+          <option [value]="9">Septiembre</option>
+          <option [value]="10">Octubre</option>
+          <option [value]="11">Noviembre</option>
+          <option [value]="12">Diciembre</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
+      <button type="button" (click)="closeDepreciarModal()"
+        class="px-5 py-2.5 border border-gray-100 text-sm font-bold text-gray-500 rounded-xl hover:bg-gray-50 transition-all cursor-pointer">
+        Cancelar
+      </button>
+      <button type="submit"
+        class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 cursor-pointer">
+        Ejecutar Depreciación
+      </button>
+    </div>
+  </form>
+</app-modal>
+
+<!-- Modal de Historial / Detalle -->
+<app-modal [(visible)]="isDetailsModalOpen" [title]="'Historial de Depreciación: ' + (selectedAsset()?.nombre || '')"
+  size="lg">
+  <div class="p-6 space-y-6">
+    @if (selectedAsset(); as asset) {
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-xl text-sm">
+      <div>
+        <div class="text-gray-400 text-xs">Costo de Compra</div>
+        <div class="font-bold text-gray-900">{{ asset.valorAdquisicion | currency:'USD':'symbol':'1.2-2' }}</div>
+      </div>
+      <div>
+        <div class="text-gray-400 text-xs">Depreciación Acumulada</div>
+        <div class="font-bold text-red-600">{{ asset.depreciacionAcumulada | currency:'USD':'symbol':'1.2-2' }}</div>
+      </div>
+      <div>
+        <div class="text-gray-400 text-xs">Valor en Libros</div>
+        <div class="font-bold text-green-600">{{ asset.valorLibros | currency:'USD':'symbol':'1.2-2' }}</div>
+      </div>
+      <div>
+        <div class="text-gray-400 text-xs">Fecha Compra</div>
+        <div class="font-bold text-gray-900">{{ asset.fechaAdquisicion | date:'dd/MM/yyyy' }}</div>
+      </div>
+    </div>
+    }
+
+    <div>
+      <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Logs de Depreciación Mensual</h4>
+      <div class="border border-gray-100 rounded-xl overflow-hidden max-h-60 overflow-y-auto">
+        <table class="w-full text-left text-sm">
+          <thead>
+            <tr class="bg-gray-50 text-gray-500 text-xs font-bold border-b border-gray-100">
+              <th class="px-4 py-2">Periodo</th>
+              <th class="px-4 py-2">Fecha Proceso</th>
+              <th class="px-4 py-2">Monto Depreciado</th>
+              <th class="px-4 py-2">ID Asiento</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100 text-gray-700">
+            @for (dep of depreciaciones(); track dep.id) {
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-2 font-bold">{{ dep.mes }}/{{ dep.anio }}</td>
+              <td class="px-4 py-2 text-xs text-gray-400">{{ dep.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td class="px-4 py-2 text-red-500 font-medium">{{ dep.monto | currency:'USD':'symbol':'1.2-2' }}</td>
+              <td class="px-4 py-2 font-mono text-xs text-gray-400 select-all">{{ dep.asientoContableId }}</td>
+            </tr>
+            } @empty {
+            <tr>
+              <td colspan="4" class="text-center py-6 text-gray-400 text-xs">
+                Este activo fijo no cuenta con depreciaciones registradas.
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="flex justify-end pt-4 border-t border-gray-100">
+      <button type="button" (click)="closeDetailsModal()"
+        class="px-6 py-2 bg-gray-900 hover:bg-black text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 cursor-pointer">
+        Cerrar
+      </button>
+    </div>
+  </div>
+</app-modal>
+
+<!-- Modal de Baja / Retiro -->
+<app-modal [(visible)]="isRetirarModalOpen" [title]="'Retirar / Dar de baja: ' + (selectedAsset()?.nombre || '')"
+  size="md">
+  <form (ngSubmit)="onSubmitRetirar()" class="p-6 space-y-4">
+    <p class="text-sm text-gray-500">
+      Se dará de baja el activo fijo de la contabilidad y se generará un asiento contable para reversar los saldos
+      históricos de la cuenta de costo y depreciación acumulada.
+    </p>
+
+    <div>
+      <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Fecha de Baja/Venta *</label>
+      <input type="date" [(ngModel)]="retirarForm.fecha" name="fecha" required
+        class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" />
+    </div>
+
+    <div>
+      <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Motivo del Retiro *</label>
+      <input type="text" [(ngModel)]="retirarForm.motivo" name="motivo" required
+        placeholder="Ej: Obsoletismo, daño físico irreparable..."
+        class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" />
+    </div>
+
+    <div>
+      <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Valor Venta (Si se vende, sino 0) *</label>
+      <input type="number" [(ngModel)]="retirarForm.valorVenta" name="valorVenta" required min="0"
+        class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" />
+    </div>
+
+    @if (retirarForm.valorVenta > 0) {
+    <div class="animate-fade-in">
+      <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Cuenta Banco/Caja Recibo *</label>
+      <select [(ngModel)]="retirarForm.cuentaBancoCajaId" name="cuentaBancoCajaId" required
+        class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+        <option value="" disabled>Seleccione la cuenta bancaria</option>
+        @for (cuenta of cuentasBancoCaja; track cuenta.id) {
+        <option [value]="cuenta.id">{{ cuenta.codigo }} - {{ cuenta.nombre }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="animate-fade-in">
+      <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Cuenta de Ingreso por Venta (Opcional - por
+        defecto 4210)</label>
+      <select [(ngModel)]="retirarForm.cuentaIngresoRetiroId" name="cuentaIngresoRetiroId"
+        class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+        <option value="">Por Defecto (Otros Ingresos)</option>
+        @for (cuenta of cuentasList(); track cuenta.id) {
+        @if (cuenta.tipo === 'INGRESO') {
+        <option [value]="cuenta.id">{{ cuenta.codigo }} - {{ cuenta.nombre }}</option>
+        }
+        }
+      </select>
+    </div>
+    }
+
+    @if (retirarForm.valorVenta < (selectedAsset()?.valorLibros || 0)) { <div class="animate-fade-in">
+      <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Cuenta de Gasto/Pérdida (Opcional - por
+        defecto 5310)</label>
+      <select [(ngModel)]="retirarForm.cuentaPerdidaRetiroId" name="cuentaPerdidaRetiroId"
+        class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+        <option value="">Por Defecto (Otros Gastos / Pérdida Bienes)</option>
+        @for (cuenta of cuentasGasto; track cuenta.id) {
+        <option [value]="cuenta.id">{{ cuenta.codigo }} - {{ cuenta.nombre }}</option>
+        }
+      </select>
+      </div>
+      }
+
+      <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
+        <button type="button" (click)="closeRetirarModal()"
+          class="px-5 py-2.5 border border-gray-100 text-sm font-bold text-gray-500 rounded-xl hover:bg-gray-50 transition-all cursor-pointer">
+          Cancelar
+        </button>
+        <button type="submit"
+          class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 cursor-pointer">
+          Confirmar Retiro
+        </button>
+      </div>
+  </form>
+</app-modal>

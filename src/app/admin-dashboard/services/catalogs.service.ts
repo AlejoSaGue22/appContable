@@ -28,6 +28,10 @@ export class CatalogsService {
  return this.http.get<DocumentType[]>(`${this.baseUrl}/catalogs/document-types`);
  }
 
+ findAllTiposActivo(): Observable<any[]> {
+ return this.http.get<any[]>(`${this.baseUrl}/catalogs/tipos-activo`);
+ }
+
  findAllPaymentMethods(): Observable<PaymentMethod[]> {
  return this.http.get<PaymentMethod[]>(`${this.baseUrl}/catalogs/payment-methods`);
  }

@@ -68,6 +68,12 @@ export interface Vendedor {
 
 import { Impuesto } from '../pages/administracion/configuraciones/pages/impuestos/interfaces/impuesto.interface';
 
+export interface TipoActivoCatalog {
+    id: number;
+    nombre: string;
+    state: boolean;
+}
+
 export interface CatalogsState {
     documentTypes: DocumentType[];
     paymentMethods: PaymentMethod[];
@@ -78,6 +84,7 @@ export interface CatalogsState {
     conceptsNotes: ConceptNote[];
     impuestos: Impuesto[];
     vendedores: Vendedor[];
+    tiposActivo: TipoActivoCatalog[];
     loading: boolean;
     error: string | null;
 }

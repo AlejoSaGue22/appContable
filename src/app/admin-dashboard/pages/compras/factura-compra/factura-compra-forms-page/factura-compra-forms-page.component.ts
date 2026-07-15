@@ -27,6 +27,8 @@ import { CuentaBancaria } from '@dashboard/pages/contabilidad/interfaces/cuenta-
 import { ProductosServiciosFormsComponent } from '@dashboard/pages/articulos/productos-servicios-forms/productos-servicios-forms.component';
 import { CuentasContablesService } from '@dashboard/pages/contabilidad/services/cuentas-contables.service';
 import { GetCuentasContables } from '@dashboard/pages/contabilidad/interfaces/cuentas-contables.interface';
+import { ActivosFijosService } from '@dashboard/pages/contabilidad/services/activos-fijos.service';
+import { ActivoFijo } from '@dashboard/pages/contabilidad/interfaces/activos-fijos.interface';
 
 @Component({
     selector: 'app-factura-compra-forms-page',
@@ -66,6 +68,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     activatedRoute = inject(ActivatedRoute);
     catalogsStore = inject(CatalogsStore);
     cuentasBancariasService = inject(CuentasBancariasService);
+    activosFijosService = inject(ActivosFijosService);
 
     // Modal State
     isProviderModalVisible = signal<boolean>(false);
@@ -90,6 +93,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     productosList = signal<GetProductosDetalle[]>([]);
     cuentasContables = signal<GetCuentasContables[]>([]);
     cuentasBancarias = signal<CuentaBancaria[]>([]);
+    activosFijosList = signal<any[]>([]);
     refreshAsientoTrigger = signal<number>(0);
     factura = signal<FacturaCompra | null>(null);
     anticiposDisponibles = signal<any[]>([]);
@@ -104,10 +108,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     });
 
     activosFijosCreados = computed(() => {
-        return this.productosList().filter(art => {
-            const catCode = art.categoriaArticulo?.codigo || '';
-            return catCode === 'activos-fijos';
-        });
+        return this.activosFijosList();
     });
 
     formCompra = this.fb.group({
@@ -160,7 +161,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
 
     productosItemsForm = this.fb.group({
         tipoConcepto: ['PRODUCTO', Validators.required],
-        producto: [null as GetProductosDetalle | null, Validators.required],
+        producto: [null as GetProductosDetalle | ActivoFijo | null, Validators.required],
         cuentaContable: [null as any],
         quantity: [1, [Validators.required, Validators.min(1)]],
         descripcion: [''],
@@ -172,11 +173,16 @@ export class FacturaCompraFormsPageComponent implements OnInit {
 
     ngOnInit(): void {
         this.setupPaymentLogic();
-        if (this.facturaId() && this.facturaId() !== 'new') {
-            this.headTitle.title = 'Editar Factura de Compra';
-            this.headTitle.slog = 'Se edita factura de compra del sistema';
-            this.loadFactura(this.facturaId());
-        }
+        this.activatedRoute.params.subscribe((params) => {
+            const id = params['id'];
+            if (id && id !== 'new') {
+                this.headTitle.title = 'Editar Factura de Compra';
+                this.headTitle.slog = 'Se edita factura de compra del sistema';
+                this.loadFactura(id);
+            } else {
+                this.factura.set(null);
+            }
+        });
 
         this.getProveedoresAndProductos();
         this.getCuentasBancarias();
@@ -210,16 +216,28 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         });
 
         // React to product selection to auto-fill price and tax
-        this.productosItemsForm.get('producto')?.valueChanges.subscribe((prod: GetProductosDetalle | any) => {
+        this.productosItemsForm.get('producto')?.valueChanges.subscribe((prod) => {
             const tipo = this.productosItemsForm.get('tipoConcepto')?.value;
-            if (prod && (tipo === 'PRODUCTO' || tipo === 'ACTIVO_FIJO')) {
-                this.productosItemsForm.patchValue({
-                    unitPrice: prod.precio,
-                    iva: prod.impuestoId,
-                    quantity: 1,
-                    discount: 0,
-                    descripcion: prod.descripcion || ''
-                });
+            if (prod) {
+                if (tipo === 'PRODUCTO') {
+                    const p = prod as GetProductosDetalle;
+                    this.productosItemsForm.patchValue({
+                        unitPrice: p.precio,
+                        iva: p.impuestoId,
+                        quantity: 1,
+                        discount: 0,
+                        descripcion: p.observacion || ''
+                    }, { emitEvent: false });
+                } else if (tipo === 'ACTIVO_FIJO') {
+                    const asset = prod as ActivoFijo;
+                    this.productosItemsForm.patchValue({
+                        unitPrice: asset.valorAdquisicion || 0,
+                        iva: '',
+                        quantity: 1,
+                        discount: 0,
+                        descripcion: asset.descripcion || asset.nombre || ''
+                    }, { emitEvent: false });
+                }
                 this.calculateItemTotal();
             }
         });
@@ -244,9 +262,10 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         forkJoin({
             proveedores: this.proveedoresServicios.getProveedores({ limit: 1000, offset: 0 }),
             productos: this.productoServicios.getProductos({ limit: 1000, offset: 0 }),
-            cuentas: this.cuentasService.getCuentasContables()
+            cuentas: this.cuentasService.getCuentasContables(),
+            activosFijos: this.activosFijosService.getActivosFijos()
         }).subscribe({
-            next: ({ proveedores, productos, cuentas }) => {
+            next: ({ proveedores, productos, cuentas, activosFijos }) => {
                 const mappedProveedores = (proveedores.proveedores || []).map((p: any) => ({
                     ...p,
                     fullName: p.razonSocial?.trim() || `${p.nombre || ''} ${p.apellido || ''}`.trim()
@@ -254,6 +273,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                 this.proveedoresList.set(mappedProveedores);
                 this.productosList.set(productos.articulos);
                 this.cuentasContables.set(cuentas.filter(c => c.aceptaMovimiento && c.isActive));
+                this.activosFijosList.set(activosFijos || []);
             },
             error: (error) => {
                 this.notificationService.error('Error al cargar los datos de la factura de compra', error);
@@ -283,9 +303,17 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                         let cuentaId = item.cuentaContableId || null;
 
                         if (item.cuentaContableId || item.cuentaContable) {
-                            tipoConceptoVal = 'CUENTA';
-                            const cuenta = item.cuentaContable || item.cuenta;
-                            nombreDisplay = cuenta ? `${cuenta.codigo} · ${cuenta.nombre}` : '';
+                            const accountId = item.cuentaContableId || item.cuentaContable?.id;
+                            const asset = this.activosFijosList().find(a => a.cuentaActivoId === accountId);
+                            if (asset) {
+                                tipoConceptoVal = 'ACTIVO_FIJO';
+                                nombreDisplay = `Activo: ${asset.codigo} · ${asset.nombre}`;
+                                prodId = asset.id;
+                            } else {
+                                tipoConceptoVal = 'CUENTA';
+                                const cuenta = item.cuentaContable || item.cuenta;
+                                nombreDisplay = cuenta ? `${cuenta.codigo} · ${cuenta.nombre}` : '';
+                            }
                         } else {
                             const isAsset = item.articulo?.categoriaArticulo?.codigo === 'activos-fijos';
                             if (isAsset) {
@@ -404,9 +432,14 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         let productoIdVal: string | null = null;
         let cuentaContableIdVal: string | null = null;
 
-        if (itemVal.tipoConcepto === 'PRODUCTO' || itemVal.tipoConcepto === 'ACTIVO_FIJO') {
-            nombreDisplay = itemVal.producto?.nombre || '';
-            productoIdVal = itemVal.producto?.id || null;
+        if (itemVal.tipoConcepto === 'PRODUCTO') {
+            const prod = itemVal.producto as GetProductosDetalle;
+            nombreDisplay = prod?.nombre || '';
+            productoIdVal = prod?.id || null;
+        } else if (itemVal.tipoConcepto === 'ACTIVO_FIJO') {
+            const asset = itemVal.producto as ActivoFijo;
+            nombreDisplay = asset ? `Activo: ${asset.codigo} · ${asset.nombre}` : '';
+            cuentaContableIdVal = asset?.cuentaActivoId || null;
         } else if (itemVal.tipoConcepto === 'CUENTA') {
             nombreDisplay = itemVal.cuentaContable ? `${itemVal.cuentaContable.codigo} · ${itemVal.cuentaContable.nombre}` : '';
             cuentaContableIdVal = itemVal.cuentaContable?.id || null;
