@@ -19,7 +19,7 @@
 
       <!-- Cabecera / Info del Egreso -->
       <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 space-y-4">
-        <h3 class="text-lg font-bold text-slate-800 border-b pb-2 flex items-center gap-2">
+        <h3 class="text-lg font-semibold text-slate-800 border-b pb-2 flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-600" fill="none" viewBox="0 0 24 24"
             stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -182,7 +182,7 @@
       @if (modoEgreso() === 'otros') {
       <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 space-y-4">
         <div class="flex justify-between items-center border-b pb-2">
-          <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+          <h3 class="text-lg font-semibold text-slate-800 flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-600" fill="none" viewBox="0 0 24 24"
               stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -216,7 +216,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <!-- Cuenta Contable -->
               <div class="flex flex-col md:col-span-1 relative">
-                <label class="text-xs font-bold text-slate-500 mb-1">Cuenta PUC (Auxiliar)</label>
+                <label class="text-xs font-bold text-slate-500 mb-1">Cuenta contable</label>
                 <app-list-group-dropdown title="" [dataList]="cuentasContables()" [labelKey]="['codigo', 'nombre']"
                   [valueInput]="getCuentaContableDisplay(i)" [searchable]="false"
                   (objectSelect)="onCuentaSelect($event, i)" />
@@ -277,7 +277,7 @@
     <!-- Panel Lateral: Resumen Totales y Guardado -->
     <div class="lg:col-span-1 space-y-6">
       <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 space-y-6 sticky top-6">
-        <h3 class="text-lg font-bold text-slate-800 border-b pb-2 flex items-center gap-2">
+        <h3 class="text-lg font-semibold text-slate-800 border-b pb-2 flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-orange-600" fill="none" viewBox="0 0 24 24"
             stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -313,7 +313,7 @@
         <!-- Botones de Acción -->
         <div class="space-y-2 pt-2">
           <button type="submit" [disabled]="submitting() || totalGeneral === 0"
-            class="w-full flex items-center justify-center gap-2 px-6 py-3 font-black text-sm bg-orange-650/90 hover:bg-orange-700 text-white rounded-xl shadow-lg hover:shadow-xl shadow-orange-600/20 hover:shadow-orange-600/30 active:scale-[0.98] transition-all border-none cursor-pointer disabled:opacity-50 disabled:pointer-events-none">
+            class="w-full flex items-center justify-center gap-2 px-6 py-3 text-sm bg-orange-650/90 hover:bg-orange-700 text-white rounded-xl shadow-lg hover:shadow-xl shadow-orange-600/20 hover:shadow-orange-600/30 active:scale-[0.98] transition-all border-none cursor-pointer disabled:opacity-50 disabled:pointer-events-none">
             @if (submitting()) {
             <div class="animate-spin rounded-full h-4.5 w-4.5 border-b-2 border-white"></div>
             Guardando...
@@ -326,8 +326,8 @@
             }
           </button>
 
-          <a routerLink="/pagos/cxp"
-            class="w-full flex items-center justify-center gap-2 px-6 py-3 font-bold text-sm bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 rounded-xl transition-all cursor-pointer text-center no-underline border border-slate-200/50">
+          <a (click)="form.reset()"
+            class="w-full flex items-center justify-center gap-2 px-6 py-3 text-sm bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 rounded-xl transition-all cursor-pointer text-center no-underline border border-slate-200/50">
             Cancelar
           </a>
         </div>

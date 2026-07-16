@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, computed, inject, signal } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, computed, inject, signal, input, effect } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CatalogsService } from '../../../../../services/catalogs.service';
 import { CategoryArticle, GetCuentasContables } from '../../../../../interfaces/catalogs-interface';
@@ -10,14 +10,14 @@ import { NotificationService } from '@shared/services/notification.service';
  imports: [ReactiveFormsModule],
  templateUrl: './categoria-form-modal.component.html'
 })
-export class CategoriaFormModalComponent implements OnInit {
+export class CategoriaFormModalComponent {
  private fb = inject(FormBuilder);
  private catalogsService = inject(CatalogsService);
  private notificationService = inject(NotificationService);
 
- @Input() isOpen = false;
- @Input() category: CategoryArticle | null = null;
- @Input() cuentasList: GetCuentasContables[] = [];
+ isOpen = input<boolean>(false);
+ category = input<CategoryArticle | null>(null);
+ cuentasList = input<GetCuentasContables[]>([]);
  @Output() close = new EventEmitter<void>();
  @Output() submitForm = new EventEmitter<void>();
 
@@ -32,25 +32,38 @@ export class CategoriaFormModalComponent implements OnInit {
  });
 
  isSubmitting = signal(false);
- cuentaPrincipal = computed(() => this.cuentasList.filter((cuenta) => 
+ cuentaPrincipal = computed(() => this.cuentasList().filter((cuenta) => 
  cuenta.aceptaMovimiento ));
- cuentaCosto = computed(() => this.cuentasList.filter((cuenta) => 
+ cuentaCosto = computed(() => this.cuentasList().filter((cuenta) => 
  cuenta.aceptaMovimiento ));
- cuentaInventario = computed(() => this.cuentasList.filter((cuenta) => 
+ cuentaInventario = computed(() => this.cuentasList().filter((cuenta) => 
  cuenta.aceptaMovimiento ));
 
- ngOnInit() {
- if (this.category) {
- this.form.patchValue({
- nombre: this.category.nombre,
- tipo: this.category.tipo.toUpperCase(),
- descripcion: this.category.descripcion,
- cuentaPrincipalId: this.category.cuentaPrincipalId || this.category.cuentaPrincipal?.id || '',
- cuentaCostoId: this.category.cuentaCostoId || this.category.cuentaCosto?.id || '',
- cuentaInventarioId: this.category.cuentaInventarioId || this.category.cuentaInventario?.id || '',
- manejaInventario: this.category.manejaInventario || false
- });
- }
+ constructor() {
+  effect(() => {
+    const cat = this.category();
+    if (cat) {
+      this.form.patchValue({
+        nombre: cat.nombre,
+        tipo: cat.tipo.toUpperCase(),
+        descripcion: cat.descripcion,
+        cuentaPrincipalId: cat.cuentaPrincipalId ? String(cat.cuentaPrincipalId) : (cat.cuentaPrincipal?.id ? String(cat.cuentaPrincipal?.id) : ''),
+        cuentaCostoId: cat.cuentaCostoId ? String(cat.cuentaCostoId) : (cat.cuentaCosto?.id ? String(cat.cuentaCosto?.id) : ''),
+        cuentaInventarioId: cat.cuentaInventarioId ? String(cat.cuentaInventarioId) : (cat.cuentaInventario?.id ? String(cat.cuentaInventario?.id) : ''),
+        manejaInventario: cat.manejaInventario || false
+      });
+    } else {
+      this.form.reset({
+        nombre: '',
+        tipo: 'PRODUCTO',
+        descripcion: '',
+        cuentaPrincipalId: '',
+        cuentaCostoId: '',
+        cuentaInventarioId: '',
+        manejaInventario: false
+      });
+    }
+  });
  }
 
  onSubmit() {
@@ -63,8 +76,8 @@ export class CategoriaFormModalComponent implements OnInit {
  this.isSubmitting.set(true);
  const dto = this.form.value;
 
- if (this.category) {
- this.catalogsService.updateCategoryArticle(this.category.id.toString(), dto).subscribe({
+ if (this.category()) {
+ this.catalogsService.updateCategoryArticle(this.category()!.id.toString(), dto).subscribe({
  next: () => {
  this.notificationService.success('Categoría actualizada correctamente', 'Éxito');
  this.submitForm.emit();

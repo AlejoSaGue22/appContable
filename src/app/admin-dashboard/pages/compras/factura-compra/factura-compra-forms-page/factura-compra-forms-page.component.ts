@@ -163,9 +163,9 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         tipoConcepto: ['PRODUCTO', Validators.required],
         producto: [null as GetProductosDetalle | ActivoFijo | null, Validators.required],
         cuentaContable: [null as any],
-        quantity: [1, [Validators.required, Validators.min(1)]],
+        quantity: [1, [Validators.required, Validators.min(0.00001)]],
         descripcion: [''],
-        unitPrice: [0, [Validators.required, Validators.min(0)]],
+        unitPrice: [0, [Validators.required, Validators.min(0.00001)]],
         iva: ['' as any],
         discount: [0, [Validators.min(0), Validators.max(100)]],
         total: [0]
@@ -235,7 +235,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                         iva: '',
                         quantity: 1,
                         discount: 0,
-                        descripcion: asset.descripcion || asset.nombre || ''
+                        descripcion: asset.descripcion || ''
                     }, { emitEvent: false });
                 }
                 this.calculateItemTotal();
@@ -425,6 +425,12 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         if (this.productosItemsForm.invalid) return;
 
         const itemVal = this.productosItemsForm.value;
+        const qty = itemVal.quantity || 0;
+        const price = itemVal.unitPrice || 0;
+        if (qty <= 0 || price <= 0) {
+            this.notificationService.warning('La cantidad y el precio unitario deben ser mayores a 0.');
+            return;
+        }
         const subtotal = (itemVal.quantity || 0) * (itemVal.unitPrice || 0);
         const tarifa = this.getIvaTarifa(itemVal.iva);
 

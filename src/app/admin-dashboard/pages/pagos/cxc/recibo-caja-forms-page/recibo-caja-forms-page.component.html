@@ -19,7 +19,7 @@
 
       <!-- Cabecera / Info del Recibo -->
       <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 space-y-4">
-        <h3 class="text-lg font-bold text-slate-800 border-b pb-2 flex items-center gap-2">
+        <h3 class="text-lg font-semibold text-slate-800 border-b pb-2 flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24"
             stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -182,7 +182,7 @@
       @if (modoCobro() === 'otros') {
       <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 space-y-4">
         <div class="flex justify-between items-center border-b pb-2">
-          <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+          <h3 class="text-lg font-semibold text-slate-800 flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24"
               stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -277,7 +277,7 @@
     <!-- Panel Lateral: Resumen Totales y Guardado -->
     <div class="lg:col-span-1 space-y-6">
       <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 space-y-6 sticky top-6">
-        <h3 class="text-lg font-bold text-slate-800 border-b pb-2 flex items-center gap-2">
+        <h3 class="text-lg font-semibold text-slate-800 border-b pb-2 flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24"
             stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -326,7 +326,7 @@
             }
           </button>
 
-          <a routerLink="/pagos/cxc"
+          <a (click)="form.reset()"
             class="w-full flex items-center justify-center gap-2 px-6 py-3 font-bold text-sm bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 rounded-xl transition-all cursor-pointer text-center no-underline border border-slate-200/50">
             Cancelar
           </a>

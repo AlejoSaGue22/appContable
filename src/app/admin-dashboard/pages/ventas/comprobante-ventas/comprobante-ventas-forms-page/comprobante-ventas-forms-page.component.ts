@@ -174,7 +174,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       productos: this.productoServicios.getProductos({
         limit: 10,
         offset: 0,
-        venta_compra: 'venta',
+        // venta_compra: 'venta',
       }),
     }).subscribe({
       next: ({ clientes, productos }) => {

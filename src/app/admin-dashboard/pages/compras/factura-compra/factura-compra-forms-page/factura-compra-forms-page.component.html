@@ -272,27 +272,25 @@
                 @if (productosItemsForm.get('tipoConcepto')?.value === 'PRODUCTO') {
                 <div class="md:col-span-2">
                   <app-list-group-dropdown title="Productos creados" [dataList]="productosCreados()"
-                    [labelKey]="['nombre', 'codigo']" formControlName="producto" (objectSelect)="
-                        productosItemsForm.patchValue({ producto: $event })
-                      " (createOption)="openProductModal()">
+                    [labelKey]="['nombre', 'codigo']" formControlName="producto"
+                    (objectSelect)="productosItemsForm.patchValue({ producto: $event })"
+                    (createOption)="openProductModal()">
                   </app-list-group-dropdown>
                 </div>
                 }
                 @if (productosItemsForm.get('tipoConcepto')?.value === 'ACTIVO_FIJO') {
                 <div class="md:col-span-2">
                   <app-list-group-dropdown title="Activos Fijos creados" [dataList]="activosFijosCreados()"
-                    [labelKey]="['nombre', 'codigo']" formControlName="producto" (objectSelect)="
-                        productosItemsForm.patchValue({ producto: $event })
-                      " (createOption)="openProductModal()">
+                    [labelKey]="['nombre', 'codigo']" formControlName="producto"
+                    (objectSelect)="productosItemsForm.patchValue({ producto: $event })">
                   </app-list-group-dropdown>
                 </div>
                 }
                 @if (productosItemsForm.get('tipoConcepto')?.value === 'CUENTA') {
                 <div class="md:col-span-2">
                   <app-list-group-dropdown title="Plan de Cuentas" [dataList]="cuentasContables()"
-                    [labelKey]="['codigo', 'nombre']" formControlName="cuentaContable" (objectSelect)="
-                        productosItemsForm.patchValue({ cuentaContable: $event })
-                      " [searchable]="false">
+                    [labelKey]="['codigo', 'nombre']" formControlName="cuentaContable"
+                    (objectSelect)="productosItemsForm.patchValue({ cuentaContable: $event })" [searchable]="false">
                   </app-list-group-dropdown>
                 </div>
                 }
@@ -502,8 +500,8 @@
             </path>
           </svg>
           }
-          {{ loading() ? "Guardando..." : (facturaId() === 'new' || factura()?.estado === 'borrador' ? "Guardar y
-          Registrar" : "Guardar Cambios") }}
+          {{ loading() ? "Guardando..." : (facturaId() === 'new' || factura()?.estado === 'borrador'
+          ? "Guardar y Registrar" : "Guardar Cambios") }}
         </button>
       </div>
     </form>

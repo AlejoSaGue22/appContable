@@ -1,4 +1,4 @@
-@if (isOpen) {
+@if (isOpen()) {
 <!-- Backdrop -->
 <div class="fixed inset-0 backdrop-blur-xs transition-opacity z-[60]" aria-hidden="true" (click)="onClose()"></div>
 
@@ -10,10 +10,10 @@
             <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                 <div>
                     <h3 class="text-base font-bold text-slate-800" id="modal-title">
-                        {{ category ? 'Editar' : 'Nueva' }} Categoría
+                        {{ category() ? 'Editar' : 'Nueva' }} Categoría
                     </h3>
                     <p class="text-[10px] text-slate-500 font-semibold uppercase mt-0.5">
-                        {{ category ? 'Actualizar información del catálogo' : 'Registro de nuevo clasificador' }}
+                        {{ category() ? 'Actualizar información del catálogo' : 'Registro de nuevo clasificador' }}
                     </p>
                 </div>
                 <button (click)="onClose()"
@@ -143,7 +143,7 @@
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="20 6 9 17 4 12"></polyline>
                         </svg>
-                        {{ category ? 'Guardar Cambios' : 'Registrar Categoría' }}
+                        {{ category() ? 'Guardar Cambios' : 'Registrar Categoría' }}
                         }
                     </button>
                 </div>

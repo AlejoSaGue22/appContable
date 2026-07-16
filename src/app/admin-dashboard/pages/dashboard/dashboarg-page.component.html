@@ -5,12 +5,12 @@
 
         <div class="relative group mt-2 md:mt-0">
             <label
-                class="text-xs font-bold text-gray-400 absolute -top-2 left-4 bg-white px-2 z-10 group-hover:text-blue-600 transition-colors">Periodo
-                de Análisis</label>
+                class="text-xs text-gray-400 absolute -top-2 left-4 bg-white px-2 z-10 group-hover:text-blue-600 transition-colors">
+                Periodo de Análisis</label>
             <select (change)="onPeriodChange($event)"
-                class="appearance-none bg-white border-2 border-gray-100 text-gray-800 font-bold text-xs rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 block w-full md:w-64 p-4 pr-12 shadow-xl shadow-gray-100 hover:border-blue-200 transition-all cursor-pointer outline-none uppercase ">
+                class="appearance-none bg-white border-2 border-gray-100 text-gray-800 text-xs rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 block w-full md:w-64 p-4 pr-12 shadow-xl shadow-gray-100 hover:border-blue-200 transition-all cursor-pointer outline-none">
                 @for (period of periods; track period.value) {
-                <option [value]="period.value" [selected]="period.value === selectedPeriod()" class="font-medium">
+                <option [value]="period.value" [selected]="period.value === selectedPeriod()">
                     {{ period.label }}
                 </option>
                 }
@@ -54,7 +54,7 @@
                 <div class="mt-6 flex items-center justify-between text-xs font-bold">
                     <span class="text-gray-500">Anterior: {{ data.sales.totalLastMonth | currency:'':'$':'1.0-0'
                         }}</span>
-                    <span class="text-blue-600 cursor-pointer hover:underline">Ver Reporte →</span>
+                    <!-- <span class="text-blue-600 cursor-pointer hover:underline">Ver Reporte →</span> -->
                 </div>
             </div>
         </div>
@@ -130,7 +130,7 @@
                 <div class="bg-gray-100 rounded-full h-1.5 w-full overflow-hidden">
                     <div class="bg-red-500 h-full" [style.width.%]="data.expenses.comparison > 0 ? 100 : 50"></div>
                 </div>
-                <p class="text-xs text-gray-400 mt-2 italic">Basado en compras + egresos registrados</p>
+                <!-- <p class="text-xs text-gray-400 mt-2 italic">Basado en compras + egresos registrados</p> -->
             </div>
         </div>
 
