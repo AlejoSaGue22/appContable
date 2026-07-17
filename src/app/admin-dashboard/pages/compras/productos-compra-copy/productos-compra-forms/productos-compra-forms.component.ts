@@ -12,164 +12,164 @@ import { ProductosService } from '@dashboard/pages/ventas/services/productos.ser
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
 
 @Component({
- selector: 'app-productos-compra-forms',
- imports: [HeaderTitlePageComponent, ReactiveFormsModule, FormErrorLabelComponent, LoaderComponent],
- templateUrl: './productos-compra-forms.component.html',
+    selector: 'app-productos-compra-forms',
+    imports: [HeaderTitlePageComponent, ReactiveFormsModule, FormErrorLabelComponent, LoaderComponent],
+    templateUrl: './productos-compra-forms.component.html',
 })
 export class ProductosCompraFormsComponent implements OnInit {
 
- headTitle: HeaderInput = {
- title: 'Registra un articulo de compra',
- slog: 'Gestiona la información de tus articulos de compra'
- }
+    headTitle: HeaderInput = {
+        title: 'Registra un articulo de compra',
+        slog: 'Gestiona la información de tus articulos de compra'
+    }
 
- private fb = inject(FormBuilder);
- productoServicios = inject(ProductosService);
- notificacionService = inject(NotificationService);
- router = inject(Router);
- activateRoute = inject(ActivatedRoute);
- catalogsStore = inject(CatalogsStore);
+    private fb = inject(FormBuilder);
+    productoServicios = inject(ProductosService);
+    notificacionService = inject(NotificationService);
+    router = inject(Router);
+    activateRoute = inject(ActivatedRoute);
+    catalogsStore = inject(CatalogsStore);
 
- isModal = input<boolean>(false);
- saveSuccess = output<any>();
- cancel = output<void>();
- 
- categorias = inject(ProductosService).categorias().filter((c) => c.tipo == 'costo' || c.tipo == 'gasto');
+    isModal = input<boolean>(false);
+    saveSuccess = output<any>();
+    cancel = output<void>();
 
- formProductos = this.fb.group({
- categoria: ['', Validators.required],
- nombre: ['', Validators.required],
- codigo: [''],
- unidadmedida: ['', Validators.required],
- impuesto: ['', Validators.required],
- isInventariable: [true],
- // retencion: ['', Validators.required],
- precio_referencial: ['', [Validators.pattern(/^\d+(\.\d{1,2})?$/)]],
- observacion: ['']
- })
+    categorias = inject(ProductosService).categorias().filter((c) => c.tipo == 'costo' || c.tipo == 'gasto');
 
- constructor() {
- this.formProductos.get('categoria')?.valueChanges.subscribe((categoriaId) => {
- if (!categoriaId) return;
- const selectedCategory = this.categorias.find((c) => c.codigo === categoriaId);
- if (selectedCategory && selectedCategory.nombre.toLowerCase().includes('servicio')) {
- this.formProductos.get('isInventariable')?.setValue(false);
- this.formProductos.get('isInventariable')?.disable();
- } else {
- this.formProductos.get('isInventariable')?.enable();
- }
- });
- }
+    formProductos = this.fb.group({
+        categoria: ['', Validators.required],
+        nombre: ['', Validators.required],
+        codigo: [''],
+        unidadmedida: ['', Validators.required],
+        impuesto: ['', Validators.required],
+        isInventariable: [true],
+        // retencion: ['', Validators.required],
+        precio_referencial: ['', [Validators.pattern(/^\d+(\.\d{1,2})?$/)]],
+        observacion: ['']
+    })
 
- ngOnInit(): void {
- if (this.isModal()) {
- this.formProductos.reset();
- }
- }
+    constructor() {
+        this.formProductos.get('categoria')?.valueChanges.subscribe((categoriaId) => {
+            if (!categoriaId) return;
+            const selectedCategory = this.categorias.find((c) => c.codigo === categoriaId);
+            if (selectedCategory && selectedCategory.nombre.toLowerCase().includes('servicio')) {
+                this.formProductos.get('isInventariable')?.setValue(false);
+                this.formProductos.get('isInventariable')?.disable();
+            } else {
+                this.formProductos.get('isInventariable')?.enable();
+            }
+        });
+    }
 
- productosID = toSignal(
- this.activateRoute.params.pipe(map((param) => param['id']))
- );
+    ngOnInit(): void {
+        if (this.isModal()) {
+            this.formProductos.reset();
+        }
+    }
 
- productoIdRxResourse = rxResource({
- request: () => {
- if (this.isModal()) return null;
- return { id: this.productosID() };
- },
- loader: ({ request }) => {
- if (!request) {
- this.formProductos.reset();
- return of(null);
- }
- return this.productoServicios.getProductoByID(request.id).pipe(
- tap((p) => {
- this.formProductos.reset(p);
- this.formProductos.get('precio_referencial')?.setValue(p.precio);
- const isInv = p.isInventariable !== undefined ? p.isInventariable : (p.afectaInventario !== undefined ? p.afectaInventario : true);
- this.formProductos.get('isInventariable')?.setValue(isInv);
- })
- )
- }
- });
+    productosID = toSignal(
+        this.activateRoute.params.pipe(map((param) => param['id']))
+    );
 
- async onSubmit() {
- const valid = this.formProductos.valid;
- this.formProductos.markAllAsTouched();
- console.log(this.formProductos.value)
+    productoIdRxResourse = rxResource({
+        request: () => {
+            if (this.isModal()) return null;
+            return { id: this.productosID() };
+        },
+        loader: ({ request }) => {
+            if (!request) {
+                this.formProductos.reset();
+                return of(null);
+            }
+            return this.productoServicios.getProductoByID(request.id).pipe(
+                tap((p) => {
+                    this.formProductos.reset(p);
+                    this.formProductos.get('precio_referencial')?.setValue(p.precio);
+                    const isInv = p.isInventariable !== undefined ? p.isInventariable : (p.afectaInventario !== undefined ? p.afectaInventario : true);
+                    this.formProductos.get('isInventariable')?.setValue(isInv);
+                })
+            )
+        }
+    });
 
- if (!valid) {
- this.notificacionService.error(`Formulario incompleto`,'Error', 5000);
- return
- }
+    async onSubmit() {
+        const valid = this.formProductos.valid;
+        this.formProductos.markAllAsTouched();
+        console.log(this.formProductos.value)
 
- const rawValue = this.formProductos.getRawValue();
- const { precio_referencial, ...restValue } = rawValue;
- const formValue = {
- ...restValue,
- precio: precio_referencial,
- };
- try {
+        if (!valid) {
+            this.notificacionService.error(`Formulario incompleto`, 'Error', 5000);
+            return
+        }
 
- if (this.productosID() == 'new-Item' || this.isModal()) {
- const product = await firstValueFrom(this.productoServicios.agregarProducto(formValue as Partial<ArticulosInterface>));
+        const rawValue = this.formProductos.getRawValue();
+        const { precio_referencial, ...restValue } = rawValue;
+        const formValue = {
+            ...restValue,
+            precio: precio_referencial,
+        };
+        try {
 
- if (product.success == false) {
- this.notificacionService.error(
- `Hubo un error al guardar el producto ${product.message}`,
- 'Error',
- 5000
- );
- return;
- }
+            if (this.productosID() == 'new-Item' || this.isModal()) {
+                const product = await firstValueFrom(this.productoServicios.agregarProducto(formValue as Partial<ArticulosInterface>));
 
- this.notificacionService.success(
- 'Producto agregado correctamente',
- 'Completado!',
- 3000
- );
+                if (product.success == false) {
+                    this.notificacionService.error(
+                        `Hubo un error al guardar el producto ${product.message}`,
+                        'Error',
+                        5000
+                    );
+                    return;
+                }
 
- if (this.isModal()) {
- this.saveSuccess.emit(product.data);
- } else {
- await this.router.navigateByUrl('/panel/compras/articles');
- }
+                this.notificacionService.success(
+                    'Producto agregado correctamente',
+                    'Completado!',
+                    3000
+                );
 
- } else {
- const product = await firstValueFrom(
- this.productoServicios.actualizarProductos(this.productosID(), formValue as Partial<ArticulosInterface>)
- );
+                if (this.isModal()) {
+                    this.saveSuccess.emit(product.data);
+                } else {
+                    await this.router.navigateByUrl('/panel/compras/articles');
+                }
 
- if (product.success == false) {
- this.notificacionService.error(
- `Hubo un error al guardar este item ${product.message}`,
- 'Error',
- 5000
- );
- return;
- }
+            } else {
+                const product = await firstValueFrom(
+                    this.productoServicios.actualizarProductos(this.productosID(), formValue as Partial<ArticulosInterface>)
+                );
+
+                if (product.success == false) {
+                    this.notificacionService.error(
+                        `Hubo un error al guardar este item ${product.message}`,
+                        'Error',
+                        5000
+                    );
+                    return;
+                }
 
 
- this.notificacionService.success(
- 'Producto actualizado correctamente',
- 'Completado!',
- 3000
- );
- await this.router.navigateByUrl('/panel/compras/articles');
+                this.notificacionService.success(
+                    'Producto actualizado correctamente',
+                    'Completado!',
+                    3000
+                );
+                await this.router.navigateByUrl('/panel/compras/articles');
 
- }
+            }
 
- } catch (error: any) {
- alert(error.message)
- }
- }
+        } catch (error: any) {
+            this.notificacionService.error(error.message, 'Error', 5000);
+        }
+    }
 
- async onCancel() {
- if (this.isModal()) {
- this.cancel.emit();
- } else {
- this.formProductos.reset();
- await this.router.navigateByUrl('/panel/compras/articles');
- }
- }
+    async onCancel() {
+        if (this.isModal()) {
+            this.cancel.emit();
+        } else {
+            this.formProductos.reset();
+            await this.router.navigateByUrl('/panel/compras/articles');
+        }
+    }
 
 }

@@ -11,6 +11,7 @@ import { PaginationService } from '@shared/components/pagination/pagination.serv
 import { ModalComponent } from '@shared/components/modal/modal.component';
 import { ModalAsientoContableComponent } from '../components/modal-asiento-contable/modal-asiento-contable.component';
 import { VolantePagoComponent } from '../components/volante-pago/volante-pago.component';
+import { NotificationService } from '@shared/services/notification.service';
 
 @Component({
     selector: 'app-movimientos',
@@ -29,6 +30,7 @@ import { VolantePagoComponent } from '../components/volante-pago/volante-pago.co
 export class MovimientosComponent {
     private svc = inject(PagosHttpService);
     private paginationService = inject(PaginationService);
+    private notificationService = inject(NotificationService);
 
     headTitle = signal<HeaderInput>({
         title: 'Movimientos Financieros',
@@ -129,12 +131,12 @@ export class MovimientosComponent {
             next: () => {
                 this.anularLoading.set(false);
                 this.anularVisible = false;
-                alert('El pago ha sido anulado exitosamente.');
+                this.notificationService.success('El pago ha sido anulado exitosamente.');
                 this.cargar();
             },
             error: (err) => {
                 this.anularLoading.set(false);
-                alert(err?.error?.message || 'Error al intentar anular el pago.');
+                this.notificationService.error(err?.error?.message || 'Error al intentar anular el pago.');
             }
         });
     }

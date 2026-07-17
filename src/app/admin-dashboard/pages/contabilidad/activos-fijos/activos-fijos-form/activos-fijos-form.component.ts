@@ -75,7 +75,7 @@ export class ActivosFijosFormComponent implements OnInit {
 
   private initForm(): void {
     this.form = this.fb.group({
-      codigo: ['', [Validators.required, Validators.maxLength(50)]],
+      codigo: [{ value: 'AUTOGENERADO', disabled: true }, [Validators.maxLength(50)]],
       nombre: ['', [Validators.required, Validators.maxLength(100)]],
       descripcion: [''],
       fechaAdquisicion: [new Date().toISOString().substring(0, 10), [Validators.required]],
