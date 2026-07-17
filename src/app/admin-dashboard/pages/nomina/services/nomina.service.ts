@@ -33,6 +33,8 @@ export class NominaService {
  if (params?.limit) httpParams = httpParams.set('limit', params.limit);
  if (params?.offset) httpParams = httpParams.set('offset', params.offset);
  if (params?.search) httpParams = httpParams.set('search', params.search);
+ if (params?.activo !== undefined && params?.activo !== '') httpParams = httpParams.set('activo', params.activo);
+ if (params?.cargoId) httpParams = httpParams.set('cargoId', params.cargoId);
  return this.http.get<PaginatedResponse<Empleado>>(`${this.base}/empleados`, { params: httpParams }).pipe(catchError(this.handleError));
  }
 

@@ -17,7 +17,6 @@
 
     <div
       [class]="isModal() ? 'w-full bg-white rounded-xl shadow-none mt-0' : 'w-2/3 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mt-6'">
-
       <div class="p-8">
         <!-- Sección: Información básica -->
         <div class="mb-8">
@@ -191,7 +190,7 @@
               <textarea
                 class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all"
                 placeholder="" formControlName="observacion">
- </textarea>
+  </textarea>
 
               <form-error-label [errorType]="clientsForm.get('email')!" />
             </div>
@@ -199,7 +198,6 @@
         </div>
 
       </div>
-
     </div>
 
     <div
@@ -247,11 +245,11 @@
         <!-- Botones de acción -->
         <div class="flex justify-end gap-3 pt-6 border-t border-gray-100">
           <button type="button" (click)="onCancel()" class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 
- rounded-xl hover:bg-gray-50 transition-all duration-300 cursor-pointer">
+  rounded-xl hover:bg-gray-50 transition-all duration-300 cursor-pointer">
             Cancelar
           </button>
           <button type="submit" class="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-xl font-bold shadow-lg
- hover:bg-blue-700 transition-all duration-300 cursor-pointer">
+  hover:bg-blue-700 transition-all duration-300 cursor-pointer">
             {{ loading() ? 'Guardando...' :
             (clienteID() && clienteID() !== 'new-Item' ? 'Actualizar Cliente' :
             'Guardar Cliente') }}

@@ -1,0 +1,241 @@
+<!-- Container for Filters and Table -->
+<div class="space-y-6 animate-fade-in">
+  <!-- Modernized Filters Panel -->
+  <div
+    class="bg-white/80 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100 p-6 overflow-hidden transition-all duration-300">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <!-- Buscador Principal -->
+      <div class="relative flex-1 max-w-md group">
+        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+          <svg class="h-4 w-4 text-gray-400 group-hover:text-blue-500 transition-colors" fill="none"
+            stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <input type="text" placeholder="Buscar por nombre o documento..." [ngModel]="search()"
+          (ngModelChange)="search.set($event)" (keyup.enter)="applyFilters()"
+          class="block w-full pl-11 pr-4 py-2 bg-gray-50/50 border border-gray-100 rounded-xl text-sm placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all" />
+      </div>
+
+      <!-- Botones Principales -->
+      <div class="flex items-center gap-3">
+        <button (click)="toggleFilters()"
+          class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm transition-all border cursor-pointer border-gray-200 hover:bg-gray-50 group"
+          [class.bg-blue-50]="showFilters()" [class.text-blue-600]="showFilters()">
+          <svg class="h-4 w-4 transition-transform group-hover:rotate-12" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+          </svg>
+          {{ showFilters() ? "Ocultar Filtros" : "Filtros Avanzados" }}
+          @if (activeFiltersCount() > 0) {
+          <span
+            class="flex items-center justify-center w-5 h-5 rounded-full bg-blue-600 text-[10px] text-white font-black animate-pulse">
+            {{ activeFiltersCount() }}
+          </span>
+          }
+        </button>
+
+        <button (click)="applyFilters()"
+          class="px-6 py-2 hover:bg-gray-100 border border-gray-200 text-sm cursor-pointer rounded-xl transition-all">
+          Consultar
+        </button>
+
+        @if (activeFiltersCount() > 0) {
+        <button (click)="clearFilters()" class="p-2 text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+          title="Limpiar filtros">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+        </button>
+        }
+      </div>
+    </div>
+
+    <!-- Advanced Filters Content -->
+    @if (showFilters()) {
+    <div
+      class="mt-6 pt-6 border-t border-gray-50 grid grid-cols-1 sm:grid-cols-2 gap-6 animate-slide-down">
+      <!-- Filtro Estado -->
+      <div class="space-y-2">
+        <label class="text-[10px] text-gray-400 ml-1">Estado Empleado</label>
+        <select [ngModel]="activo()" (ngModelChange)="activo.set($event)"
+          class="block w-full px-4 py-2 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:border-blue-500/50 transition-all appearance-none cursor-pointer">
+          <option value="">Todos</option>
+          <option value="true">Activos</option>
+          <option value="false">Inactivos</option>
+        </select>
+      </div>
+
+      <!-- Filtro Cargo -->
+      <div class="space-y-2">
+        <label class="text-[10px] text-gray-400 ml-1">Cargo</label>
+        <select [ngModel]="cargoId()" (ngModelChange)="cargoId.set($event)"
+          class="block w-full px-4 py-2 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:border-blue-500/50 transition-all appearance-none cursor-pointer">
+          <option value="">Todos los cargos</option>
+          @for (c of cargos(); track c.id) {
+          <option [value]="c.id">{{ c.nombre }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="mt-6 flex justify-end gap-3">
+      <button (click)="clearFilters()"
+        class="px-6 py-2 hover:bg-gray-100 border border-gray-200 text-sm cursor-pointer rounded-xl transition-all">
+        Limpiar Filtros
+      </button>
+      <button (click)="applyFilters()"
+        class="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm cursor-pointer rounded-xl transition-all active:scale-95">
+        Aplicar Filtros
+      </button>
+    </div>
+    }
+  </div>
+
+  <!-- Tabla de Empleados -->
+  <div
+    class="relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+    <div class="overflow-x-auto">
+      <table class="ledger-table">
+        <thead>
+          <tr>
+            <th class="text-center">Documento</th>
+            <th class="text-center">Nombre Completo</th>
+            <th class="text-center">Cargo</th>
+            <th class="text-right">Salario Base</th>
+            <th class="text-center">EPS</th>
+            <th class="text-center">Estado</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (emp of empleados(); track emp.id) {
+          <tr>
+            <td class="text-center font-mono text-xs">
+              {{ emp.tipoDocumento }} - {{ emp.numeroDocumento }}
+            </td>
+            <td class="text-center">
+              <a
+                [routerLink]="['/panel/nomina/empleados', emp.id, 'detalle']"
+                class="font-semibold text-slate-900 hover:text-blue-600 transition-colors"
+              >
+                {{ emp.primerNombre }} {{ emp.segundoNombre || '' }} {{ emp.primerApellido }} {{ emp.segundoApellido || '' }}
+              </a>
+            </td>
+            <td class="text-center text-slate-600">
+              {{ emp.cargo?.nombre || '-' }}
+            </td>
+            <td class="text-right tabular-nums">
+              <span class="font-semibold text-slate-900">{{
+                emp.salarioBase | currency: "" : "$" : "1.0-0"
+              }}</span>
+            </td>
+            <td class="text-center">
+              {{ emp.eps?.nombre || '-' }}
+            </td>
+            <td class="text-center">
+              <span
+                class="px-2.5 py-1 text-[10px] font-semibold uppercase rounded-lg border"
+                [class.bg-emerald-50]="emp.activo"
+                [class.text-emerald-600]="emp.activo"
+                [class.border-emerald-100]="emp.activo"
+                [class.bg-red-50]="!emp.activo"
+                [class.text-red-500]="!emp.activo"
+                [class.border-red-100]="!emp.activo"
+              >
+                {{ emp.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td>
+              <div class="flex justify-center gap-2">
+                <a
+                  [routerLink]="['/panel/nomina/empleados', emp.id, 'detalle']"
+                  class="inline-flex items-center rounded-lg text-sm text-blue-600 hover:text-blue-900 cursor-pointer"
+                  title="Ver Detalle"
+                >
+                  <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                  </svg>
+                </a>
+                <a
+                  [routerLink]="['/panel/nomina/empleados', emp.id, 'editar']"
+                  class="inline-flex items-center rounded-lg text-sm text-green-600 hover:text-green-900 cursor-pointer"
+                  title="Editar"
+                >
+                  <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                  </svg>
+                </a>
+                <button
+                  (click)="delete.emit(emp.id)"
+                  class="inline-flex items-center rounded-lg text-sm text-red-600 hover:text-red-900 cursor-pointer"
+                  title="Eliminar"
+                >
+                  <svg class="h-5 w-5 text-red-600 dark:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+          } @empty {
+          <tr>
+            <td colspan="7" class="text-center">
+              <div class="flex flex-col items-center justify-center py-14">
+                <div
+                  class="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center mb-4"
+                >
+                  <svg
+                    class="h-10 w-10 text-gray-200"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.5"
+                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                    />
+                  </svg>
+                </div>
+                <p class="text-sm font-bold text-gray-900">
+                  Sin empleados registrados
+                </p>
+                <p class="mt-1 text-xs text-gray-400">
+                  Aún no se han registrado empleados con los filtros aplicados.
+                </p>
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginación -->
+    <app-pagination [length]="empleados().length" />
+  </div>
+</div>
+
+<style>
+  .animate-slide-down {
+    animation: slideDown 0.3s ease-out;
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>

@@ -347,12 +347,15 @@ export class ComprobanteFormComponent implements OnInit {
         }
       }
 
+      const { terceroUnionId, ...cleanDetalle } = d;
+
       return {
-        ...d,
+        ...cleanDetalle,
         clienteId,
         proveedorId,
         entidadSSId,
-        centroCostoId: d.centroCostoId || null,
+        centroCostoId: cleanDetalle.centroCostoId || null,
+        documentoReferencia: cleanDetalle.documentoReferencia || null,
       };
     });
 
@@ -431,12 +434,15 @@ export class ComprobanteFormComponent implements OnInit {
         }
       }
 
+      const { terceroUnionId, ...cleanDetalle } = d;
+
       return {
-        ...d,
+        ...cleanDetalle,
         clienteId,
         proveedorId,
         entidadSSId,
-        centroCostoId: d.centroCostoId || null,
+        centroCostoId: cleanDetalle.centroCostoId || null,
+        documentoReferencia: cleanDetalle.documentoReferencia || null,
       };
     });
 

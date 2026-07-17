@@ -1,4 +1,4 @@
-@if (comprobanteVentasResource.isLoading()) {
+@if (comprobanteVentasResource.isLoading() && !comprobanteVentasResource.hasValue()) {
   <div class="flex justify-center items-center h-screen">
     <app-loader />
   </div>
