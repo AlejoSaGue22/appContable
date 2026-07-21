@@ -16,6 +16,7 @@ export interface Empresa {
   direccion?: string;
   telefono?: string;
   email?: string;
+  logoUrl?: string;
   configuracionDian?: any;
 }
 
@@ -31,5 +32,11 @@ export class EmpresaService {
 
   updateEmpresa(dto: Partial<Empresa>): Observable<ApiResponse<Empresa>> {
     return this.http.put<ApiResponse<Empresa>>(`${this.base}`, dto);
+  }
+
+  uploadLogo(file: File): Observable<{ success: boolean; logoUrl: string; message: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<{ success: boolean; logoUrl: string; message: string }>(`${this.base}/upload-logo`, formData);
   }
 }

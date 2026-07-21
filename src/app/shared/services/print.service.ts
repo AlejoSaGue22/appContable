@@ -1,9 +1,11 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { GetFacturaRequest } from '@dashboard/interfaces/documento-venta-interface';
 import { FacturaCompraResponse } from '@dashboard/interfaces/factura-compra-interface';
 import { NotaAjuste } from '@dashboard/interfaces/notas-ajuste-interface';
 import { NotaAjusteCompra } from '@dashboard/interfaces/notas-ajuste-compra-interface';
 import { HelpersUtils } from '@utils/helpers.utils';
+import { EmpresaService } from '@dashboard/services/empresa.service';
+import { environment } from 'src/app/environments/environment';
 
 export interface EmpresaInfo {
   nombre: string;
@@ -13,10 +15,11 @@ export interface EmpresaInfo {
   direccion: string;
   ciudad: string;
   sucursal: string;
+  logoUrl?: string;
   textoAdicional?: string;
 }
 
-/** Constantes editables — reemplazar por endpoint cuando esté disponible */
+/** Constantes por defecto en caso de fallback */
 const EMPRESA_DEFAULT: EmpresaInfo = {
   nombre: 'Factus',
   nit: '901724254-1',
@@ -25,14 +28,50 @@ const EMPRESA_DEFAULT: EmpresaInfo = {
   direccion: 'Calle 123',
   ciudad: 'San Gil - Santander',
   sucursal: 'Sucursal Principal',
-  textoAdicional: 'texto de prueba',
+  textoAdicional: '',
 };
 
 @Injectable({ providedIn: 'root' })
 export class PrintService {
+  private empresaService = inject(EmpresaService);
   private empresa: EmpresaInfo = EMPRESA_DEFAULT;
   private logoApp = `/${HelpersUtils.logoApp}`;
   private nameApp = HelpersUtils.nameApp;
+
+  constructor() {
+    this.cargarEmpresa();
+  }
+
+  public cargarEmpresa(): void {
+    this.empresaService.getEmpresa().subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          const d = res.data;
+          const origin = environment.baseUrl.replace(/\/api\/v1\/?$/, '');
+          const formattedLogoUrl = d.logoUrl ? (d.logoUrl.startsWith('/') ? `${origin}${d.logoUrl}` : d.logoUrl) : `/${HelpersUtils.logoApp}`;
+
+          this.empresa = {
+            nombre: d.razonSocial || EMPRESA_DEFAULT.nombre,
+            nit: d.nit || EMPRESA_DEFAULT.nit,
+            telefono: d.telefono || EMPRESA_DEFAULT.telefono,
+            email: d.email || EMPRESA_DEFAULT.email,
+            direccion: d.direccion || EMPRESA_DEFAULT.direccion,
+            ciudad: 'Colombia',
+            sucursal: 'Principal',
+            logoUrl: formattedLogoUrl,
+            textoAdicional: '',
+          };
+          if (d.logoUrl) {
+            this.logoApp = formattedLogoUrl;
+          }
+          if (d.razonSocial) {
+            this.nameApp = d.razonSocial;
+          }
+        }
+      },
+      error: () => {}
+    });
+  }
 
   // ──────────────────────────────────────────────────────────────────────
   // IMPRIMIR FACTURA DE VENTA

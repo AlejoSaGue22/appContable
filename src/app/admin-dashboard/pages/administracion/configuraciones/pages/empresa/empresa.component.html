@@ -4,85 +4,120 @@
 <div class="w-full px-4 sm:px-6 lg:px-8 py-8 space-y-6">
   <div class="max-w-4xl mx-auto">
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-      
+
       @if (empresaResource.isLoading()) {
-        <div class="flex flex-col gap-3 justify-center items-center py-20">
-          <app-loader />
-          <p class="text-sm text-gray-400 animate-pulse">Cargando información de la empresa...</p>
-        </div>
+      <div class="flex flex-col gap-3 justify-center items-center py-20">
+        <app-loader />
+        <p class="text-sm text-gray-400 animate-pulse">Cargando información de la empresa...</p>
+      </div>
       } @else {
-        <div class="border-b border-gray-100 pb-5 mb-8">
-          <h2 class="text-lg font-bold text-gray-900">Información General</h2>
-          <p class="text-xs text-gray-500 mt-1">Completa los datos de identificación y localización de tu empresa.</p>
+      <div class="border-b border-gray-100 pb-5 mb-8">
+        <h2 class="text-lg font-bold text-gray-900">Información General</h2>
+        <p class="text-xs text-gray-500 mt-1">Completa los datos de identificación y localización de tu empresa.</p>
+      </div>
+
+      <form [formGroup]="formEmpresa" (ngSubmit)="onSubmit()" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Razón Social -->
+          <div class="space-y-2">
+            <label class="block text-xs font-bold text-gray-700 uppercase">Razón Social <span
+                class="text-red-500">*</span></label>
+            <input type="text" formControlName="razonSocial"
+              class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all"
+              placeholder="Ej: ALVA Corp S.A.S" />
+            @if (formEmpresa.get('razonSocial')?.touched && formEmpresa.get('razonSocial')?.invalid) {
+            <p class="text-xs text-red-500">La razón social es obligatoria</p>
+            }
+          </div>
+
+          <!-- NIT -->
+          <div class="space-y-2">
+            <label class="block text-xs font-bold text-gray-700 uppercase">NIT / Identificación <span
+                class="text-red-500">*</span></label>
+            <input type="text" formControlName="nit"
+              class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all font-mono"
+              placeholder="Ej: 900.123.456-7" />
+            @if (formEmpresa.get('nit')?.touched && formEmpresa.get('nit')?.invalid) {
+            <p class="text-xs text-red-500">El NIT es obligatorio</p>
+            }
+          </div>
+
+          <!-- Correo Electrónico -->
+          <div class="space-y-2">
+            <label class="block text-xs font-bold text-gray-700 uppercase">Correo Electrónico</label>
+            <input type="email" formControlName="email"
+              class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all"
+              placeholder="correo@empresa.com" />
+            @if (formEmpresa.get('email')?.touched && formEmpresa.get('email')?.invalid) {
+            <p class="text-xs text-red-500">Ingresa un correo electrónico válido</p>
+            }
+          </div>
+
+          <!-- Teléfono -->
+          <div class="space-y-2">
+            <label class="block text-xs font-bold text-gray-700 uppercase">Teléfono / Celular</label>
+            <input type="text" formControlName="telefono"
+              class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all"
+              placeholder="Ej: +57 300 123 4567" />
+          </div>
+
+          <!-- Dirección -->
+          <div class="space-y-2 md:col-span-2">
+            <label class="block text-xs font-bold text-gray-700 uppercase">Dirección Principal</label>
+            <input type="text" formControlName="direccion"
+              class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all"
+              placeholder="Ej: Calle 45 # 12 - 34" />
+          </div>
+
+          <!-- Logo File Upload & Preview -->
+          <div class="space-y-2 md:col-span-2 pt-2 border-t border-gray-100">
+            <label class="block text-xs font-bold text-gray-700 uppercase">Logo de la Empresa</label>
+            <div class="flex flex-col sm:flex-row gap-4 items-center">
+              <div class="flex-1 w-full">
+                <label
+                  class="flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-50/50 hover:bg-gray-100 border border-gray-200 border-dashed rounded-xl text-sm font-semibold text-gray-600 cursor-pointer transition-all">
+                  <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                    </path>
+                  </svg>
+                  <span>{{ selectedFile() ? selectedFile()?.name : 'Seleccionar imagen de logo...' }}</span>
+                  <input type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden" />
+                </label>
+              </div>
+
+              <div
+                class="w-16 h-16 rounded-xl border border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-inner p-1">
+                @if (logoPreviewUrl()) {
+                <img [src]="logoPreviewUrl()" alt="Vista previa del logo"
+                  class="max-h-full max-w-full object-contain" />
+                } @else {
+                <span class="text-[10px] text-gray-400 font-bold text-center">Sin Logo</span>
+                }
+              </div>
+            </div>
+            <p class="text-xs text-gray-400">La imagen subida se almacenará en el servidor y aparecerá en el encabezado
+              de las facturas e impresiones PDF.</p>
+          </div>
         </div>
 
-        <form [formGroup]="formEmpresa" (ngSubmit)="onSubmit()" class="space-y-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Razón Social -->
-            <div class="space-y-2">
-              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider">Razón Social <span class="text-red-500">*</span></label>
-              <input type="text" formControlName="razonSocial"
-                class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all"
-                placeholder="Ej: ALVA Corp S.A.S" />
-              @if (formEmpresa.get('razonSocial')?.touched && formEmpresa.get('razonSocial')?.invalid) {
-                <p class="text-xs text-red-500">La razón social es obligatoria</p>
-              }
-            </div>
-
-            <!-- NIT -->
-            <div class="space-y-2">
-              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider">NIT / Identificación <span class="text-red-500">*</span></label>
-              <input type="text" formControlName="nit"
-                class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all font-mono"
-                placeholder="Ej: 900.123.456-7" />
-              @if (formEmpresa.get('nit')?.touched && formEmpresa.get('nit')?.invalid) {
-                <p class="text-xs text-red-500">El NIT es obligatorio</p>
-              }
-            </div>
-
-            <!-- Correo Electrónico -->
-            <div class="space-y-2">
-              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider">Correo Electrónico</label>
-              <input type="email" formControlName="email"
-                class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all"
-                placeholder="correo@empresa.com" />
-              @if (formEmpresa.get('email')?.touched && formEmpresa.get('email')?.invalid) {
-                <p class="text-xs text-red-500">Ingresa un correo electrónico válido</p>
-              }
-            </div>
-
-            <!-- Teléfono -->
-            <div class="space-y-2">
-              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider">Teléfono / Celular</label>
-              <input type="text" formControlName="telefono"
-                class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all"
-                placeholder="Ej: +57 300 123 4567" />
-            </div>
-
-            <!-- Dirección -->
-            <div class="space-y-2 md:col-span-2">
-              <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider">Dirección Principal</label>
-              <input type="text" formControlName="direccion"
-                class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all"
-                placeholder="Ej: Calle 45 # 12 - 34" />
-            </div>
-          </div>
-
-          <div class="flex justify-end pt-4 border-t border-gray-50">
-            <button type="submit" [disabled]="isSubmitting() || formEmpresa.invalid"
-              class="px-6 py-2.5 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white text-sm font-bold rounded-xl transition-all cursor-pointer shadow-lg shadow-blue-500/10 active:scale-95 flex items-center gap-2">
-              @if (isSubmitting()) {
-                <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Guardando...
-              } @else {
-                Guardar Configuración
-              }
-            </button>
-          </div>
-        </form>
+        <div class="flex justify-end pt-4 border-t border-gray-50">
+          <button type="submit" [disabled]="isSubmitting() || formEmpresa.invalid"
+            class="px-6 py-2.5 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white text-sm font-bold rounded-xl transition-all cursor-pointer shadow-lg shadow-blue-500/10 active:scale-95 flex items-center gap-2">
+            @if (isSubmitting()) {
+            <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+              </path>
+            </svg>
+            Guardando...
+            } @else {
+            Guardar Configuración
+            }
+          </button>
+        </div>
+      </form>
       }
     </div>
   </div>
