@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, effect } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
@@ -10,7 +10,7 @@ import { ModalComponent } from "@shared/components/modal/modal.component";
 import { HeaderTitlePageComponent, HeaderInput } from "@dashboard/components/header-title-page/header-title-page.component";
 import { ModalHistorialpagoComponent } from "../components/modal-historialpago/modal-historialpago..component";
 import { TarjetasResumenPagos } from "../components/tarjetas-resumen-pagos/tarjetas-resumen-pagos.component";
-import { map, startWith } from 'rxjs';
+import { map, startWith, debounceTime, distinctUntilChanged } from 'rxjs';
 import { PaginationComponent } from "@shared/components/pagination/pagination";
 import { PaginationService } from '@shared/components/pagination/pagination.service';
 import { ModalAsientoContableComponent } from '../components/modal-asiento-contable/modal-asiento-contable.component';
@@ -89,16 +89,27 @@ export class CxpComponent {
  volanteVisible = false;
  volanteItem = signal<MovimientoItem | null>(null);
 
- constructor() {
- this.cargar();
- }
+  constructor() {
+    this.cargar();
+    this.pagosFiltroTexto.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged())
+      .subscribe(() => {
+        if (this.activeTab() === 'pagos') {
+          this.cargarPagos();
+        }
+      });
 
- cambiarTab(tab: string): void {
- this.activeTab.set(tab);
- if (tab === 'pagos' && this.pagosData().items.length === 0) {
- this.cargarPagos();
- }
- }
+    effect(() => {
+      const tab = this.activeTab();
+      if (tab === 'pagos') {
+        this.cargarPagos();
+      }
+    });
+  }
+
+  cambiarTab(tab: string): void {
+    this.activeTab.set(tab);
+  }
 
  cargar(): void {
  this.loading.set(true);

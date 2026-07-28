@@ -51,15 +51,15 @@ export class ConfiguracionMenuComponent {
         // { label: 'Propinas', route: 'propinas' },
       ],
     },
-    {
-      title: 'Plantillas de impresión',
-      icon: 'M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z',
-      description: 'Administra los diseños y formatos de impresión de tus documentos.',
-      options: [
-        { label: 'Plantillas de Factura', route: 'plantillas' },
-        { label: 'Formatos de Comprobante', route: 'formatos' },
-      ],
-    },
+    // {
+    //   title: 'Plantillas de impresión',
+    //   icon: 'M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z',
+    //   description: 'Administra los diseños y formatos de impresión de tus documentos.',
+    //   options: [
+    //     { label: 'Plantillas de Factura', route: 'plantillas' },
+    //     { label: 'Formatos de Comprobante', route: 'formatos' },
+    //   ],
+    // },
     {
       title: 'Impuestos',
       icon: 'M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z',
@@ -86,16 +86,16 @@ export class ConfiguracionMenuComponent {
         // { label: 'Numeraciones contables', route: 'numeraciones-contables' },
       ],
     },
-    {
-      title: 'Notificaciones y correos',
-      icon: 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
-      description: 'Configura las plantillas, las notificaciones del sistema y las de facturas.',
-      options: [
-        { label: 'Notificaciones de cobro', route: 'notificaciones-cobro' },
-        { label: 'Plantillas de correos y WhatsApp', route: 'plantillas-comunicacion' },
-        { label: 'Preferencias de correo', route: 'preferencias-correo' },
-      ],
-    },
+    // {
+    //   title: 'Notificaciones y correos',
+    //   icon: 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
+    //   description: 'Configura las plantillas, las notificaciones del sistema y las de facturas.',
+    //   options: [
+    //     { label: 'Notificaciones de cobro', route: 'notificaciones-cobro' },
+    //     { label: 'Plantillas de correos y WhatsApp', route: 'plantillas-comunicacion' },
+    //     { label: 'Preferencias de correo', route: 'preferencias-correo' },
+    //   ],
+    // },
     // {
     // title: 'Inventario',
     // icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4',

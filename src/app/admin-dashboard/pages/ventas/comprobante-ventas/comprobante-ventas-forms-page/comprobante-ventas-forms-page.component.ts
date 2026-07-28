@@ -99,6 +99,14 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   anticiposDisponibles = signal<any[]>([]);
   anticiposAsociados = signal<{ anticipoId: string; numero: string; montoOriginal: number; saldoDisponible: number; montoAplicado: number }[]>([]);
 
+  InvoiceStatus = InvoiceStatus;
+
+  isDraftInvoice(): boolean {
+    const f = this.factura();
+    if (!f) return this.invoiceID() !== 'new-Item';
+    return f.status === InvoiceStatus.DRAFT || (f.status as any) === 'draft' || (f.status as any) === 'DRAFT';
+  }
+
   invoiceID = toSignal(
     this.activateRoute.params.pipe(map((param) => param['id'])),
   );
@@ -145,14 +153,18 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
 
     this.getClientesAndProductos();
     this.loadCuentasBancarias();
-    if (this.invoiceID() == 'new-Item') {
-      this.loaderservice.hide();
-      return;
-    }
 
-    this.headTitle.title = 'Editar Factura de Venta';
-    this.headTitle.slog = 'Se edita factura de venta del sistema';
-    this.loadInvoice(this.invoiceID());
+    this.activateRoute.params.subscribe((params) => {
+      const id = params['id'];
+      if (id && id !== 'new-Item') {
+        this.headTitle.title = 'Editar Factura de Venta';
+        this.headTitle.slog = 'Se edita factura de venta del sistema';
+        this.loadInvoice(id);
+        this.refreshAsientoTrigger.update((v) => v + 1);
+      } else {
+        this.loaderservice.hide();
+      }
+    });
   }
 
   loadCuentasBancarias() {
@@ -360,8 +372,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       iva: tarifa,
       impuestoId: typeof valores.iva === 'string' ? valores.iva : '',
       valor_iva:
-        this.productosItemsForm.value.quantity! *
-        this.productosItemsForm.value.unitPrice! *
+        valorItemImporte *
         (tarifa / 100),
       discount: valores.discount ?? 0,
       valor_discount: valores.discount
@@ -540,7 +551,8 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
 
   onProductoSeleccionado(producto: Partial<GetProductosDetalle>) {
     this.productosItemsForm.patchValue({
-      unitPrice: producto.precio,
+      articulo: producto.nombre || producto.id || '',
+      unitPrice: producto.precio ?? 0,
       iva: (producto.impuestoId ?? 0) as any,
       articuloId: producto.id,
     });

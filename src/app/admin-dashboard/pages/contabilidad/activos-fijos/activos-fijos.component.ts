@@ -53,6 +53,7 @@ export class ActivosFijosComponent {
 
   selectedAsset = signal<ActivoFijo | null>(null);
   depreciaciones = signal<DepreciacionActivoFijo[]>([]);
+  expandedAsientoId = signal<string | null>(null);
 
   // --- Form Objects ---
   depreciarForm = {
@@ -171,6 +172,7 @@ export class ActivosFijosComponent {
   openDetailsModal(activo: ActivoFijo) {
     this.selectedAsset.set(activo);
     this.depreciaciones.set([]);
+    this.expandedAsientoId.set(null);
     this.isDetailsModalOpen.set(true);
 
     this.activosService.getDepreciaciones(activo.id).subscribe({
@@ -178,6 +180,14 @@ export class ActivosFijosComponent {
         this.depreciaciones.set(logs);
       }
     });
+  }
+
+  toggleAsientoDetail(depId: string) {
+    if (this.expandedAsientoId() === depId) {
+      this.expandedAsientoId.set(null);
+    } else {
+      this.expandedAsientoId.set(depId);
+    }
   }
 
   closeDetailsModal() {

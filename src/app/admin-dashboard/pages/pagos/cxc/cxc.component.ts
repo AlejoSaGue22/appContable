@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal, effect } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
@@ -133,21 +133,28 @@ export class CxcComponent implements OnInit {
   volanteVisible = false;
   volanteItem = signal<MovimientoItem | null>(null);
 
-  constructor(private svc: PagosHttpService) { }
+  constructor(private svc: PagosHttpService) {
+    effect(() => {
+      const tab = this.activeTab();
+      if (tab === 'cobros') {
+        this.cargarCobros();
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.cargar();
-    this.filtroEstado.valueChanges.subscribe(() => { });
-    this.filtroTexto.valueChanges
-      .pipe(debounceTime(250), distinctUntilChanged())
-      .subscribe(() => { });
+    this.cobrosFiltroTexto.valueChanges
+      .pipe(debounceTime(300), distinctUntilChanged())
+      .subscribe(() => {
+        if (this.activeTab() === 'cobros') {
+          this.cargarCobros();
+        }
+      });
   }
 
   cambiarTab(tab: string): void {
     this.activeTab.set(tab);
-    if (tab === 'cobros' && this.cobrosData().items.length === 0) {
-      this.cargarCobros();
-    }
   }
 
   cargar(): void {

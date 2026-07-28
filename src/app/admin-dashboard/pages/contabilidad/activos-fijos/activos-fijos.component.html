@@ -219,27 +219,118 @@
 
     <div>
       <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Logs de Depreciación Mensual</h4>
-      <div class="border border-gray-100 rounded-xl overflow-hidden max-h-60 overflow-y-auto">
+      <div class="border border-gray-100 rounded-xl overflow-hidden max-h-96 overflow-y-auto">
         <table class="w-full text-left text-sm">
           <thead>
             <tr class="bg-gray-50 text-gray-500 text-xs font-bold border-b border-gray-100">
-              <th class="px-4 py-2">Periodo</th>
-              <th class="px-4 py-2">Fecha Proceso</th>
-              <th class="px-4 py-2">Monto Depreciado</th>
-              <th class="px-4 py-2">ID Asiento</th>
+              <th class="px-4 py-2.5">Periodo</th>
+              <th class="px-4 py-2.5">Fecha Proceso</th>
+              <th class="px-4 py-2.5">Monto Depreciado</th>
+              <th class="px-4 py-2.5">Comprobante Contable</th>
+              <th class="px-4 py-2.5 text-center">Acción</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100 text-gray-700">
             @for (dep of depreciaciones(); track dep.id) {
-            <tr class="hover:bg-gray-50">
-              <td class="px-4 py-2 font-bold">{{ dep.mes }}/{{ dep.anio }}</td>
-              <td class="px-4 py-2 text-xs text-gray-400">{{ dep.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
-              <td class="px-4 py-2 text-red-500 font-medium">{{ dep.monto | currency:'USD':'symbol':'1.2-2' }}</td>
-              <td class="px-4 py-2 font-mono text-xs text-gray-400 select-all">{{ dep.asientoContableId }}</td>
+            <tr class="hover:bg-gray-50 transition-colors">
+              <td class="px-4 py-3 font-bold">{{ dep.mes }}/{{ dep.anio }}</td>
+              <td class="px-4 py-3 text-xs text-gray-400">{{ dep.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td class="px-4 py-3 text-red-500 font-bold">{{ dep.monto | currency:'USD':'symbol':'1.2-2' }}</td>
+              <td class="px-4 py-3 font-mono text-xs">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 border border-blue-100">
+                  <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  N° {{ dep.asientoContable?.numero || dep.asientoContable?.referencia || dep.asientoContableId }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <button (click)="toggleAsientoDetail(dep.id)"
+                  class="inline-flex items-center text-xs font-semibold px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-all cursor-pointer">
+                  {{ expandedAsientoId() === dep.id ? 'Ocultar Detalle' : 'Ver Asiento' }}
+                  <svg class="ml-1 h-3.5 w-3.5 transition-transform" [class.rotate-180]="expandedAsientoId() === dep.id" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+              </td>
             </tr>
+
+            <!-- Detalle Expandido del Asiento Contable -->
+            @if (expandedAsientoId() === dep.id) {
+            <tr>
+              <td colspan="5" class="px-4 py-3 bg-slate-50 border-y border-slate-200">
+                <div class="space-y-3 p-3 bg-white rounded-xl border border-slate-200 shadow-sm animate-fade-in">
+                  <div class="flex flex-wrap justify-between items-center gap-2 border-b border-gray-100 pb-2">
+                    <div>
+                      <span class="text-xs font-bold text-slate-900 uppercase">Detalle del Asiento Contable</span>
+                      <span class="ml-2 text-xs font-mono text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
+                        Ref: {{ dep.asientoContable?.referencia || 'N/A' }}
+                      </span>
+                    </div>
+                    <div class="text-xs text-slate-500">
+                      Fecha Asiento: <strong class="text-slate-700">{{ (dep.asientoContable?.fecha | date:'dd/MM/yyyy') || 'N/A' }}</strong>
+                    </div>
+                  </div>
+
+                  @if (dep.asientoContable?.descripcion) {
+                  <p class="text-xs text-slate-600 italic">
+                    "{{ dep.asientoContable?.descripcion }}"
+                  </p>
+                  }
+
+                  <!-- Tabla de Detalles de Cuenta (Débito y Crédito) -->
+                  <div class="overflow-x-auto rounded-lg border border-slate-100">
+                    <table class="w-full text-xs text-left">
+                      <thead>
+                        <tr class="bg-slate-100 text-slate-600 font-bold">
+                          <th class="px-3 py-2">Código Cuenta</th>
+                          <th class="px-3 py-2">Nombre Cuenta / Descripción</th>
+                          <th class="px-3 py-2 text-right">Débito</th>
+                          <th class="px-3 py-2 text-right">Crédito</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-slate-100">
+                        @for (det of dep.asientoContable?.detalles; track det.id) {
+                        <tr class="hover:bg-slate-50">
+                          <td class="px-3 py-2 font-mono font-bold text-slate-800">{{ det.cuenta?.codigo || '—' }}</td>
+                          <td class="px-3 py-2 text-slate-700">{{ det.cuenta?.nombre || det.descripcion || '—' }}</td>
+                          <td class="px-3 py-2 text-right font-medium text-slate-900">
+                            {{ det.debito > 0 ? (det.debito | currency:'USD':'symbol':'1.2-2') : '—' }}
+                          </td>
+                          <td class="px-3 py-2 text-right font-medium text-slate-900">
+                            {{ det.credito > 0 ? (det.credito | currency:'USD':'symbol':'1.2-2') : '—' }}
+                          </td>
+                        </tr>
+                        } @empty {
+                        <tr>
+                          <td colspan="4" class="px-3 py-3 text-center text-slate-400 italic">
+                            No se encontraron renglones de detalle para este asiento.
+                          </td>
+                        </tr>
+                        }
+                      </tbody>
+                      @if (dep.asientoContable?.detalles && dep.asientoContable.detalles.length > 0) {
+                      <tfoot>
+                        <tr class="bg-slate-100 font-bold text-slate-900 border-t border-slate-200">
+                          <td colspan="2" class="px-3 py-2 text-right">Total Asiento:</td>
+                          <td class="px-3 py-2 text-right text-blue-700">
+                            {{ (dep.asientoContable?.totalDebito || dep.monto) | currency:'USD':'symbol':'1.2-2' }}
+                          </td>
+                          <td class="px-3 py-2 text-right text-blue-700">
+                            {{ (dep.asientoContable?.totalCredito || dep.monto) | currency:'USD':'symbol':'1.2-2' }}
+                          </td>
+                        </tr>
+                      </tfoot>
+                      }
+                    </table>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            }
             } @empty {
             <tr>
-              <td colspan="4" class="text-center py-6 text-gray-400 text-xs">
+              <td colspan="5" class="text-center py-6 text-gray-400 text-xs">
                 Este activo fijo no cuenta con depreciaciones registradas.
               </td>
             </tr>

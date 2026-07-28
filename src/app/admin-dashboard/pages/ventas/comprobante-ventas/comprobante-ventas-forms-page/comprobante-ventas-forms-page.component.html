@@ -458,7 +458,7 @@
         <button routerLink="/panel/ventas/comprobantes"
           class="rounded-xl w-full sm:w-auto px-6 py-2.5 border border-gray-200 cursor-pointer text-center text-sm font-semibold text-gray-600 bg-white hover:bg-gray-50 transition-all"
           type="button">
-          Cancelar
+          Regresar
         </button>
 
         @if (invoiceID() === "new-Item") {
@@ -535,7 +535,7 @@
   </div>
 
   <!-- Vista Previa del Asiento Contable (Simulación) -->
-  @if (factura()?.status === 'draft') {
+  @if (isDraftInvoice()) {
   <div class="mt-8">
     <app-preview-asiento [documentId]="invoiceID() || 'new-Item'" [documentType]="'FACTURA_VENTA'"
       [refreshTrigger]="refreshAsientoTrigger()">

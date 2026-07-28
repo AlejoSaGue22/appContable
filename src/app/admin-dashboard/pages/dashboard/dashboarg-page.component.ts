@@ -69,7 +69,7 @@ export class DashboargPageComponent implements OnInit {
     },
   ];
 
-  roles = signal(['Super Admin', 'Admin', 'User']);
+  roles = signal(['Super Admin', 'Admin', 'Gerente', 'Contador']);
   role = inject(AuthService).user()?.role;
   logoApp = HelpersUtils.logoApp;
   nameApp = HelpersUtils.nameApp;

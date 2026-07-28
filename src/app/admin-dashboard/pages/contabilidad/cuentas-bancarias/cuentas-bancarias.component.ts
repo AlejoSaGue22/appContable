@@ -106,8 +106,9 @@ export default class CuentasBancariasComponent {
 
   onTransferenciaSubmit() {
     this.closeTransferenciaModal();
-    this.notificationService.success('Transferencia realizada correctamente');
-    this.cuentasResource.reload();
+    setTimeout(() => {
+      this.cuentasResource.reload();
+    }, 1000);
   }
 
   deleteCuenta(id: string) {

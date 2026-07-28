@@ -45,8 +45,33 @@ export class ListGroupDropdownComponent<
 
   constructor(private elementRef: ElementRef) {
     effect(() => {
-      this.searchOption.set(this.valueInput());
+      if (this.valueInput()) {
+        this.searchOption.set(this.getLabelForValue(this.valueInput()));
+      }
     });
+  }
+
+  getLabelForValue(val: any): string {
+    if (!val) return '';
+    if (typeof val === 'object') {
+      return this.buildLabel(val);
+    }
+    const strVal = String(val);
+    const list = this.dataList();
+    if (list && list.length > 0) {
+      const keys = this.labelKey();
+      const firstKey = keys[0];
+      const match = list.find(
+        (item) =>
+          String(item[firstKey] ?? '') === strVal ||
+          String(item['id'] ?? '') === strVal ||
+          String(item['codigo'] ?? '') === strVal,
+      );
+      if (match) {
+        return this.buildLabel(match);
+      }
+    }
+    return strVal;
   }
 
   filteredOptions = computed(() => {
@@ -75,9 +100,7 @@ export class ListGroupDropdownComponent<
 
   writeValue(value: T | null): void {
     this._value = value;
-    if (value) {
-      this.searchOption.set(this.buildLabel(value));
-    }
+    this.searchOption.set(this.getLabelForValue(value));
   }
 
   registerOnChange(fn: any): void {
@@ -91,9 +114,7 @@ export class ListGroupDropdownComponent<
   set value(val: T | null) {
     this._value = val;
     this.onChange(val);
-    if (val) {
-      this.searchOption.set(val[this.buildLabel(val)]);
-    }
+    this.searchOption.set(this.getLabelForValue(val));
   }
 
   get value(): T | null {
@@ -108,10 +129,9 @@ export class ListGroupDropdownComponent<
   }
 
   selectedItem(item: T) {
-    console.log(item);
     this.value = item[this.labelKey()[0]];
     this.objectSelect.emit(item);
-    this.searchOption.set(item[this.labelKey()[0]]);
+    this.searchOption.set(this.buildLabel(item));
     this.showDropdown.set(false);
   }
 
