@@ -42,6 +42,7 @@ import { CatalogsStore } from '@dashboard/services/catalogs.store';
 import { HelpersUtils } from '@utils/helpers.utils';
 import { CuentasBancariasService } from '@dashboard/pages/contabilidad/services/cuentas-bancarias.service';
 import { CuentaBancaria } from '@dashboard/pages/contabilidad/interfaces/cuenta-bancaria.interface';
+import { CurrencyFormatDirective } from '@shared/directives/currency-format.directive';
 import { ProductosServiciosFormsComponent } from '@dashboard/pages/articulos/productos-servicios-forms/productos-servicios-forms.component';
 
 @Component({
@@ -59,6 +60,7 @@ import { ProductosServiciosFormsComponent } from '@dashboard/pages/articulos/pro
     ClientsFormPageComponent,
     ProductosServiciosFormsComponent,
     PreviewAsientoComponent,
+    CurrencyFormatDirective,
   ],
   templateUrl: './comprobante-ventas-forms-page.component.html',
 })

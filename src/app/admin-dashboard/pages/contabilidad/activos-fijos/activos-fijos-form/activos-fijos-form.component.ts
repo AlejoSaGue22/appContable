@@ -12,6 +12,7 @@ import { ProveedoresService } from '../../../compras/services/proveedores.servic
 import { CentrosCostosService } from '../../../administracion/configuraciones/pages/centros-costos/services/centros-costos.service';
 import { GetCuentasContables } from '../../interfaces/cuentas-contables.interface';
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
+import { CurrencyFormatDirective } from '@shared/directives/currency-format.directive';
 
 @Component({
   selector: 'app-activos-fijos-form',
@@ -23,6 +24,7 @@ import { CatalogsStore } from '@dashboard/services/catalogs.store';
     HeaderTitlePageComponent,
     BreadcrumbComponent,
     FormErrorLabelComponent,
+    CurrencyFormatDirective
   ],
   templateUrl: './activos-fijos-form.component.html',
 })
@@ -168,12 +170,12 @@ export class ActivosFijosFormComponent implements OnInit {
     const valor = this.form.get('valorAdquisicion')?.value || 0;
     const salvamento = this.form.get('valorSalvamento')?.value || 0;
     const meses = this.form.get('vidaUtilMeses')?.value || 1;
-    
+
     if (valor <= 0 || meses <= 0) return 0;
-    
+
     const baseDepreciable = valor - salvamento;
     if (baseDepreciable <= 0) return 0;
-    
+
     return baseDepreciable / meses;
   });
 

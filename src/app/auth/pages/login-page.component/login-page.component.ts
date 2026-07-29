@@ -8,7 +8,7 @@ import { NotificationService } from '@shared/services/notification.service';
 
 @Component({
   selector: 'app-login-page.component',
-  imports: [RouterLink, ReactiveFormsModule, FormErrorLabelComponent],
+  imports: [ReactiveFormsModule, FormErrorLabelComponent],
   templateUrl: './login-page.component.html',
 })
 export class LoginPageComponent {

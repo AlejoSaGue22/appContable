@@ -51,30 +51,28 @@
         <tbody class="divide-y divide-gray-100 text-sm text-gray-700">
           @for (activo of activos(); track activo.id) {
           <tr class="hover:bg-gray-50 transition-colors group">
-            <td class="px-6 py-4 font-mono font-bold text-blue-600">
+            <td class="px-6 py-4 font-mono text-blue-600">
               {{ activo.codigo }}
             </td>
             <td class="px-6 py-4">
-              <div class="font-bold text-gray-900">{{ activo.nombre }}</div>
+              <div class="font-semibold text-gray-900">{{ activo.nombre }}</div>
               <div class="text-xs text-blue-500 font-medium">{{ activo.tipoActivo }}</div>
               <div class="text-xs text-gray-400">Adq: {{ activo.fechaAdquisicion | date:'dd/MM/yyyy' }}</div>
             </td>
             <td class="px-6 py-4">
               {{ activo.vidaUtilMeses }} meses
             </td>
-            <td class="px-6 py-4 font-medium">
+            <td class="px-6 py-4">
               {{ activo.valorAdquisicion | currency:'USD':'symbol':'1.2-2' }}
             </td>
-            <td class="px-6 py-4 text-red-500 font-medium">
+            <td class="px-6 py-4 text-red-500">
               {{ activo.depreciacionAcumulada | currency:'USD':'symbol':'1.2-2' }}
             </td>
-            <td class="px-6 py-4 text-green-600 font-bold">
+            <td class="px-6 py-4 text-green-600">
               {{ activo.valorLibros | currency:'USD':'symbol':'1.2-2' }}
             </td>
             <td class="px-6 py-4">
-              <span
-                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider"
-                [ngClass]="{
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs uppercase" [ngClass]="{
                     'bg-green-50 text-green-700': activo.estado === 'ACTIVO',
                     'bg-blue-50 text-blue-700': activo.estado === 'DEPRECIADO',
                     'bg-gray-100 text-gray-700': activo.estado === 'RETIRADO',
@@ -237,9 +235,11 @@
               <td class="px-4 py-3 text-xs text-gray-400">{{ dep.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
               <td class="px-4 py-3 text-red-500 font-bold">{{ dep.monto | currency:'USD':'symbol':'1.2-2' }}</td>
               <td class="px-4 py-3 font-mono text-xs">
-                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 border border-blue-100">
+                <span
+                  class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 border border-blue-100">
                   <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                   N° {{ dep.asientoContable?.numero || dep.asientoContable?.referencia || dep.asientoContableId }}
                 </span>
@@ -248,7 +248,8 @@
                 <button (click)="toggleAsientoDetail(dep.id)"
                   class="inline-flex items-center text-xs font-semibold px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-all cursor-pointer">
                   {{ expandedAsientoId() === dep.id ? 'Ocultar Detalle' : 'Ver Asiento' }}
-                  <svg class="ml-1 h-3.5 w-3.5 transition-transform" [class.rotate-180]="expandedAsientoId() === dep.id" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="ml-1 h-3.5 w-3.5 transition-transform" [class.rotate-180]="expandedAsientoId() === dep.id"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
@@ -268,7 +269,8 @@
                       </span>
                     </div>
                     <div class="text-xs text-slate-500">
-                      Fecha Asiento: <strong class="text-slate-700">{{ (dep.asientoContable?.fecha | date:'dd/MM/yyyy') || 'N/A' }}</strong>
+                      Fecha Asiento: <strong class="text-slate-700">{{ (dep.asientoContable?.fecha | date:'dd/MM/yyyy')
+                        || 'N/A' }}</strong>
                     </div>
                   </div>
 

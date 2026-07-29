@@ -30,6 +30,8 @@ import { GetCuentasContables } from '@dashboard/pages/contabilidad/interfaces/cu
 import { ActivosFijosService } from '@dashboard/pages/contabilidad/services/activos-fijos.service';
 import { ActivoFijo } from '@dashboard/pages/contabilidad/interfaces/activos-fijos.interface';
 
+import { CurrencyFormatDirective } from '@shared/directives/currency-format.directive';
+
 @Component({
     selector: 'app-factura-compra-forms-page',
     standalone: true,
@@ -44,6 +46,7 @@ import { ActivoFijo } from '@dashboard/pages/contabilidad/interfaces/activos-fij
         ProveedoresFormsPageComponent,
         ProductosServiciosFormsComponent,
         PreviewAsientoComponent,
+        CurrencyFormatDirective,
     ],
     providers: [
         DecimalPipe

@@ -13,6 +13,7 @@ import { HeaderTitlePageComponent, HeaderInput } from '@dashboard/components/hea
 import { ListGroupDropdownComponent } from '@shared/components/list-group-dropdown/list-group-dropdown.component';
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
 import { NotificationService } from '@shared/services/notification.service';
+import { CurrencyFormatDirective } from '@shared/directives/currency-format.directive';
 
 @Component({
   selector: 'app-recibo-caja-forms-page',
@@ -22,7 +23,8 @@ import { NotificationService } from '@shared/services/notification.service';
     ReactiveFormsModule,
     RouterLink,
     HeaderTitlePageComponent,
-    ListGroupDropdownComponent
+    ListGroupDropdownComponent,
+    CurrencyFormatDirective,
   ],
   templateUrl: './recibo-caja-forms-page.component.html',
   styleUrls: []

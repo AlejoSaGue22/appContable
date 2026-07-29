@@ -5,11 +5,12 @@ import { CuentasBancariasService } from '../../../services/cuentas-bancarias.ser
 import { CuentaBancaria } from '../../../interfaces/cuenta-bancaria.interface';
 import { NotificationService } from '@shared/services/notification.service';
 import { LoaderService } from '@utils/services/loader.service';
+import { CurrencyFormatDirective } from '@shared/directives/currency-format.directive';
 
 @Component({
     selector: 'app-transferencia-modal',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [CommonModule, ReactiveFormsModule, CurrencyFormatDirective],
     templateUrl: './transferencia-modal.component.html'
 })
 export class TransferenciaModalComponent implements OnInit {

@@ -243,7 +243,7 @@
                 <label class="text-xs font-bold text-slate-500 mb-1">Valor Unitario</label>
                 <div class="relative">
                   <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">$</span>
-                  <input type="number" formControlName="valorUnitario"
+                  <input type="number" formControlName="valorUnitario" appCurrencyFormat
                     class="w-full pl-6 pr-2 py-1.5 text-right text-sm bg-white border border-slate-200 rounded-xl shadow-sm focus:outline-none focus:ring-4 focus:ring-green-500/5 focus:border-green-500/50 transition-all" />
                 </div>
               </div>
@@ -263,7 +263,7 @@
               <!-- Total Línea -->
               <div class="flex flex-col">
                 <label class="text-xs font-bold text-slate-500 mb-1">Total</label>
-                <input type="text" formControlName="total"
+                <input type="text" formControlName="total" appCurrencyFormat
                   class="text-sm font-semibold bg-slate-200 border-none rounded-xl py-1.5 px-3 text-right text-slate-700 font-mono" />
               </div>
             </div>

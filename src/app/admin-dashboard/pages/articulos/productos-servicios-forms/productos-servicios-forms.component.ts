@@ -11,10 +11,11 @@ import { NotificationService } from '@shared/services/notification.service';
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
 import { HelpersUtils } from '@utils/helpers.utils';
 import { ProductosService } from '@dashboard/pages/ventas/services/productos.service';
+import { CurrencyFormatDirective } from '@shared/directives/currency-format.directive';
 
 @Component({
     selector: 'app-productos-servicios-forms',
-    imports: [HeaderTitlePageComponent, ReactiveFormsModule, FormErrorLabelComponent, LoaderComponent],
+    imports: [HeaderTitlePageComponent, ReactiveFormsModule, FormErrorLabelComponent, LoaderComponent, CurrencyFormatDirective],
     templateUrl: './productos-servicios-forms.component.html',
 })
 export class ProductosServiciosFormsComponent {

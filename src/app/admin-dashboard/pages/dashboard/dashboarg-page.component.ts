@@ -65,7 +65,7 @@ export class DashboargPageComponent implements OnInit {
     },
     {
       title: 'Pagos',
-      ruta: '/panel/pagos/cxc',
+      ruta: '/panel/pagos/movimientos',
     },
   ];
 

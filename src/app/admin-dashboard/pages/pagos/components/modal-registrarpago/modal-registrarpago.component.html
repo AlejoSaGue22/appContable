@@ -46,11 +46,10 @@
             </label>
             <div class="relative">
                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium">$</span>
-                <input
+                <input appCurrencyFormat
                     class="w-full bg-transparent text-slate-700 text-sm border rounded-md pl-7 pr-24 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
-                    [class.border-red-400]="
-            form.get('monto')?.invalid && form.get('monto')?.touched
-          " type="number" formControlName="monto" min="1" [max]="data.saldoPendiente" placeholder="0" />
+                    [class.border-red-400]="form.get('monto')?.invalid && form.get('monto')?.touched" type="number"
+                    formControlName="monto" min="1" [max]="data.saldoPendiente" placeholder="0" />
                 <button type="button" (click)="pagarTotal()"
                     class="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-blue-600 hover:text-blue-800 font-semibold px-2 py-0.5 rounded bg-blue-50 hover:bg-blue-100 transition-colors">
                     Total

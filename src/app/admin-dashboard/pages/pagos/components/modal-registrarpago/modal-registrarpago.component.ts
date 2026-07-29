@@ -6,6 +6,7 @@ import { PagosHttpService } from '../../services/pagos.service';
 import { NotificationService } from '@shared/services/notification.service';
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
 import { CuentasBancariasService } from '@dashboard/pages/contabilidad/services/cuentas-bancarias.service';
+import { CurrencyFormatDirective } from '@shared/directives/currency-format.directive';
 
 export interface RegistrarPagoModalData {
     tipo: 'cobro' | 'pago';
@@ -19,7 +20,7 @@ export interface RegistrarPagoModalData {
 @Component({
     selector: 'app-registrar-pago-modal',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [CommonModule, ReactiveFormsModule, CurrencyFormatDirective],
     templateUrl: './modal-registrarpago.component.html',
 })
 export class RegistrarPagoModalComponent implements OnInit {

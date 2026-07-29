@@ -26,11 +26,12 @@ import { LoaderService } from '@utils/services/loader.service';
 import { CuentasContablesService } from '../../../services/cuentas-contables.service';
 import { ListGroupDropdownComponent } from '@shared/components/list-group-dropdown/list-group-dropdown.component';
 import { GetCuentasContables } from '@dashboard/interfaces/catalogs-interface';
+import { CurrencyFormatDirective } from '@shared/directives/currency-format.directive';
 
 @Component({
   selector: 'app-cuenta-form-modal',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ListGroupDropdownComponent],
+  imports: [CommonModule, ReactiveFormsModule, ListGroupDropdownComponent, CurrencyFormatDirective],
   templateUrl: './cuenta-form-modal.component.html',
 })
 export class CuentaFormModalComponent implements OnInit {
