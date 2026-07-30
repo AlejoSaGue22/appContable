@@ -5,11 +5,12 @@ import { NominaService } from '../../../services/nomina.service';
 import { Empleado, ConceptoNomina, EmpleadoConceptoRecurrente } from '../../../interfaces/nomina.interface';
 import { NotificationService } from '@shared/services/notification.service';
 import { LoaderService } from '@utils/services/loader.service';
+import { ConfirmModalComponent, ConfirmModalConfig } from '@shared/components/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-conceptos-recurrentes-tab',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, CurrencyPipe],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, CurrencyPipe, ConfirmModalComponent],
   templateUrl: './conceptos-recurrentes-tab.component.html',
 })
 export class ConceptosRecurrentesTabComponent implements OnInit {
@@ -23,6 +24,10 @@ export class ConceptosRecurrentesTabComponent implements OnInit {
   conceptosMaster = signal<ConceptoNomina[]>([]);
   recurrentes = signal<EmpleadoConceptoRecurrente[]>([]);
   loading = signal(true);
+
+  // Modal de confirmación
+  confirmModal = signal<ConfirmModalConfig | null>(null);
+  private confirmCallback: (() => void) | null = null;
 
   // Modal State
   showModal = signal(false);
@@ -38,6 +43,22 @@ export class ConceptosRecurrentesTabComponent implements OnInit {
     fechaFin: [''],
     observacion: [''],
   });
+
+  private pedirConfirmacion(config: ConfirmModalConfig, onConfirm: () => void) {
+    this.confirmModal.set(config);
+    this.confirmCallback = onConfirm;
+  }
+
+  onConfirmado() {
+    this.confirmCallback?.();
+    this.confirmModal.set(null);
+    this.confirmCallback = null;
+  }
+
+  onCancelado() {
+    this.confirmModal.set(null);
+    this.confirmCallback = null;
+  }
 
   // Totales
   totalIngresos = computed(() => {
@@ -183,14 +204,29 @@ export class ConceptosRecurrentesTabComponent implements OnInit {
     }
   }
 
-  async deleteItem(item: EmpleadoConceptoRecurrente) {
-    if (!confirm(`¿Está seguro de eliminar el concepto "${item.concepto?.nombre}"?`)) return;
-    try {
-      await this.nominaService.deleteEmpleadoConcepto(item.id).toPromise();
-      this.notification.success('Concepto eliminado');
-      this.loadData();
-    } catch (err: any) {
-      this.notification.error('Error al eliminar concepto', err?.message);
-    }
+  deleteItem(item: EmpleadoConceptoRecurrente) {
+    const nombre = item.concepto?.nombre || 'este concepto';
+    this.pedirConfirmacion(
+      {
+        title: 'Eliminar Concepto Recurrente',
+        message: `¿Está seguro de eliminar el concepto "${nombre}"?`,
+        detail: 'Esta acción removerá el concepto de la liquidación de este empleado.',
+        icon: 'danger',
+        confirmLabel: 'Sí, Eliminar',
+        confirmClass: 'bg-red-600 hover:bg-red-700',
+      },
+      async () => {
+        this.loader.show();
+        try {
+          await this.nominaService.deleteEmpleadoConcepto(item.id).toPromise();
+          this.notification.success('Concepto eliminado exitosamente');
+          this.loadData();
+        } catch (err: any) {
+          this.notification.error('Error al eliminar concepto', err?.message);
+        } finally {
+          this.loader.hide();
+        }
+      }
+    );
   }
 }

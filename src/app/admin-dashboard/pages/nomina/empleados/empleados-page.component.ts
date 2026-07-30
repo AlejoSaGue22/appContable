@@ -8,6 +8,7 @@ import { HeaderTitlePageComponent } from '@dashboard/components/header-title-pag
 import { LoaderService } from '@utils/services/loader.service';
 import { NotificationService } from '@shared/services/notification.service';
 import { PaginationService } from '@shared/components/pagination/pagination.service';
+import { ConfirmModalComponent, ConfirmModalConfig } from '@shared/components/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-empleados-page',
@@ -17,6 +18,7 @@ import { PaginationService } from '@shared/components/pagination/pagination.serv
     RouterLink,
     EmpleadoTableComponent,
     HeaderTitlePageComponent,
+    ConfirmModalComponent,
   ],
   templateUrl: './empleados-page.component.html',
 })
@@ -31,6 +33,10 @@ export default class EmpleadosPageComponent {
   cargos = signal<Cargo[]>([]);
   filters = signal<any>({});
 
+  // Modal de confirmación
+  confirmModal = signal<ConfirmModalConfig | null>(null);
+  private confirmCallback: (() => void) | null = null;
+
   constructor() {
     this.loadCargos();
 
@@ -38,6 +44,22 @@ export default class EmpleadosPageComponent {
     effect(() => {
       this.loadEmpleados();
     });
+  }
+
+  private pedirConfirmacion(config: ConfirmModalConfig, onConfirm: () => void) {
+    this.confirmModal.set(config);
+    this.confirmCallback = onConfirm;
+  }
+
+  onConfirmado() {
+    this.confirmCallback?.();
+    this.confirmModal.set(null);
+    this.confirmCallback = null;
+  }
+
+  onCancelado() {
+    this.confirmModal.set(null);
+    this.confirmCallback = null;
   }
 
   loadCargos() {
@@ -59,12 +81,16 @@ export default class EmpleadosPageComponent {
         next: (res) => {
           this.empleados.set(res.data);
           this.paginationService.totalItems.set(res.count);
-          this.paginationService.pageSize.set(res.pages);
+          this.pageSize.set(res.pages);
         },
         error: (err) =>
           this.notification.error(err.message, 'Error al cargar empleados'),
         complete: () => this.loader.hide(),
       });
+  }
+
+  private get pageSize() {
+    return this.paginationService.pageSize;
   }
 
   onFilterChange(newFilters: any) {
@@ -73,18 +99,32 @@ export default class EmpleadosPageComponent {
   }
 
   confirmDelete(id: string) {
-    if (
-      !confirm(
-        '¿Está seguro de eliminar este empleado? Esta acción no se puede deshacer.',
-      )
-    )
-      return;
-    this.nominaService.deleteEmpleado(id).subscribe({
-      next: () => {
-        this.notification.success('Empleado eliminado');
-        this.loadEmpleados();
+    const emp = this.empleados().find((e) => e.id === id);
+    const nombre = emp ? `${emp.primerNombre} ${emp.primerApellido}`.trim() : 'este empleado';
+
+    this.pedirConfirmacion(
+      {
+        title: 'Eliminar Empleado',
+        message: `¿Está seguro de eliminar al empleado "${nombre}"?`,
+        detail: 'Esta acción desactivará al empleado de la nómina.',
+        icon: 'danger',
+        confirmLabel: 'Sí, Eliminar',
+        confirmClass: 'bg-red-600 hover:bg-red-700',
       },
-      error: (err) => this.notification.error('Error al eliminar', err),
-    });
+      () => {
+        this.loader.show();
+        this.nominaService.deleteEmpleado(id).subscribe({
+          next: () => {
+            this.notification.success('Empleado eliminado exitosamente');
+            this.loadEmpleados();
+            this.loader.hide();
+          },
+          error: (err) => {
+            this.notification.error(err?.message || err, 'Error al eliminar');
+            this.loader.hide();
+          },
+        });
+      }
+    );
   }
 }

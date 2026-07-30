@@ -11,6 +11,7 @@ import { HeaderTitlePageComponent } from '@dashboard/components/header-title-pag
 import { LoaderService } from '@utils/services/loader.service';
 import { NotificationService } from '@shared/services/notification.service';
 import { ConfirmModalComponent, ConfirmModalConfig } from '@shared/components/confirm-modal/confirm-modal.component';
+import { PaginationService } from '@shared/components/pagination/pagination.service';
 
 @Component({
   selector: 'app-periodos-page',
@@ -31,6 +32,7 @@ export default class PeriodosPageComponent {
   private nominaService = inject(NominaService);
   private loader = inject(LoaderService);
   private notification = inject(NotificationService);
+  private paginationService = inject(PaginationService);
 
   periodos = signal<PeriodoNomina[]>([]);
   liquidaciones = signal<Liquidacion[]>([]);
@@ -77,7 +79,11 @@ export default class PeriodosPageComponent {
   loadPeriodos() {
     this.loader.show();
     this.nominaService.getPeriodos({ limit: 1000 }).subscribe({
-      next: (res) => this.periodos.set(res.data),
+      next: (res) => {
+        this.periodos.set(res.data);
+        this.paginationService.totalItems.set(res.count);
+        this.paginationService.pageSize.set(res.pages);
+      },
       error: (err) => this.notification.error(err, 'Error al cargar períodos'),
       complete: () => this.loader.hide(),
     });

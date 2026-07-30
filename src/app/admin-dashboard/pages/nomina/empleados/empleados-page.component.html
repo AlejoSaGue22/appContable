@@ -26,4 +26,12 @@
     (filterChange)="onFilterChange($event)"
     (delete)="confirmDelete($event)"
   />
+
+  @if (confirmModal()) {
+    <app-confirm-modal
+      [config]="confirmModal()!"
+      (confirmed)="onConfirmado()"
+      (cancelled)="onCancelado()">
+    </app-confirm-modal>
+  }
 </div>

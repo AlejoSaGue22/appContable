@@ -296,4 +296,12 @@
   </div>
   }
 
+  @if (confirmModal()) {
+    <app-confirm-modal
+      [config]="confirmModal()!"
+      (confirmed)="onConfirmado()"
+      (cancelled)="onCancelado()">
+    </app-confirm-modal>
+  }
+
 </div>

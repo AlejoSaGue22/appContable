@@ -15,6 +15,7 @@ import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.co
 import { NotificationService } from '@shared/services/notification.service';
 import { FormErrorLabelComponent } from '@utils/components/form-error-label/form-error-label.component';
 import { EstadoComprobante } from '../../interfaces/comprobantes.interface';
+import { ConfirmModalComponent, ConfirmModalConfig } from '@shared/components/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-comprobante-form',
@@ -26,6 +27,7 @@ import { EstadoComprobante } from '../../interfaces/comprobantes.interface';
     HeaderTitlePageComponent,
     BreadcrumbComponent,
     FormErrorLabelComponent,
+    ConfirmModalComponent,
   ],
   templateUrl: './comprobante-form.component.html',
 })
@@ -33,6 +35,26 @@ export class ComprobanteFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+
+  // Modal de confirmación
+  confirmModal = signal<ConfirmModalConfig | null>(null);
+  private confirmCallback: (() => void) | null = null;
+
+  private pedirConfirmacion(config: ConfirmModalConfig, onConfirm: () => void) {
+    this.confirmModal.set(config);
+    this.confirmCallback = onConfirm;
+  }
+
+  onConfirmado() {
+    this.confirmCallback?.();
+    this.confirmModal.set(null);
+    this.confirmCallback = null;
+  }
+
+  onCancelado() {
+    this.confirmModal.set(null);
+    this.confirmCallback = null;
+  }
   private toastService = inject(NotificationService);
 
   private service = inject(ComprobantesService);
@@ -388,19 +410,29 @@ export class ComprobanteFormComponent implements OnInit {
 
   contabilizarComprobante(): void {
     if (!this.id()) return;
-    if (confirm('¿Estás seguro de contabilizar este comprobante contable? Se volverá inmutable y registrará los movimientos contables definitivos.')) {
-      this.loading.set(true);
-      this.service.contabilizar(this.id()!).subscribe({
-        next: () => {
-          this.toastService.success('Comprobante contabilizado con éxito.');
-          this.cargarComprobante(this.id()!);
-        },
-        error: (err) => {
-          this.toastService.error(err.error?.message || 'Error al contabilizar.');
-          this.loading.set(false);
-        },
-      });
-    }
+    this.pedirConfirmacion(
+      {
+        title: 'Contabilizar Comprobante',
+        message: '¿Estás seguro de contabilizar este comprobante contable?',
+        detail: 'Se volverá inmutable y registrará los movimientos contables definitivos.',
+        icon: 'warning',
+        confirmLabel: 'Sí, Contabilizar',
+        confirmClass: 'bg-emerald-600 hover:bg-emerald-700',
+      },
+      () => {
+        this.loading.set(true);
+        this.service.contabilizar(this.id()!).subscribe({
+          next: () => {
+            this.toastService.success('Comprobante contabilizado con éxito.');
+            this.cargarComprobante(this.id()!);
+          },
+          error: (err) => {
+            this.toastService.error(err.error?.message || 'Error al contabilizar.');
+            this.loading.set(false);
+          },
+        });
+      }
+    );
   }
 
   guardarYContabilizar(): void {

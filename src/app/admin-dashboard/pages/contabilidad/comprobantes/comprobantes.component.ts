@@ -8,6 +8,7 @@ import { HeaderTitlePageComponent } from '@dashboard/components/header-title-pag
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
 import { ModalComponents } from '@shared/components/modal.components/modal.components';
 import { NotificationService } from '@shared/services/notification.service';
+import { ConfirmModalComponent, ConfirmModalConfig } from '@shared/components/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-comprobantes',
@@ -19,6 +20,7 @@ import { NotificationService } from '@shared/services/notification.service';
     HeaderTitlePageComponent,
     BreadcrumbComponent,
     ModalComponents,
+    ConfirmModalComponent,
   ],
   templateUrl: './comprobantes.component.html',
 })
@@ -37,6 +39,10 @@ export class ComprobantesComponent implements OnInit {
     { label: 'Comprobantes Contables' },
   ];
 
+  // Modal de confirmación
+  confirmModal = signal<ConfirmModalConfig | null>(null);
+  private confirmCallback: (() => void) | null = null;
+
   // Estado local para anulación
   public isAnularModalOpen = signal(false);
   public selectedComprobanteId = signal<string | null>(null);
@@ -49,24 +55,50 @@ export class ComprobantesComponent implements OnInit {
   public previewAsiento = signal<any>(null);
   public previewLoading = signal(false);
 
+  private pedirConfirmacion(config: ConfirmModalConfig, onConfirm: () => void) {
+    this.confirmModal.set(config);
+    this.confirmCallback = onConfirm;
+  }
+
+  onConfirmado() {
+    this.confirmCallback?.();
+    this.confirmModal.set(null);
+    this.confirmCallback = null;
+  }
+
+  onCancelado() {
+    this.confirmModal.set(null);
+    this.confirmCallback = null;
+  }
+
   ngOnInit(): void {
     this.service.loadComprobantes().subscribe();
   }
 
   contabilizar(id: string) {
-    if (confirm('¿Estás seguro de contabilizar este comprobante? Se generará el asiento contable definitivo y afectará saldos.')) {
-      this.service.contabilizar(id).subscribe({
-        next: () => {
-          this.toastService.success('Comprobante contabilizado y asiento generado con éxito');
-        },
-        error: (err) => {
-          this.toastService.error(
-            err.error?.message || 'Error al contabilizar el comprobante',
-            'Error Contable'
-          );
-        },
-      });
-    }
+    this.pedirConfirmacion(
+      {
+        title: 'Contabilizar Comprobante',
+        message: '¿Estás seguro de contabilizar este comprobante?',
+        detail: 'Se generará el asiento contable definitivo y afectará saldos en la contabilidad.',
+        icon: 'warning',
+        confirmLabel: 'Sí, Contabilizar',
+        confirmClass: 'bg-emerald-600 hover:bg-emerald-700',
+      },
+      () => {
+        this.service.contabilizar(id).subscribe({
+          next: () => {
+            this.toastService.success('Comprobante contabilizado y asiento generado con éxito');
+          },
+          error: (err) => {
+            this.toastService.error(
+              err.error?.message || 'Error al contabilizar el comprobante',
+              'Error Contable'
+            );
+          },
+        });
+      }
+    );
   }
 
   openAnularModal(id: string) {
