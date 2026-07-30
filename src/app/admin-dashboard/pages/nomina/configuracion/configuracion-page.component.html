@@ -1,0 +1,131 @@
+<div class="p-6 space-y-6">
+  <header-title-page [titleHead]="headTitle" />
+
+  <div class="flex justify-end">
+    <button (click)="openNewModal()"
+      class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition-all shadow-sm shadow-blue-200 cursor-pointer active:scale-95">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+      </svg>
+      Nueva Vigencia Legal
+    </button>
+  </div>
+
+  <!-- Parámetros Vigentes Actuales -->
+  @if (loading()) {
+  <div class="py-12 text-center text-slate-400 text-xs">Cargando parámetros de ley...</div>
+  } @else if (parametroVigente()) {
+  <div class="bg-white rounded-2xl border border-slate-200 p-6 space-y-6 shadow-sm">
+    <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+      <div>
+        <h3 class="text-base font-bold text-slate-800">Parámetros Legales Vigentes ({{ parametroVigente()?.anio }})</h3>
+        <p class="text-xs text-slate-500">Vigencia activa desde: {{ parametroVigente()?.fechaInicioVigencia }}</p>
+      </div>
+      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">
+        Activo y Aplicado
+      </span>
+    </div>
+
+    <!-- Grid de Parámetros -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
+        <span class="text-xs text-slate-400 font-semibold uppercase">Salario Mínimo (SMMLV)</span>
+        <p class="text-xl font-extrabold text-slate-800">${{ parametroVigente()?.smmlv | number: '1.0-0' }}</p>
+      </div>
+
+      <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
+        <span class="text-xs text-slate-400 font-semibold uppercase">Auxilio de Transporte</span>
+        <p class="text-xl font-extrabold text-slate-800">${{ parametroVigente()?.auxilioTransporte | number: '1.0-0' }}</p>
+      </div>
+
+      <div class="p-4 rounded-xl bg-blue-50/50 border border-blue-100 space-y-1">
+        <span class="text-xs text-blue-600 font-semibold uppercase">Salud Empleado</span>
+        <p class="text-xl font-extrabold text-blue-900">{{ parametroVigente()?.porcentajeSaludEmpleado }}%</p>
+      </div>
+
+      <div class="p-4 rounded-xl bg-blue-50/50 border border-blue-100 space-y-1">
+        <span class="text-xs text-blue-600 font-semibold uppercase">Pensión Empleado</span>
+        <p class="text-xl font-extrabold text-blue-900">{{ parametroVigente()?.porcentajePensionEmpleado }}%</p>
+      </div>
+
+      <div class="p-4 rounded-xl bg-indigo-50/50 border border-indigo-100 space-y-1">
+        <span class="text-xs text-indigo-600 font-semibold uppercase">Salud Empleador</span>
+        <p class="text-xl font-extrabold text-indigo-900">{{ parametroVigente()?.porcentajeSaludEmpresa }}%</p>
+      </div>
+
+      <div class="p-4 rounded-xl bg-indigo-50/50 border border-indigo-100 space-y-1">
+        <span class="text-xs text-indigo-600 font-semibold uppercase">Pensión Empleador</span>
+        <p class="text-xl font-extrabold text-indigo-900">{{ parametroVigente()?.porcentajePensionEmpresa }}%</p>
+      </div>
+
+      <div class="p-4 rounded-xl bg-purple-50/50 border border-purple-100 space-y-1">
+        <span class="text-xs text-purple-600 font-semibold uppercase">Caja Compensación</span>
+        <p class="text-xl font-extrabold text-purple-900">{{ parametroVigente()?.porcentajeCcf }}%</p>
+      </div>
+
+      <div class="p-4 rounded-xl bg-purple-50/50 border border-purple-100 space-y-1">
+        <span class="text-xs text-purple-600 font-semibold uppercase">SENA / ICBF</span>
+        <p class="text-xl font-extrabold text-purple-900">{{ parametroVigente()?.porcentajeSena }}% / {{ parametroVigente()?.porcentajeIcbf }}%</p>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- Modal: Crear Nueva Vigencia Legal -->
+  @if (showModal()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in" (click.self)="closeModal()">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-xl overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <h3 class="text-base font-bold text-slate-800">Nueva Vigencia de Parámetros Legales</h3>
+        <button (click)="closeModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600">
+          ✕
+        </button>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-6 space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Año</label>
+            <input type="number" formControlName="anio" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Fecha Inicio Vigencia</label>
+            <input type="date" formControlName="fechaInicioVigencia" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">SMMLV ($)</label>
+            <input type="number" formControlName="smmlv" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Auxilio Transporte ($)</label>
+            <input type="number" formControlName="auxilioTransporte" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+          <div>
+            <label class="block text-xs font-bold text-blue-700 mb-1">Salud Empleado (%)</label>
+            <input type="number" step="0.1" formControlName="porcentajeSaludEmpleado" class="w-full bg-blue-50/40 border border-blue-200 rounded-xl px-3 py-2 text-xs" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-blue-700 mb-1">Pensión Empleado (%)</label>
+            <input type="number" step="0.1" formControlName="porcentajePensionEmpleado" class="w-full bg-blue-50/40 border border-blue-200 rounded-xl px-3 py-2 text-xs" />
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
+          <button (click)="closeModal()" type="button" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 border border-slate-200 rounded-xl">
+            Cancelar
+          </button>
+          <button type="submit" class="px-5 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-sm">
+            Guardar Parámetros
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  }
+</div>

@@ -17,7 +17,7 @@ import { ProveedoresRequest } from '@dashboard/interfaces/proveedores-interface'
 import { PaginationComponent } from '@shared/components/pagination/pagination';
 import { HeaderTitlePageComponent } from "@dashboard/components/header-title-page/header-title-page.component";
 import { HeaderTitleProveedoresComponent } from './components/header-title-proveedores/header-title-proveedores.component';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 
 @Component({
   imports: [LoaderComponent, RouterLink, ErrorPages, HeaderTitleProveedoresComponent, TableProveedoresComponent, ModalComponent,
@@ -41,26 +41,36 @@ export class ProveedoresComponent {
   isModalEdit = signal<boolean>(false);
   idProveedorToModal = signal<string>('');
 
+  router = inject(Router);
+  route = inject(ActivatedRoute);
   paginationService = inject(PaginationService);
   proveedoresService = inject(ProveedoresService);
   notificacionService = inject(NotificationService);
   totalProveedores = signal<number>(0);
   cardsTotales = signal<CardsTotales[]>([]);
 
-  proveedoresList = signal<ProveedoresRequest[]>([]);
+  searchTerm = signal<string>(this.route.snapshot.queryParams['search'] || '');
+  appliedSearchTerm = signal<string>(this.route.snapshot.queryParams['search'] || '');
 
   proveedoresResource = rxResource({
-    request: () => ({ page: this.paginationService.currentPage(), limit: 10 }),
-    loader: ({ request }) => this.proveedoresService.getProveedores({ offset: this.paginationService.currentPage(), limit: request.limit }).pipe(
+    request: () => ({
+      page: this.paginationService.currentPage(),
+      limit: 10,
+      search: this.appliedSearchTerm()
+    }),
+    loader: ({ request }) => this.proveedoresService.getProveedores({
+      offset: request.page,
+      limit: request.limit,
+      search: request.search
+    }).pipe(
       tap((response) => {
-        this.proveedoresList.set(response.proveedores);
         this.totalProveedores.set(response.count ?? 0);
-        const size = Math.ceil(response.count / request.limit);
+        const size = Math.ceil((response.count ?? 0) / request.limit);
         this.paginationService.totalItems.set(response.count ?? 0);
         this.paginationService.pageSize.set(size);
       })
     )
-  })
+  });
 
   get columnsTable() {
     return [
@@ -73,14 +83,24 @@ export class ProveedoresComponent {
     ]
   }
 
-  onSearch(searchTerm: string) {
-    const proveedores = this.proveedoresList();
-    if (searchTerm.length > 0) {
-      const proveedoresFiltrados = proveedores.filter((proveedor) => proveedor.nombre.toLowerCase().includes(searchTerm.toLowerCase()));
-      this.proveedoresList.set(proveedoresFiltrados);
-    } else {
-      this.proveedoresList.set(proveedores);
-    }
+  onSearch(term: string) {
+    // Solo actualiza el texto del input — NO dispara petición HTTP
+    this.searchTerm.set(term);
+  }
+
+  executeSearch() {
+    // Aplica la búsqueda y recarga el resource (resetea paginación a página 1)
+    this.appliedSearchTerm.set(this.searchTerm());
+    this.router.navigate([], {
+      queryParams: { search: this.searchTerm() || null, page: 1 },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  clearSearch() {
+    this.searchTerm.set('');
+    this.appliedSearchTerm.set('');
+    this.router.navigate([], { queryParams: { search: null, page: 1 }, queryParamsHandling: 'merge' });
   }
 
   openModal(event: any) {

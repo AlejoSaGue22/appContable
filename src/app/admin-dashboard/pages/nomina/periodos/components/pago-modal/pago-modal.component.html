@@ -1,0 +1,56 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" (click.self)="close.emit()">
+  <div class="bg-white rounded-xl w-full max-w-md p-6 space-y-4 shadow-2xl">
+    <h3 class="text-lg font-bold text-slate-800">Pagar Nómina</h3>
+
+    <div class="bg-slate-50 rounded-lg p-3 space-y-1">
+      <p class="text-sm text-slate-600">
+        Período: <strong class="text-slate-800">{{ periodo().nombre }}</strong>
+      </p>
+      <p class="text-sm text-slate-600">
+        Neto a pagar: <strong class="text-green-600">${{ periodo().totalNeto | number: '1.0-0' }}</strong>
+      </p>
+    </div>
+
+    <div>
+      <label class="block text-xs font-bold text-slate-600 mb-1">Fecha de pago</label>
+      <input type="date" [value]="pagoFecha()" (input)="pagoFecha.set($any($event.target).value)"
+        class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400" />
+    </div>
+
+    <div>
+      <label class="block text-xs font-bold text-slate-600 mb-1">Código cuenta contable (ej: 1110)</label>
+      <input type="text" [value]="pagoCuentaCodigo()" (input)="pagoCuentaCodigo.set($any($event.target).value)"
+        placeholder="1110"
+        class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400" />
+    </div>
+
+    <div>
+      <label class="block text-xs font-bold text-slate-600 mb-1">
+        No. Comprobante <span class="text-slate-400 font-normal">(opcional)</span>
+      </label>
+      <input type="text" [value]="pagoNumeroComprobante()" (input)="pagoNumeroComprobante.set($any($event.target).value)"
+        placeholder="Ej: TRANSF-001"
+        class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400" />
+    </div>
+
+    <div>
+      <label class="block text-xs font-bold text-slate-600 mb-1">
+        Observaciones <span class="text-slate-400 font-normal">(opcional)</span>
+      </label>
+      <textarea [value]="pagoObservaciones()" (input)="pagoObservaciones.set($any($event.target).value)"
+        rows="2"
+        class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400"></textarea>
+    </div>
+
+    <div class="flex justify-end gap-3 pt-2 border-t border-slate-100">
+      <button (click)="close.emit()" type="button"
+        class="px-4 py-2 text-sm font-bold text-slate-600 hover:text-slate-800 cursor-pointer">
+        Cancelar
+      </button>
+      <button (click)="onConfirmar()" type="button" [disabled]="!pagoFecha() || !pagoCuentaCodigo()"
+        class="px-4 py-2 text-sm font-bold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 cursor-pointer">
+        Confirmar Pago
+      </button>
+    </div>
+  </div>
+</div>

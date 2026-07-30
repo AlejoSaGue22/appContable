@@ -4,10 +4,10 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from 'src/app/environments/environment';
 import {
- Empleado, CreateEmpleadoDto, UpdateEmpleadoDto,
- PeriodoNomina, CreatePeriodoDto, Liquidacion, PagoNomina,
- EntidadSeguridadSocial, Cargo, CentroCosto,
- PaginatedResponse
+  Empleado, CreateEmpleadoDto, UpdateEmpleadoDto,
+  PeriodoNomina, CreatePeriodoDto, Liquidacion, PagoNomina,
+  EntidadSeguridadSocial, Cargo, CentroCosto,
+  PaginatedResponse, ConceptoNomina, EmpleadoConceptoRecurrente, CreateEmpleadoConceptoDto, PeriodoEmpleado, ParametroNominaVersion
 } from '../interfaces/nomina.interface';
 
 
@@ -126,6 +126,55 @@ export class NominaService {
 
  getBancos(): Observable<any[]> {
  return this.http.get<any[]>(`${environment.baseUrl}/bancos`).pipe(catchError(this.handleError));
+ }
+
+ // ── Conceptos y Recurrentes ───────────────────────────────────────
+ getConceptos(): Observable<ConceptoNomina[]> {
+ return this.http.get<ConceptoNomina[]>(`${this.base}/conceptos`).pipe(catchError(this.handleError));
+ }
+
+ getConceptosRecurrentesByEmpleado(empleadoId: string): Observable<EmpleadoConceptoRecurrente[]> {
+ return this.http.get<EmpleadoConceptoRecurrente[]>(`${this.base}/empleados/${empleadoId}/conceptos-recurrentes`).pipe(catchError(this.handleError));
+ }
+
+ createEmpleadoConcepto(empleadoId: string, dto: CreateEmpleadoConceptoDto): Observable<EmpleadoConceptoRecurrente> {
+ return this.http.post<EmpleadoConceptoRecurrente>(`${this.base}/empleados/${empleadoId}/conceptos-recurrentes`, dto).pipe(catchError(this.handleError));
+ }
+
+ updateEmpleadoConcepto(id: string, dto: Partial<CreateEmpleadoConceptoDto>): Observable<EmpleadoConceptoRecurrente> {
+ return this.http.patch<EmpleadoConceptoRecurrente>(`${this.base}/empleados/conceptos-recurrentes/${id}`, dto).pipe(catchError(this.handleError));
+ }
+
+ toggleEmpleadoConcepto(id: string): Observable<EmpleadoConceptoRecurrente> {
+ return this.http.patch<EmpleadoConceptoRecurrente>(`${this.base}/empleados/conceptos-recurrentes/${id}/toggle`, {}).pipe(catchError(this.handleError));
+ }
+
+ deleteEmpleadoConcepto(id: string): Observable<any> {
+ return this.http.delete(`${this.base}/empleados/conceptos-recurrentes/${id}`).pipe(catchError(this.handleError));
+ }
+
+ // ── Empleados por Período ───────────────────────────────────────
+ getEmpleadosOfPeriodo(periodoId: string): Observable<PeriodoEmpleado[]> {
+   return this.http.get<PeriodoEmpleado[]>(`${this.base}/periodos/${periodoId}/empleados`).pipe(catchError(this.handleError));
+ }
+
+ assignEmpleadosToPeriodo(periodoId: string, empleadoIds: string[], diasNovedad: number = 30): Observable<PeriodoEmpleado[]> {
+   return this.http.post<PeriodoEmpleado[]>(`${this.base}/periodos/${periodoId}/empleados`, { empleadoIds, diasNovedad }).pipe(catchError(this.handleError));
+ }
+
+ removeEmpleadoFromPeriodo(periodoId: string, empleadoId: string): Observable<any> {
+   return this.http.delete(`${this.base}/periodos/${periodoId}/empleados/${empleadoId}`).pipe(catchError(this.handleError));
+ }
+
+ // ── Parametrización Legal ───────────────────────────────────────
+ getParametrosVigentes(fecha?: string): Observable<ParametroNominaVersion> {
+   let params = new HttpParams();
+   if (fecha) params = params.set('fecha', fecha);
+   return this.http.get<ParametroNominaVersion>(`${this.base}/parametros/vigentes`, { params }).pipe(catchError(this.handleError));
+ }
+
+ createParametroVersion(dto: any): Observable<ParametroNominaVersion> {
+   return this.http.post<ParametroNominaVersion>(`${this.base}/parametros`, dto).pipe(catchError(this.handleError));
  }
 
  // ── Reportes ────────────────────────────────────────────────────

@@ -31,14 +31,13 @@ export class ProveedoresService {
   private http = inject(HttpClient);
 
   getProveedores(options: Options): Observable<ProveedoresResponse> {
-    const { limit = 10, offset = 0 } = options;
+    const { limit = 10, offset = 0, search } = options;
+    const params: Record<string, any> = { limit, offset };
+    if (search && search.trim().length > 0) {
+      params['search'] = search.trim();
+    }
 
-    return this.http.get<ProveedoresResponse>(`${baseUrl}/proveedores`, {
-      params: {
-        limit,
-        offset
-      }
-    });
+    return this.http.get<ProveedoresResponse>(`${baseUrl}/proveedores`, { params });
   }
 
   getProveedoresById(id: string): Observable<ProveedoresInterface> {

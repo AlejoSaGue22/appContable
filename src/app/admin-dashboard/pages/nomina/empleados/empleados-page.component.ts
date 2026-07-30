@@ -18,47 +18,7 @@ import { PaginationService } from '@shared/components/pagination/pagination.serv
     EmpleadoTableComponent,
     HeaderTitlePageComponent,
   ],
-  template: `
-    <div class="p-6 space-y-6">
-      <header-title-page
-        [titleHead]="{
-          title: 'Empleados',
-          slog: 'Gestión de empleados para nómina',
-        }"
-      >
-      </header-title-page>
-
-      <div class="flex justify-end">
-        <a
-          routerLink="/panel/nomina/empleados/crear"
-          class="inline-flex items-center gap-2 px-4 py-2 cursor-pointer bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition-all shadow-sm shadow-blue-200 active:scale-[0.98]"
-        >
-          <svg
-            class="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 4v16m8-8H4"
-            />
-          </svg>
-          Nuevo Empleado
-        </a>
-      </div>
-
-      <app-empleado-table
-        [empleados]="empleados()"
-        [cargos]="cargos()"
-        [activeFilters]="filters()"
-        (filterChange)="onFilterChange($event)"
-        (delete)="confirmDelete($event)"
-      />
-    </div>
-  `,
+  templateUrl: './empleados-page.component.html',
 })
 export default class EmpleadosPageComponent {
   private nominaService = inject(NominaService);

@@ -1,281 +1,31 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { NominaService } from '../services/nomina.service';
-import {
-  PeriodoNomina,
-  Liquidacion,
-  PagoNomina,
-} from '../interfaces/nomina.interface';
+import { PeriodoNomina, Liquidacion, PagoNomina } from '../interfaces/nomina.interface';
 import { PeriodoFormModalComponent } from './components/periodo-form-modal/periodo-form-modal.component';
 import { DetalleLiquidacionModalComponent } from './components/detalle-liquidacion-modal/detalle-liquidacion-modal.component';
+import { PeriodosTableComponent } from './components/periodos-table/periodos-table.component';
+import { PagoModalComponent } from './components/pago-modal/pago-modal.component';
+import { PeriodoEmpleadosModalComponent } from './components/periodo-empleados-modal/periodo-empleados-modal.component';
 import { HeaderTitlePageComponent } from '@dashboard/components/header-title-page/header-title-page.component';
 import { LoaderService } from '@utils/services/loader.service';
 import { NotificationService } from '@shared/services/notification.service';
+import { ConfirmModalComponent, ConfirmModalConfig } from '@shared/components/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-periodos-page',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
     PeriodoFormModalComponent,
     DetalleLiquidacionModalComponent,
+    PeriodosTableComponent,
+    PagoModalComponent,
+    PeriodoEmpleadosModalComponent,
     HeaderTitlePageComponent,
+    ConfirmModalComponent,
   ],
-  template: `
-    <div class="p-6 space-y-6">
-      <header-title-page
-        [titleHead]="{
-          title: 'Períodos de Nómina',
-          slog: 'Liquidación y gestión de nómina por período',
-        }"
-      >
-      </header-title-page>
-
-      <div class="flex justify-end">
-        <button
-          (click)="showFormModal.set(true)"
-          class="px-4 py-2 bg-blue-600 cursor-pointer text-white rounded-lg text-sm font-bold hover:bg-blue-700"
-        >
-          + Nuevo Período
-        </button>
-      </div>
-
-      <div class="overflow-x-auto rounded-xl border border-slate-200">
-        <table class="w-full text-sm">
-          <thead
-            class="bg-slate-50 text-slate-600 text-xs font-bold uppercase "
-          >
-            <tr>
-              <th class="px-4 py-3 text-left">Nombre</th>
-              <th class="px-4 py-3 text-left">Período</th>
-              <th class="px-4 py-3 text-left">Tipo</th>
-              <th class="px-4 py-3 text-right">Devengado</th>
-              <th class="px-4 py-3 text-right">Deducciones</th>
-              <th class="px-4 py-3 text-right">Neto</th>
-              <th class="px-4 py-3 text-center">Estado</th>
-              <th class="px-4 py-3 text-right">Acciones</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100">
-            @for (p of periodos(); track p.id) {
-              <tr class="hover:bg-slate-50 transition-colors">
-                <td class="px-4 py-3 font-medium">{{ p.nombre }}</td>
-                <td class="px-4 py-3 text-xs text-slate-600">
-                  {{ p.fechaInicio }} - {{ p.fechaFin }}
-                </td>
-                <td class="px-4 py-3 text-xs">{{ p.tipo }}</td>
-                <td class="px-4 py-3 font-mono text-right">
-                  \${{ p.totalDevengado | number: '1.0-0' }}
-                </td>
-                <td class="px-4 py-3 font-mono text-right text-red-600">
-                  \${{ p.totalDeducciones | number: '1.0-0' }}
-                </td>
-                <td
-                  class="px-4 py-3 font-mono text-right text-green-600 font-bold"
-                >
-                  \${{ p.totalNeto | number: '1.0-0' }}
-                </td>
-                <td class="px-4 py-3 text-center">
-                  <span
-                    class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold"
-                    [class.bg-yellow-100]="p.estado === 'BORRADOR'"
-                    [class.text-yellow-700]="p.estado === 'BORRADOR'"
-                    [class.bg-green-100]="p.estado === 'LIQUIDADA'"
-                    [class.text-green-700]="p.estado === 'LIQUIDADA'"
-                    [class.bg-blue-100]="p.estado === 'PAGADA'"
-                    [class.text-blue-700]="p.estado === 'PAGADA'"
-                    [class.bg-red-100]="p.estado === 'ANULADA'"
-                    [class.text-red-700]="p.estado === 'ANULADA'"
-                  >
-                    {{ p.estado }}
-                  </span>
-                </td>
-                <td class="px-4 py-3 text-right">
-                  @if (p.estado === 'BORRADOR') {
-                    <button
-                      (click)="liquidar(p)"
-                      class="text-green-600 hover:text-green-800 text-xs font-bold mr-3"
-                    >
-                      Liquidar
-                    </button>
-                  }
-                  @if (p.estado === 'LIQUIDADA') {
-                    <button
-                      (click)="prepararPago(p)"
-                      class="text-indigo-600 hover:text-indigo-800 text-xs font-bold mr-3"
-                    >
-                      Pagar
-                    </button>
-                    <button
-                      (click)="anular(p)"
-                      class="text-red-600 hover:text-red-800 text-xs font-bold mr-3"
-                    >
-                      Anular
-                    </button>
-                    <button
-                      (click)="verDetalle(p)"
-                      class="text-blue-600 hover:text-blue-800 text-xs font-bold mr-3"
-                    >
-                      Ver
-                    </button>
-                  }
-                  @if (p.estado === 'PAGADA' || p.estado === 'LIQUIDADA') {
-                    @if (p.dianEstado === 'NO_ENVIADA') {
-                      <button
-                        (click)="enviarDian(p)"
-                        class="text-purple-600 hover:text-purple-800 text-xs font-bold mr-3"
-                      >
-                        Enviar DIAN
-                      </button>
-                    }
-                    @if (
-                      p.dianEstado === 'ENVIADA' || p.dianEstado === 'ACEPTADA'
-                    ) {
-                      <span
-                        class="text-xs font-bold mr-3"
-                        [class.text-green-600]="p.dianEstado === 'ACEPTADA'"
-                        [class.text-yellow-600]="p.dianEstado === 'ENVIADA'"
-                      >
-                        DIAN: {{ p.dianEstado }}
-                      </span>
-                      <button
-                        (click)="descargarXml(p)"
-                        class="text-purple-600 hover:text-purple-800 text-xs font-bold mr-3"
-                      >
-                        XML
-                      </button>
-                    }
-                  }
-                  @if (p.estado === 'PAGADA') {
-                    <button
-                      (click)="verDetalle(p)"
-                      class="text-blue-600 hover:text-blue-800 text-xs font-bold mr-3"
-                    >
-                      Ver
-                    </button>
-                    <button
-                      (click)="anular(p)"
-                      class="text-red-600 hover:text-red-800 text-xs font-bold mr-3"
-                    >
-                      Anular
-                    </button>
-                  }
-                </td>
-              </tr>
-            } @empty {
-              <tr>
-                <td colspan="8" class="px-4 py-8 text-center text-slate-400">
-                  No hay períodos creados
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-
-      @if (showFormModal()) {
-        <app-periodo-form-modal
-          (close)="showFormModal.set(false)"
-          (saved)="onPeriodoSaved()"
-        />
-      }
-
-      @if (showDetalleModal()) {
-        <app-detalle-liquidacion-modal
-          [periodo]="selectedPeriodo()!"
-          [liquidaciones]="liquidaciones()"
-          [pagos]="pagos()"
-          (close)="showDetalleModal.set(false)"
-        />
-      }
-
-      @if (showPagoModal()) {
-        <div
-          class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-          (click.self)="showPagoModal.set(false)"
-        >
-          <div class="bg-white rounded-xl w-full max-w-md p-6 space-y-4">
-            <h3 class="text-lg font-bold">Pagar Nómina</h3>
-            <p class="text-sm text-slate-600">
-              Período: <strong>{{ periodoPagar()?.nombre }}</strong>
-            </p>
-            <p class="text-sm text-slate-600">
-              Neto a pagar:
-              <strong
-                >\${{ periodoPagar()?.totalNeto | number: '1.0-0' }}</strong
-              >
-            </p>
-
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1"
-                >Fecha de pago</label
-              >
-              <input
-                type="date"
-                [(ngModel)]="pagoFecha"
-                class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-              />
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1"
-                >Código cuenta contable (ej: 1110)</label
-              >
-              <input
-                type="text"
-                [(ngModel)]="pagoCuentaCodigo"
-                placeholder="1110"
-                class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-              />
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1"
-                >No. Comprobante
-                <span class="text-slate-400">(opcional)</span></label
-              >
-              <input
-                type="text"
-                [(ngModel)]="pagoNumeroComprobante"
-                placeholder="Ej: TRANSF-001"
-                class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-              />
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1"
-                >Observaciones
-                <span class="text-slate-400">(opcional)</span></label
-              >
-              <textarea
-                [(ngModel)]="pagoObservaciones"
-                rows="2"
-                class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-              ></textarea>
-            </div>
-
-            <div class="flex justify-end gap-3 pt-2">
-              <button
-                (click)="showPagoModal.set(false)"
-                class="px-4 py-2 text-sm font-bold text-slate-600 hover:text-slate-800"
-              >
-                Cancelar
-              </button>
-              <button
-                (click)="pagar()"
-                [disabled]="!pagoFecha || !pagoCuentaCodigo"
-                class="px-4 py-2 text-sm font-bold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50"
-              >
-                Pagar
-              </button>
-            </div>
-          </div>
-        </div>
-      }
-    </div>
-  `,
+  templateUrl: './periodos-page.component.html',
 })
 export default class PeriodosPageComponent {
   private nominaService = inject(NominaService);
@@ -286,17 +36,42 @@ export default class PeriodosPageComponent {
   liquidaciones = signal<Liquidacion[]>([]);
   pagos = signal<PagoNomina[]>([]);
   selectedPeriodo = signal<PeriodoNomina | null>(null);
+  periodoPagar = signal<PeriodoNomina | null>(null);
+  periodoGestionar = signal<PeriodoNomina | null>(null);
+
   showFormModal = signal(false);
   showDetalleModal = signal(false);
   showPagoModal = signal(false);
-  periodoPagar = signal<PeriodoNomina | null>(null);
-  pagoFecha = signal('');
-  pagoCuentaCodigo = signal('');
-  pagoNumeroComprobante = signal('');
-  pagoObservaciones = signal('');
+  showEmpleadosModal = signal(false);
+
+  // Modal de confirmación genérico
+  confirmModal = signal<ConfirmModalConfig | null>(null);
+  private confirmCallback: (() => void) | null = null;
+
+  headTitle = {
+    title: 'Períodos de Nómina',
+    slog: 'Liquidación y gestión de nómina por período',
+  };
 
   constructor() {
     this.loadPeriodos();
+  }
+
+  /** Abre el modal de confirmación con la config dada y guarda el callback a ejecutar si confirma */
+  private pedirConfirmacion(config: ConfirmModalConfig, onConfirm: () => void) {
+    this.confirmModal.set(config);
+    this.confirmCallback = onConfirm;
+  }
+
+  onConfirmado() {
+    this.confirmCallback?.();
+    this.confirmModal.set(null);
+    this.confirmCallback = null;
+  }
+
+  onCancelado() {
+    this.confirmModal.set(null);
+    this.confirmCallback = null;
   }
 
   loadPeriodos() {
@@ -313,27 +88,36 @@ export default class PeriodosPageComponent {
     this.loadPeriodos();
   }
 
+  gestionarEmpleados(periodo: PeriodoNomina) {
+    this.periodoGestionar.set(periodo);
+    this.showEmpleadosModal.set(true);
+  }
+
   liquidar(periodo: PeriodoNomina) {
-    if (
-      !confirm(
-        `¿Liquidar nómina del período "${periodo.nombre}"? Esto tomará todos los empleados activos.`,
-      )
-    )
-      return;
-    this.loader.show();
-    this.nominaService
-      .liquidarPeriodo(periodo.id, { empleados: [] })
-      .subscribe({
-        next: () => {
-          this.notification.success('Nómina liquidada exitosamente');
-          this.loadPeriodos();
-          this.loader.hide();
-        },
-        error: (err) => {
-          this.notification.error('Error al liquidar nómina', err);
-          this.loader.hide();
-        },
-      });
+    this.pedirConfirmacion(
+      {
+        title: 'Liquidar Nómina',
+        message: `¿Desea liquidar la nómina del período "${periodo.nombre}"?`,
+        detail: 'Esta acción procesará los conceptos recurrentes y deducciones legales congelando un snapshot estático.',
+        icon: 'warning',
+        confirmLabel: 'Sí, Liquidar',
+        confirmClass: 'bg-green-600 hover:bg-green-700',
+      },
+      () => {
+        this.loader.show();
+        this.nominaService.liquidarPeriodo(periodo.id, { empleados: [] }).subscribe({
+          next: () => {
+            this.notification.success('Nómina liquidada exitosamente con snapshot congelado');
+            this.loadPeriodos();
+            this.loader.hide();
+          },
+          error: (err) => {
+            this.notification.error('Error al liquidar nómina', err);
+            this.loader.hide();
+          },
+        });
+      }
+    );
   }
 
   verDetalle(periodo: PeriodoNomina) {
@@ -360,56 +144,51 @@ export default class PeriodosPageComponent {
 
   prepararPago(periodo: PeriodoNomina) {
     this.periodoPagar.set(periodo);
-    this.pagoFecha.set(new Date().toISOString().split('T')[0]);
-    this.pagoCuentaCodigo.set('1110');
-    this.pagoNumeroComprobante.set('');
-    this.pagoObservaciones.set('');
     this.showPagoModal.set(true);
   }
 
-  pagar() {
+  onPagoConfirmado(datos: { fechaPago: string; cuentaCodigoContable: string; numeroComprobante?: string; observaciones?: string }) {
     const periodo = this.periodoPagar();
-    if (!periodo || !this.pagoFecha() || !this.pagoCuentaCodigo()) return;
+    if (!periodo) return;
 
     this.loader.show();
     this.showPagoModal.set(false);
-    this.nominaService
-      .pagarNomina(periodo.id, {
-        fechaPago: this.pagoFecha(),
-        cuentaCodigoContable: this.pagoCuentaCodigo(),
-        numeroComprobante: this.pagoNumeroComprobante() || undefined,
-        observaciones: this.pagoObservaciones() || undefined,
-      })
-      .subscribe({
-        next: () => {
-          this.notification.success('Nómina pagada exitosamente');
-          this.loadPeriodos();
-        },
-        error: (err) => {
-          this.notification.error('Error al pagar nómina', err);
-          this.loader.hide();
-        },
-      });
-  }
-
-  enviarDian(periodo: PeriodoNomina) {
-    if (
-      !confirm(
-        `¿Generar y enviar nómina electrónica a DIAN para "${periodo.nombre}"?`,
-      )
-    )
-      return;
-    this.loader.show();
-    this.nominaService.enviarDian(periodo.id).subscribe({
+    this.nominaService.pagarNomina(periodo.id, datos).subscribe({
       next: () => {
-        this.notification.success('Nómina electrónica generada exitosamente');
+        this.notification.success('Nómina pagada exitosamente');
         this.loadPeriodos();
       },
       error: (err) => {
-        this.notification.error('Error al enviar a DIAN', err);
+        this.notification.error('Error al pagar nómina', err);
         this.loader.hide();
       },
     });
+  }
+
+  enviarDian(periodo: PeriodoNomina) {
+    this.pedirConfirmacion(
+      {
+        title: 'Enviar a DIAN',
+        message: `¿Desea enviar la nómina electrónica del período "${periodo.nombre}" a la DIAN?`,
+        detail: 'Se generará el documento XML y se transmitirá al sistema de nómina electrónica.',
+        icon: 'info',
+        confirmLabel: 'Sí, Enviar',
+        confirmClass: 'bg-purple-600 hover:bg-purple-700',
+      },
+      () => {
+        this.loader.show();
+        this.nominaService.enviarDian(periodo.id).subscribe({
+          next: () => {
+            this.notification.success('Nómina electrónica generada exitosamente');
+            this.loadPeriodos();
+          },
+          error: (err) => {
+            this.notification.error('Error al enviar a DIAN', err);
+            this.loader.hide();
+          },
+        });
+      }
+    );
   }
 
   descargarXml(periodo: PeriodoNomina) {
@@ -432,22 +211,28 @@ export default class PeriodosPageComponent {
   }
 
   anular(periodo: PeriodoNomina) {
-    if (
-      !confirm(
-        `¿Anular la nómina del período "${periodo.nombre}"? Se revertirán los asientos contables.`,
-      )
-    )
-      return;
-    this.loader.show();
-    this.nominaService.anularNomina(periodo.id).subscribe({
-      next: () => {
-        this.notification.success('Nómina anulada exitosamente');
-        this.loadPeriodos();
+    this.pedirConfirmacion(
+      {
+        title: 'Anular Nómina',
+        message: `¿Está seguro de anular la nómina del período "${periodo.nombre}"?`,
+        detail: 'Esta acción revertirá todos los asientos contables generados. No se puede deshacer.',
+        icon: 'danger',
+        confirmLabel: 'Sí, Anular',
+        confirmClass: 'bg-red-600 hover:bg-red-700',
       },
-      error: (err) => {
-        this.notification.error('Error al anular nómina', err);
-        this.loader.hide();
-      },
-    });
+      () => {
+        this.loader.show();
+        this.nominaService.anularNomina(periodo.id).subscribe({
+          next: () => {
+            this.notification.success('Nómina anulada exitosamente');
+            this.loadPeriodos();
+          },
+          error: (err) => {
+            this.notification.error('Error al anular nómina', err);
+            this.loader.hide();
+          },
+        });
+      }
+    );
   }
 }

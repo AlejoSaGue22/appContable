@@ -1,0 +1,70 @@
+<div class="p-6 space-y-6">
+  <header-title-page [titleHead]="headTitle" />
+
+  <div class="flex justify-end">
+    <button (click)="showFormModal.set(true)"
+      class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 cursor-pointer text-white rounded-xl text-sm font-bold hover:bg-blue-700 transition-all shadow-sm shadow-blue-200 active:scale-[0.98]">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+      </svg>
+      Nuevo Período
+    </button>
+  </div>
+
+  <!-- Tabla de períodos -->
+  <app-periodos-table
+    [periodos]="periodos()"
+    (gestionarEmpleados)="gestionarEmpleados($event)"
+    (liquidar)="liquidar($event)"
+    (prepararPago)="prepararPago($event)"
+    (verDetalle)="verDetalle($event)"
+    (anular)="anular($event)"
+    (enviarDian)="enviarDian($event)"
+    (descargarXml)="descargarXml($event)"
+  />
+
+  <!-- Modal: Crear Período -->
+  @if (showFormModal()) {
+  <app-periodo-form-modal
+    (close)="showFormModal.set(false)"
+    (saved)="onPeriodoSaved()"
+  />
+  }
+
+  <!-- Modal: Detalle de Liquidación -->
+  @if (showDetalleModal() && selectedPeriodo()) {
+  <app-detalle-liquidacion-modal
+    [periodo]="selectedPeriodo()!"
+    [liquidaciones]="liquidaciones()"
+    [pagos]="pagos()"
+    (close)="showDetalleModal.set(false)"
+  />
+  }
+
+  <!-- Modal: Pagar Nómina -->
+  @if (showPagoModal() && periodoPagar()) {
+  <app-pago-modal
+    [periodo]="periodoPagar()!"
+    (close)="showPagoModal.set(false)"
+    (confirmar)="onPagoConfirmado($event)"
+  />
+  }
+
+  <!-- Modal: Gestionar Empleados en Período -->
+  @if (showEmpleadosModal() && periodoGestionar()) {
+  <app-periodo-empleados-modal
+    [periodo]="periodoGestionar()!"
+    (close)="showEmpleadosModal.set(false)"
+    (saved)="loadPeriodos()"
+  />
+  }
+
+  <!-- Modal: Confirmación de Acción -->
+  @if (confirmModal()) {
+  <app-confirm-modal
+    [config]="confirmModal()!"
+    (confirmed)="onConfirmado()"
+    (cancelled)="onCancelado()"
+  />
+  }
+</div>

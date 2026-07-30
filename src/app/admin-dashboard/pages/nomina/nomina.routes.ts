@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { ErrorPageComponent } from '@utils/components/error-page/error-page.component';
 
 export default [
     {
@@ -21,6 +20,10 @@ export default [
     {
         path: 'periodos',
         loadComponent: () => import('./periodos/periodos-page.component'),
+    },
+    {
+        path: 'configuracion',
+        loadComponent: () => import('./configuracion/configuracion-page.component'),
     },
     {
         path: 'reportes',

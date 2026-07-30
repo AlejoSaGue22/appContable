@@ -3,12 +3,13 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { NominaService } from '../../services/nomina.service';
 import { Empleado } from '../../interfaces/nomina.interface';
+import { ConceptosRecurrentesTabComponent } from '../components/conceptos-recurrentes-tab/conceptos-recurrentes-tab.component';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
     selector: 'app-detalle-empleado-page',
     standalone: true,
-    imports: [CommonModule, RouterLink, DatePipe],
+    imports: [CommonModule, RouterLink, DatePipe, ConceptosRecurrentesTabComponent],
     templateUrl: './detalle-empleado-page.component.html',
 })
 export default class DetalleEmpleadoPageComponent {
@@ -18,6 +19,7 @@ export default class DetalleEmpleadoPageComponent {
     empleado = signal<Empleado | null>(null);
     loading = signal(true);
     error = signal<string | null>(null);
+    activeTab = signal<'general' | 'conceptos' | 'historial'>('general');
 
     nombreCompleto = computed(() => {
         const e = this.empleado();
