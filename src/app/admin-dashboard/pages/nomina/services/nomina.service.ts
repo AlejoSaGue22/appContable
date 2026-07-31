@@ -7,7 +7,8 @@ import {
   Empleado, CreateEmpleadoDto, UpdateEmpleadoDto,
   PeriodoNomina, CreatePeriodoDto, Liquidacion, PagoNomina,
   EntidadSeguridadSocial, Cargo, CentroCosto,
-  PaginatedResponse, ConceptoNomina, EmpleadoConceptoRecurrente, CreateEmpleadoConceptoDto, PeriodoEmpleado, ParametroNominaVersion
+  PaginatedResponse, ConceptoNomina, EmpleadoConceptoRecurrente, CreateEmpleadoConceptoDto, PeriodoEmpleado, ParametroNominaVersion,
+  PeriodoEmpleadoConcepto, ConceptosConsolidadosResponse
 } from '../interfaces/nomina.interface';
 
 
@@ -164,6 +165,18 @@ export class NominaService {
 
  removeEmpleadoFromPeriodo(periodoId: string, empleadoId: string): Observable<any> {
    return this.http.delete(`${this.base}/periodos/${periodoId}/empleados/${empleadoId}`).pipe(catchError(this.handleError));
+ }
+
+ getConceptosConsolidadosPeriodoEmpleado(periodoId: string, empleadoId: string): Observable<ConceptosConsolidadosResponse> {
+   return this.http.get<ConceptosConsolidadosResponse>(`${this.base}/periodos/${periodoId}/empleados/${empleadoId}/conceptos`).pipe(catchError(this.handleError));
+ }
+
+ addConceptoOcasionalPeriodo(periodoId: string, empleadoId: string, dto: { conceptoId: string; valor: number; tipoValor?: string; observacion?: string }): Observable<PeriodoEmpleadoConcepto> {
+   return this.http.post<PeriodoEmpleadoConcepto>(`${this.base}/periodos/${periodoId}/empleados/${empleadoId}/conceptos`, dto).pipe(catchError(this.handleError));
+ }
+
+ removeConceptoOcasionalPeriodo(id: string): Observable<any> {
+   return this.http.delete(`${this.base}/periodos/empleados/conceptos/${id}`).pipe(catchError(this.handleError));
  }
 
  // ── Parametrización Legal ───────────────────────────────────────

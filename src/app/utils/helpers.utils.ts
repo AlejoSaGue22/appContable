@@ -1,8 +1,8 @@
 export class HelpersUtils {
 
- static readonly nameApp = 'ALVA SOFT';
+ static readonly nameApp = 'Fintura';
  static readonly logoApp = 'assets/images/logo_app.png';
- static readonly slogan = 'Software Contable, Administradora y Comercial';
+ static readonly slogan = 'Software Contable, Nómina y Comercial';
 
  static getMessageError(error: string[]): string {
 

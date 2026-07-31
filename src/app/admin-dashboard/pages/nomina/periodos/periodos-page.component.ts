@@ -1,12 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { NominaService } from '../services/nomina.service';
 import { PeriodoNomina, Liquidacion, PagoNomina } from '../interfaces/nomina.interface';
 import { PeriodoFormModalComponent } from './components/periodo-form-modal/periodo-form-modal.component';
 import { DetalleLiquidacionModalComponent } from './components/detalle-liquidacion-modal/detalle-liquidacion-modal.component';
 import { PeriodosTableComponent } from './components/periodos-table/periodos-table.component';
 import { PagoModalComponent } from './components/pago-modal/pago-modal.component';
-import { PeriodoEmpleadosModalComponent } from './components/periodo-empleados-modal/periodo-empleados-modal.component';
 import { HeaderTitlePageComponent } from '@dashboard/components/header-title-page/header-title-page.component';
 import { LoaderService } from '@utils/services/loader.service';
 import { NotificationService } from '@shared/services/notification.service';
@@ -22,7 +22,6 @@ import { PaginationService } from '@shared/components/pagination/pagination.serv
     DetalleLiquidacionModalComponent,
     PeriodosTableComponent,
     PagoModalComponent,
-    PeriodoEmpleadosModalComponent,
     HeaderTitlePageComponent,
     ConfirmModalComponent,
   ],
@@ -33,6 +32,7 @@ export default class PeriodosPageComponent {
   private loader = inject(LoaderService);
   private notification = inject(NotificationService);
   private paginationService = inject(PaginationService);
+  private router = inject(Router);
 
   periodos = signal<PeriodoNomina[]>([]);
   liquidaciones = signal<Liquidacion[]>([]);
@@ -95,8 +95,7 @@ export default class PeriodosPageComponent {
   }
 
   gestionarEmpleados(periodo: PeriodoNomina) {
-    this.periodoGestionar.set(periodo);
-    this.showEmpleadosModal.set(true);
+    this.router.navigate(['/panel/nomina/periodos', periodo.id, 'gestionar']);
   }
 
   liquidar(periodo: PeriodoNomina) {

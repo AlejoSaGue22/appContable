@@ -50,15 +50,6 @@
   />
   }
 
-  <!-- Modal: Gestionar Empleados en Período -->
-  @if (showEmpleadosModal() && periodoGestionar()) {
-  <app-periodo-empleados-modal
-    [periodo]="periodoGestionar()!"
-    (close)="showEmpleadosModal.set(false)"
-    (saved)="loadPeriodos()"
-  />
-  }
-
   <!-- Modal: Confirmación de Acción -->
   @if (confirmModal()) {
   <app-confirm-modal

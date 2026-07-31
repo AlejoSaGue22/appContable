@@ -206,6 +206,17 @@ export interface CreateEmpleadoConceptoDto {
   observacion?: string;
 }
 
+export interface PeriodoEmpleadoConcepto {
+  id: string;
+  periodoEmpleadoId: string;
+  conceptoId: string;
+  concepto?: ConceptoNomina;
+  valor: number;
+  tipoValor: 'FIJO' | 'PORCENTAJE';
+  observacion?: string;
+  createdAt?: string;
+}
+
 export interface PeriodoEmpleado {
   id: string;
   periodoId: string;
@@ -213,6 +224,27 @@ export interface PeriodoEmpleado {
   empleado: Empleado;
   diasNovedad: number;
   estado: string;
+  conceptosOcasionales?: PeriodoEmpleadoConcepto[];
+}
+
+export interface ConceptoConsolidadoItem {
+  id: string;
+  conceptoId: string;
+  conceptoNombre: string;
+  tipo: 'DEVENGADO' | 'DEDUCCION';
+  categoria: string;
+  valor: number;
+  tipoValor: 'FIJO' | 'PORCENTAJE';
+  observacion?: string;
+  origen: 'RECURRENTE' | 'ESTA_NOMINA';
+  badge: 'Recurrente' | 'Esta nómina';
+}
+
+export interface ConceptosConsolidadosResponse {
+  empleado: Empleado;
+  periodo: PeriodoNomina;
+  recurrentes: ConceptoConsolidadoItem[];
+  ocasionales: ConceptoConsolidadoItem[];
 }
 
 export interface ParametroNominaVersion {

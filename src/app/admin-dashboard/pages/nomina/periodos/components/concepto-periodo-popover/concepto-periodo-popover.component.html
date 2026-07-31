@@ -1,0 +1,175 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in" (click.self)="close.emit()">
+  <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden flex flex-col">
+
+    <!-- Header Popover / Modal (Estilo Alegra Nómina) -->
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg"
+          [class.bg-emerald-100]="tipoView === 'DEVENGADO'" [class.text-emerald-700]="tipoView === 'DEVENGADO'"
+          [class.bg-rose-100]="tipoView === 'DEDUCCION'" [class.text-rose-700]="tipoView === 'DEDUCCION'">
+          @if (tipoView === 'DEVENGADO') {
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          } @else {
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+          </svg>
+          }
+        </div>
+        <div>
+          <h3 class="text-base font-extrabold text-slate-800">
+            {{ tipoView === 'DEVENGADO' ? 'Ingresos adicionales' : 'Deducciones' }}
+          </h3>
+          <p class="text-xs text-slate-500 font-medium">
+            {{ empleado.primerNombre }} {{ empleado.primerApellido }}
+          </p>
+        </div>
+      </div>
+
+      <div class="text-right">
+        <span class="text-base font-extrabold text-slate-900">${{ totalMonto() | number: '1.0-0' }}</span>
+        <button (click)="close.emit()" class="block ml-auto text-slate-400 hover:text-slate-600 transition-colors p-1 cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Contenido de Lista de Conceptos -->
+    <div class="p-6 space-y-3 max-h-[60vh] overflow-y-auto">
+      @if (loading()) {
+      <div class="py-8 text-center text-xs text-slate-400">Cargando desglose de conceptos...</div>
+      } @else {
+
+      <!-- Item Base: Salario Base (solo en devengados) -->
+      @if (tipoView === 'DEVENGADO') {
+      <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+        <div>
+          <h4 class="text-xs font-bold text-slate-800">Salario Base</h4>
+          <span class="text-[11px] text-slate-500">Valor: <strong class="text-slate-700">${{ empleado.salarioBase | number: '1.0-0' }}</strong></span>
+        </div>
+        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-200/70 text-slate-600">
+          Todas las nóminas
+        </span>
+      </div>
+      }
+
+      <!-- Items Recurrentes del Empleado -->
+      @for (item of recurrentesFiltrados(); track item.id) {
+      <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+        <div>
+          <h4 class="text-xs font-bold text-slate-800">{{ item.conceptoNombre }}</h4>
+          <span class="text-[11px] text-slate-500">Valor: <strong class="text-slate-700">${{ item.valor | number: '1.0-0' }}</strong></span>
+        </div>
+        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+          Recurrente
+        </span>
+      </div>
+      }
+
+      <!-- Items Ocasionales Agregados Manualmente en ESTA Nómina -->
+      @for (item of ocasionalesFiltrados(); track item.id) {
+      <div class="flex items-center justify-between p-3 rounded-xl bg-blue-50/50 border border-blue-100">
+        <div class="flex items-start gap-2">
+          <div>
+            <h4 class="text-xs font-bold text-blue-900">{{ item.conceptoNombre }}</h4>
+            <span class="text-[11px] text-slate-600">Valor: <strong class="text-blue-950">${{ item.valor | number: '1.0-0' }}</strong></span>
+            @if (item.observacion) {
+            <p class="text-[10px] text-slate-400 italic">{{ item.observacion }}</p>
+            }
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700">
+            Esta nómina
+          </span>
+          <button (click)="removeOcasional(item)" title="Retirar de esta nómina"
+            class="p-1 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      }
+
+      <!-- Estado vacío -->
+      @if (tipoView === 'DEDUCCION' && recurrentesFiltrados().length === 0 && ocasionalesFiltrados().length === 0) {
+      <div class="py-6 text-center text-xs text-slate-400 italic">
+        No hay deducciones adicionales asignadas a este empleado.
+      </div>
+      }
+
+      <!-- Formulario Inline para Agregar Nuevo Concepto Ocasional -->
+      @if (showAddForm()) {
+      <form [formGroup]="form" (ngSubmit)="onSubmitNewConcepto()" class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3 mt-2 animate-fade-in">
+        <h4 class="text-xs font-bold text-slate-800">
+          Agregar {{ tipoView === 'DEVENGADO' ? 'ingreso ocasional' : 'deducción ocasional' }}
+        </h4>
+
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-700 mb-1">Concepto <span class="text-rose-500">*</span></label>
+          <select formControlName="conceptoId" class="w-full text-xs bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+            <option value="" disabled>Seleccione un concepto...</option>
+            @for (c of masterConceptosFiltrados(); track c.id) {
+            <option [value]="c.id">{{ c.nombre }} ({{ c.codigo }})</option>
+            }
+          </select>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2">
+          <div class="col-span-2">
+            <label class="block text-[11px] font-semibold text-slate-700 mb-1">Valor ($) <span class="text-rose-500">*</span></label>
+            <input type="number" formControlName="valor" placeholder="0" step="any" class="w-full text-xs bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-700 mb-1">Tipo</label>
+            <select formControlName="tipoValor" class="w-full text-xs bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+              <option value="FIJO">Fijo ($)</option>
+              <option value="PORCENTAJE">Porcentaje (%)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-700 mb-1">Observación / Nota (opcional)</label>
+          <input type="text" formControlName="observacion" placeholder="Ej. Horas extras 10h" class="w-full text-xs bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500" />
+        </div>
+
+        <div class="flex justify-end gap-2 pt-1">
+          <button (click)="toggleAddForm()" type="button" class="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200/60 rounded-lg transition-all cursor-pointer">
+            Cancelar
+          </button>
+          <button type="submit" class="px-3.5 py-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-all cursor-pointer active:scale-95">
+            Guardar en esta nómina
+          </button>
+        </div>
+      </form>
+      }
+
+      <!-- Botón Punteado estilo Alegra Nómina -->
+      @if (!showAddForm()) {
+      <button (click)="toggleAddForm()" type="button"
+        class="w-full py-2.5 border-2 border-dashed border-emerald-400 hover:border-emerald-500 bg-emerald-50/30 hover:bg-emerald-50 text-emerald-700 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        + {{ tipoView === 'DEVENGADO' ? 'Agregar ingreso adicional' : 'Agregar deducción' }}
+      </button>
+      }
+
+      }
+    </div>
+
+    <!-- Footer -->
+    <div class="px-6 py-3 border-t border-slate-100 flex justify-end bg-slate-50/50">
+      <button (click)="close.emit()" type="button"
+        class="px-4 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-200/60 border border-slate-200 rounded-xl transition-all cursor-pointer">
+        Listo
+      </button>
+    </div>
+
+  </div>
+</div>

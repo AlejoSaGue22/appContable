@@ -22,6 +22,10 @@ export default [
         loadComponent: () => import('./periodos/periodos-page.component'),
     },
     {
+        path: 'periodos/:id/gestionar',
+        loadComponent: () => import('./periodos/gestionar-periodo-page/gestionar-periodo-page.component'),
+    },
+    {
         path: 'configuracion',
         loadComponent: () => import('./configuracion/configuracion-page.component'),
     },

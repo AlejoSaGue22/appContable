@@ -56,8 +56,7 @@
 
     <!-- Advanced Filters Content -->
     @if (showFilters()) {
-    <div
-      class="mt-6 pt-6 border-t border-gray-50 grid grid-cols-1 sm:grid-cols-2 gap-6 animate-slide-down">
+    <div class="mt-6 pt-6 border-t border-gray-50 grid grid-cols-1 sm:grid-cols-2 gap-6 animate-slide-down">
       <!-- Filtro Estado -->
       <div class="space-y-2">
         <label class="text-[10px] text-gray-400 ml-1">Estado Período</label>
@@ -123,7 +122,8 @@
               {{ p.fechaInicio }} - {{ p.fechaFin }}
             </td>
             <td class="text-center">
-              <span class="px-2.5 py-1 text-[10px] font-semibold uppercase rounded-lg border bg-blue-50 text-blue-600 border-blue-100">
+              <span
+                class="px-2.5 py-1 text-[10px] font-semibold uppercase rounded-lg border bg-blue-50 text-blue-600 border-blue-100">
                 {{ p.tipo }}
               </span>
             </td>
@@ -138,17 +138,12 @@
             </td>
             <td class="text-center">
               <span class="px-2.5 py-1 text-[10px] font-semibold uppercase rounded-lg border"
-                [class.bg-yellow-50]="p.estado === 'BORRADOR'"
-                [class.text-yellow-600]="p.estado === 'BORRADOR'"
-                [class.border-yellow-100]="p.estado === 'BORRADOR'"
-                [class.bg-emerald-50]="p.estado === 'LIQUIDADA'"
+                [class.bg-yellow-50]="p.estado === 'BORRADOR'" [class.text-yellow-600]="p.estado === 'BORRADOR'"
+                [class.border-yellow-100]="p.estado === 'BORRADOR'" [class.bg-emerald-50]="p.estado === 'LIQUIDADA'"
                 [class.text-emerald-600]="p.estado === 'LIQUIDADA'"
-                [class.border-emerald-100]="p.estado === 'LIQUIDADA'"
-                [class.bg-blue-50]="p.estado === 'PAGADA'"
-                [class.text-blue-600]="p.estado === 'PAGADA'"
-                [class.border-blue-100]="p.estado === 'PAGADA'"
-                [class.bg-red-50]="p.estado === 'ANULADA'"
-                [class.text-red-500]="p.estado === 'ANULADA'"
+                [class.border-emerald-100]="p.estado === 'LIQUIDADA'" [class.bg-blue-50]="p.estado === 'PAGADA'"
+                [class.text-blue-600]="p.estado === 'PAGADA'" [class.border-blue-100]="p.estado === 'PAGADA'"
+                [class.bg-red-50]="p.estado === 'ANULADA'" [class.text-red-500]="p.estado === 'ANULADA'"
                 [class.border-red-100]="p.estado === 'ANULADA'">
                 {{ p.estado }}
               </span>
@@ -205,26 +200,26 @@
 
                 <!-- Enviar DIAN / Descargar XML (LIQUIDADA o PAGADA) -->
                 @if (p.estado === 'PAGADA' || p.estado === 'LIQUIDADA') {
-                  @if (p.dianEstado === 'NO_ENVIADA') {
-                  <button (click)="enviarDian.emit(p)"
-                    class="inline-flex items-center rounded-lg text-sm text-purple-600 hover:text-purple-900 cursor-pointer"
-                    title="Enviar a DIAN">
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                    </svg>
-                  </button>
-                  }
-                  @if (p.dianEstado === 'ENVIADA' || p.dianEstado === 'ACEPTADA') {
-                  <button (click)="descargarXml.emit(p)"
-                    class="inline-flex items-center rounded-lg text-sm text-orange-600 hover:text-orange-900 cursor-pointer"
-                    title="Descargar XML (DIAN: {{ p.dianEstado }})">
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                    </svg>
-                  </button>
-                  }
+                @if (p.dianEstado === 'NO_ENVIADA') {
+                <button (click)="enviarDian.emit(p)"
+                  class="inline-flex items-center rounded-lg text-sm text-purple-600 hover:text-purple-900 cursor-pointer"
+                  title="Enviar a DIAN">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                </button>
+                }
+                @if (p.dianEstado === 'ENVIADA' || p.dianEstado === 'ACEPTADA') {
+                <button (click)="descargarXml.emit(p)"
+                  class="inline-flex items-center rounded-lg text-sm text-orange-600 hover:text-orange-900 cursor-pointer"
+                  title="Descargar XML (DIAN: {{ p.dianEstado }})">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                  </svg>
+                </button>
+                }
                 }
 
                 <!-- Anular (LIQUIDADA o PAGADA) -->
