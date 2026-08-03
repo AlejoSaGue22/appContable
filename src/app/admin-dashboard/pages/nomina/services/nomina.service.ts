@@ -190,6 +190,15 @@ export class NominaService {
    return this.http.post<ParametroNominaVersion>(`${this.base}/parametros`, dto).pipe(catchError(this.handleError));
  }
 
+ // ── Configuración Contable de Nómina ─────────────────────────────
+ getConfiguracionesContables(): Observable<any> {
+   return this.http.get(`${this.base}/configuracion-contable`).pipe(catchError(this.handleError));
+ }
+
+ saveConfiguracionContable(area: string, configuracion: any): Observable<any> {
+   return this.http.post(`${this.base}/configuracion-contable`, { area, configuracion }).pipe(catchError(this.handleError));
+ }
+
  // ── Reportes ────────────────────────────────────────────────────
  getReporteCostosCentroCosto(fechaInicio?: string, fechaFin?: string): Observable<any> {
  let params = new HttpParams();

@@ -164,8 +164,64 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
         this.loadInvoice(id);
         this.refreshAsientoTrigger.update((v) => v + 1);
       } else {
-        this.loaderservice.hide();
+        this.activateRoute.queryParams.subscribe((queryParams) => {
+          const cloneFrom = queryParams['cloneFrom'];
+          if (cloneFrom) {
+            this.headTitle.title = 'Clonar Factura de Venta';
+            this.headTitle.slog = 'Se crea nueva factura basada en factura existente';
+            this.loadInvoiceForClone(cloneFrom);
+          } else {
+            this.loaderservice.hide();
+          }
+        });
       }
+    });
+  }
+
+  loadInvoiceForClone(id: string): void {
+    this.ventaServices.getInvoiceById(id).subscribe({
+      next: (response) => {
+        const invoice = response.data[0];
+        const cliente = invoice.client;
+        const nombreDisplay = cliente.razonSocial?.trim()
+          ? cliente.razonSocial
+          : `${cliente.nombre || ''} ${cliente.apellido || ''}`.trim();
+        const abreviatura = cliente.tipoDocumentoRel?.abreviatura || '';
+
+        this.formVentas.patchValue({
+          cliente: invoice.clientId,
+          tipoFactura: invoice.tipoFactura || '',
+          tipoDocumento: cliente.tipoDocumento,
+          identificacion: abreviatura
+            ? `${abreviatura} - ${cliente.numeroDocumento}`
+            : cliente.numeroDocumento,
+          clienteSearch: nombreDisplay,
+          contacto: cliente.email,
+          vendedor: invoice.vendedor,
+          canal: invoice.canalVenta,
+          fecha: new Date().toISOString().substring(0, 10),
+          formaPago: invoice.formaPago,
+          metodoPago: invoice.metodoPago,
+          cuentaBancariaId: (invoice as any).cuentaBancariaId || '',
+          fechaVencimiento: invoice.fechaVencimiento,
+        });
+
+        const clonedItems = (invoice.items as ItemFactura[]).map((item) => ({
+          ...item,
+          id: this.generateUUID(),
+        }));
+        this.productSeleccionados.set(clonedItems);
+        this.calcularTotal();
+
+        if (invoice.clientId) {
+          this.cargarAnticiposDisponibles(invoice.clientId);
+        }
+        this.loaderservice.hide();
+      },
+      error: (err) => {
+        this.notificacionService.error('Error al cargar factura para clonar', 'Error');
+        this.loaderservice.hide();
+      },
     });
   }
 

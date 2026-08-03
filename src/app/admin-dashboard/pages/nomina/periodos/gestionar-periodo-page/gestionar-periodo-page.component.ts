@@ -3,7 +3,9 @@ import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NominaService } from '../../services/nomina.service';
-import { PeriodoNomina, Empleado, PeriodoEmpleado } from '../../interfaces/nomina.interface';
+import { PdfDesprendibleService } from '../../services/pdf-desprendible.service';
+import { EmpresaService } from '@dashboard/services/empresa.service';
+import { PeriodoNomina, Empleado, PeriodoEmpleado, Liquidacion } from '../../interfaces/nomina.interface';
 import { ConceptoPeriodoPopoverComponent } from '../components/concepto-periodo-popover/concepto-periodo-popover.component';
 import { HeaderTitlePageComponent } from '@dashboard/components/header-title-page/header-title-page.component';
 import { NotificationService } from '@shared/services/notification.service';
@@ -26,6 +28,8 @@ export default class GestionarPeriodoPageComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private nominaService = inject(NominaService);
+  private pdfService = inject(PdfDesprendibleService);
+  private empresaService = inject(EmpresaService);
   private notification = inject(NotificationService);
   private loader = inject(LoaderService);
 
@@ -35,6 +39,7 @@ export default class GestionarPeriodoPageComponent implements OnInit {
   selectedIds = signal<Set<string>>(new Set());
   searchQuery = signal('');
   loading = signal(true);
+  empresa = signal<any>(null);
 
   // Popover state
   showPopover = signal(false);
@@ -100,6 +105,13 @@ export default class GestionarPeriodoPageComponent implements OnInit {
       this.router.navigate(['/panel/nomina/periodos']);
       return;
     }
+
+    this.empresaService.getEmpresa().subscribe({
+      next: (res: any) => {
+        this.empresa.set(res?.data || res);
+      },
+      error: () => { },
+    });
 
     try {
       const p = await this.nominaService.getPeriodo(id).toPromise();
@@ -214,5 +226,55 @@ export default class GestionarPeriodoPageComponent implements OnInit {
     } finally {
       this.loader.hide();
     }
+  }
+
+  async descargarDesprendibles() {
+    const p = this.periodo();
+    if (!p) return;
+
+    const ids = Array.from(this.selectedIds());
+    if (ids.length === 0) {
+      this.notification.error('Seleccione al menos un empleado para descargar desprendibles');
+      return;
+    }
+
+    this.loader.show();
+    try {
+      const liquidaciones = await this.nominaService.getLiquidaciones(p.id).toPromise();
+      if (!liquidaciones || liquidaciones.length === 0) {
+        this.notification.warning('El período no tiene liquidaciones. Debe liquidar la nómina primero.');
+        this.loader.hide();
+        return;
+      }
+
+      const selectedLiquidaciones = liquidaciones.filter(l => ids.includes(l.empleadoId));
+      if (selectedLiquidaciones.length === 0) {
+        this.notification.warning('Los empleados seleccionados no tienen liquidaciones en este período.');
+        this.loader.hide();
+        return;
+      }
+
+      let count = 0;
+      for (const liq of selectedLiquidaciones) {
+        try {
+          this.pdfService.generarDesprendible(liq, p, this.empresa());
+          count++;
+        } catch (err) {
+          console.error(`Error generando desprendible para ${liq.empleadoId}`, err);
+        }
+      }
+
+      this.notification.success(`${count} desprendido(s) generado(s) exitosamente`);
+    } catch (err: any) {
+      this.notification.error('Error al descargar desprendibles', err?.message);
+    } finally {
+      this.loader.hide();
+    }
+  }
+
+  verDetalleEmpleado(empleadoId: string) {
+    const p = this.periodo();
+    if (!p) return;
+    this.router.navigate(['/panel/nomina/periodos', p.id, 'empleado', empleadoId]);
   }
 }

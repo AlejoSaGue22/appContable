@@ -105,6 +105,7 @@
             <th class="text-center">Documento</th>
             <th class="text-center">Nombre Completo</th>
             <th class="text-center">Cargo</th>
+            <th class="text-center">Área</th>
             <th class="text-right">Salario Base</th>
             <th class="text-center">EPS</th>
             <th class="text-center">Estado</th>
@@ -127,6 +128,17 @@
             </td>
             <td class="text-center text-slate-600">
               {{ emp.cargo?.nombre || '-' }}
+            </td>
+            <td class="text-center">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase border border-slate-100"
+                [class.bg-blue-50]="emp.area === 'ADMINISTRATIVA' || !emp.area"
+                [class.text-blue-600]="emp.area === 'ADMINISTRATIVA' || !emp.area"
+                [class.bg-teal-50]="emp.area === 'OPERATIVA'"
+                [class.text-teal-600]="emp.area === 'OPERATIVA'"
+                [class.bg-purple-50]="emp.area === 'VENTAS'"
+                [class.text-purple-600]="emp.area === 'VENTAS'">
+                {{ emp.area || 'ADMINISTRATIVA' }}
+              </span>
             </td>
             <td class="text-right tabular-nums">
               <span class="font-semibold text-slate-900">{{

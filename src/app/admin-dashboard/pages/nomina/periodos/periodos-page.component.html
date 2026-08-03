@@ -31,16 +31,6 @@
   />
   }
 
-  <!-- Modal: Detalle de Liquidación -->
-  @if (showDetalleModal() && selectedPeriodo()) {
-  <app-detalle-liquidacion-modal
-    [periodo]="selectedPeriodo()!"
-    [liquidaciones]="liquidaciones()"
-    [pagos]="pagos()"
-    (close)="showDetalleModal.set(false)"
-  />
-  }
-
   <!-- Modal: Pagar Nómina -->
   @if (showPagoModal() && periodoPagar()) {
   <app-pago-modal

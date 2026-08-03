@@ -9,42 +9,46 @@ import { CentrosCostosComponent } from "./pages/centros-costos/centros-costos.co
 import { TipoComprobantesComponent } from "./pages/tipo-comprobantes/tipo-comprobantes.component";
 
 const configuracionesRoutes: Routes = [
- {
- path: '',
- component: ConfiguracionMenuComponent
- },
- {
- path: 'empresa',
- component: EmpresaComponent
- },
- {
- path: 'impuestos',
- component: ImpuestosComponent
- },
- {
- path: 'vendedores',
- component: VendedoresComponent
- },
- {
- path: 'parametrizacion-contable',
- component: ParametrizacionContable
- },
- {
- path: 'cargos',
- component: CargosComponent
- },
- {
- path: 'centros-costos',
- component: CentrosCostosComponent
- },
- {
- path: 'tipos-comprobantes',
- component: TipoComprobantesComponent
- },
- {
- path: '**',
- redirectTo: ''
- }
+    {
+        path: '',
+        component: ConfiguracionMenuComponent
+    },
+    {
+        path: 'empresa',
+        component: EmpresaComponent
+    },
+    {
+        path: 'impuestos',
+        component: ImpuestosComponent
+    },
+    {
+        path: 'vendedores',
+        component: VendedoresComponent
+    },
+    {
+        path: 'parametrizacion-contable',
+        component: ParametrizacionContable
+    },
+    {
+        path: 'cargos',
+        component: CargosComponent
+    },
+    {
+        path: 'centros-costos',
+        component: CentrosCostosComponent
+    },
+    {
+        path: 'tipos-comprobantes',
+        component: TipoComprobantesComponent
+    },
+    {
+        path: 'configuracion-contable',
+        loadComponent: () => import('./pages/configuracion-contable-nomina/configuracion-contable-nomina.component').then(m => m.ConfiguracionContableNominaComponent)
+    },
+    {
+        path: '**',
+        redirectTo: ''
+    }
 ];
 
 export default configuracionesRoutes;

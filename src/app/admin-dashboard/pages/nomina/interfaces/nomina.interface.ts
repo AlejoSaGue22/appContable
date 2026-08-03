@@ -9,6 +9,7 @@ export interface Empleado {
   email?: string;
   telefono?: string;
   direccion?: string;
+  area?: 'ADMINISTRATIVA' | 'OPERATIVA' | 'VENTAS';
   centroCosto?: CentroCosto;
   centroCostoId?: string;
   fechaIngreso: string;
@@ -48,6 +49,7 @@ export interface CreateEmpleadoDto {
   email?: string;
   telefono?: string;
   direccion?: string;
+  area?: 'ADMINISTRATIVA' | 'OPERATIVA' | 'VENTAS';
   centroCostoId?: string;
   fechaIngreso: string;
   fechaRetiro?: string;

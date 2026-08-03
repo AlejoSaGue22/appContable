@@ -1,6 +1,6 @@
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DianStatus, FormaPago, GetFacturaRequest, InvoiceStatus, TipoFactura } from '@dashboard/interfaces/documento-venta-interface';
 import { PagoHistorial, PaymentStatus } from '@dashboard/interfaces/pagos-interface';
 import { RegistrarPagoModalData } from '@dashboard/pages/pagos/components/modal-registrarpago/modal-registrarpago.component';
@@ -33,6 +33,7 @@ export class InvoiceDetailsComponent {
     sendingEmail = false;
 
     private printService = inject(PrintService);
+    private router = inject(Router);
 
     constructor(
         private facturasService: ComprobantesVentasService,
@@ -261,6 +262,14 @@ export class InvoiceDetailsComponent {
                 this.notificationService.error(message || 'Ocurrió un error inesperado al enviar el email', 'Error');
                 this.sendingEmail = false;
             }
+        });
+    }
+
+    clonarFactura(): void {
+        const f = this.factura();
+        if (!f) return;
+        this.router.navigate(['/panel/ventas/comprobantes/new-Item'], {
+            queryParams: { cloneFrom: f.id }
         });
     }
 }

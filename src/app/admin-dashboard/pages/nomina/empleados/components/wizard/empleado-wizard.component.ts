@@ -46,7 +46,7 @@ export class EmpleadoWizardComponent implements OnInit {
 
   pasos: Step[] = [
     { numero: 0, titulo: 'Datos Personales', descripcion: 'Identificación y contacto', icono: 'user', color: 'blue', campos: ['tipoDocumento', 'numeroDocumento', 'primerNombre', 'segundoNombre', 'primerApellido', 'segundoApellido', 'email', 'telefono', 'direccion'] },
-    { numero: 1, titulo: 'Contrato', descripcion: 'Información laboral', icono: 'briefcase', color: 'teal', campos: ['tipoContratoId', 'cargoId', 'centroCostoId', 'salarioBase', 'fechaIngreso', 'fechaRetiro', 'salarioIntegral', 'auxilioTransporte'] },
+    { numero: 1, titulo: 'Contrato', descripcion: 'Información laboral', icono: 'briefcase', color: 'teal', campos: ['tipoContratoId', 'cargoId', 'centroCostoId', 'area', 'salarioBase', 'fechaIngreso', 'fechaRetiro', 'salarioIntegral', 'auxilioTransporte'] },
     { numero: 2, titulo: 'Afiliaciones', descripcion: 'Seguridad social', icono: 'shield', color: 'violet', campos: ['epsId', 'afpId', 'ccfId', 'arlNivelRiesgo'] },
     { numero: 3, titulo: 'Datos de Pago', descripcion: 'Método y cuenta bancaria', icono: 'credit-card', color: 'amber', campos: ['metodoPago', 'bancoId', 'tipoCuentaBancaria', 'numeroCuentaBancaria'] },
   ];
@@ -64,6 +64,7 @@ export class EmpleadoWizardComponent implements OnInit {
     tipoContratoId: ['', Validators.required],
     cargoId: [''],
     centroCostoId: [''],
+    area: ['ADMINISTRATIVA', Validators.required],
     salarioBase: [0, [Validators.required, Validators.min(1)]],
     fechaIngreso: ['', Validators.required],
     fechaRetiro: [''],

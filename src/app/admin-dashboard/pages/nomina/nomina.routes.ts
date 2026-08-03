@@ -26,6 +26,14 @@ export default [
         loadComponent: () => import('./periodos/gestionar-periodo-page/gestionar-periodo-page.component'),
     },
     {
+        path: 'periodos/:id/detalle',
+        loadComponent: () => import('./periodos/periodo-detalle-page/periodo-detalle-page.component'),
+    },
+    {
+        path: 'periodos/:id/empleado/:empleadoId',
+        loadComponent: () => import('./periodos/empleado-detalle-page/empleado-detalle-page.component'),
+    },
+    {
         path: 'configuracion',
         loadComponent: () => import('./configuracion/configuracion-page.component'),
     },

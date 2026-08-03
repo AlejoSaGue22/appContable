@@ -35,8 +35,8 @@ export class ConfiguracionMenuComponent {
         { label: 'Datos de Empresa', route: 'empresa' },
         // { label: 'Usuarios y Permisos', route: 'usuarios' },
         // { label: 'Mi perfil', route: 'perfil' },
-        { label: 'Centros de costos', route: 'centros-costos' },
-        { label: 'Cargos', route: 'cargos' },
+        // { label: 'Centros de costos', route: 'centros-costos' },
+        // { label: 'Cargos', route: 'cargos' },
       ],
     },
     {
@@ -86,6 +86,17 @@ export class ConfiguracionMenuComponent {
         // { label: 'Numeraciones contables', route: 'numeraciones-contables' },
       ],
     },
+    {
+      title: 'Nómina',
+      icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+      description: 'Define opciones avanzadas para el manejo de tu nómina.',
+      options: [
+        { label: 'Parametrización de nómina', route: 'parametrizacion-nomina' },
+        { label: 'Configuración contable', route: 'configuracion-contable' },
+        { label: 'Cargos', route: 'cargos' },
+        { label: 'Centros de costos', route: 'centros-costos' },
+      ],
+    }
     // {
     //   title: 'Notificaciones y correos',
     //   icon: 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
@@ -105,14 +116,5 @@ export class ConfiguracionMenuComponent {
     // { label: 'Variantes de producto', route: 'variantes' },
     // ]
     // },
-    // {
-    // title: 'Integraciones',
-    // icon: 'M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 00-1 1v1a2 2 0 11-4 0v-1a1 1 0 00-1-1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z',
-    // description: 'Encuentra toda la información para que puedas integrar otros sistemas.',
-    // options: [
-    // { label: 'API / Webhooks', route: 'api-webhooks' },
-    // { label: 'Marketplace de Apps', route: 'marketplace' },
-    // ]
-    // }
   ];
 }

@@ -1,0 +1,904 @@
+<div class="p-6 space-y-6 animate-fade-in">
+  <header-title-page [titleHead]="titleHead"></header-title-page>
+  <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+
+  <!-- Loader overlay -->
+  @if (isLoading()) {
+  <div class="flex flex-col items-center justify-center py-24 space-y-4">
+    <svg class="animate-spin h-10 w-10 text-blue-600" viewBox="0 0 24 24" fill="none">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+    </svg>
+    <span class="text-sm font-semibold text-slate-500">Cargando catálogo contable y conceptos de nómina...</span>
+  </div>
+  } @else {
+  <!-- Main layout -->
+  <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mt-6">
+    <!-- Tabs header -->
+    <div class="border-b border-slate-100 bg-slate-50/50 p-4">
+      <nav class="flex space-x-2">
+        <button type="button" (click)="changeTab('ADMINISTRATIVA')"
+          class="px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer transition-all duration-200"
+          [class.bg-blue-600]="activeTab() === 'ADMINISTRATIVA'" [class.text-white]="activeTab() === 'ADMINISTRATIVA'"
+          [class.text-slate-600]="activeTab() !== 'ADMINISTRATIVA'"
+          [class.hover:bg-slate-100]="activeTab() !== 'ADMINISTRATIVA'">
+          Administrativa
+        </button>
+        <button type="button" (click)="changeTab('OPERATIVA')"
+          class="px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer transition-all duration-200"
+          [class.bg-blue-600]="activeTab() === 'OPERATIVA'" [class.text-white]="activeTab() === 'OPERATIVA'"
+          [class.text-slate-600]="activeTab() !== 'OPERATIVA'" [class.hover:bg-slate-100]="activeTab() !== 'OPERATIVA'">
+          Operativa
+        </button>
+        <button type="button" (click)="changeTab('VENTAS')"
+          class="px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer transition-all duration-200"
+          [class.bg-blue-600]="activeTab() === 'VENTAS'" [class.text-white]="activeTab() === 'VENTAS'"
+          [class.text-slate-600]="activeTab() !== 'VENTAS'" [class.hover:bg-slate-100]="activeTab() !== 'VENTAS'">
+          Ventas
+        </button>
+      </nav>
+    </div>
+
+    <!-- Tab content -->
+    <div class="p-6">
+      <form [formGroup]="form" (ngSubmit)="save()" class="space-y-8">
+        <!-- Active area scope -->
+        <div [formGroupName]="activeTab()" class="space-y-8 animate-fade-in">
+
+          <!-- SECTION: Obligación Laboral (Pasivo General) -->
+          <div class="space-y-4">
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+              <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-slate-800">Obligación Laboral (Neto a Pagar)</h3>
+                <p class="text-xs text-slate-400">Cuenta de pasivo que registrará la contrapartida del pago neto de
+                  nómina</p>
+              </div>
+            </div>
+
+            <div [formGroupName]="'cajaBanco'" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="space-y-1.5">
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide">Cuenta Salarios por
+                  Pagar <span class="text-red-400">*</span></label>
+                <select formControlName="cuentaObligacionesLabId"
+                  class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all cursor-pointer">
+                  <option [value]="null">Seleccionar cuenta de pasivo...</option>
+                  @for (c of cuentasPasivos(); track c.id) {
+                  <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- ══════════════════════════════════════════════════════════════ -->
+          <!-- CARD: Devengados                                             -->
+          <!-- ══════════════════════════════════════════════════════════════ -->
+          <div class="border border-emerald-100 rounded-2xl overflow-hidden transition-all duration-300">
+            <!-- Card Header -->
+            <div class="flex items-center justify-between px-5 py-3.5 bg-gradient-to-r from-emerald-50/80 to-emerald-50/30 border-b border-emerald-100">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-800">Devengados</h3>
+                  <p class="text-[11px] text-slate-400">Cuentas contables para salario, auxilio y conceptos devengados</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                @if (!editingDevengados()) {
+                <button type="button" (click)="startEditDevengados()"
+                  class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-emerald-700 bg-white border border-emerald-200 rounded-lg hover:bg-emerald-50 transition-all cursor-pointer">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                  Editar
+                </button>
+                }
+                <button type="button" (click)="toggleCollapseDevengados()"
+                  class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-white/60 transition-all cursor-pointer">
+                  <svg class="w-4 h-4 transition-transform duration-200" [class.rotate-180]="collapsedDevengados()"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Card Body -->
+            @if (!collapsedDevengados()) {
+            <div class="p-5 space-y-4 animate-fade-in" [formGroupName]="'conceptos'">
+
+              <!-- ── VIEW MODE ── -->
+              @if (!editingDevengados()) {
+              <div class="overflow-hidden rounded-xl border border-slate-100">
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="bg-slate-50/80">
+                      <th class="text-left px-4 py-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Concepto</th>
+                      <th class="text-left px-4 py-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cuenta Contable (Gasto / Débito)</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-50">
+                    <!-- Salario Básico -->
+                    <tr class="hover:bg-slate-50/50 transition-colors">
+                      <td class="px-4 py-2.5">
+                        <div class="flex items-center gap-2">
+                          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                          <span class="text-xs font-semibold text-slate-700">Salario Básico</span>
+                          <span class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-slate-100 text-slate-400">FIJO</span>
+                        </div>
+                      </td>
+                      <td class="px-4 py-2.5">
+                        <span class="text-xs text-slate-600"
+                          [class.text-slate-300]="!getConceptoCuentaId('salario')">
+                          {{ getAccountDisplay(getConceptoCuentaId('salario')) }}
+                        </span>
+                      </td>
+                    </tr>
+                    <!-- Auxilio de Transporte -->
+                    <tr class="hover:bg-slate-50/50 transition-colors">
+                      <td class="px-4 py-2.5">
+                        <div class="flex items-center gap-2">
+                          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                          <span class="text-xs font-semibold text-slate-700">Auxilio de Transporte</span>
+                          <span class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-slate-100 text-slate-400">FIJO</span>
+                        </div>
+                      </td>
+                      <td class="px-4 py-2.5">
+                        <span class="text-xs text-slate-600"
+                          [class.text-slate-300]="!getConceptoCuentaId('auxilioTransporte')">
+                          {{ getAccountDisplay(getConceptoCuentaId('auxilioTransporte')) }}
+                        </span>
+                      </td>
+                    </tr>
+                    <!-- Dynamic DEVENGADO concepts -->
+                    @for (concepto of conceptosDevengados(); track concepto.id) {
+                    <tr class="hover:bg-slate-50/50 transition-colors">
+                      <td class="px-4 py-2.5">
+                        <div class="flex items-center gap-2">
+                          <span class="w-1.5 h-1.5 rounded-full bg-emerald-300"></span>
+                          <span class="text-xs font-semibold text-slate-700">{{ concepto.nombre }}</span>
+                        </div>
+                      </td>
+                      <td class="px-4 py-2.5">
+                        <span class="text-xs text-slate-600"
+                          [class.text-slate-300]="!getConceptoCuentaId(concepto.id)">
+                          {{ getAccountDisplay(getConceptoCuentaId(concepto.id)) }}
+                        </span>
+                      </td>
+                    </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+              }
+
+              <!-- ── EDIT MODE ── -->
+              @if (editingDevengados()) {
+              <div class="space-y-3">
+                <!-- Salario Básico (fixed, no remove) -->
+                <div [formGroupName]="'salario'" class="flex items-center gap-3 p-3 bg-slate-50/50 rounded-xl border border-slate-100">
+                  <div class="flex-shrink-0 min-w-[160px]">
+                    <div class="flex items-center gap-2">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                      <span class="text-xs font-bold text-slate-700">Salario Básico</span>
+                      <span class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-slate-100 text-slate-400">FIJO</span>
+                    </div>
+                  </div>
+                  <select formControlName="cuentaId"
+                    class="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all cursor-pointer">
+                    <option [value]="null">Seleccionar cuenta de gasto...</option>
+                    @for (c of cuentasGastos(); track c.id) {
+                    <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
+                    }
+                  </select>
+                  <div class="w-8"></div> <!-- spacer to align with remove buttons -->
+                </div>
+
+                <!-- Auxilio de Transporte (fixed, no remove) -->
+                <div [formGroupName]="'auxilioTransporte'" class="flex items-center gap-3 p-3 bg-slate-50/50 rounded-xl border border-slate-100">
+                  <div class="flex-shrink-0 min-w-[160px]">
+                    <div class="flex items-center gap-2">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                      <span class="text-xs font-bold text-slate-700">Auxilio de Transporte</span>
+                      <span class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-slate-100 text-slate-400">FIJO</span>
+                    </div>
+                  </div>
+                  <select formControlName="cuentaId"
+                    class="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all cursor-pointer">
+                    <option [value]="null">Seleccionar cuenta de gasto...</option>
+                    @for (c of cuentasGastos(); track c.id) {
+                    <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
+                    }
+                  </select>
+                  <div class="w-8"></div>
+                </div>
+
+                <!-- Dynamic DEVENGADO concepts -->
+                @for (concepto of conceptosDevengados(); track concepto.id) {
+                <div [formGroupName]="concepto.id" class="flex items-center gap-3 p-3 rounded-xl border border-slate-100 hover:border-emerald-200 transition-colors">
+                  <div class="flex-shrink-0 min-w-[160px]">
+                    <div class="flex items-center gap-2">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-300"></span>
+                      <span class="text-xs font-semibold text-slate-700">{{ concepto.nombre }}</span>
+                    </div>
+                  </div>
+                  <select formControlName="cuentaId"
+                    class="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all cursor-pointer">
+                    <option [value]="null">Seleccionar cuenta de gasto...</option>
+                    @for (c of cuentasGastos(); track c.id) {
+                    <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
+                    }
+                  </select>
+                  <button type="button" (click)="clearConceptoCuenta(concepto.id)"
+                    class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all cursor-pointer"
+                    title="Limpiar cuenta asignada">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                }
+
+                <!-- Action buttons -->
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                  <button type="button" (click)="cancelEditDevengados()"
+                    class="px-4 py-2 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-all cursor-pointer">
+                    Cancelar
+                  </button>
+                  <button type="button" (click)="editingDevengados.set(false)"
+                    class="px-4 py-2 text-xs font-semibold text-white bg-emerald-600 rounded-lg shadow-sm hover:bg-emerald-700 transition-all cursor-pointer flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Confirmar
+                  </button>
+                </div>
+              </div>
+              }
+
+            </div>
+            }
+          </div>
+
+          <!-- ══════════════════════════════════════════════════════════════ -->
+          <!-- CARD: Deducciones (includes deduccionesTrabajador + conceptos) -->
+          <!-- ══════════════════════════════════════════════════════════════ -->
+          <div class="border border-red-100 rounded-2xl overflow-hidden transition-all duration-300">
+            <!-- Card Header -->
+            <div class="flex items-center justify-between px-5 py-3.5 bg-gradient-to-r from-red-50/80 to-red-50/30 border-b border-red-100">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-800">Deducciones</h3>
+                  <p class="text-[11px] text-slate-400">Retenciones de ley (Salud, Pensión) y conceptos de deducción dinámicos</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                @if (!editingDeducciones()) {
+                <button type="button" (click)="startEditDeducciones()"
+                  class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 transition-all cursor-pointer">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                  Editar
+                </button>
+                }
+                <button type="button" (click)="toggleCollapseDeducciones()"
+                  class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-white/60 transition-all cursor-pointer">
+                  <svg class="w-4 h-4 transition-transform duration-200" [class.rotate-180]="collapsedDeducciones()"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Card Body -->
+            @if (!collapsedDeducciones()) {
+            <div class="p-5 space-y-4 animate-fade-in">
+
+              <!-- ── VIEW MODE ── -->
+              @if (!editingDeducciones()) {
+              <div class="overflow-hidden rounded-xl border border-slate-100">
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="bg-slate-50/80">
+                      <th class="text-left px-4 py-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Concepto</th>
+                      <th class="text-left px-4 py-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cuenta Contable (Pasivo / Crédito)</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-50">
+                    <!-- Deducciones del Trabajador (fijas) -->
+                    <tr class="hover:bg-slate-50/50 transition-colors">
+                      <td class="px-4 py-2.5">
+                        <div class="flex items-center gap-2">
+                          <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+                          <span class="text-xs font-semibold text-slate-700">Salud (4%)</span>
+                          <span class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-slate-100 text-slate-400">LEY</span>
+                        </div>
+                      </td>
+                      <td class="px-4 py-2.5">
+                        <span class="text-xs text-slate-600"
+                          [class.text-slate-300]="!getFormValue('deduccionesTrabajador.salud', 'cuentaPasivoId')">
+                          {{ getAccountDisplay(getFormValue('deduccionesTrabajador.salud', 'cuentaPasivoId')) }}
+                        </span>
+                      </td>
+                    </tr>
+                    <tr class="hover:bg-slate-50/50 transition-colors">
+                      <td class="px-4 py-2.5">
+                        <div class="flex items-center gap-2">
+                          <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+                          <span class="text-xs font-semibold text-slate-700">Pensión (4%)</span>
+                          <span class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-slate-100 text-slate-400">LEY</span>
+                        </div>
+                      </td>
+                      <td class="px-4 py-2.5">
+                        <span class="text-xs text-slate-600"
+                          [class.text-slate-300]="!getFormValue('deduccionesTrabajador.pension', 'cuentaPasivoId')">
+                          {{ getAccountDisplay(getFormValue('deduccionesTrabajador.pension', 'cuentaPasivoId')) }}
+                        </span>
+                      </td>
+                    </tr>
+                    <!-- Dynamic DEDUCCION concepts -->
+                    @for (concepto of conceptosDeducciones(); track concepto.id) {
+                    <tr class="hover:bg-slate-50/50 transition-colors">
+                      <td class="px-4 py-2.5">
+                        <div class="flex items-center gap-2">
+                          <span class="w-1.5 h-1.5 rounded-full bg-red-300"></span>
+                          <span class="text-xs font-semibold text-slate-700">{{ concepto.nombre }}</span>
+                        </div>
+                      </td>
+                      <td class="px-4 py-2.5">
+                        <span class="text-xs text-slate-600"
+                          [class.text-slate-300]="!getConceptoCuentaId(concepto.id)">
+                          {{ getAccountDisplay(getConceptoCuentaId(concepto.id)) }}
+                        </span>
+                      </td>
+                    </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+              }
+
+              <!-- ── EDIT MODE ── -->
+              @if (editingDeducciones()) {
+              <div class="space-y-3">
+                <!-- Deducciones del Trabajador (fijas - from deduccionesTrabajador formGroup) -->
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-1">Retenciones de Ley</div>
+
+                <div [formGroupName]="'deduccionesTrabajador'">
+                  @for (dedKey of ['salud', 'pension']; track dedKey) {
+                  <div [formGroupName]="dedKey" class="flex items-center gap-3 p-3 bg-slate-50/50 rounded-xl border border-slate-100 mb-3">
+                    <div class="flex-shrink-0 min-w-[160px]">
+                      <div class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+                        <span class="text-xs font-bold text-slate-700">{{ dedKey === 'pension' ? 'Pensión (4%)' : 'Salud (4%)' }}</span>
+                        <span class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-slate-100 text-slate-400">LEY</span>
+                      </div>
+                    </div>
+                    <select formControlName="cuentaPasivoId"
+                      class="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-400 transition-all cursor-pointer">
+                      <option [value]="null">Seleccionar cuenta de pasivo...</option>
+                      @for (c of cuentasPasivos(); track c.id) {
+                      <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
+                      }
+                    </select>
+                    <div class="w-8"></div>
+                  </div>
+                  }
+                </div>
+
+                <!-- Dynamic DEDUCCION concepts (from conceptos formGroup) -->
+                @if (conceptosDeducciones().length > 0) {
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-1 pt-2">Conceptos Dinámicos</div>
+                }
+
+                <div [formGroupName]="'conceptos'">
+                  @for (concepto of conceptosDeducciones(); track concepto.id) {
+                  <div [formGroupName]="concepto.id" class="flex items-center gap-3 p-3 rounded-xl border border-slate-100 hover:border-red-200 transition-colors mb-3">
+                    <div class="flex-shrink-0 min-w-[160px]">
+                      <div class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-red-300"></span>
+                        <span class="text-xs font-semibold text-slate-700">{{ concepto.nombre }}</span>
+                      </div>
+                    </div>
+                    <select formControlName="cuentaId"
+                      class="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-400 transition-all cursor-pointer">
+                      <option [value]="null">Seleccionar cuenta de pasivo...</option>
+                      @for (c of cuentasPasivos(); track c.id) {
+                      <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
+                      }
+                    </select>
+                    <button type="button" (click)="clearConceptoCuenta(concepto.id)"
+                      class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all cursor-pointer"
+                      title="Limpiar cuenta asignada">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                  }
+                </div>
+
+                <!-- Action buttons -->
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                  <button type="button" (click)="cancelEditDeducciones()"
+                    class="px-4 py-2 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-all cursor-pointer">
+                    Cancelar
+                  </button>
+                  <button type="button" (click)="editingDeducciones.set(false)"
+                    class="px-4 py-2 text-xs font-semibold text-white bg-red-500 rounded-lg shadow-sm hover:bg-red-600 transition-all cursor-pointer flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Confirmar
+                  </button>
+                </div>
+              </div>
+              }
+
+            </div>
+            }
+          </div>
+
+          <!-- ══════════════════════════════════════════════════════════════ -->
+          <!-- CARD: Aportes del Empleador (Obligatorios)                    -->
+          <!-- ══════════════════════════════════════════════════════════════ -->
+          <div class="border border-blue-100 rounded-2xl overflow-hidden transition-all duration-300">
+            <!-- Card Header -->
+            <div class="flex items-center justify-between px-5 py-3.5 bg-gradient-to-r from-blue-50/80 to-blue-50/30 border-b border-blue-100">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-800">Aportes del Empleador (Obligatorios)</h3>
+                  <p class="text-[11px] text-slate-400">Pensión (12%), ARL y Caja de Compensación. Gasto (Débito) + Pasivo (Crédito)</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                @if (!editingAportes()) {
+                <button type="button" (click)="startEditAportes()"
+                  class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-blue-700 bg-white border border-blue-200 rounded-lg hover:bg-blue-50 transition-all cursor-pointer">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                  Editar
+                </button>
+                }
+                <button type="button" (click)="toggleCollapseAportes()"
+                  class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-white/60 transition-all cursor-pointer">
+                  <svg class="w-4 h-4 transition-transform duration-200" [class.rotate-180]="collapsedAportes()"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Card Body -->
+            @if (!collapsedAportes()) {
+            <div class="p-5 space-y-4 animate-fade-in" [formGroupName]="'aportesEmpleador'">
+
+              <!-- ── VIEW MODE ── -->
+              @if (!editingAportes()) {
+              <div class="overflow-hidden rounded-xl border border-slate-100">
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="bg-slate-50/80">
+                      <th class="text-left px-4 py-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Concepto</th>
+                      <th class="text-left px-4 py-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cuenta de Gasto (Débito)</th>
+                      <th class="text-left px-4 py-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cuenta por Pagar (Crédito)</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-50">
+                    @for (ssKey of ['pension', 'arl', 'ccf']; track ssKey) {
+                    <tr class="hover:bg-slate-50/50 transition-colors">
+                      <td class="px-4 py-2.5">
+                        <div class="flex items-center gap-2">
+                          <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                          <span class="text-xs font-semibold text-slate-700">
+                            {{ ssKey === 'ccf' ? 'Caja Compensación (4%)' : (ssKey === 'pension' ? 'Pensión (12%)' : 'ARL') }}
+                          </span>
+                        </div>
+                      </td>
+                      <td class="px-4 py-2.5">
+                        <span class="text-xs text-slate-600"
+                          [class.text-slate-300]="!getFormValue('aportesEmpleador.' + ssKey, 'cuentaGastoId')">
+                          {{ getAccountDisplay(getFormValue('aportesEmpleador.' + ssKey, 'cuentaGastoId')) }}
+                        </span>
+                      </td>
+                      <td class="px-4 py-2.5">
+                        <span class="text-xs text-slate-600"
+                          [class.text-slate-300]="!getFormValue('aportesEmpleador.' + ssKey, 'cuentaPasivoId')">
+                          {{ getAccountDisplay(getFormValue('aportesEmpleador.' + ssKey, 'cuentaPasivoId')) }}
+                        </span>
+                      </td>
+                    </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+              }
+
+              <!-- ── EDIT MODE ── -->
+              @if (editingAportes()) {
+              <div class="space-y-3">
+                @for (ssKey of ['pension', 'arl', 'ccf']; track ssKey) {
+                <div [formGroupName]="ssKey" class="p-3 rounded-xl border border-slate-100 hover:border-blue-200 transition-colors space-y-3">
+                  <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                    <span class="text-xs font-bold text-slate-700">
+                      {{ ssKey === 'ccf' ? 'Caja Compensación (4%)' : (ssKey === 'pension' ? 'Pensión (12%)' : 'ARL') }}
+                    </span>
+                  </div>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="space-y-1">
+                      <label class="block text-[9px] font-bold text-slate-400 uppercase">Cuenta de Gasto (Débito)</label>
+                      <select formControlName="cuentaGastoId"
+                        class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all cursor-pointer">
+                        <option [value]="null">Seleccionar cuenta de gasto...</option>
+                        @for (c of cuentasGastos(); track c.id) {
+                        <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
+                        }
+                      </select>
+                    </div>
+                    <div class="space-y-1">
+                      <label class="block text-[9px] font-bold text-slate-400 uppercase">Cuenta por Pagar (Crédito)</label>
+                      <select formControlName="cuentaPasivoId"
+                        class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all cursor-pointer">
+                        <option [value]="null">Seleccionar cuenta de pasivo...</option>
+                        @for (c of cuentasPasivos(); track c.id) {
+                        <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
+                        }
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                }
+
+                <!-- Action buttons -->
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                  <button type="button" (click)="cancelEditAportes()"
+                    class="px-4 py-2 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-all cursor-pointer">
+                    Cancelar
+                  </button>
+                  <button type="button" (click)="editingAportes.set(false)"
+                    class="px-4 py-2 text-xs font-semibold text-white bg-blue-600 rounded-lg shadow-sm hover:bg-blue-700 transition-all cursor-pointer flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Confirmar
+                  </button>
+                </div>
+              </div>
+              }
+
+            </div>
+            }
+          </div>
+
+          <!-- ══════════════════════════════════════════════════════════════ -->
+          <!-- CARD: Aportes No Exonerados (Art. 114-1 E.T.)                -->
+          <!-- ══════════════════════════════════════════════════════════════ -->
+          <div class="border border-amber-200 rounded-2xl overflow-hidden transition-all duration-300">
+            <!-- Card Header -->
+            <div class="flex items-center justify-between px-5 py-3.5 bg-gradient-to-r from-amber-50/80 to-amber-50/30 border-b border-amber-200">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-800">Aportes No Exonerados (Art. 114-1 E.T.)</h3>
+                  <p class="text-[11px] text-slate-400">Solo aplican cuando el IBC ≥ 10 SMMLV. El sistema los omite automáticamente para empleados exonerados.</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                @if (!editingNoExonerados()) {
+                <button type="button" (click)="startEditNoExonerados()"
+                  class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-amber-700 bg-white border border-amber-200 rounded-lg hover:bg-amber-50 transition-all cursor-pointer">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                  Editar
+                </button>
+                }
+                <button type="button" (click)="toggleCollapseNoExonerados()"
+                  class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-white/60 transition-all cursor-pointer">
+                  <svg class="w-4 h-4 transition-transform duration-200" [class.rotate-180]="collapsedNoExonerados()"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Card Body -->
+            @if (!collapsedNoExonerados()) {
+            <div class="p-5 space-y-4 animate-fade-in" [formGroupName]="'aportesEmpleador'">
+
+              <!-- ── VIEW MODE ── -->
+              @if (!editingNoExonerados()) {
+              <div class="overflow-hidden rounded-xl border border-amber-100">
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="bg-amber-50/50">
+                      <th class="text-left px-4 py-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Concepto</th>
+                      <th class="text-left px-4 py-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cuenta de Gasto (Débito)</th>
+                      <th class="text-left px-4 py-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cuenta por Pagar (Crédito)</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-amber-50">
+                    @for (ssKey of ['saludPatronal', 'sena', 'icbf']; track ssKey) {
+                    <tr class="hover:bg-amber-50/30 transition-colors">
+                      <td class="px-4 py-2.5">
+                        <div class="flex items-center gap-2">
+                          <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                          <span class="text-xs font-semibold text-slate-700">
+                            {{ ssKey === 'saludPatronal' ? 'Salud Patronal (8.5%)' : (ssKey === 'sena' ? 'SENA (2%)' : 'ICBF (3%)') }}
+                          </span>
+                        </div>
+                      </td>
+                      <td class="px-4 py-2.5">
+                        <span class="text-xs text-slate-600"
+                          [class.text-slate-300]="!getFormValue('aportesEmpleador.' + ssKey, 'cuentaGastoId')">
+                          {{ getAccountDisplay(getFormValue('aportesEmpleador.' + ssKey, 'cuentaGastoId')) }}
+                        </span>
+                      </td>
+                      <td class="px-4 py-2.5">
+                        <span class="text-xs text-slate-600"
+                          [class.text-slate-300]="!getFormValue('aportesEmpleador.' + ssKey, 'cuentaPasivoId')">
+                          {{ getAccountDisplay(getFormValue('aportesEmpleador.' + ssKey, 'cuentaPasivoId')) }}
+                        </span>
+                      </td>
+                    </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+              }
+
+              <!-- ── EDIT MODE ── -->
+              @if (editingNoExonerados()) {
+              <div class="space-y-3">
+                @for (ssKey of ['saludPatronal', 'sena', 'icbf']; track ssKey) {
+                <div [formGroupName]="ssKey" class="p-3 rounded-xl border border-amber-100 bg-amber-50/20 hover:border-amber-200 transition-colors space-y-3">
+                  <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                    <span class="text-xs font-bold text-slate-700">
+                      {{ ssKey === 'saludPatronal' ? 'Salud Patronal (8.5%)' : (ssKey === 'sena' ? 'SENA (2%)' : 'ICBF (3%)') }}
+                    </span>
+                  </div>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="space-y-1">
+                      <label class="block text-[9px] font-bold text-slate-400 uppercase">Cuenta de Gasto (Débito)</label>
+                      <select formControlName="cuentaGastoId"
+                        class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 transition-all cursor-pointer">
+                        <option [value]="null">Seleccionar cuenta de gasto...</option>
+                        @for (c of cuentasGastos(); track c.id) {
+                        <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
+                        }
+                      </select>
+                    </div>
+                    <div class="space-y-1">
+                      <label class="block text-[9px] font-bold text-slate-400 uppercase">Cuenta por Pagar (Crédito)</label>
+                      <select formControlName="cuentaPasivoId"
+                        class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 transition-all cursor-pointer">
+                        <option [value]="null">Seleccionar cuenta de pasivo...</option>
+                        @for (c of cuentasPasivos(); track c.id) {
+                        <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
+                        }
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                }
+
+                <!-- Action buttons -->
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                  <button type="button" (click)="cancelEditNoExonerados()"
+                    class="px-4 py-2 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-all cursor-pointer">
+                    Cancelar
+                  </button>
+                  <button type="button" (click)="editingNoExonerados.set(false)"
+                    class="px-4 py-2 text-xs font-semibold text-white bg-amber-600 rounded-lg shadow-sm hover:bg-amber-700 transition-all cursor-pointer flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Confirmar
+                  </button>
+                </div>
+              </div>
+              }
+
+            </div>
+            }
+          </div>
+
+          <!-- ══════════════════════════════════════════════════════════════ -->
+          <!-- CARD: Provisiones de Prestaciones Sociales                   -->
+          <!-- ══════════════════════════════════════════════════════════════ -->
+          <div class="border border-violet-100 rounded-2xl overflow-hidden transition-all duration-300">
+            <!-- Card Header -->
+            <div class="flex items-center justify-between px-5 py-3.5 bg-gradient-to-r from-violet-50/80 to-violet-50/30 border-b border-violet-100">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center">
+                  <svg class="w-4 h-4 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-800">Provisiones de Prestaciones Sociales</h3>
+                  <p class="text-[11px] text-slate-400">Provisiones mensuales: Prima, Cesantías, Intereses sobre Cesantías, Vacaciones</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                @if (!editingProvisiones()) {
+                <button type="button" (click)="startEditProvisiones()"
+                  class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-violet-700 bg-white border border-violet-200 rounded-lg hover:bg-violet-50 transition-all cursor-pointer">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  </svg>
+                  Editar
+                </button>
+                }
+                <button type="button" (click)="toggleCollapseProvisiones()"
+                  class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-white/60 transition-all cursor-pointer">
+                  <svg class="w-4 h-4 transition-transform duration-200" [class.rotate-180]="collapsedProvisiones()"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Card Body -->
+            @if (!collapsedProvisiones()) {
+            <div class="p-5 space-y-4 animate-fade-in" [formGroupName]="'provisiones'">
+
+              <!-- ── VIEW MODE ── -->
+              @if (!editingProvisiones()) {
+              <div class="overflow-hidden rounded-xl border border-slate-100">
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="bg-slate-50/80">
+                      <th class="text-left px-4 py-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Prestación</th>
+                      <th class="text-left px-4 py-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cuenta de Gasto (Débito)</th>
+                      <th class="text-left px-4 py-2.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cuenta de Provisión (Crédito)</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-50">
+                    @for (provKey of ['prima', 'cesantias', 'interesesCesantias', 'vacaciones']; track provKey) {
+                    <tr class="hover:bg-slate-50/50 transition-colors">
+                      <td class="px-4 py-2.5">
+                        <div class="flex items-center gap-2">
+                          <span class="w-1.5 h-1.5 rounded-full bg-violet-400"></span>
+                          <span class="text-xs font-semibold text-slate-700 capitalize">
+                            {{ provKey === 'interesesCesantias' ? 'Intereses sobre Cesantías' : provKey }}
+                          </span>
+                        </div>
+                      </td>
+                      <td class="px-4 py-2.5">
+                        <span class="text-xs text-slate-600"
+                          [class.text-slate-300]="!getFormValue('provisiones.' + provKey, 'cuentaGastoId')">
+                          {{ getAccountDisplay(getFormValue('provisiones.' + provKey, 'cuentaGastoId')) }}
+                        </span>
+                      </td>
+                      <td class="px-4 py-2.5">
+                        <span class="text-xs text-slate-600"
+                          [class.text-slate-300]="!getFormValue('provisiones.' + provKey, 'cuentaPasivoId')">
+                          {{ getAccountDisplay(getFormValue('provisiones.' + provKey, 'cuentaPasivoId')) }}
+                        </span>
+                      </td>
+                    </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+              }
+
+              <!-- ── EDIT MODE ── -->
+              @if (editingProvisiones()) {
+              <div class="space-y-3">
+                @for (provKey of ['prima', 'cesantias', 'interesesCesantias', 'vacaciones']; track provKey) {
+                <div [formGroupName]="provKey" class="p-3 rounded-xl border border-slate-100 hover:border-violet-200 transition-colors space-y-3">
+                  <div class="flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-violet-400"></span>
+                    <span class="text-xs font-bold text-slate-700 capitalize">
+                      {{ provKey === 'interesesCesantias' ? 'Intereses sobre Cesantías' : provKey }}
+                    </span>
+                  </div>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="space-y-1">
+                      <label class="block text-[9px] font-bold text-slate-400 uppercase">Cuenta de Gasto (Débito)</label>
+                      <select formControlName="cuentaGastoId"
+                        class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all cursor-pointer">
+                        <option [value]="null">Seleccionar cuenta de gasto...</option>
+                        @for (c of cuentasGastos(); track c.id) {
+                        <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
+                        }
+                      </select>
+                    </div>
+                    <div class="space-y-1">
+                      <label class="block text-[9px] font-bold text-slate-400 uppercase">Cuenta de Provisión (Crédito)</label>
+                      <select formControlName="cuentaPasivoId"
+                        class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all cursor-pointer">
+                        <option [value]="null">Seleccionar cuenta de pasivo...</option>
+                        @for (c of cuentasPasivos(); track c.id) {
+                        <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
+                        }
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                }
+
+                <!-- Action buttons -->
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                  <button type="button" (click)="cancelEditProvisiones()"
+                    class="px-4 py-2 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-all cursor-pointer">
+                    Cancelar
+                  </button>
+                  <button type="button" (click)="editingProvisiones.set(false)"
+                    class="px-4 py-2 text-xs font-semibold text-white bg-violet-600 rounded-lg shadow-sm hover:bg-violet-700 transition-all cursor-pointer flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Confirmar
+                  </button>
+                </div>
+              </div>
+              }
+
+            </div>
+            }
+          </div>
+
+        </div>
+
+        <!-- Save Action Bar -->
+        <div class="flex justify-end gap-3 pt-6 border-t border-slate-100">
+          <button type="button" [routerLink]="['/panel/admin/settings']"
+            class="px-6 py-2.5 text-sm font-semibold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all cursor-pointer">
+            Regresar
+          </button>
+          <button type="submit" [disabled]="isSaving()"
+            class="px-6 py-2.5 text-sm font-semibold bg-blue-600 text-white rounded-xl shadow-lg hover:bg-blue-700 transition-all cursor-pointer flex items-center gap-2">
+            {{ isSaving() ? 'Guardando...' : 'Guardar Configuración ' + (activeTab() | titlecase) }}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+  }
+</div>

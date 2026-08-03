@@ -2,9 +2,8 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { NominaService } from '../services/nomina.service';
-import { PeriodoNomina, Liquidacion, PagoNomina } from '../interfaces/nomina.interface';
+import { PeriodoNomina } from '../interfaces/nomina.interface';
 import { PeriodoFormModalComponent } from './components/periodo-form-modal/periodo-form-modal.component';
-import { DetalleLiquidacionModalComponent } from './components/detalle-liquidacion-modal/detalle-liquidacion-modal.component';
 import { PeriodosTableComponent } from './components/periodos-table/periodos-table.component';
 import { PagoModalComponent } from './components/pago-modal/pago-modal.component';
 import { HeaderTitlePageComponent } from '@dashboard/components/header-title-page/header-title-page.component';
@@ -19,7 +18,6 @@ import { PaginationService } from '@shared/components/pagination/pagination.serv
   imports: [
     CommonModule,
     PeriodoFormModalComponent,
-    DetalleLiquidacionModalComponent,
     PeriodosTableComponent,
     PagoModalComponent,
     HeaderTitlePageComponent,
@@ -35,14 +33,10 @@ export default class PeriodosPageComponent {
   private router = inject(Router);
 
   periodos = signal<PeriodoNomina[]>([]);
-  liquidaciones = signal<Liquidacion[]>([]);
-  pagos = signal<PagoNomina[]>([]);
-  selectedPeriodo = signal<PeriodoNomina | null>(null);
   periodoPagar = signal<PeriodoNomina | null>(null);
   periodoGestionar = signal<PeriodoNomina | null>(null);
 
   showFormModal = signal(false);
-  showDetalleModal = signal(false);
   showPagoModal = signal(false);
   showEmpleadosModal = signal(false);
 
@@ -126,25 +120,7 @@ export default class PeriodosPageComponent {
   }
 
   verDetalle(periodo: PeriodoNomina) {
-    this.selectedPeriodo.set(periodo);
-    this.loader.show();
-    this.nominaService.getLiquidaciones(periodo.id).subscribe({
-      next: (res) => {
-        this.liquidaciones.set(res);
-        this.nominaService.getPagosByPeriodo(periodo.id).subscribe({
-          next: (pagos) => {
-            this.pagos.set(pagos);
-            this.showDetalleModal.set(true);
-            this.loader.hide();
-          },
-          error: () => this.loader.hide(),
-        });
-      },
-      error: (err) => {
-        this.notification.error('Error al cargar detalle', err);
-        this.loader.hide();
-      },
-    });
+    this.router.navigate(['/panel/nomina/periodos', periodo.id, 'detalle']);
   }
 
   prepararPago(periodo: PeriodoNomina) {
