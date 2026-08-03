@@ -16,6 +16,7 @@ export class ConceptoPeriodoPopoverComponent implements OnInit {
   @Input({ required: true }) periodoId!: string;
   @Input({ required: true }) empleado!: Empleado;
   @Input() tipoView: 'DEVENGADO' | 'DEDUCCION' = 'DEVENGADO';
+  @Input() deduccionesLegales: { salud: number; pension: number; retefuente: number } | null = null;
 
   close = output<void>();
   updated = output<void>();
@@ -55,6 +56,8 @@ export class ConceptoPeriodoPopoverComponent implements OnInit {
     let total = 0;
     if (this.tipoView === 'DEVENGADO') {
       total += Number(this.empleado.salarioBase || 0);
+    } else if (this.tipoView === 'DEDUCCION' && this.deduccionesLegales) {
+      total += this.deduccionesLegales.salud + this.deduccionesLegales.pension + this.deduccionesLegales.retefuente;
     }
     for (const item of this.recurrentesFiltrados()) total += Number(item.valor);
     for (const item of this.ocasionalesFiltrados()) total += Number(item.valor);

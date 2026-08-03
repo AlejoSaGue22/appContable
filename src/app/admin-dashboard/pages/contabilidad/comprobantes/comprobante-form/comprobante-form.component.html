@@ -11,11 +11,12 @@
 
   <div class="max-w-7xl mx-auto space-y-6">
     <form [formGroup]="form" class="space-y-6">
-      
+
       <!-- Ficha Cabecera -->
       <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
         <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2 mb-6">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
             <line x1="9" y1="9" x2="15" y2="9"></line>
             <line x1="9" y1="13" x2="15" y2="13"></line>
@@ -30,8 +31,7 @@
               Tipo de Comprobante <span class="text-red-500">*</span>
             </label>
             <select formControlName="tipoComprobanteId"
-              class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all cursor-pointer bg-white"
-            >
+              class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all cursor-pointer bg-white">
               <option value="" disabled>Seleccione un tipo...</option>
               @for (tipo of tiposComprobantes(); track tipo.id) {
               <option [value]="tipo.id">{{ tipo.codigo }} - {{ tipo.nombre }}</option>
@@ -45,14 +45,14 @@
               Fecha de Documento <span class="text-red-500">*</span>
             </label>
             <input type="date" formControlName="fechaDocumento"
-              class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all font-mono"
-            />
+              class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all font-mono" />
             <form-error-label [errorType]="form.get('fechaDocumento')!" />
           </div>
 
           <div>
             <label class="block text-xs font-medium text-gray-500 mb-2">Consecutivo / Número</label>
-            <div class="px-4 py-2.5 bg-gray-100/70 border border-gray-200 rounded-xl text-sm text-gray-500 cursor-not-allowed outline-none font-medium">
+            <div
+              class="px-4 py-2.5 bg-gray-100/70 border border-gray-200 rounded-xl text-sm text-gray-500 cursor-not-allowed outline-none font-medium">
               {{ consecutivo() }}
             </div>
           </div>
@@ -71,7 +71,8 @@
       <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mt-6">
         <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
           <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="8" y1="6" x2="21" y2="6"></line>
               <line x1="8" y1="12" x2="21" y2="12"></line>
               <line x1="8" y1="18" x2="21" y2="18"></line>
@@ -93,17 +94,21 @@
           <table class="w-full text-xs text-left border-collapse min-w-[1000px]">
             <thead class="bg-gray-50 text-gray-500 border-b border-gray-100">
               <tr>
-                <th class="px-4 py-3 w-1/4 font-medium uppercase text-[10px] tracking-wider">Cuenta Contable <span class="text-red-500">*</span></th>
-                <th class="px-4 py-3 w-1/4 font-medium uppercase text-[10px] tracking-wider">Descripción / Concepto</th>
-                <th class="px-4 py-3 font-medium uppercase text-[10px] tracking-wider">Tercero</th>
+                <th class="px-4 py-3 w-1/4 font-medium uppercase text-[10px]">Cuenta Contable <span
+                    class="text-red-500">*</span></th>
+                <th class="px-4 py-3 w-1/4 font-medium uppercase text-[10px]">Descripción / Concepto</th>
+                <th class="px-4 py-3 font-medium uppercase text-[10px]">Tercero</th>
                 @if (centrosCostos().length > 0) {
-                <th class="px-4 py-3 font-medium uppercase text-[10px] tracking-wider">C. Costo</th>
+                <th class="px-4 py-3 font-medium uppercase text-[10px]">C. Costo</th>
                 }
-                <th class="px-4 py-3 font-medium uppercase text-[10px] tracking-wider">Ref. Doc. @if (requiereRefDoc()) { <span class="text-red-500">*</span> }</th>
-                <th class="px-4 py-3 text-right w-40 font-medium uppercase text-[10px] tracking-wider">Débito <span class="text-red-500">*</span></th>
-                <th class="px-4 py-3 text-right w-40 font-medium uppercase text-[10px] tracking-wider">Crédito <span class="text-red-500">*</span></th>
+                <th class="px-4 py-3 font-medium uppercase text-[10px]">Ref. Doc. @if (requiereRefDoc()) { <span
+                    class="text-red-500">*</span> }</th>
+                <th class="px-4 py-3 text-right w-40 font-medium uppercase text-[10px]">Débito <span
+                    class="text-red-500">*</span></th>
+                <th class="px-4 py-3 text-right w-40 font-medium uppercase text-[10px]">Crédito <span
+                    class="text-red-500">*</span></th>
                 @if (estado() === 'BORRADOR') {
-                <th class="px-4 py-3 text-center w-24 font-medium uppercase text-[10px] tracking-wider">Acción</th>
+                <th class="px-4 py-3 text-center w-24 font-medium uppercase text-[10px]">Acción</th>
                 }
               </tr>
             </thead>
@@ -113,8 +118,7 @@
                 <!-- Cuenta -->
                 <td class="px-2 py-3">
                   <select formControlName="cuentaContableId" (change)="onCuentaCambio(i)"
-                    class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-[11px] focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all cursor-pointer bg-white"
-                  >
+                    class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-[11px] focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all cursor-pointer bg-white">
                     <option value="" disabled>Seleccione cuenta...</option>
                     @for (cta of cuentasContables(); track cta.id) {
                     <option [value]="cta.id">{{ cta.codigo }} - {{ cta.nombre }}</option>
@@ -126,15 +130,13 @@
                 <td class="px-2 py-3">
                   <input type="text" formControlName="descripcion"
                     class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-[11px] focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all bg-white"
-                    placeholder="Concepto de línea"
-                  />
+                    placeholder="Concepto de línea" />
                 </td>
 
                 <!-- Tercero -->
                 <td class="px-2 py-3">
                   <select formControlName="terceroUnionId"
-                    class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-[11px] focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all cursor-pointer bg-white"
-                  >
+                    class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-[11px] focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all cursor-pointer bg-white">
                     <option value="">-- Seleccione Tercero --</option>
                     @for (t of terceros(); track t.id) {
                     <option [value]="t.id">{{ t.nombreDisplay }}</option>
@@ -147,8 +149,7 @@
                 <td class="px-2 py-3">
                   @if (requiereCentro(i)) {
                   <select formControlName="centroCostoId"
-                    class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-[11px] focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all cursor-pointer bg-white"
-                  >
+                    class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-[11px] focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all cursor-pointer bg-white">
                     <option value="">Seleccione centro...</option>
                     @for (cc of centrosCostos(); track cc.id) {
                     <option [value]="cc.id">{{ cc.codigo }} - {{ cc.nombre }}</option>
@@ -164,24 +165,21 @@
                 <td class="px-2 py-3">
                   <input type="text" formControlName="documentoReferencia"
                     class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-[11px] focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all bg-white"
-                    [placeholder]="requiereRefDoc() ? 'Requerido' : 'Opcional'"
-                  />
+                    [placeholder]="requiereRefDoc() ? 'Requerido' : 'Opcional'" />
                 </td>
 
                 <!-- Debito -->
                 <td class="px-2 py-3">
                   <input type="number" formControlName="debito"
                     class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-[11px] focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all text-right font-mono font-semibold text-slate-800 bg-white"
-                    placeholder="0"
-                  />
+                    placeholder="0" />
                 </td>
 
                 <!-- Credito -->
                 <td class="px-2 py-3">
                   <input type="number" formControlName="credito"
                     class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-[11px] focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all text-right font-mono font-semibold text-slate-800 bg-white"
-                    placeholder="0"
-                  />
+                    placeholder="0" />
                 </td>
 
                 <!-- Acciones -->
@@ -190,8 +188,7 @@
                   <div class="flex items-center justify-center gap-1">
                     <button type="button" (click)="cuadrarAsiento(i)"
                       class="p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 rounded-lg transition-colors cursor-pointer"
-                      title="Cuadrar contra diferencia"
-                    >
+                      title="Cuadrar contra diferencia">
                       <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -200,8 +197,7 @@
 
                     <button type="button" (click)="eliminarLinea(i)"
                       class="p-1.5 text-rose-500 hover:bg-rose-50 hover:text-rose-600 rounded-lg transition-colors cursor-pointer"
-                      title="Eliminar línea"
-                    >
+                      title="Eliminar línea">
                       <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -217,7 +213,8 @@
             <!-- Footer Totales -->
             <tfoot class="bg-gray-50 font-bold border-t border-gray-100 text-gray-900">
               <tr class="text-right">
-                <td [attr.colspan]="centrosCostos().length > 0 ? 5 : 4" class="px-4 py-3 text-xs uppercase tracking-wider text-gray-500 font-medium">Suma Totales</td>
+                <td [attr.colspan]="centrosCostos().length > 0 ? 5 : 4"
+                  class="px-4 py-3 text-xs uppercase text-gray-500 font-medium">Suma Totales</td>
                 <td class="px-4 py-3 font-mono text-emerald-600 text-sm font-bold">{{ totalDebitos | currency }}</td>
                 <td class="px-4 py-3 font-mono text-blue-600 text-sm font-bold">{{ totalCreditos | currency }}</td>
                 @if (estado() === 'BORRADOR') {
@@ -233,8 +230,10 @@
           [ngClass]="estaBalanceado ? 'bg-emerald-50/70 text-emerald-800' : 'bg-rose-50/70 text-rose-800'">
           <div class="flex items-center gap-2">
             <span class="relative flex h-2.5 w-2.5">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" [ngClass]="estaBalanceado ? 'bg-emerald-400' : 'bg-rose-400'"></span>
-              <span class="relative inline-flex rounded-full h-2.5 w-2.5" [ngClass]="estaBalanceado ? 'bg-emerald-500' : 'bg-rose-500'"></span>
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+                [ngClass]="estaBalanceado ? 'bg-emerald-400' : 'bg-rose-400'"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5"
+                [ngClass]="estaBalanceado ? 'bg-emerald-500' : 'bg-rose-500'"></span>
             </span>
             <span class="font-medium">
               {{ estaBalanceado ?
@@ -251,29 +250,25 @@
       <!-- Action Buttons -->
       <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
         <button type="button" routerLink="/panel/contabilidad/comprobantes"
-          class="rounded-xl w-full sm:w-auto px-6 py-2.5 border border-gray-200 cursor-pointer text-center text-sm font-semibold text-gray-600 bg-white hover:bg-gray-50 transition-all"
-        >
+          class="rounded-xl w-full sm:w-auto px-6 py-2.5 border border-gray-200 cursor-pointer text-center text-sm font-semibold text-gray-600 bg-white hover:bg-gray-50 transition-all">
           Cancelar
         </button>
 
         <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
           @if (estado() === 'BORRADOR') {
           <button type="button" (click)="guardarBorrador()" [disabled]="submitting()"
-            class="rounded-xl w-full sm:w-auto px-6 py-2.5 border border-gray-200 cursor-pointer text-center text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
+            class="rounded-xl w-full sm:w-auto px-6 py-2.5 border border-gray-200 cursor-pointer text-center text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
             Guardar Borrador
           </button>
 
           <button type="button" (click)="guardarYContabilizar()" [disabled]="submitting() || !estaBalanceado"
-            class="rounded-xl w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg shadow-blue-100 cursor-pointer text-center text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
+            class="rounded-xl w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg shadow-blue-100 cursor-pointer text-center text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
             Guardar y Contabilizar
           </button>
 
           @if (isEditing()) {
           <button type="button" (click)="contabilizarComprobante()" [disabled]="submitting() || !estaBalanceado"
-            class="rounded-xl w-full sm:w-auto px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-lg shadow-emerald-100 cursor-pointer text-center text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
+            class="rounded-xl w-full sm:w-auto px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-lg shadow-emerald-100 cursor-pointer text-center text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
             Contabilizar
           </button>
           }
@@ -285,9 +280,6 @@
 </div>
 
 @if (confirmModal()) {
-  <app-confirm-modal
-    [config]="confirmModal()!"
-    (confirmed)="onConfirmado()"
-    (cancelled)="onCancelado()">
-  </app-confirm-modal>
+<app-confirm-modal [config]="confirmModal()!" (confirmed)="onConfirmado()" (cancelled)="onCancelado()">
+</app-confirm-modal>
 }

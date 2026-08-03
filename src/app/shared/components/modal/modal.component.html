@@ -1,6 +1,6 @@
 @if (visible()) {
 <div class="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in">
-    <div class="fixed inset-0 bg-slate-900/20 backdrop-blur-sm" (click)="closable() && close()"></div>
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" (click)="closable() && close()"></div>
     <div class="relative transform rounded-2xl bg-white shadow-modal w-full animate-scale-in overflow-hidden"
         [class]="sizeClass[size()]">
         @if (title()) {

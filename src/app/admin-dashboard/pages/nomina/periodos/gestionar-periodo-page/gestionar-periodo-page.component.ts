@@ -46,6 +46,18 @@ export default class GestionarPeriodoPageComponent implements OnInit {
   popoverEmpleado = signal<Empleado | null>(null);
   popoverTipo = signal<'DEVENGADO' | 'DEDUCCION'>('DEVENGADO');
 
+  popoverDeduccionesLegales = computed(() => {
+    const emp = this.popoverEmpleado();
+    if (!emp) return null;
+    const data = this.assignedMap().get(emp.id);
+    if (!data) return null;
+    return {
+      salud: data.saludEmpleado || 0,
+      pension: data.pensionEmpleado || 0,
+      retefuente: data.retencionFuente || 0,
+    };
+  });
+
   headTitle = computed(() => {
     const p = this.periodo();
     return {
@@ -216,13 +228,20 @@ export default class GestionarPeriodoPageComponent implements OnInit {
     const p = this.periodo();
     if (!p) return;
 
+    if (this.assignedEmpleados().length === 0) {
+      this.notification.error('Debe haber al menos un empleado asignado para liquidar el período');
+      return;
+    }
+
     this.loader.show();
     try {
       await this.nominaService.liquidarPeriodo(p.id, { empleados: [] }).toPromise();
       this.notification.success('Nómina liquidada exitosamente con snapshot congelado');
       this.router.navigate(['/panel/nomina/periodos']);
     } catch (err: any) {
-      this.notification.error('Error al liquidar nómina', err?.message);
+      const msg = err.error?.message || err.message || 'Error desconocido';
+      const finalMsg = Array.isArray(msg) ? msg.join(', ') : msg;
+      this.notification.error(finalMsg, 'Error al liquidar nómina');
     } finally {
       this.loader.hide();
     }

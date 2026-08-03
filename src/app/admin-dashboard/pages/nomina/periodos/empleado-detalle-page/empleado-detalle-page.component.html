@@ -1,204 +1,238 @@
 <div class="p-6 space-y-6 animate-fade-in">
   @if (isLoading()) {
-    <div class="flex justify-center items-center h-64">
-      <svg class="animate-spin h-10 w-10 text-blue-600" viewBox="0 0 24 24" fill="none">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-      </svg>
-    </div>
+  <div class="flex justify-center items-center h-64">
+    <svg class="animate-spin h-10 w-10 text-blue-600" viewBox="0 0 24 24" fill="none">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+    </svg>
+  </div>
   } @else if (periodo() && liquidacion()) {
-    <!-- Header -->
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-4">
-        <button (click)="volver()" class="p-2 rounded-lg hover:bg-slate-100 cursor-pointer transition-colors">
-          <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <div>
-          <h1 class="text-2xl font-bold text-slate-900">Desprendido de Pago</h1>
-          <p class="text-sm text-slate-500">{{ periodo()!.nombre }} · {{ periodo()!.fechaInicio }} — {{ periodo()!.fechaFin }}</p>
-        </div>
-      </div>
-      <button (click)="descargarColilla()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold cursor-pointer hover:bg-blue-700 transition-colors flex items-center gap-2">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-100">
+    <div class="flex items-center gap-4">
+      <button (click)="volver()" class="p-2 rounded-xl hover:bg-slate-100 cursor-pointer transition-colors">
+        <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
         </svg>
-        Descargar Colilla
       </button>
+      <div>
+        <h1 class="text-2xl font-extrabold text-slate-900">Desprendido de Pago</h1>
+        <p class="text-sm text-slate-500 mt-0.5">{{ periodo()!.nombre }} · {{ periodo()!.fechaInicio }} — {{
+          periodo()!.fechaFin }}</p>
+      </div>
     </div>
+    <button (click)="descargarColilla()"
+      class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-blue-600 text-white rounded-xl text-xs font-semibold cursor-pointer hover:bg-blue-700 transition-all shadow-sm shadow-blue-200 active:scale-[0.98]">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      Descargar Colilla
+    </button>
+  </div>
 
-    <!-- Employee Info Card -->
-    <div class="bg-white rounded-xl border border-slate-100 p-6 shadow-sm">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">Empleado</h3>
-          <p class="text-lg font-bold text-slate-900">{{ liquidacion()!.empleado?.primerNombre }} {{ liquidacion()!.empleado?.segundoNombre }} {{ liquidacion()!.empleado?.primerApellido }} {{ liquidacion()!.empleado?.segundoApellido }}</p>
-          <p class="text-sm text-slate-500">C.C. {{ liquidacion()!.empleado?.numeroDocumento }}</p>
-          <p class="text-sm text-slate-500">{{ liquidacion()!.empleado?.cargo?.nombre }}</p>
-        </div>
-        <div class="md:text-right">
-          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">Período</h3>
-          <p class="text-sm text-slate-900 font-semibold">{{ periodo()!.tipo }}</p>
-          <p class="text-sm text-slate-500">{{ periodo()!.fechaInicio }} — {{ periodo()!.fechaFin }}</p>
-          <p class="text-sm text-slate-500">Días trabajados: <span class="font-semibold text-slate-900">{{ liquidacion()!.diasTrabajados }}</span></p>
-        </div>
+  <!-- Employee Info Card -->
+  <div class="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <h3 class="text-[11px] font-semibold text-slate-400 uppercase mb-2">Empleado</h3>
+        <p class="text-lg font-extrabold text-slate-900">{{ liquidacion()!.empleado?.primerNombre }} {{
+          liquidacion()!.empleado?.segundoNombre }} {{ liquidacion()!.empleado?.primerApellido }} {{
+          liquidacion()!.empleado?.segundoApellido }}</p>
+        <p class="text-sm text-slate-500 mt-1 flex items-center gap-2">
+          <span class="font-mono text-xs bg-slate-100 px-2 py-0.5 rounded">C.C. {{
+            liquidacion()!.empleado?.numeroDocumento }}</span>
+        </p>
+        <p class="text-sm text-slate-500 mt-0.5">{{ liquidacion()!.empleado?.cargo?.nombre }}</p>
+      </div>
+      <div class="md:text-right">
+        <h3 class="text-[11px] font-semibold text-slate-400 uppercase mb-2">Período</h3>
+        <p class="text-sm font-medium text-slate-800">{{ periodo()!.tipo }}</p>
+        <p class="text-sm text-slate-500 mt-0.5">{{ periodo()!.fechaInicio }} — {{ periodo()!.fechaFin }}</p>
+        <p class="text-sm text-slate-500 mt-0.5">Días trabajados: <span class="font-semibold text-slate-800">{{
+            liquidacion()!.diasTrabajados }}</span></p>
       </div>
     </div>
+  </div>
 
-    <!-- Summary Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="bg-white rounded-xl border border-slate-100 p-5 shadow-sm">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Devengado</p>
-        <p class="text-2xl font-bold text-slate-900 mt-1">{{ liquidacion()!.totalDevengado | currency:'':'$':'1.0-0' }}</p>
-      </div>
-      <div class="bg-white rounded-xl border border-slate-100 p-5 shadow-sm">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Auxilio Transporte</p>
-        <p class="text-2xl font-bold text-slate-900 mt-1">{{ liquidacion()!.auxilioTransporte | currency:'':'$':'1.0-0' }}</p>
-      </div>
-      <div class="bg-white rounded-xl border border-slate-100 p-5 shadow-sm">
-        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Deducciones</p>
-        <p class="text-2xl font-bold text-red-600 mt-1">{{ liquidacion()!.totalDeducciones | currency:'':'$':'1.0-0' }}</p>
-      </div>
-      <div class="bg-white rounded-xl border border-emerald-100 bg-emerald-50/30 p-5 shadow-sm">
-        <p class="text-xs font-semibold text-emerald-600 uppercase tracking-wide">Neto a Pagar</p>
-        <p class="text-2xl font-bold text-emerald-600 mt-1">{{ liquidacion()!.netoPagar | currency:'':'$':'1.0-0' }}</p>
-      </div>
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm space-y-1">
+      <p class="text-[11px] font-semibold text-slate-400 uppercase">Devengado</p>
+      <p class="text-2xl font-extrabold text-slate-800 mt-1">{{ liquidacion()!.totalDevengado | currency:'':'$':'1.0-0'
+        }}</p>
     </div>
+    <div class="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm space-y-1">
+      <p class="text-[11px] font-semibold text-slate-400 uppercase">Auxilio Transporte</p>
+      <p class="text-2xl font-extrabold text-slate-800 mt-1">{{ liquidacion()!.auxilioTransporte |
+        currency:'':'$':'1.0-0' }}</p>
+    </div>
+    <div class="bg-white rounded-2xl border border-rose-100 p-5 shadow-sm space-y-1">
+      <p class="text-[11px] font-semibold text-slate-400 uppercase">Deducciones</p>
+      <p class="text-2xl font-extrabold text-rose-600 mt-1">{{ liquidacion()!.totalDeducciones | currency:'':'$':'1.0-0'
+        }}</p>
+    </div>
+    <div class="bg-emerald-50/40 rounded-2xl border border-emerald-100 p-5 shadow-sm space-y-1">
+      <p class="text-[11px] font-semibold text-emerald-600 uppercase">Neto a Pagar</p>
+      <p class="text-2xl font-extrabold text-emerald-600 mt-1">{{ liquidacion()!.netoPagar | currency:'':'$':'1.0-0' }}
+      </p>
+    </div>
+  </div>
 
-    <!-- Ingresos Table -->
-    <div class="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
-      <div class="px-6 py-4 border-b border-slate-100">
-        <h3 class="text-sm font-bold text-slate-800">Ingresos</h3>
-      </div>
-      <table class="w-full">
-        <thead class="bg-slate-50">
-          <tr>
-            <th class="text-left px-6 py-3 text-xs font-semibold text-slate-500 uppercase">Concepto</th>
-            <th class="text-center px-6 py-3 text-xs font-semibold text-slate-500 uppercase">Días</th>
-            <th class="text-right px-6 py-3 text-xs font-semibold text-slate-500 uppercase">Valor</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-slate-100">
-          @if (liquidacion()!.salarioDevengado > 0) {
-          <tr>
-            <td class="px-6 py-4 text-sm font-medium text-slate-900">Salario Básico</td>
-            <td class="px-6 py-4 text-center text-sm text-slate-600">{{ liquidacion()!.diasTrabajados }}</td>
-            <td class="px-6 py-4 text-right tabular-nums font-semibold text-slate-900">{{ liquidacion()!.salarioDevengado | currency:'':'$':'1.0-0' }}</td>
-          </tr>
-          }
-          @if (liquidacion()!.auxilioTransporte > 0) {
-          <tr>
-            <td class="px-6 py-4 text-sm font-medium text-slate-900">Auxilio de Transporte</td>
-            <td class="px-6 py-4 text-center text-sm text-slate-600">{{ liquidacion()!.diasTrabajados }}</td>
-            <td class="px-6 py-4 text-right tabular-nums font-semibold text-slate-900">{{ liquidacion()!.auxilioTransporte | currency:'':'$':'1.0-0' }}</td>
-          </tr>
-          }
-          @if (liquidacion()!.comisiones > 0) {
-          <tr>
-            <td class="px-6 py-4 text-sm font-medium text-slate-900">Comisiones</td>
-            <td class="px-6 py-4 text-center text-sm text-slate-600">-</td>
-            <td class="px-6 py-4 text-right tabular-nums font-semibold text-slate-900">{{ liquidacion()!.comisiones | currency:'':'$':'1.0-0' }}</td>
-          </tr>
-          }
-          @if (liquidacion()!.totalBonificaciones > 0) {
-          <tr>
-            <td class="px-6 py-4 text-sm font-medium text-slate-900">Bonificaciones</td>
-            <td class="px-6 py-4 text-center text-sm text-slate-600">-</td>
-            <td class="px-6 py-4 text-right tabular-nums font-semibold text-slate-900">{{ liquidacion()!.totalBonificaciones | currency:'':'$':'1.0-0' }}</td>
-          </tr>
-          }
-          @if (liquidacion()!.totalHorasExtras > 0) {
-          <tr>
-            <td class="px-6 py-4 text-sm font-medium text-slate-900">Horas Extras</td>
-            <td class="px-6 py-4 text-center text-sm text-slate-600">-</td>
-            <td class="px-6 py-4 text-right tabular-nums font-semibold text-slate-900">{{ liquidacion()!.totalHorasExtras | currency:'':'$':'1.0-0' }}</td>
-          </tr>
-          }
-        </tbody>
-        <tfoot class="bg-slate-50">
-          <tr>
-            <td colspan="2" class="px-6 py-3 text-sm font-bold text-slate-900">Total Ingresos</td>
-            <td class="px-6 py-3 text-right tabular-nums font-bold text-slate-900">{{ liquidacion()!.totalDevengado | currency:'':'$':'1.0-0' }}</td>
-          </tr>
-        </tfoot>
-      </table>
+  <!-- Ingresos Table -->
+  <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center gap-2.5 bg-slate-50/50">
+      <span class="w-1.5 h-5 bg-emerald-600 rounded-full"></span>
+      <h3 class="text-sm font-semibold text-slate-800">Ingresos</h3>
     </div>
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50">
+        <tr>
+          <th class="text-left px-6 py-3 text-[11px] font-semibold text-slate-500 uppercase">Concepto
+          </th>
+          <th class="text-center px-6 py-3 text-[11px] font-semibold text-slate-500 uppercase">Días</th>
+          <th class="text-right px-6 py-3 text-[11px] font-semibold text-slate-500 uppercase">Valor</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        @if (liquidacion()!.salarioDevengado > 0) {
+        <tr class="hover:bg-slate-50/80 transition-colors">
+          <td class="px-6 py-3.5 text-sm font-medium text-slate-700">Salario Básico</td>
+          <td class="px-6 py-3.5 text-center text-sm text-slate-500">{{ liquidacion()!.diasTrabajados }}</td>
+          <td class="px-6 py-3.5 text-right tabular-nums text-sm text-slate-800">{{ liquidacion()!.salarioDevengado |
+            currency:'':'$':'1.0-0' }}</td>
+        </tr>
+        }
+        @if (liquidacion()!.auxilioTransporte > 0) {
+        <tr class="hover:bg-slate-50/80 transition-colors">
+          <td class="px-6 py-3.5 text-sm font-medium text-slate-700">Auxilio de Transporte</td>
+          <td class="px-6 py-3.5 text-center text-sm text-slate-500">{{ liquidacion()!.diasTrabajados }}</td>
+          <td class="px-6 py-3.5 text-right tabular-nums text-sm text-slate-800">{{ liquidacion()!.auxilioTransporte |
+            currency:'':'$':'1.0-0' }}</td>
+        </tr>
+        }
+        @if (liquidacion()!.comisiones > 0) {
+        <tr class="hover:bg-slate-50/80 transition-colors">
+          <td class="px-6 py-3.5 text-sm font-medium text-slate-700">Comisiones</td>
+          <td class="px-6 py-3.5 text-center text-sm text-slate-500">-</td>
+          <td class="px-6 py-3.5 text-right tabular-nums text-sm text-slate-800">{{ liquidacion()!.comisiones |
+            currency:'':'$':'1.0-0' }}</td>
+        </tr>
+        }
+        @if (liquidacion()!.totalBonificaciones > 0) {
+        <tr class="hover:bg-slate-50/80 transition-colors">
+          <td class="px-6 py-3.5 text-sm font-medium text-slate-700">Bonificaciones</td>
+          <td class="px-6 py-3.5 text-center text-sm text-slate-500">-</td>
+          <td class="px-6 py-3.5 text-right tabular-nums text-sm text-slate-800">{{ liquidacion()!.totalBonificaciones |
+            currency:'':'$':'1.0-0' }}</td>
+        </tr>
+        }
+        @if (liquidacion()!.totalHorasExtras > 0) {
+        <tr class="hover:bg-slate-50/80 transition-colors">
+          <td class="px-6 py-3.5 text-sm font-medium text-slate-700">Horas Extras</td>
+          <td class="px-6 py-3.5 text-center text-sm text-slate-500">-</td>
+          <td class="px-6 py-3.5 text-right tabular-nums text-sm text-slate-800">{{ liquidacion()!.totalHorasExtras |
+            currency:'':'$':'1.0-0' }}</td>
+        </tr>
+        }
+      </tbody>
+      <tfoot class="bg-slate-50 border-t border-slate-100">
+        <tr>
+          <td colspan="2" class="px-6 py-3 text-sm font-semibold text-slate-800">Total Ingresos</td>
+          <td class="px-6 py-3 text-right tabular-nums font-semibold text-slate-800">{{ liquidacion()!.totalDevengado |
+            currency:'':'$':'1.0-0' }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
 
-    <!-- Deducciones Table -->
-    <div class="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
-      <div class="px-6 py-4 border-b border-slate-100">
-        <h3 class="text-sm font-bold text-slate-800">Deducciones</h3>
-      </div>
-      <table class="w-full">
-        <thead class="bg-slate-50">
-          <tr>
-            <th class="text-left px-6 py-3 text-xs font-semibold text-slate-500 uppercase">Concepto</th>
-            <th class="text-center px-6 py-3 text-xs font-semibold text-slate-500 uppercase">Base (IBC)</th>
-            <th class="text-right px-6 py-3 text-xs font-semibold text-slate-500 uppercase">Valor</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-slate-100">
-          @if (liquidacion()!.saludEmpleado > 0) {
-          <tr>
-            <td class="px-6 py-4 text-sm font-medium text-slate-900">Salud (4%)</td>
-            <td class="px-6 py-4 text-center text-sm text-slate-600">{{ liquidacion()!.ibc | currency:'':'$':'1.0-0' }}</td>
-            <td class="px-6 py-4 text-right tabular-nums font-semibold text-red-600">-{{ liquidacion()!.saludEmpleado | currency:'':'$':'1.0-0' }}</td>
-          </tr>
-          }
-          @if (liquidacion()!.pensionEmpleado > 0) {
-          <tr>
-            <td class="px-6 py-4 text-sm font-medium text-slate-900">Pensión (4%)</td>
-            <td class="px-6 py-4 text-center text-sm text-slate-600">{{ liquidacion()!.ibc | currency:'':'$':'1.0-0' }}</td>
-            <td class="px-6 py-4 text-right tabular-nums font-semibold text-red-600">-{{ liquidacion()!.pensionEmpleado | currency:'':'$':'1.0-0' }}</td>
-          </tr>
-          }
-          @if (liquidacion()!.retencionFuente > 0) {
-          <tr>
-            <td class="px-6 py-4 text-sm font-medium text-slate-900">Retención en la Fuente</td>
-            <td class="px-6 py-4 text-center text-sm text-slate-600">-</td>
-            <td class="px-6 py-4 text-right tabular-nums font-semibold text-red-600">-{{ liquidacion()!.retencionFuente | currency:'':'$':'1.0-0' }}</td>
-          </tr>
-          }
-        </tbody>
-        <tfoot class="bg-slate-50">
-          <tr>
-            <td colspan="2" class="px-6 py-3 text-sm font-bold text-slate-900">Total Deducciones</td>
-            <td class="px-6 py-3 text-right tabular-nums font-bold text-red-600">-{{ liquidacion()!.totalDeducciones | currency:'':'$':'1.0-0' }}</td>
-          </tr>
-        </tfoot>
-      </table>
+  <!-- Deducciones Table -->
+  <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center gap-2.5 bg-slate-50/50">
+      <span class="w-1.5 h-5 bg-rose-500 rounded-full"></span>
+      <h3 class="text-sm font-semibold text-slate-800">Deducciones</h3>
     </div>
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50">
+        <tr>
+          <th class="text-left px-6 py-3 text-[11px] font-semibold text-slate-500 uppercase">Concepto
+          </th>
+          <th class="text-center px-6 py-3 text-[11px] font-semibold text-slate-500 uppercase">Base (IBC)
+          </th>
+          <th class="text-right px-6 py-3 text-[11px] font-semibold text-slate-500 uppercase">Valor</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        @if (liquidacion()!.saludEmpleado > 0) {
+        <tr class="hover:bg-slate-50/80 transition-colors">
+          <td class="px-6 py-3.5 text-sm font-medium text-slate-700">Salud (4%)</td>
+          <td class="px-6 py-3.5 text-center text-sm text-slate-500">{{ liquidacion()!.ibc | currency:'':'$':'1.0-0' }}
+          </td>
+          <td class="px-6 py-3.5 text-right tabular-nums text-sm text-rose-500">-{{ liquidacion()!.saludEmpleado |
+            currency:'':'$':'1.0-0' }}</td>
+        </tr>
+        }
+        @if (liquidacion()!.pensionEmpleado > 0) {
+        <tr class="hover:bg-slate-50/80 transition-colors">
+          <td class="px-6 py-3.5 text-sm font-medium text-slate-700">Pensión (4%)</td>
+          <td class="px-6 py-3.5 text-center text-sm text-slate-500">{{ liquidacion()!.ibc | currency:'':'$':'1.0-0' }}
+          </td>
+          <td class="px-6 py-3.5 text-right tabular-nums text-sm text-rose-500">-{{ liquidacion()!.pensionEmpleado |
+            currency:'':'$':'1.0-0' }}</td>
+        </tr>
+        }
+        @if (liquidacion()!.retencionFuente > 0) {
+        <tr class="hover:bg-slate-50/80 transition-colors">
+          <td class="px-6 py-3.5 text-sm font-medium text-slate-700">Retención en la Fuente</td>
+          <td class="px-6 py-3.5 text-center text-sm text-slate-500">-</td>
+          <td class="px-6 py-3.5 text-right tabular-nums text-sm text-rose-500">-{{ liquidacion()!.retencionFuente |
+            currency:'':'$':'1.0-0' }}</td>
+        </tr>
+        }
+      </tbody>
+      <tfoot class="bg-slate-50 border-t border-slate-100">
+        <tr>
+          <td colspan="2" class="px-6 py-3 text-sm font-semibold text-slate-800">Total Deducciones</td>
+          <td class="px-6 py-3 text-right tabular-nums font-semibold text-rose-600">-{{ liquidacion()!.totalDeducciones
+            | currency:'':'$':'1.0-0' }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
 
-    <!-- Aportes Empleador -->
-    @if (liquidacion()!.aportesEmpleador && liquidacion()!.aportesEmpleador.length > 0) {
-    <div class="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
-      <div class="px-6 py-4 border-b border-slate-100">
-        <h3 class="text-sm font-bold text-slate-800">Aportes del Empleador</h3>
-      </div>
-      <table class="w-full">
-        <thead class="bg-slate-50">
-          <tr>
-            <th class="text-left px-6 py-3 text-xs font-semibold text-slate-500 uppercase">Concepto</th>
-            <th class="text-right px-6 py-3 text-xs font-semibold text-slate-500 uppercase">Valor</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-slate-100">
-          @for (ap of liquidacion()!.aportesEmpleador; track ap.concepto) {
-          <tr>
-            <td class="px-6 py-4 text-sm font-medium text-slate-900">{{ ap.concepto }}</td>
-            <td class="px-6 py-4 text-right tabular-nums font-semibold text-slate-900">{{ ap.valor | currency:'':'$':'1.0-0' }}</td>
-          </tr>
-          }
-        </tbody>
-        <tfoot class="bg-slate-50">
-          <tr>
-            <td class="px-6 py-3 text-sm font-bold text-slate-900">Total Aportes</td>
-            <td class="px-6 py-3 text-right tabular-nums font-bold text-slate-900">{{ liquidacion()!.totalAportes | currency:'':'$':'1.0-0' }}</td>
-          </tr>
-        </tfoot>
-      </table>
+  <!-- Aportes Empleador -->
+  @if (liquidacion()!.aportesEmpleador && liquidacion()!.aportesEmpleador.length > 0) {
+  <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center gap-2.5 bg-slate-50/50">
+      <span class="w-1.5 h-5 bg-blue-600 rounded-full"></span>
+      <h3 class="text-sm font-semibold text-slate-800">Aportes del Empleador</h3>
     </div>
-    }
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50">
+        <tr>
+          <th class="text-left px-6 py-3 text-[11px] font-semibold text-slate-500 uppercase">Concepto
+          </th>
+          <th class="text-right px-6 py-3 text-[11px] font-semibold text-slate-500 uppercase">Valor</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        @for (ap of liquidacion()!.aportesEmpleador; track ap.concepto) {
+        <tr class="hover:bg-slate-50/80 transition-colors">
+          <td class="px-6 py-3.5 text-sm font-medium text-slate-700">{{ ap.concepto }}</td>
+          <td class="px-6 py-3.5 text-right tabular-nums text-sm text-slate-800">{{ ap.valor | currency:'':'$':'1.0-0'
+            }}</td>
+        </tr>
+        }
+      </tbody>
+      <tfoot class="bg-slate-50 border-t border-slate-100">
+        <tr>
+          <td class="px-6 py-3 text-sm font-semibold text-slate-800">Total Aportes</td>
+          <td class="px-6 py-3 text-right tabular-nums font-semibold text-slate-800">{{ liquidacion()!.totalAportes |
+            currency:'':'$':'1.0-0' }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+  }
   }
 </div>

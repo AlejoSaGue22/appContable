@@ -1,4 +1,5 @@
-<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in" (click.self)="close.emit()">
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 animate-fade-in"
+  (click.self)="close.emit()">
   <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden flex flex-col">
 
     <!-- Header Popover / Modal (Estilo Alegra Nómina) -->
@@ -18,7 +19,7 @@
           }
         </div>
         <div>
-          <h3 class="text-base font-extrabold text-slate-800">
+          <h3 class="text-base font-medium text-slate-800">
             {{ tipoView === 'DEVENGADO' ? 'Ingresos adicionales' : 'Deducciones' }}
           </h3>
           <p class="text-xs text-slate-500 font-medium">
@@ -28,8 +29,9 @@
       </div>
 
       <div class="text-right">
-        <span class="text-base font-extrabold text-slate-900">${{ totalMonto() | number: '1.0-0' }}</span>
-        <button (click)="close.emit()" class="block ml-auto text-slate-400 hover:text-slate-600 transition-colors p-1 cursor-pointer">
+        <span class="text-base font-medium text-slate-900">${{ totalMonto() | number: '1.0-0' }}</span>
+        <button (click)="close.emit()"
+          class="block ml-auto text-slate-400 hover:text-slate-600 transition-colors p-1 cursor-pointer">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -47,10 +49,11 @@
       @if (tipoView === 'DEVENGADO') {
       <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
         <div>
-          <h4 class="text-xs font-bold text-slate-800">Salario Base</h4>
-          <span class="text-[11px] text-slate-500">Valor: <strong class="text-slate-700">${{ empleado.salarioBase | number: '1.0-0' }}</strong></span>
+          <h4 class="text-xs font-medium text-slate-800">Salario Base</h4>
+          <span class="text-[11px] text-slate-500">Valor: <strong class="text-slate-700">${{ empleado.salarioBase |
+              number: '1.0-0' }}</strong></span>
         </div>
-        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-200/70 text-slate-600">
+        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-slate-200/70 text-slate-600">
           Todas las nóminas
         </span>
       </div>
@@ -60,10 +63,11 @@
       @for (item of recurrentesFiltrados(); track item.id) {
       <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
         <div>
-          <h4 class="text-xs font-bold text-slate-800">{{ item.conceptoNombre }}</h4>
-          <span class="text-[11px] text-slate-500">Valor: <strong class="text-slate-700">${{ item.valor | number: '1.0-0' }}</strong></span>
+          <h4 class="text-xs font-medium text-slate-800">{{ item.conceptoNombre }}</h4>
+          <span class="text-[11px] text-slate-500">Valor: <strong class="text-slate-700">${{ item.valor | number:
+              '1.0-0' }}</strong></span>
         </div>
-        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-emerald-100 text-emerald-800">
           Recurrente
         </span>
       </div>
@@ -74,29 +78,111 @@
       <div class="flex items-center justify-between p-3 rounded-xl bg-blue-50/50 border border-blue-100">
         <div class="flex items-start gap-2">
           <div>
-            <h4 class="text-xs font-bold text-blue-900">{{ item.conceptoNombre }}</h4>
-            <span class="text-[11px] text-slate-600">Valor: <strong class="text-blue-950">${{ item.valor | number: '1.0-0' }}</strong></span>
+            <h4 class="text-xs font-medium text-blue-900">{{ item.conceptoNombre }}</h4>
+            <span class="text-[11px] text-slate-600">Valor: <strong class="text-blue-950">${{ item.valor | number:
+                '1.0-0' }}</strong></span>
             @if (item.observacion) {
             <p class="text-[10px] text-slate-400 italic">{{ item.observacion }}</p>
             }
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700">
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-100 text-blue-700">
             Esta nómina
           </span>
           <button (click)="removeOcasional(item)" title="Retirar de esta nómina"
             class="p-1 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg>
           </button>
         </div>
       </div>
       }
 
-      <!-- Estado vacío -->
-      @if (tipoView === 'DEDUCCION' && recurrentesFiltrados().length === 0 && ocasionalesFiltrados().length === 0) {
+      <!-- Deducciones de Ley (automáticas del sistema) -->
+      @if (tipoView === 'DEDUCCION' && deduccionesLegales) {
+      <div class="space-y-2">
+        <p class="text-[10px] text-slate-400 uppercase font-semibold tracking-wide">Deducciones de Ley</p>
+
+        <!-- Salud -->
+        @if (deduccionesLegales.salud > 0) {
+        <div class="flex items-center justify-between p-3 rounded-xl bg-amber-50/50 border border-amber-100">
+          <div class="flex items-center gap-2.5">
+            <div class="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center">
+              <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+            </div>
+            <div>
+              <h4 class="text-xs font-medium text-slate-800">Salud</h4>
+              <span class="text-[10px] text-slate-400">4% del IBC</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold text-rose-600 tabular-nums">${{ deduccionesLegales.salud | number: '1.0-0' }}</span>
+            <span class="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-slate-100 text-slate-500">Automática</span>
+          </div>
+        </div>
+        }
+
+        <!-- Pensión -->
+        @if (deduccionesLegales.pension > 0) {
+        <div class="flex items-center justify-between p-3 rounded-xl bg-amber-50/50 border border-amber-100">
+          <div class="flex items-center gap-2.5">
+            <div class="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center">
+              <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <div>
+              <h4 class="text-xs font-medium text-slate-800">Pensión</h4>
+              <span class="text-[10px] text-slate-400">4% del IBC</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold text-rose-600 tabular-nums">${{ deduccionesLegales.pension | number: '1.0-0' }}</span>
+            <span class="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-slate-100 text-slate-500">Automática</span>
+          </div>
+        </div>
+        }
+
+        <!-- Retención en la Fuente -->
+        @if (deduccionesLegales.retefuente > 0) {
+        <div class="flex items-center justify-between p-3 rounded-xl bg-amber-50/50 border border-amber-100">
+          <div class="flex items-center gap-2.5">
+            <div class="w-7 h-7 rounded-lg bg-amber-100 flex items-center justify-center">
+              <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16z" />
+              </svg>
+            </div>
+            <div>
+              <h4 class="text-xs font-medium text-slate-800">Retención en la Fuente</h4>
+              <span class="text-[10px] text-slate-400">Art. 383 E.T.</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold text-rose-600 tabular-nums">${{ deduccionesLegales.retefuente | number: '1.0-0' }}</span>
+            <span class="px-2 py-0.5 rounded-full text-[9px] font-semibold bg-slate-100 text-slate-500">Automática</span>
+          </div>
+        </div>
+        }
+      </div>
+
+      <!-- Separador si hay conceptos adicionales -->
+      @if (recurrentesFiltrados().length > 0 || ocasionalesFiltrados().length > 0) {
+      <div class="pt-1">
+        <p class="text-[10px] text-slate-400 uppercase font-semibold tracking-wide">Deducciones Adicionales</p>
+      </div>
+      }
+      }
+
+      <!-- Estado vacío (solo si no hay deducciones legales ni adicionales) -->
+      @if (tipoView === 'DEDUCCION' && recurrentesFiltrados().length === 0 && ocasionalesFiltrados().length === 0 && !deduccionesLegales) {
       <div class="py-6 text-center text-xs text-slate-400 italic">
         No hay deducciones adicionales asignadas a este empleado.
       </div>
@@ -104,14 +190,17 @@
 
       <!-- Formulario Inline para Agregar Nuevo Concepto Ocasional -->
       @if (showAddForm()) {
-      <form [formGroup]="form" (ngSubmit)="onSubmitNewConcepto()" class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3 mt-2 animate-fade-in">
-        <h4 class="text-xs font-bold text-slate-800">
+      <form [formGroup]="form" (ngSubmit)="onSubmitNewConcepto()"
+        class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-3 mt-2 animate-fade-in">
+        <h4 class="text-xs font-medium text-slate-800">
           Agregar {{ tipoView === 'DEVENGADO' ? 'ingreso ocasional' : 'deducción ocasional' }}
         </h4>
 
         <div>
-          <label class="block text-[11px] font-semibold text-slate-700 mb-1">Concepto <span class="text-rose-500">*</span></label>
-          <select formControlName="conceptoId" class="w-full text-xs bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+          <label class="block text-[11px] font-semibold text-slate-700 mb-1">Concepto <span
+              class="text-rose-500">*</span></label>
+          <select formControlName="conceptoId"
+            class="w-full text-xs bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
             <option value="" disabled>Seleccione un concepto...</option>
             @for (c of masterConceptosFiltrados(); track c.id) {
             <option [value]="c.id">{{ c.nombre }} ({{ c.codigo }})</option>
@@ -121,12 +210,15 @@
 
         <div class="grid grid-cols-3 gap-2">
           <div class="col-span-2">
-            <label class="block text-[11px] font-semibold text-slate-700 mb-1">Valor ($) <span class="text-rose-500">*</span></label>
-            <input type="number" formControlName="valor" placeholder="0" step="any" class="w-full text-xs bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500" />
+            <label class="block text-[11px] font-semibold text-slate-700 mb-1">Valor ($) <span
+                class="text-rose-500">*</span></label>
+            <input type="number" formControlName="valor" placeholder="0" step="any"
+              class="w-full text-xs bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500" />
           </div>
           <div>
             <label class="block text-[11px] font-semibold text-slate-700 mb-1">Tipo</label>
-            <select formControlName="tipoValor" class="w-full text-xs bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+            <select formControlName="tipoValor"
+              class="w-full text-xs bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
               <option value="FIJO">Fijo ($)</option>
               <option value="PORCENTAJE">Porcentaje (%)</option>
             </select>
@@ -135,14 +227,17 @@
 
         <div>
           <label class="block text-[11px] font-semibold text-slate-700 mb-1">Observación / Nota (opcional)</label>
-          <input type="text" formControlName="observacion" placeholder="Ej. Horas extras 10h" class="w-full text-xs bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500" />
+          <input type="text" formControlName="observacion" placeholder="Ej. Horas extras 10h"
+            class="w-full text-xs bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500" />
         </div>
 
         <div class="flex justify-end gap-2 pt-1">
-          <button (click)="toggleAddForm()" type="button" class="px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200/60 rounded-lg transition-all cursor-pointer">
+          <button (click)="toggleAddForm()" type="button"
+            class="px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-200/60 rounded-lg transition-all cursor-pointer">
             Cancelar
           </button>
-          <button type="submit" class="px-3.5 py-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-all cursor-pointer active:scale-95">
+          <button type="submit"
+            class="px-3.5 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-all cursor-pointer active:scale-95">
             Guardar en esta nómina
           </button>
         </div>

@@ -111,7 +111,9 @@ export default class PeriodosPageComponent {
             this.loader.hide();
           },
           error: (err) => {
-            this.notification.error('Error al liquidar nómina', err);
+            const msg = err.error?.message || err.message || 'Error desconocido';
+            const finalMsg = Array.isArray(msg) ? msg.join(', ') : msg;
+            this.notification.error(finalMsg, 'Error al liquidar nómina');
             this.loader.hide();
           },
         });
