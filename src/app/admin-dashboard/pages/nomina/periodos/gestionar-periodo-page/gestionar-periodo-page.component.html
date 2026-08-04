@@ -136,9 +136,9 @@
                   </svg>
                   Ingresos
                 </button>
-                @if (selectedIds().has(emp.id) && assignedMap().has(emp.id)) {
-                <span class="text-[11px] font-semibold text-emerald-600">
-                  +${{ (assignedMap().get(emp.id)?.totalIngresosAdicionales || 0) | number: '1.0-0' }}
+                @if (selectedIds().has(emp.id) && displayMap().has(emp.id)) {
+                <span class="text-[11px] font-semibold" [class.text-emerald-600]="!displayMap().get(emp.id)?.isEstimate" [class.text-emerald-400]="displayMap().get(emp.id)?.isEstimate" [title]="displayMap().get(emp.id)?.isEstimate ? 'Valor estimado (sin guardar)' : ''">
+                  +${{ (displayMap().get(emp.id)?.totalIngresosAdicionales || 0) | number: '1.0-0' }}
                 </span>
                 }
               </div>
@@ -154,9 +154,9 @@
                   </svg>
                   Deducciones
                 </button>
-                @if (selectedIds().has(emp.id) && assignedMap().has(emp.id)) {
-                <span class="text-[11px] font-semibold text-rose-600">
-                  -${{ (assignedMap().get(emp.id)?.totalDeducciones || 0) | number: '1.0-0' }}
+                @if (selectedIds().has(emp.id) && displayMap().has(emp.id)) {
+                <span class="text-[11px] font-semibold" [class.text-rose-600]="!displayMap().get(emp.id)?.isEstimate" [class.text-rose-400]="displayMap().get(emp.id)?.isEstimate" [title]="displayMap().get(emp.id)?.isEstimate ? 'Valor estimado (sin guardar)' : ''">
+                  -${{ (displayMap().get(emp.id)?.totalDeducciones || 0) | number: '1.0-0' }}
                 </span>
                 }
               </div>
@@ -164,11 +164,14 @@
 
             <!-- Columna Neto Estimado -->
             <td class="px-5 py-3.5 text-right font-semibold text-slate-700">
-              @if (selectedIds().has(emp.id) && assignedMap().has(emp.id)) {
+              @if (selectedIds().has(emp.id) && displayMap().has(emp.id)) {
               <div class="flex items-center justify-end gap-2">
-                <span class="tabular-nums text-slate-900">${{ (assignedMap().get(emp.id)?.netoPagar || 0) | number:
+                @if (displayMap().get(emp.id)?.isEstimate) {
+                  <span class="text-[10px] text-orange-500 font-medium px-1.5 py-0.5 bg-orange-50 rounded" title="Guarda la selección para calcular la nómina real">Estimado</span>
+                }
+                <span class="tabular-nums" [class.text-slate-900]="!displayMap().get(emp.id)?.isEstimate" [class.text-slate-500]="displayMap().get(emp.id)?.isEstimate">${{ (displayMap().get(emp.id)?.netoPagar || 0) | number:
                   '1.0-0' }}</span>
-                @if (periodo()?.estado !== 'BORRADOR') {
+                @if (periodo()?.estado !== 'BORRADOR' && !displayMap().get(emp.id)?.isEstimate) {
                 <button (click)="verDetalleEmpleado(emp.id)"
                   class="p-1 text-slate-400 hover:text-blue-600 transition-colors cursor-pointer" title="Ver detalle">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -201,7 +204,7 @@
   <!-- Popover / Modal de Conceptos por Período -->
   @if (showPopover() && popoverEmpleado() && periodo()) {
   <app-concepto-periodo-popover [periodoId]="periodo()!.id" [empleado]="popoverEmpleado()!" [tipoView]="popoverTipo()"
-    [deduccionesLegales]="popoverDeduccionesLegales()"
-    (close)="showPopover.set(false)" (updated)="onPopoverUpdated()" />
+    [deduccionesLegales]="popoverDeduccionesLegales()" (close)="showPopover.set(false)"
+    (updated)="onPopoverUpdated()" />
   }
 </div>

@@ -51,16 +51,16 @@
           <tbody class="divide-y divide-slate-100">
             @for (comp of service.comprobantes(); track comp.id) {
             <tr class="hover:bg-slate-50/80 transition-colors">
-              <td class="px-6 py-4 font-mono font-bold text-slate-950">{{ comp.numero }}</td>
-              <td class="px-6 py-4 font-semibold text-slate-700">{{ comp.tipoComprobante?.nombre || 'Manual' }}</td>
+              <td class="px-6 py-4 text-slate-950">{{ comp.numero }}</td>
+              <td class="px-6 py-4 text-slate-700">{{ comp.tipoComprobante?.nombre || 'Manual' }}</td>
               <td class="px-6 py-4 text-slate-600">{{ comp.fechaDocumento | date:'dd/MM/yyyy' }}</td>
               <td class="px-6 py-4 text-slate-500 max-w-xs truncate">{{ comp.observaciones || '-' }}</td>
-              <td class="px-6 py-4 text-right font-mono font-medium text-slate-950">{{ comp.totalDebito | currency }}
+              <td class="px-6 py-4 text-right text-slate-950">{{ comp.totalDebito | currency }}
               </td>
-              <td class="px-6 py-4 text-right font-mono font-medium text-slate-950">{{ comp.totalCredito | currency }}
+              <td class="px-6 py-4 text-right text-slate-950">{{ comp.totalCredito | currency }}
               </td>
               <td class="px-6 py-4">
-                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold" [ngClass]="{
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs" [ngClass]="{
                     'bg-slate-100 text-slate-700 border border-slate-200': comp.estado === 'BORRADOR',
                     'bg-emerald-50 text-emerald-700 border border-emerald-200': comp.estado === 'CONTABILIZADO',
                     'bg-rose-50 text-rose-700 border border-rose-200': comp.estado === 'ANULADO'
@@ -304,9 +304,6 @@
 </app-modal>
 
 @if (confirmModal()) {
-  <app-confirm-modal
-    [config]="confirmModal()!"
-    (confirmed)="onConfirmado()"
-    (cancelled)="onCancelado()">
-  </app-confirm-modal>
+<app-confirm-modal [config]="confirmModal()!" (confirmed)="onConfirmado()" (cancelled)="onCancelado()">
+</app-confirm-modal>
 }

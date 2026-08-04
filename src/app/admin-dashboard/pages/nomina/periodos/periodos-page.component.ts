@@ -106,19 +106,45 @@ export default class PeriodosPageComponent {
         this.loader.show();
         this.nominaService.liquidarPeriodo(periodo.id, { empleados: [] }).subscribe({
           next: () => {
-            this.notification.success('Nómina liquidada exitosamente con snapshot congelado');
-            this.loadPeriodos();
-            this.loader.hide();
+            this.notification.info('El proceso de liquidación ha comenzado en segundo plano...');
+            this.pollJobStatus(periodo.id);
           },
           error: (err) => {
             const msg = err.error?.message || err.message || 'Error desconocido';
             const finalMsg = Array.isArray(msg) ? msg.join(', ') : msg;
-            this.notification.error(finalMsg, 'Error al liquidar nómina');
+            this.notification.error(finalMsg, 'Error al encolar liquidación');
             this.loader.hide();
           },
         });
       }
     );
+  }
+
+  pollJobStatus(periodoId: string) {
+    const intervalId = setInterval(() => {
+      this.nominaService.getJobStatus(periodoId).subscribe({
+        next: (res) => {
+          if (res.estado === 'COMPLETADO') {
+            clearInterval(intervalId);
+            this.notification.success('Nómina liquidada y contabilizada exitosamente');
+            this.loadPeriodos();
+            this.loader.hide();
+          } else if (res.estado === 'FALLIDO') {
+            clearInterval(intervalId);
+            const msg = res.errores?.message || 'Error en el procesamiento en segundo plano';
+            this.notification.error(msg, 'Error en liquidación');
+            this.loader.hide();
+          } else if (res.estado === 'NINGUNO') {
+            clearInterval(intervalId);
+            this.loader.hide();
+          }
+        },
+        error: () => {
+          clearInterval(intervalId);
+          this.loader.hide();
+        }
+      });
+    }, 2000);
   }
 
   verDetalle(periodo: PeriodoNomina) {
@@ -198,7 +224,7 @@ export default class PeriodosPageComponent {
       {
         title: 'Anular Nómina',
         message: `¿Está seguro de anular la nómina del período "${periodo.nombre}"?`,
-        detail: 'Esta acción revertirá todos los asientos contables generados. No se puede deshacer.',
+        detail: 'Esta acción revertirá todos los asientos contables generados y el período no podrá ser procesado de nuevo.',
         icon: 'danger',
         confirmLabel: 'Sí, Anular',
         confirmClass: 'bg-red-600 hover:bg-red-700',
@@ -212,6 +238,59 @@ export default class PeriodosPageComponent {
           },
           error: (err) => {
             this.notification.error('Error al anular nómina', err);
+            this.loader.hide();
+          },
+        });
+      }
+    );
+  }
+
+  reversar(periodo: PeriodoNomina) {
+    this.pedirConfirmacion(
+      {
+        title: 'Reversar Liquidación',
+        message: `¿Está seguro de reversar la liquidación del período "${periodo.nombre}"?`,
+        detail: 'Esta acción revertirá el asiento contable de provisión, eliminará las liquidaciones generadas y regresará el período a estado BORRADOR para ser calculado nuevamente.',
+        icon: 'warning',
+        confirmLabel: 'Sí, Reversar',
+        confirmClass: 'bg-yellow-600 hover:bg-yellow-700',
+      },
+      () => {
+        this.loader.show();
+        this.nominaService.reversarLiquidacion(periodo.id).subscribe({
+          next: () => {
+            this.notification.success('Nómina reversada exitosamente, ahora está en BORRADOR');
+            this.loadPeriodos();
+          },
+          error: (err) => {
+            this.notification.error('Error al reversar nómina', err);
+            this.loader.hide();
+          },
+        });
+      }
+    );
+  }
+
+  eliminarPeriodo(periodo: PeriodoNomina) {
+    this.pedirConfirmacion(
+      {
+        title: 'Eliminar Período',
+        message: `¿Está seguro de eliminar el período "${periodo.nombre}"?`,
+        detail: 'Se perderá la selección de empleados y los conceptos ocasionales asignados a este período. Esta acción no se puede deshacer.',
+        icon: 'danger',
+        confirmLabel: 'Sí, Eliminar',
+        confirmClass: 'bg-red-600 hover:bg-red-700',
+      },
+      () => {
+        this.loader.show();
+        this.nominaService.deletePeriodo(periodo.id).subscribe({
+          next: () => {
+            this.notification.success('Período eliminado exitosamente');
+            this.loadPeriodos();
+          },
+          error: (err) => {
+            const msg = err.error?.message || err.message || 'Error desconocido';
+            this.notification.error(msg, 'Error al eliminar período');
             this.loader.hide();
           },
         });

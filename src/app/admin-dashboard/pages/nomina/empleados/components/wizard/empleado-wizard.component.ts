@@ -101,7 +101,7 @@ export class EmpleadoWizardComponent implements OnInit {
     this.nominaService.getCentrosCosto().subscribe(r => this.centrosCosto.set(r));
     this.nominaService.getTiposContrato().subscribe(r => this.tiposContrato.set(r));
     this.nominaService.getBancos().subscribe(r => this.bancos.set(r));
-    
+
     this.nominaService.getParametrosVigentes().subscribe(r => {
       if (r && r.smmlv) {
         this.smmlv.set(r.smmlv);
@@ -206,7 +206,7 @@ export class EmpleadoWizardComponent implements OnInit {
     if (dto.arlNivelRiesgo) {
       dto.arlNivelRiesgo = Number(dto.arlNivelRiesgo);
     }
-    
+
     if (dto.tipoContratoId) {
       const tipoSel = this.tiposContrato().find(t => t.id === dto.tipoContratoId);
       if (tipoSel) {

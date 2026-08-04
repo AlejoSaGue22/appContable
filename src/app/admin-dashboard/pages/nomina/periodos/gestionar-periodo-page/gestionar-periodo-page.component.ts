@@ -66,22 +66,68 @@ export default class GestionarPeriodoPageComponent implements OnInit {
     };
   });
 
-  totalDevengadoEstimado = computed(() =>
-    this.assignedEmpleados().reduce((sum, item: any) => sum + Number(item.totalDevengado || 0), 0)
-  );
+  totalDevengadoEstimado = computed(() => {
+    let sum = 0;
+    const map = this.displayMap();
+    for (const id of this.selectedIds()) {
+      if (map.has(id)) sum += Number(map.get(id).totalDevengado || 0);
+    }
+    return sum;
+  });
 
-  totalDeduccionesEstimado = computed(() =>
-    this.assignedEmpleados().reduce((sum, item: any) => sum + Number(item.totalDeducciones || 0), 0)
-  );
+  totalDeduccionesEstimado = computed(() => {
+    let sum = 0;
+    const map = this.displayMap();
+    for (const id of this.selectedIds()) {
+      if (map.has(id)) sum += Number(map.get(id).totalDeducciones || 0);
+    }
+    return sum;
+  });
 
-  totalNetoEstimado = computed(() =>
-    this.assignedEmpleados().reduce((sum, item: any) => sum + Number(item.netoPagar || 0), 0)
-  );
+  totalNetoEstimado = computed(() => {
+    let sum = 0;
+    const map = this.displayMap();
+    for (const id of this.selectedIds()) {
+      if (map.has(id)) sum += Number(map.get(id).netoPagar || 0);
+    }
+    return sum;
+  });
 
   assignedMap = computed(() => {
     const map = new Map<string, any>();
     for (const item of this.assignedEmpleados()) {
       map.set(item.empleadoId, item);
+    }
+    return map;
+  });
+
+  displayMap = computed(() => {
+    const map = new Map<string, any>();
+    const assigned = this.assignedMap();
+    const all = this.allEmpleados();
+    const selected = this.selectedIds();
+    const p = this.periodo();
+    const isQuincenal = p?.tipo === 'QUINCENAL';
+    const dias = isQuincenal ? 15 : 30;
+
+    for (const emp of all) {
+      if (assigned.has(emp.id)) {
+        map.set(emp.id, assigned.get(emp.id));
+      } else if (selected.has(emp.id)) {
+        const salarioProp = (Number(emp.salarioBase) / 30) * dias;
+        const auxTrans = emp.auxilioTransporte ? (249095 / 30) * dias : 0;
+        const devengado = salarioProp + auxTrans;
+        const salud = salarioProp * 0.04;
+        const pension = salarioProp * 0.04;
+        const deducciones = salud + pension;
+        map.set(emp.id, {
+          totalDevengado: devengado,
+          totalDeducciones: deducciones,
+          netoPagar: devengado - deducciones,
+          totalIngresosAdicionales: 0,
+          isEstimate: true
+        });
+      }
     }
     return map;
   });
@@ -236,15 +282,41 @@ export default class GestionarPeriodoPageComponent implements OnInit {
     this.loader.show();
     try {
       await this.nominaService.liquidarPeriodo(p.id, { empleados: [] }).toPromise();
-      this.notification.success('Nómina liquidada exitosamente con snapshot congelado');
-      this.router.navigate(['/panel/nomina/periodos']);
+      this.notification.info('El proceso de liquidación ha comenzado en segundo plano...');
+      this.pollJobStatus(p.id);
     } catch (err: any) {
       const msg = err.error?.message || err.message || 'Error desconocido';
       const finalMsg = Array.isArray(msg) ? msg.join(', ') : msg;
-      this.notification.error(finalMsg, 'Error al liquidar nómina');
-    } finally {
+      this.notification.error(finalMsg, 'Error al encolar liquidación');
       this.loader.hide();
     }
+  }
+
+  pollJobStatus(periodoId: string) {
+    const intervalId = setInterval(() => {
+      this.nominaService.getJobStatus(periodoId).subscribe({
+        next: (res) => {
+          if (res.estado === 'COMPLETADO') {
+            clearInterval(intervalId);
+            this.notification.success('Nómina liquidada y contabilizada exitosamente');
+            this.router.navigate(['/panel/nomina/periodos']);
+            this.loader.hide();
+          } else if (res.estado === 'FALLIDO') {
+            clearInterval(intervalId);
+            const msg = res.errores?.message || 'Error en el procesamiento en segundo plano';
+            this.notification.error(msg, 'Error en liquidación');
+            this.loader.hide();
+          } else if (res.estado === 'NINGUNO') {
+            clearInterval(intervalId);
+            this.loader.hide();
+          }
+        },
+        error: () => {
+          clearInterval(intervalId);
+          this.loader.hide();
+        }
+      });
+    }, 2000);
   }
 
   async descargarDesprendibles() {

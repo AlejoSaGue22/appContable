@@ -22,9 +22,11 @@ export class PeriodosTableComponent {
   liquidar = output<PeriodoNomina>();
   prepararPago = output<PeriodoNomina>();
   verDetalle = output<PeriodoNomina>();
+  reversar = output<PeriodoNomina>();
   anular = output<PeriodoNomina>();
   enviarDian = output<PeriodoNomina>();
   descargarXml = output<PeriodoNomina>();
+  eliminar = output<PeriodoNomina>();
 
   // Filter signals
   search = signal<string>('');
