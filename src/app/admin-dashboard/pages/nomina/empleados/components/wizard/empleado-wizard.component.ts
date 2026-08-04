@@ -5,6 +5,7 @@ import { NominaService } from '../../../services/nomina.service';
 import { Empleado, EntidadSeguridadSocial, Cargo, CentroCosto } from '../../../interfaces/nomina.interface';
 import { NotificationService } from '@shared/services/notification.service';
 import { LoaderService } from '@utils/services/loader.service';
+import { CurrencyFormatDirective } from '@shared/directives/currency-format.directive';
 
 interface Step {
   numero: number;
@@ -18,7 +19,7 @@ interface Step {
 @Component({
   selector: 'app-empleado-wizard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, CurrencyFormatDirective],
   templateUrl: './empleado-wizard.component.html',
 })
 export class EmpleadoWizardComponent implements OnInit {
@@ -34,6 +35,7 @@ export class EmpleadoWizardComponent implements OnInit {
   currentStep = signal(0);
   isSubmitting = signal(false);
   metodoPago = signal('EFECTIVO');
+  smmlv = signal<number>(1300000); // Default to a standard minimum in case API fails, or 0.
 
   entidadesEPS = signal<EntidadSeguridadSocial[]>([]);
   entidadesAFP = signal<EntidadSeguridadSocial[]>([]);
@@ -99,6 +101,14 @@ export class EmpleadoWizardComponent implements OnInit {
     this.nominaService.getCentrosCosto().subscribe(r => this.centrosCosto.set(r));
     this.nominaService.getTiposContrato().subscribe(r => this.tiposContrato.set(r));
     this.nominaService.getBancos().subscribe(r => this.bancos.set(r));
+    
+    this.nominaService.getParametrosVigentes().subscribe(r => {
+      if (r && r.smmlv) {
+        this.smmlv.set(r.smmlv);
+        this.form.get('salarioBase')?.setValidators([Validators.required, Validators.min(r.smmlv)]);
+        this.form.get('salarioBase')?.updateValueAndValidity();
+      }
+    });
 
     const emp = this.empleado();
     if (emp) {
