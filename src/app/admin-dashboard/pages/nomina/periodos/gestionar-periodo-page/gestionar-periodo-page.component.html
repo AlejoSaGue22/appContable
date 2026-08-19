@@ -137,7 +137,9 @@
                   Ingresos
                 </button>
                 @if (selectedIds().has(emp.id) && displayMap().has(emp.id)) {
-                <span class="text-[11px] font-semibold" [class.text-emerald-600]="!displayMap().get(emp.id)?.isEstimate" [class.text-emerald-400]="displayMap().get(emp.id)?.isEstimate" [title]="displayMap().get(emp.id)?.isEstimate ? 'Valor estimado (sin guardar)' : ''">
+                <span class="text-[11px] font-semibold" [class.text-emerald-600]="!displayMap().get(emp.id)?.isEstimate"
+                  [class.text-emerald-400]="displayMap().get(emp.id)?.isEstimate"
+                  [title]="displayMap().get(emp.id)?.isEstimate ? 'Valor estimado (sin guardar)' : ''">
                   +${{ (displayMap().get(emp.id)?.totalIngresosAdicionales || 0) | number: '1.0-0' }}
                 </span>
                 }
@@ -155,7 +157,9 @@
                   Deducciones
                 </button>
                 @if (selectedIds().has(emp.id) && displayMap().has(emp.id)) {
-                <span class="text-[11px] font-semibold" [class.text-rose-600]="!displayMap().get(emp.id)?.isEstimate" [class.text-rose-400]="displayMap().get(emp.id)?.isEstimate" [title]="displayMap().get(emp.id)?.isEstimate ? 'Valor estimado (sin guardar)' : ''">
+                <span class="text-[11px] font-semibold" [class.text-rose-600]="!displayMap().get(emp.id)?.isEstimate"
+                  [class.text-rose-400]="displayMap().get(emp.id)?.isEstimate"
+                  [title]="displayMap().get(emp.id)?.isEstimate ? 'Valor estimado (sin guardar)' : ''">
                   -${{ (displayMap().get(emp.id)?.totalDeducciones || 0) | number: '1.0-0' }}
                 </span>
                 }
@@ -167,9 +171,12 @@
               @if (selectedIds().has(emp.id) && displayMap().has(emp.id)) {
               <div class="flex items-center justify-end gap-2">
                 @if (displayMap().get(emp.id)?.isEstimate) {
-                  <span class="text-[10px] text-orange-500 font-medium px-1.5 py-0.5 bg-orange-50 rounded" title="Guarda la selección para calcular la nómina real">Estimado</span>
+                <span class="text-[10px] text-orange-500 font-medium px-1.5 py-0.5 bg-orange-50 rounded"
+                  title="Guarda la selección para calcular la nómina real">Estimado</span>
                 }
-                <span class="tabular-nums" [class.text-slate-900]="!displayMap().get(emp.id)?.isEstimate" [class.text-slate-500]="displayMap().get(emp.id)?.isEstimate">${{ (displayMap().get(emp.id)?.netoPagar || 0) | number:
+                <span class="tabular-nums" [class.text-slate-900]="!displayMap().get(emp.id)?.isEstimate"
+                  [class.text-slate-500]="displayMap().get(emp.id)?.isEstimate">${{ (displayMap().get(emp.id)?.netoPagar
+                  || 0) | number:
                   '1.0-0' }}</span>
                 @if (periodo()?.estado !== 'BORRADOR' && !displayMap().get(emp.id)?.isEstimate) {
                 <button (click)="verDetalleEmpleado(emp.id)"
