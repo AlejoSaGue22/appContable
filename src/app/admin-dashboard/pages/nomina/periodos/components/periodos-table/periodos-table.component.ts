@@ -27,11 +27,12 @@ export class PeriodosTableComponent {
   enviarDian = output<PeriodoNomina>();
   descargarXml = output<PeriodoNomina>();
   eliminar = output<PeriodoNomina>();
+  filtersChanged = output<any>();
 
-  // Filter signals
   search = signal<string>('');
   estado = signal<string>('');
   tipo = signal<string>('');
+  anio = signal<string>('');
 
   showFilters = signal<boolean>(false);
 
@@ -40,32 +41,13 @@ export class PeriodosTableComponent {
     if (this.search()) count++;
     if (this.estado()) count++;
     if (this.tipo()) count++;
+    if (this.anio()) count++;
     return count;
   });
 
   filteredPeriodos = computed(() => {
-    let list = this.periodos();
-    const searchTerm = this.search().toLowerCase().trim();
-    const estadoFilter = this.estado();
-    const tipoFilter = this.tipo();
-
-    if (searchTerm) {
-      list = list.filter(
-        (p) =>
-          p.nombre.toLowerCase().includes(searchTerm) ||
-          p.tipo.toLowerCase().includes(searchTerm)
-      );
-    }
-
-    if (estadoFilter) {
-      list = list.filter((p) => p.estado === estadoFilter);
-    }
-
-    if (tipoFilter) {
-      list = list.filter((p) => p.tipo === tipoFilter);
-    }
-
-    return list;
+    // The filtering is now handled by the backend
+    return this.periodos();
   });
 
   toggleFilters(): void {
@@ -73,12 +55,19 @@ export class PeriodosTableComponent {
   }
 
   applyFilters(): void {
-    // Computed signal updates automatically
+    this.filtersChanged.emit({
+      search: this.search(),
+      estado: this.estado(),
+      tipo: this.tipo(),
+      anio: this.anio(),
+    });
   }
 
   clearFilters(): void {
     this.search.set('');
     this.estado.set('');
     this.tipo.set('');
+    this.anio.set('');
+    this.applyFilters();
   }
 }

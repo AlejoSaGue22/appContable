@@ -60,6 +60,11 @@ export class NominaService {
     let httpParams = new HttpParams();
     if (params?.limit) httpParams = httpParams.set('limit', params.limit);
     if (params?.offset) httpParams = httpParams.set('offset', params.offset);
+    if (params?.search) httpParams = httpParams.set('search', params.search);
+    if (params?.estado) httpParams = httpParams.set('estado', params.estado);
+    if (params?.tipo) httpParams = httpParams.set('tipo', params.tipo);
+    if (params?.fecha) httpParams = httpParams.set('fecha', params.fecha);
+    if (params?.anio) httpParams = httpParams.set('anio', params.anio);
     return this.http.get<PaginatedResponse<PeriodoNomina>>(`${this.base}/periodos`, { params: httpParams }).pipe(catchError(this.handleError));
   }
 

@@ -36,6 +36,8 @@ export default class PeriodosPageComponent {
   periodoPagar = signal<PeriodoNomina | null>(null);
   periodoGestionar = signal<PeriodoNomina | null>(null);
 
+  currentFilters = signal<any>({});
+
   showFormModal = signal(false);
   showPagoModal = signal(false);
   showEmpleadosModal = signal(false);
@@ -72,7 +74,11 @@ export default class PeriodosPageComponent {
 
   loadPeriodos() {
     this.loader.show();
-    this.nominaService.getPeriodos({ limit: 1000 }).subscribe({
+
+    // Merge standard pagination limit with current filters
+    const params = { limit: 1000, ...this.currentFilters() };
+
+    this.nominaService.getPeriodos(params).subscribe({
       next: (res) => {
         this.periodos.set(res.data);
         this.paginationService.totalItems.set(res.count);
@@ -81,6 +87,11 @@ export default class PeriodosPageComponent {
       error: (err) => this.notification.error(err, 'Error al cargar períodos'),
       complete: () => this.loader.hide(),
     });
+  }
+
+  onFiltersChanged(filters: any) {
+    this.currentFilters.set(filters);
+    this.loadPeriodos();
   }
 
   onPeriodoSaved() {
@@ -93,30 +104,30 @@ export default class PeriodosPageComponent {
   }
 
   liquidar(periodo: PeriodoNomina) {
-    this.pedirConfirmacion(
-      {
-        title: 'Liquidar Nómina',
-        message: `¿Desea liquidar la nómina del período "${periodo.nombre}"?`,
-        detail: 'Esta acción procesará los conceptos recurrentes y deducciones legales congelando un snapshot estático.',
-        icon: 'warning',
-        confirmLabel: 'Sí, Liquidar',
-        confirmClass: 'bg-green-600 hover:bg-green-700',
-      },
-      () => {
-        this.loader.show();
-        this.nominaService.liquidarPeriodo(periodo.id, { empleados: [] }).subscribe({
-          next: () => {
-            this.notification.info('El proceso de liquidación ha comenzado en segundo plano...');
-            this.pollJobStatus(periodo.id);
-          },
-          error: (err) => {
-            const msg = err.error?.message || err.message || 'Error desconocido';
-            const finalMsg = Array.isArray(msg) ? msg.join(', ') : msg;
-            this.notification.error(finalMsg, 'Error al encolar liquidación');
-            this.loader.hide();
-          },
-        });
-      }
+    this.pedirConfirmacion({
+      title: 'Liquidar Nómina',
+      message: `¿Desea liquidar la nómina del período "${periodo.nombre}"?`,
+      detail: 'Esta acción procesará los conceptos recurrentes y deducciones legales congelando un snapshot estático.',
+      icon: 'warning',
+      confirmLabel: 'Sí, Liquidar',
+      confirmClass: 'bg-green-600 hover:bg-green-700',
+    }, () => {
+      this.loader.show();
+      this.nominaService.liquidarPeriodo(periodo.id, { empleados: [] }).subscribe({
+        next: () => {
+          this.loader.hide();
+          this.notification.info('El proceso de liquidación ha comenzado en segundo plano...');
+          this.pollJobStatus(periodo.id);
+        },
+        error: (err) => {
+          const msg = err.error?.message || err.message || 'Error desconocido';
+          const finalMsg = Array.isArray(msg) ? msg.join(', ') : msg;
+          this.notification.error(finalMsg, 'Error al encolar liquidación');
+          this.loader.hide();
+        },
+        complete: () => this.loader.hide(),
+      });
+    }
     );
   }
 
@@ -128,20 +139,16 @@ export default class PeriodosPageComponent {
             clearInterval(intervalId);
             this.notification.success('Nómina liquidada y contabilizada exitosamente');
             this.loadPeriodos();
-            this.loader.hide();
           } else if (res.estado === 'FALLIDO') {
             clearInterval(intervalId);
             const msg = res.errores?.message || 'Error en el procesamiento en segundo plano';
             this.notification.error(msg, 'Error en liquidación');
-            this.loader.hide();
           } else if (res.estado === 'NINGUNO') {
             clearInterval(intervalId);
-            this.loader.hide();
           }
         },
         error: () => {
           clearInterval(intervalId);
-          this.loader.hide();
         }
       });
     }, 2000);

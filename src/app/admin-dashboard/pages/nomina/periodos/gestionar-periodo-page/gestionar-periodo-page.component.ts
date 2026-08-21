@@ -279,7 +279,7 @@ export default class GestionarPeriodoPageComponent implements OnInit {
       return;
     }
 
-    this.loader.show();
+    // this.loader.show();
     try {
       await this.nominaService.liquidarPeriodo(p.id, { empleados: [] }).toPromise();
       this.notification.info('El proceso de liquidación ha comenzado en segundo plano...');
@@ -288,7 +288,7 @@ export default class GestionarPeriodoPageComponent implements OnInit {
       const msg = err.error?.message || err.message || 'Error desconocido';
       const finalMsg = Array.isArray(msg) ? msg.join(', ') : msg;
       this.notification.error(finalMsg, 'Error al encolar liquidación');
-      this.loader.hide();
+      // this.loader.hide();
     }
   }
 

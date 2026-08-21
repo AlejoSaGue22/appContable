@@ -56,7 +56,7 @@
 
     <!-- Advanced Filters Content -->
     @if (showFilters()) {
-    <div class="mt-6 pt-6 border-t border-gray-50 grid grid-cols-1 sm:grid-cols-2 gap-6 animate-slide-down">
+    <div class="mt-6 pt-6 border-t border-gray-50 grid grid-cols-1 sm:grid-cols-3 gap-6 animate-slide-down">
       <!-- Filtro Estado -->
       <div class="space-y-2">
         <label class="text-[10px] text-gray-400 ml-1">Estado Período</label>
@@ -78,6 +78,18 @@
           <option value="">Todos los tipos</option>
           <option value="MENSUAL">Mensual</option>
           <option value="QUINCENAL">Quincenal</option>
+        </select>
+      </div>
+
+      <!-- Filtro Año -->
+      <div class="space-y-2">
+        <label class="text-[10px] text-gray-400 ml-1">Año</label>
+        <select [ngModel]="anio()" (ngModelChange)="anio.set($event)"
+          class="block w-full px-4 py-2 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:border-blue-500/50 transition-all appearance-none cursor-pointer">
+          <option value="">Todos los años</option>
+          <option value="2026">2026</option>
+          <option value="2025">2025</option>
+          <option value="2024">2024</option>
         </select>
       </div>
     </div>
@@ -194,7 +206,8 @@
                   class="inline-flex items-center rounded-lg text-sm text-yellow-600 hover:text-yellow-900 cursor-pointer"
                   title="Reversar Liquidación">
                   <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
                   </svg>
                 </button>
                 }
