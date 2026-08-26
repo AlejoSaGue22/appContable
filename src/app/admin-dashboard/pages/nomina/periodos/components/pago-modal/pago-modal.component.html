@@ -14,32 +14,37 @@
     <div>
       <label class="block text-xs font-bold text-slate-600 mb-1">Fecha de pago</label>
       <input type="date" [value]="pagoFecha()" (input)="pagoFecha.set($any($event.target).value)"
-        class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400" />
+        class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
     </div>
 
-    <div>
-      <label class="block text-xs font-bold text-slate-600 mb-1">Código cuenta contable (ej: 1110)</label>
-      <input type="text" [value]="pagoCuentaCodigo()" (input)="pagoCuentaCodigo.set($any($event.target).value)"
-        placeholder="1110"
-        class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400" />
+    <div class="relative">
+      <label class="block text-xs font-bold text-slate-600 mb-1">Cuenta bancaria / Caja</label>
+      <select [value]="pagoCuentaCodigo()" (change)="pagoCuentaCodigo.set($any($event.target).value)"
+        class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 bg-white cursor-pointer">
+        <option value="" disabled>Seleccione una cuenta...</option>
+        @for (cuenta of cuentasBancariasActivas(); track cuenta.id) {
+        <option [value]="cuenta.codigoCuentaContable">
+          {{ cuenta.displayName }} {{ cuenta.numeroCuenta ? '(' + cuenta.numeroCuenta + ')' : '' }}
+        </option>
+        }
+      </select>
     </div>
 
     <div>
       <label class="block text-xs font-bold text-slate-600 mb-1">
         No. Comprobante <span class="text-slate-400 font-normal">(opcional)</span>
       </label>
-      <input type="text" [value]="pagoNumeroComprobante()" (input)="pagoNumeroComprobante.set($any($event.target).value)"
-        placeholder="Ej: TRANSF-001"
-        class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400" />
+      <input type="text" [value]="pagoNumeroComprobante()"
+        (input)="pagoNumeroComprobante.set($any($event.target).value)" placeholder="Ej: TRANSF-001"
+        class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
     </div>
 
     <div>
       <label class="block text-xs font-bold text-slate-600 mb-1">
         Observaciones <span class="text-slate-400 font-normal">(opcional)</span>
       </label>
-      <textarea [value]="pagoObservaciones()" (input)="pagoObservaciones.set($any($event.target).value)"
-        rows="2"
-        class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400"></textarea>
+      <textarea [value]="pagoObservaciones()" (input)="pagoObservaciones.set($any($event.target).value)" rows="2"
+        class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20"></textarea>
     </div>
 
     <div class="flex justify-end gap-3 pt-2 border-t border-slate-100">
@@ -48,7 +53,7 @@
         Cancelar
       </button>
       <button (click)="onConfirmar()" type="button" [disabled]="!pagoFecha() || !pagoCuentaCodigo()"
-        class="px-4 py-2 text-sm font-bold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50 cursor-pointer">
+        class="px-4 py-2 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 cursor-pointer">
         Confirmar Pago
       </button>
     </div>
