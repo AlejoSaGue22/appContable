@@ -7,56 +7,78 @@
     </svg>
   </div>
   } @else if (periodo() && liquidacion()) {
-  
-  <!-- Controles superiores -->
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 print:hidden">
-    <button (click)="volver()" class="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">
+    <button (click)="volver()"
+      class="inline-flex items-center gap-2 cursor-pointer text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
       </svg>
       Volver
     </button>
-    <button (click)="descargarColilla()" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 text-white rounded-lg text-sm font-medium hover:bg-slate-700 transition-colors">
+    <button (click)="descargarColilla()"
+      class="inline-flex items-center gap-2 cursor-pointer px-4 py-2 bg-slate-800 text-white rounded-lg text-sm font-medium hover:bg-slate-700 transition-colors">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
       </svg>
       Imprimir / Descargar
     </button>
   </div>
 
-  <!-- Hoja de detalle (Estilo Documento) -->
   <div class="bg-white border border-slate-200 shadow-md p-8 md:p-12 text-slate-800 text-sm">
-    <!-- Encabezado Documento -->
-    <div class="flex justify-between items-start border-b-2 border-slate-800 pb-6 mb-6">
-      <div>
-        <h1 class="text-2xl font-bold uppercase tracking-wide text-slate-900">Comprobante de Pago</h1>
-        <p class="text-slate-600 mt-1">Nómina {{ periodo()!.tipo }}</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 items-center border-b-2 border-slate-800 pb-6 mb-6 gap-6">
+      <!-- Espacio izquierdo para posible logo -->
+      <div class="flex items-center justify-center md:justify-start">
+        @if (empresa()?.logoUrlFormated) {
+        <img [src]="empresa().logoUrlFormated" alt="Logo" class="max-h-20 max-w-[140px] object-contain">
+        }
       </div>
-      <div class="text-right text-slate-600">
-        <p><span class="font-semibold text-slate-800">Período:</span> {{ periodo()!.fechaInicio }} al {{ periodo()!.fechaFin }}</p>
-        <p><span class="font-semibold text-slate-800">Días liquidados:</span> {{ liquidacion()!.diasTrabajados }}</p>
+
+      <!-- Información de la Empresa -->
+      <div class="text-center">
+        @if (empresa()) {
+        <h2 class="text-lg font-bold text-slate-900 uppercase">{{ empresa().razonSocial }}</h2>
+        <p class="text-slate-600 mt-1">NIT: {{ empresa().nit }}</p>
+        @if (empresa().email) {
+        <p class="text-slate-600">{{ empresa().email }}</p>
+        }
+        } @else {
+        <div class="animate-pulse flex flex-col items-center gap-1.5 mt-2">
+          <div class="h-5 bg-slate-200 rounded w-48"></div>
+          <div class="h-4 bg-slate-200 rounded w-32"></div>
+          <div class="h-4 bg-slate-200 rounded w-40"></div>
+        </div>
+        }
+      </div>
+
+      <!-- Título de la Colilla -->
+      <div class="text-center md:text-right text-slate-600">
+        <h1 class="text-2xl font-bold tracking-wide text-slate-900 mb-2">Colilla de pago</h1>
+        <p class="text-sm"><span class="font-semibold text-slate-800">Período:</span> {{ periodo()!.fechaInicio }} al {{
+          periodo()!.fechaFin }}</p>
+        <p class="text-sm mt-0.5"><span class="font-semibold text-slate-800">Nómina:</span> {{ periodo()!.tipo }}</p>
       </div>
     </div>
 
-    <!-- Datos del Empleado -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
       <div class="col-span-2">
         <p class="text-xs uppercase text-slate-500 font-semibold">Empleado</p>
-        <p class="font-medium text-base">{{ liquidacion()!.empleado?.primerNombre }} {{ liquidacion()!.empleado?.segundoNombre }} {{ liquidacion()!.empleado?.primerApellido }} {{ liquidacion()!.empleado?.segundoApellido }}</p>
+        <p class="font-medium text-base">{{ liquidacion()!.empleado.primerNombre }} {{
+          liquidacion()!.empleado.segundoNombre }} {{ liquidacion()!.empleado.primerApellido }} {{
+          liquidacion()!.empleado.segundoApellido }}</p>
       </div>
       <div>
         <p class="text-xs uppercase text-slate-500 font-semibold">Identificación</p>
-        <p class="font-medium">CC. {{ liquidacion()!.empleado?.numeroDocumento }}</p>
+        <p class="font-medium">CC. {{ liquidacion()!.empleado.numeroDocumento }}</p>
       </div>
       <div>
         <p class="text-xs uppercase text-slate-500 font-semibold">Cargo</p>
-        <p class="font-medium">{{ liquidacion()!.empleado?.cargo?.nombre }}</p>
+        <p class="font-medium">{{ liquidacion()!.empleado.cargo?.nombre }}</p>
       </div>
     </div>
 
-    <!-- Tablas (Ingresos y Deducciones lado a lado si es posible o apiladas) -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-      
+
       <!-- Ingresos -->
       <div>
         <h3 class="text-sm font-bold uppercase border-b border-slate-300 pb-2 mb-3">Conceptos de Ingreso</h3>
@@ -121,13 +143,13 @@
           <tbody class="divide-y divide-slate-100">
             @if (liquidacion()!.saludEmpleado > 0) {
             <tr>
-              <td class="py-2 text-slate-700">Salud (4%)</td>
+              <td class="py-2 text-slate-700">Salud</td>
               <td class="py-2 text-right">-{{ liquidacion()!.saludEmpleado | currency:'':'$':'1.0-0' }}</td>
             </tr>
             }
             @if (liquidacion()!.pensionEmpleado > 0) {
             <tr>
-              <td class="py-2 text-slate-700">Pensión (4%)</td>
+              <td class="py-2 text-slate-700">Pensión</td>
               <td class="py-2 text-right">-{{ liquidacion()!.pensionEmpleado | currency:'':'$':'1.0-0' }}</td>
             </tr>
             }
@@ -143,30 +165,13 @@
 
     </div>
 
-    <!-- Totales -->
     <div class="border-t border-slate-300 pt-6">
       <div class="flex flex-col md:flex-row justify-between items-end gap-6">
-        
-        <!-- Detalles adicionales -->
+
         <div class="w-full md:w-1/2">
-          @if (liquidacion()!.aportesEmpleador && liquidacion()!.aportesEmpleador.length > 0) {
-            <p class="text-xs uppercase text-slate-500 font-semibold mb-2">Información Adicional (Aportes Empleador)</p>
-            <div class="text-xs text-slate-600 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
-              @for (ap of liquidacion()!.aportesEmpleador; track ap.concepto) {
-                <div class="flex justify-between border-b border-slate-100 py-1">
-                  <span>{{ ap.concepto }}</span>
-                  <span class="font-medium">{{ ap.valor | currency:'':'$':'1.0-0' }}</span>
-                </div>
-              }
-              <div class="flex justify-between font-semibold border-b border-slate-100 py-1 text-slate-800 sm:col-span-2 mt-1">
-                <span>Total Aportes Empleador</span>
-                <span>{{ liquidacion()!.totalAportes | currency:'':'$':'1.0-0' }}</span>
-              </div>
-            </div>
-          }
+          <!-- Espacio reservado para información adicional si es requerida en el futuro -->
         </div>
 
-        <!-- Cuadro de Totales -->
         <div class="w-full md:w-80 bg-slate-50 p-4 border border-slate-200 rounded">
           <div class="flex justify-between items-center py-1">
             <span class="text-slate-600">Total Devengado</span>
@@ -178,13 +183,13 @@
           </div>
           <div class="flex justify-between items-center pt-2 mt-2 border-t border-slate-300">
             <span class="font-bold text-slate-900 uppercase">Neto a Pagar</span>
-            <span class="font-bold text-lg text-slate-900">{{ liquidacion()!.netoPagar | currency:'':'$':'1.0-0' }}</span>
+            <span class="font-bold text-lg text-slate-900">{{ liquidacion()!.netoPagar | currency:'':'$':'1.0-0'
+              }}</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Firmas -->
     <div class="mt-20 grid grid-cols-2 gap-8 text-center text-slate-500 text-sm">
       <div>
         <div class="border-b border-slate-400 mx-auto w-3/4 md:w-1/2 mb-2"></div>
@@ -193,7 +198,7 @@
       <div>
         <div class="border-b border-slate-400 mx-auto w-3/4 md:w-1/2 mb-2"></div>
         <p>Firma Empleado</p>
-        <p class="text-xs mt-1">CC. {{ liquidacion()!.empleado?.numeroDocumento }}</p>
+        <p class="text-xs mt-1">CC. {{ liquidacion()!.empleado.numeroDocumento }}</p>
       </div>
     </div>
 

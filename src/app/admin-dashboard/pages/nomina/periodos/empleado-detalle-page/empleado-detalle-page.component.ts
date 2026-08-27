@@ -8,6 +8,8 @@ import { HeaderTitlePageComponent } from '@dashboard/components/header-title-pag
 import { LoaderService } from '@utils/services/loader.service';
 import { NotificationService } from '@shared/services/notification.service';
 import { EmpresaService } from '@dashboard/services/empresa.service';
+import { environment } from 'src/app/environments/environment';
+import { HelpersUtils } from '@utils/helpers.utils';
 
 @Component({
   selector: 'app-empleado-detalle-page',
@@ -50,7 +52,12 @@ export default class EmpleadoDetallePageComponent implements OnInit {
 
     this.empresaService.getEmpresa().subscribe({
       next: (res: any) => {
-        this.empresa.set(res?.data || res);
+        const d = res?.data || res;
+        if (d) {
+          const origin = environment.baseUrl.replace(/\/api\/v1\/?$/, '');
+          const logoUrlFormated = d.logoUrl ? (d.logoUrl.startsWith('/') ? `${origin}${d.logoUrl}` : d.logoUrl) : `/${HelpersUtils.logoApp}`;
+          this.empresa.set({ ...d, logoUrlFormated });
+        }
       },
       error: () => { },
     });

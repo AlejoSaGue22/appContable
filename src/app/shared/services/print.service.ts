@@ -69,7 +69,7 @@ export class PrintService {
           }
         }
       },
-      error: () => {}
+      error: () => { }
     });
   }
 
