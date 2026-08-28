@@ -60,70 +60,70 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 bg-slate-50 p-4 rounded border border-slate-100">
       <div class="col-span-2">
-        <p class="text-xs uppercase text-slate-500 font-semibold">Empleado</p>
-        <p class="font-medium text-base">{{ liquidacion()!.empleado.primerNombre }} {{
+        <p class="text-[10px] uppercase tracking-wider text-slate-500 mb-0.5">Empleado</p>
+        <p class="text-slate-800">{{ liquidacion()!.empleado.primerNombre }} {{
           liquidacion()!.empleado.segundoNombre }} {{ liquidacion()!.empleado.primerApellido }} {{
           liquidacion()!.empleado.segundoApellido }}</p>
       </div>
       <div>
-        <p class="text-xs uppercase text-slate-500 font-semibold">Identificación</p>
-        <p class="font-medium">CC. {{ liquidacion()!.empleado.numeroDocumento }}</p>
+        <p class="text-[10px] uppercase tracking-wider text-slate-500 mb-0.5">Identificación</p>
+        <p class="text-slate-800">CC. {{ liquidacion()!.empleado.numeroDocumento }}</p>
       </div>
       <div>
-        <p class="text-xs uppercase text-slate-500 font-semibold">Cargo</p>
-        <p class="font-medium">{{ liquidacion()!.empleado.cargo?.nombre }}</p>
+        <p class="text-[10px] uppercase tracking-wider text-slate-500 mb-0.5">Cargo</p>
+        <p class="text-slate-800">{{ liquidacion()!.empleado.cargo?.nombre }}</p>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8 mb-8">
 
       <!-- Ingresos -->
       <div>
-        <h3 class="text-sm font-bold uppercase border-b border-slate-300 pb-2 mb-3">Conceptos de Ingreso</h3>
-        <table class="w-full">
-          <thead class="text-xs text-slate-500 border-b border-slate-200">
+        <h3 class="text-xs font-semibold tracking-wider uppercase text-slate-500 border-b border-slate-200 pb-2 mb-3">Conceptos de Ingreso</h3>
+        <table class="w-full text-sm">
+          <thead class="text-[11px] uppercase tracking-wider text-slate-400">
             <tr>
-              <th class="font-medium text-left py-2">Concepto</th>
-              <th class="font-medium text-center py-2">Días</th>
-              <th class="font-medium text-right py-2">Valor</th>
+              <th class="font-normal text-left py-2">Concepto</th>
+              <th class="font-normal text-center py-2">Días</th>
+              <th class="font-normal text-right py-2">Valor</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-100">
+          <tbody class="divide-y divide-slate-50 text-slate-600">
             @if (liquidacion()!.salarioDevengado > 0) {
             <tr>
-              <td class="py-2 text-slate-700">Salario Básico</td>
-              <td class="py-2 text-center text-slate-500">{{ liquidacion()!.diasTrabajados }}</td>
-              <td class="py-2 text-right">{{ liquidacion()!.salarioDevengado | currency:'':'$':'1.0-0' }}</td>
+              <td class="py-2.5">Salario Básico</td>
+              <td class="py-2.5 text-center text-slate-400">{{ liquidacion()!.diasTrabajados }}</td>
+              <td class="py-2.5 text-right">{{ liquidacion()!.salarioDevengado | currency:'':'$':'1.0-0' }}</td>
             </tr>
             }
             @if (liquidacion()!.auxilioTransporte > 0) {
             <tr>
-              <td class="py-2 text-slate-700">Auxilio de Transporte</td>
-              <td class="py-2 text-center text-slate-500">{{ liquidacion()!.diasTrabajados }}</td>
-              <td class="py-2 text-right">{{ liquidacion()!.auxilioTransporte | currency:'':'$':'1.0-0' }}</td>
+              <td class="py-2.5">Auxilio de Transporte</td>
+              <td class="py-2.5 text-center text-slate-400">{{ liquidacion()!.diasTrabajados }}</td>
+              <td class="py-2.5 text-right">{{ liquidacion()!.auxilioTransporte | currency:'':'$':'1.0-0' }}</td>
             </tr>
             }
             @if (liquidacion()!.comisiones > 0) {
             <tr>
-              <td class="py-2 text-slate-700">Comisiones</td>
-              <td class="py-2 text-center text-slate-500">-</td>
-              <td class="py-2 text-right">{{ liquidacion()!.comisiones | currency:'':'$':'1.0-0' }}</td>
+              <td class="py-2.5">Comisiones</td>
+              <td class="py-2.5 text-center text-slate-400">-</td>
+              <td class="py-2.5 text-right">{{ liquidacion()!.comisiones | currency:'':'$':'1.0-0' }}</td>
             </tr>
             }
             @if (liquidacion()!.totalBonificaciones > 0) {
             <tr>
-              <td class="py-2 text-slate-700">Bonificaciones</td>
-              <td class="py-2 text-center text-slate-500">-</td>
-              <td class="py-2 text-right">{{ liquidacion()!.totalBonificaciones | currency:'':'$':'1.0-0' }}</td>
+              <td class="py-2.5">Bonificaciones</td>
+              <td class="py-2.5 text-center text-slate-400">-</td>
+              <td class="py-2.5 text-right">{{ liquidacion()!.totalBonificaciones | currency:'':'$':'1.0-0' }}</td>
             </tr>
             }
             @if (liquidacion()!.totalHorasExtras > 0) {
             <tr>
-              <td class="py-2 text-slate-700">Horas Extras</td>
-              <td class="py-2 text-center text-slate-500">-</td>
-              <td class="py-2 text-right">{{ liquidacion()!.totalHorasExtras | currency:'':'$':'1.0-0' }}</td>
+              <td class="py-2.5">Horas Extras</td>
+              <td class="py-2.5 text-center text-slate-400">-</td>
+              <td class="py-2.5 text-right">{{ liquidacion()!.totalHorasExtras | currency:'':'$':'1.0-0' }}</td>
             </tr>
             }
           </tbody>
@@ -132,31 +132,31 @@
 
       <!-- Deducciones -->
       <div>
-        <h3 class="text-sm font-bold uppercase border-b border-slate-300 pb-2 mb-3">Deducciones</h3>
-        <table class="w-full">
-          <thead class="text-xs text-slate-500 border-b border-slate-200">
+        <h3 class="text-xs font-semibold tracking-wider uppercase text-slate-500 border-b border-slate-200 pb-2 mb-3">Deducciones</h3>
+        <table class="w-full text-sm">
+          <thead class="text-[11px] uppercase tracking-wider text-slate-400">
             <tr>
-              <th class="font-medium text-left py-2">Concepto</th>
-              <th class="font-medium text-right py-2">Valor</th>
+              <th class="font-normal text-left py-2">Concepto</th>
+              <th class="font-normal text-right py-2">Valor</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-100">
+          <tbody class="divide-y divide-slate-50 text-slate-600">
             @if (liquidacion()!.saludEmpleado > 0) {
             <tr>
-              <td class="py-2 text-slate-700">Salud</td>
-              <td class="py-2 text-right">-{{ liquidacion()!.saludEmpleado | currency:'':'$':'1.0-0' }}</td>
+              <td class="py-2.5">Salud</td>
+              <td class="py-2.5 text-right">-{{ liquidacion()!.saludEmpleado | currency:'':'$':'1.0-0' }}</td>
             </tr>
             }
             @if (liquidacion()!.pensionEmpleado > 0) {
             <tr>
-              <td class="py-2 text-slate-700">Pensión</td>
-              <td class="py-2 text-right">-{{ liquidacion()!.pensionEmpleado | currency:'':'$':'1.0-0' }}</td>
+              <td class="py-2.5">Pensión</td>
+              <td class="py-2.5 text-right">-{{ liquidacion()!.pensionEmpleado | currency:'':'$':'1.0-0' }}</td>
             </tr>
             }
             @if (liquidacion()!.retencionFuente > 0) {
             <tr>
-              <td class="py-2 text-slate-700">Retención en la Fuente</td>
-              <td class="py-2 text-right">-{{ liquidacion()!.retencionFuente | currency:'':'$':'1.0-0' }}</td>
+              <td class="py-2.5">Retención en la Fuente</td>
+              <td class="py-2.5 text-right">-{{ liquidacion()!.retencionFuente | currency:'':'$':'1.0-0' }}</td>
             </tr>
             }
           </tbody>
@@ -165,25 +165,25 @@
 
     </div>
 
-    <div class="border-t border-slate-300 pt-6">
+    <div class="border-t border-slate-200 pt-6">
       <div class="flex flex-col md:flex-row justify-between items-end gap-6">
 
         <div class="w-full md:w-1/2">
           <!-- Espacio reservado para información adicional si es requerida en el futuro -->
         </div>
 
-        <div class="w-full md:w-80 bg-slate-50 p-4 border border-slate-200 rounded">
-          <div class="flex justify-between items-center py-1">
-            <span class="text-slate-600">Total Devengado</span>
-            <span class="font-medium">{{ liquidacion()!.totalDevengado | currency:'':'$':'1.0-0' }}</span>
+        <div class="w-full md:w-80">
+          <div class="flex justify-between items-center py-1 text-sm text-slate-600">
+            <span>Total Devengado</span>
+            <span>{{ liquidacion()!.totalDevengado | currency:'':'$':'1.0-0' }}</span>
           </div>
-          <div class="flex justify-between items-center py-1">
-            <span class="text-slate-600">Total Deducciones</span>
-            <span class="font-medium">-{{ liquidacion()!.totalDeducciones | currency:'':'$':'1.0-0' }}</span>
+          <div class="flex justify-between items-center py-1 text-sm text-slate-600">
+            <span>Total Deducciones</span>
+            <span>-{{ liquidacion()!.totalDeducciones | currency:'':'$':'1.0-0' }}</span>
           </div>
-          <div class="flex justify-between items-center pt-2 mt-2 border-t border-slate-300">
-            <span class="font-bold text-slate-900 uppercase">Neto a Pagar</span>
-            <span class="font-bold text-lg text-slate-900">{{ liquidacion()!.netoPagar | currency:'':'$':'1.0-0'
+          <div class="flex justify-between items-center pt-3 mt-2 border-t border-slate-200">
+            <span class="font-semibold text-xs text-slate-800 uppercase tracking-wider">Neto a Pagar</span>
+            <span class="font-semibold text-lg text-slate-900">{{ liquidacion()!.netoPagar | currency:'':'$':'1.0-0'
               }}</span>
           </div>
         </div>
