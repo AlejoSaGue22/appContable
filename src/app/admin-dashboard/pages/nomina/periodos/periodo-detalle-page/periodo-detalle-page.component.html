@@ -8,7 +8,8 @@
   </div>
   } @else if (periodo()) {
   <!-- Header -->
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-100">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justif
+  y-between gap-4 pb-4 border-b border-slate-100">
     <div class="flex items-center gap-4">
       <button (click)="volver()" class="p-2 rounded-xl hover:bg-slate-100 cursor-pointer transition-colors">
         <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -44,14 +45,52 @@
       </button>
       }
       @if (periodo()!.estado === 'LIQUIDADA' || periodo()!.estado === 'PAGADA') {
-      <button (click)="descargarDesprendibles()"
-        class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-semibold cursor-pointer hover:bg-emerald-700 transition-all shadow-sm shadow-emerald-200 active:scale-[0.98]">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-        Descargar Desprendibles
-      </button>
+      <div class="relative" #dropdownContainer>
+        <button (click)="toggleDropdown($event)"
+          class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-semibold cursor-pointer hover:bg-emerald-700 transition-all shadow-sm shadow-emerald-200 active:scale-[0.98]">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          Descargar y Exportar
+          <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        @if (isDropdownOpen()) {
+        <div
+          class="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-slate-100 z-50 overflow-hidden animate-fade-in-up">
+          <div class="py-1">
+            <button (click)="descargarDetalleExcel()"
+              class="w-full text-left px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer transition-colors">
+              <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Descargar detalle (Excel)
+            </button>
+            <button (click)="descargarComprobantesZip()"
+              class="w-full text-left px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer transition-colors">
+              <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+              </svg>
+              Descargar comprobantes (ZIP)
+            </button>
+            <div class="h-px bg-slate-100 my-1"></div>
+            <button (click)="irAGenerarPago()"
+              class="w-full text-left px-4 py-2.5 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer transition-colors">
+              <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+              </svg>
+              Generar archivo de pago
+            </button>
+          </div>
+        </div>
+        }
+      </div>
       <button (click)="anularPeriodo()"
         class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-white border-2 border-red-200 text-red-600 rounded-xl text-xs font-semibold cursor-pointer hover:bg-red-50 transition-all active:scale-[0.98]">
         Anular
@@ -70,51 +109,74 @@
       <p class="text-[10px] uppercase tracking-wider text-slate-500 mb-1">Total Deducciones</p>
       <p class="text-xl font-medium text-slate-800">{{ periodo()!.totalDeducciones | currency:'':'$':'1.0-0' }}</p>
     </div>
-    <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex flex-col justify-center relative overflow-hidden">
+    <div
+      class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex flex-col justify-center relative overflow-hidden">
       <div class="absolute left-0 top-0 bottom-0 w-1 bg-emerald-400"></div>
       <p class="text-[10px] uppercase tracking-wider text-slate-500 mb-1 pl-1">Neto a Pagar</p>
       <p class="text-xl font-medium text-slate-900 pl-1">{{ periodo()!.totalNeto | currency:'':'$':'1.0-0' }}</p>
     </div>
-    <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex flex-col justify-center relative overflow-hidden">
+    <div
+      class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm flex flex-col justify-center relative overflow-hidden">
       <div class="absolute left-0 top-0 bottom-0 w-1 bg-blue-400"></div>
       <p class="text-[10px] uppercase tracking-wider text-slate-500 mb-1 pl-1">Costo Empresa</p>
-      <p class="text-xl font-medium text-slate-900 pl-1">{{ periodo()!.totalCostoEmpresa | currency:'':'$':'1.0-0' }}</p>
+      <p class="text-xl font-medium text-slate-900 pl-1">{{ periodo()!.totalCostoEmpresa | currency:'':'$':'1.0-0' }}
+      </p>
     </div>
   </div>
 
   <!-- Liquidaciones Table -->
-  <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-    <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+  <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col max-h-[500px]">
+    <div
+      class="px-6 py-4 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between bg-slate-50 sticky top-0 z-20 gap-4">
       <div>
         <h3 class="text-sm font-semibold text-slate-800 tracking-wide">Liquidaciones por Empleado</h3>
         <p class="text-xs text-slate-500 mt-0.5">{{ liquidaciones().length }} empleados liquidados</p>
       </div>
+      <div class="relative w-full md:w-64">
+        <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor"
+          viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input type="text" [(ngModel)]="searchQuery" placeholder="Buscar por nombre o doc..."
+          class="w-full pl-9 pr-3 py-2 text-xs border-slate-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-all">
+      </div>
     </div>
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm">
-        <thead>
+    <div class="overflow-y-auto flex-1">
+      <table class="w-full text-sm relative">
+        <thead class="sticky top-0 bg-white z-10 shadow-sm">
           <tr class="border-b border-slate-200">
-            <th class="text-left px-6 py-3 text-[10px] font-medium text-slate-500 uppercase tracking-wider">Empleado</th>
-            <th class="text-right px-6 py-3 text-[10px] font-medium text-slate-500 uppercase tracking-wider">Devengado</th>
+            <th class="text-left px-6 py-3 text-[10px] font-medium text-slate-500 uppercase tracking-wider">Empleado
+            </th>
+            <th class="text-right px-6 py-3 text-[10px] font-medium text-slate-500 uppercase tracking-wider">Devengado
+            </th>
             <th class="text-right px-6 py-3 text-[10px] font-medium text-slate-500 uppercase tracking-wider">Salud</th>
-            <th class="text-right px-6 py-3 text-[10px] font-medium text-slate-500 uppercase tracking-wider">Pensión</th>
-            <th class="text-right px-6 py-3 text-[10px] font-medium text-slate-500 uppercase tracking-wider">Retefte</th>
+            <th class="text-right px-6 py-3 text-[10px] font-medium text-slate-500 uppercase tracking-wider">Pensión
+            </th>
+            <th class="text-right px-6 py-3 text-[10px] font-medium text-slate-500 uppercase tracking-wider">Retefte
+            </th>
             <th class="text-right px-6 py-3 text-[10px] font-medium text-slate-500 uppercase tracking-wider">Neto</th>
-            <th class="text-center px-6 py-3 text-[10px] font-medium text-slate-500 uppercase tracking-wider">Acciones</th>
+            <th class="text-center px-6 py-3 text-[10px] font-medium text-slate-500 uppercase tracking-wider">Acciones
+            </th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">
-          @for (l of liquidaciones(); track l.id) {
+          @for (l of filteredLiquidaciones(); track l.id) {
           <tr class="hover:bg-slate-50 transition-colors cursor-pointer" (click)="verDetalleEmpleado(l)">
             <td class="px-6 py-3.5">
               <p class="text-sm text-slate-800">{{ l.empleado.primerNombre }} {{ l.empleado.primerApellido }}</p>
               <p class="text-[11px] text-slate-500">{{ l.empleado.numeroDocumento }}</p>
             </td>
-            <td class="px-6 py-3.5 text-right tabular-nums text-sm text-slate-600">{{ l.totalDevengado | currency:'':'$':'1.0-0' }}</td>
-            <td class="px-6 py-3.5 text-right tabular-nums text-sm text-slate-500">{{ l.saludEmpleado | currency:'':'$':'1.0-0' }}</td>
-            <td class="px-6 py-3.5 text-right tabular-nums text-sm text-slate-500">{{ l.pensionEmpleado | currency:'':'$':'1.0-0' }}</td>
-            <td class="px-6 py-3.5 text-right tabular-nums text-sm text-slate-500">{{ l.retencionFuente | currency:'':'$':'1.0-0' }}</td>
-            <td class="px-6 py-3.5 text-right tabular-nums text-sm font-medium text-slate-800">{{ l.netoPagar | currency:'':'$':'1.0-0' }}</td>
+            <td class="px-6 py-3.5 text-right tabular-nums text-sm text-slate-600">{{ l.totalDevengado |
+              currency:'':'$':'1.0-0' }}</td>
+            <td class="px-6 py-3.5 text-right tabular-nums text-sm text-slate-500">{{ l.saludEmpleado |
+              currency:'':'$':'1.0-0' }}</td>
+            <td class="px-6 py-3.5 text-right tabular-nums text-sm text-slate-500">{{ l.pensionEmpleado |
+              currency:'':'$':'1.0-0' }}</td>
+            <td class="px-6 py-3.5 text-right tabular-nums text-sm text-slate-500">{{ l.retencionFuente |
+              currency:'':'$':'1.0-0' }}</td>
+            <td class="px-6 py-3.5 text-right tabular-nums text-sm font-medium text-slate-800">{{ l.netoPagar |
+              currency:'':'$':'1.0-0' }}</td>
             <td class="px-6 py-3.5 text-center">
               <button (click)="verDetalleEmpleado(l); $event.stopPropagation()"
                 class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all cursor-pointer">
@@ -152,9 +214,11 @@
           <tr class="border-b border-slate-200">
             <th class="text-left px-6 py-3 text-[10px] font-medium text-slate-500 uppercase tracking-wider">Fecha</th>
             <th class="text-left px-6 py-3 text-[10px] font-medium text-slate-500 uppercase tracking-wider">Cuenta</th>
-            <th class="text-left px-6 py-3 text-[10px] font-medium text-slate-500 uppercase tracking-wider">Comprobante</th>
+            <th class="text-left px-6 py-3 text-[10px] font-medium text-slate-500 uppercase tracking-wider">Comprobante
+            </th>
             <th class="text-right px-6 py-3 text-[10px] font-medium text-slate-500 uppercase tracking-wider">Valor</th>
-            <th class="text-left px-6 py-3 text-[10px] font-medium text-slate-500 uppercase tracking-wider">Observaciones</th>
+            <th class="text-left px-6 py-3 text-[10px] font-medium text-slate-500 uppercase tracking-wider">
+              Observaciones</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">

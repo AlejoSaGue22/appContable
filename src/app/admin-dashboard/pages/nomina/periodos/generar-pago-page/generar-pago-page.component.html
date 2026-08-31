@@ -1,0 +1,185 @@
+<div class="p-6 space-y-6 animate-fade-in">
+  @if (isLoading()) {
+  <div class="flex justify-center items-center h-64">
+    <svg class="animate-spin h-10 w-10 text-blue-600" viewBox="0 0 24 24" fill="none">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+    </svg>
+  </div>
+  } @else if (periodo()) {
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-100">
+    <div class="flex items-center gap-4">
+      <button (click)="volver()" class="p-2 rounded-xl hover:bg-slate-100 cursor-pointer transition-colors">
+        <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+      <div>
+        <h1 class="text-2xl font-extrabold text-slate-900">Generar Archivo de Pago</h1>
+        <p class="text-sm text-slate-500 mt-0.5">Configura la información bancaria y selecciona los empleados a incluir en el archivo de dispersión.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <div class="xl:col-span-2 space-y-6">
+      
+      <!-- Resumen de Liquidación & Banco -->
+      <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+        <h3 class="text-sm font-semibold text-slate-800 tracking-wide mb-4">Información del Período y Banco</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
+            <p class="text-xs text-slate-500 uppercase tracking-wider mb-1">Período Seleccionado</p>
+            <p class="font-medium text-slate-800">{{ periodo()!.nombre }}</p>
+            <p class="text-xs text-slate-500 mt-1">{{ periodo()!.fechaInicio }} — {{ periodo()!.fechaFin }}</p>
+          </div>
+          
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
+            <p class="text-xs text-slate-500 uppercase tracking-wider mb-1">Total Liquidaciones</p>
+            <p class="font-medium text-slate-800">{{ liquidaciones().length }} Empleados</p>
+            <p class="text-xs text-emerald-600 mt-1 font-medium">{{ periodo()!.totalNeto | currency:'':'$':'1.0-0' }} Neto Total</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1.5">Banco de Origen <span class="text-red-500">*</span></label>
+            <select [(ngModel)]="bancoSeleccionado" class="w-full text-sm border-slate-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5">
+              <option value="" disabled selected>Seleccione un banco...</option>
+              @for (b of bancos(); track b.id) {
+                <option [value]="b.id">{{ b.nombre }}</option>
+              }
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-700 mb-1.5">Número de Cuenta Origen <span class="text-red-500">*</span></label>
+            <input type="text" [(ngModel)]="cuentaOrigen" placeholder="Ej: 1234567890" class="w-full text-sm border-slate-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5">
+          </div>
+        </div>
+      </div>
+
+      <!-- Empleados a pagar Table -->
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col max-h-[500px]">
+        <div class="px-6 py-4 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between bg-slate-50 sticky top-0 z-20 gap-4">
+          <div>
+            <h3 class="text-sm font-semibold text-slate-800 tracking-wide">Empleados a Pagar</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Seleccione los empleados que desea incluir en el archivo</p>
+          </div>
+          <div class="flex flex-col md:flex-row items-center gap-4">
+            <div class="relative w-full md:w-64">
+              <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input type="text" [(ngModel)]="searchQuery" placeholder="Buscar por nombre o doc..." class="w-full pl-9 pr-3 py-2 text-xs border-slate-200 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-all">
+            </div>
+            <p class="text-xs font-semibold text-blue-600 whitespace-nowrap">{{ totalSeleccionados() }} de {{ liquidaciones().length }} seleccionados</p>
+          </div>
+        </div>
+        
+        <div class="overflow-y-auto flex-1">
+          <table class="w-full text-sm relative">
+            <thead class="sticky top-0 bg-white z-10 shadow-sm">
+              <tr class="border-b border-slate-200">
+                <th class="px-6 py-3 w-12 text-center">
+                  <input type="checkbox" 
+                    class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer" 
+                    [checked]="todosSeleccionados()"
+                    (change)="toggleAll($event)">
+                </th>
+                <th class="text-left px-4 py-3 text-[10px] font-medium text-slate-500 uppercase tracking-wider">Empleado</th>
+                <th class="text-left px-4 py-3 text-[10px] font-medium text-slate-500 uppercase tracking-wider">Información Bancaria</th>
+                <th class="text-right px-6 py-3 text-[10px] font-medium text-slate-500 uppercase tracking-wider">Valor Neto</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              @for (l of filteredLiquidaciones(); track l.id) {
+              <tr class="hover:bg-slate-50 transition-colors" [class.bg-blue-50]="l.seleccionado">
+                <td class="px-6 py-3.5 text-center">
+                  <input type="checkbox" 
+                    class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer" 
+                    [checked]="l.seleccionado"
+                    (change)="toggleRow(l.id, $event)">
+                </td>
+                <td class="px-4 py-3.5">
+                  <p class="text-sm font-medium text-slate-800">{{ l.empleado.primerNombre }} {{ l.empleado.primerApellido }}</p>
+                  <p class="text-[11px] text-slate-500">{{ l.empleado.numeroDocumento }}</p>
+                </td>
+                <td class="px-4 py-3.5">
+                  @if ($any(l.empleado).numeroCuenta && $any(l.empleado).bancoId) {
+                    <p class="text-sm text-slate-700 font-mono">{{ $any(l.empleado).numeroCuenta }}</p>
+                    <p class="text-[11px] text-slate-500 flex items-center gap-1">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                      {{ $any(l.empleado).banco?.nombre || $any(l.empleado).bancoId }}
+                    </p>
+                  } @else {
+                    <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-red-50 text-red-600 text-xs font-medium border border-red-100">
+                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                      Información Incompleta
+                    </span>
+                  }
+                </td>
+                <td class="px-6 py-3.5 text-right tabular-nums text-sm font-medium text-slate-800">
+                  {{ l.netoPagar | currency:'':'$':'1.0-0' }}
+                </td>
+              </tr>
+              } @empty {
+              <tr>
+                <td colspan="4" class="text-center py-12">
+                  <p class="text-sm text-slate-500">No hay liquidaciones disponibles en este período.</p>
+                </td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Panel -->
+    <div class="xl:col-span-1">
+      <div class="bg-slate-900 rounded-xl p-6 shadow-xl sticky top-6 text-white border border-slate-800">
+        <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
+          <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Resumen de Pago
+        </h3>
+
+        <div class="space-y-4 mb-8">
+          <div class="flex justify-between items-center py-2 border-b border-slate-700/50">
+            <span class="text-slate-400 text-sm">Empleados a pagar</span>
+            <span class="font-semibold text-slate-100">{{ totalSeleccionados() }}</span>
+          </div>
+          <div class="flex justify-between items-center py-2 border-b border-slate-700/50">
+            <span class="text-slate-400 text-sm">Banco Destino</span>
+            <span class="font-medium text-slate-100 truncate max-w-[150px] text-right" [title]="bancoSeleccionado() || 'No seleccionado'">
+              {{ bancoSeleccionado() ? (bancoSeleccionado() | slice:0:15) : 'Pendiente' }}
+            </span>
+          </div>
+          <div class="flex justify-between items-center py-3">
+            <span class="text-slate-300 font-medium">Total a Transferir</span>
+            <span class="text-2xl font-bold text-emerald-400 tabular-nums">{{ valorTotalSeleccionado() | currency:'':'$':'1.0-0' }}</span>
+          </div>
+        </div>
+
+        <button (click)="generarArchivo()"
+          [disabled]="totalSeleccionados() === 0 || !bancoSeleccionado() || !cuentaOrigen()"
+          class="w-full py-3.5 px-4 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-700 disabled:text-slate-400 disabled:cursor-not-allowed text-white rounded-xl font-bold text-sm transition-all shadow-lg shadow-blue-500/20 active:scale-[0.98] flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Generar Archivo de Pago
+        </button>
+
+        <p class="text-[11px] text-slate-500 text-center mt-4 leading-relaxed">
+          Al generar el archivo, se descargará un documento en formato texto (.txt) que puede ser procesado por la sucursal virtual de su banco.
+        </p>
+      </div>
+    </div>
+  </div>
+  }
+</div>

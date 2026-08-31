@@ -6,7 +6,7 @@ import { Liquidacion, PeriodoNomina, Empleado } from '../interfaces/nomina.inter
 @Injectable({ providedIn: 'root' })
 export class PdfDesprendibleService {
 
-  generarDesprendible(liquidacion: Liquidacion, periodo: PeriodoNomina, empresa: any) {
+  generarDesprendible(liquidacion: Liquidacion, periodo: PeriodoNomina, empresa: any, asBlob: boolean = false): { blob?: Blob, fileName: string } | void {
     const doc = new jsPDF();
     const emp = liquidacion.empleado as any;
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -25,7 +25,7 @@ export class PdfDesprendibleService {
     // Title
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
-    doc.text('Desprendido de Pago de Nómina', pageWidth / 2, 20, { align: 'center' });
+    doc.text('Desprendible de Pago de Nómina', pageWidth / 2, 20, { align: 'center' });
 
     // Period info
     doc.setFontSize(8);
@@ -182,7 +182,12 @@ export class PdfDesprendibleService {
     doc.text('Firma Empleado', 50, footerY - 15, { align: 'center' });
     doc.text('Representante Legal', pageWidth - 50, footerY - 15, { align: 'center' });
 
-    const fileName = `Desprendido_${emp?.primerNombre}_${emp?.primerApellido}_${periodo.nombre.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+    const fileName = `Desprendible_${emp?.primerNombre}_${emp?.primerApellido}_${periodo.nombre.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+    
+    if (asBlob) {
+      return { blob: doc.output('blob'), fileName };
+    }
+    
     doc.save(fileName);
   }
 

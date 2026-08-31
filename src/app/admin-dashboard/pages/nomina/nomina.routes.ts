@@ -34,6 +34,10 @@ export default [
         loadComponent: () => import('./periodos/empleado-detalle-page/empleado-detalle-page.component'),
     },
     {
+        path: 'periodos/:id/generar-pago',
+        loadComponent: () => import('./periodos/generar-pago-page/generar-pago-page.component'),
+    },
+    {
         path: 'configuracion',
         loadComponent: () => import('./configuracion/configuracion-page.component'),
     },
