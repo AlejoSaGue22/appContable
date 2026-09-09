@@ -1,0 +1,52 @@
+<div class="modal-overlay" (click)="cerrar.emit()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    
+    <button class="close-btn" (click)="cerrar.emit()">✕</button>
+
+    <div class="modal-header">
+      <h2>Registrar Pago de Nómina</h2>
+      <p class="subtitle">Lote seleccionado: {{ lote.length }} empleados del período {{ periodoNombre }}</p>
+    </div>
+
+    <div class="modal-body">
+      <div *ngIf="error" class="error-alert">
+        {{ error }}
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Fecha de Pago <span class="required">*</span></label>
+          <input type="date" [(ngModel)]="fechaPago" class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label>Cuenta Bancaria (Código) <span class="required">*</span></label>
+          <input type="text" [(ngModel)]="cuentaCodigoContable" class="form-control" placeholder="Ej. 111005">
+          <span class="help-text">Cuenta contable desde la cual saldrá el dinero.</span>
+        </div>
+
+        <div class="form-group">
+          <label>N° Comprobante Bancario</label>
+          <input type="text" [(ngModel)]="numeroComprobante" class="form-control" placeholder="Opcional">
+        </div>
+
+        <div class="form-group full-width">
+          <label>Observaciones</label>
+          <textarea [(ngModel)]="observaciones" class="form-control" rows="2" placeholder="Opcional"></textarea>
+        </div>
+      </div>
+
+      <div class="summary-box">
+        <span class="summary-label">Total a debitar:</span>
+        <span class="summary-value">{{ totalAbono | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="cerrar.emit()" [disabled]="isSubmitting">Cancelar</button>
+      <button class="btn-primary" (click)="submit()" [disabled]="isSubmitting">
+        {{ isSubmitting ? 'Procesando...' : 'Confirmar Pago' }}
+      </button>
+    </div>
+  </div>
+</div>

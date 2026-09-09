@@ -55,6 +55,30 @@ export default class PeriodoDetallePageComponent implements OnInit {
     });
   });
 
+  uniqueComprobantes = computed(() => {
+    const map = new Map<string, any>();
+    this.liquidaciones().forEach(l => {
+      if (l.comprobante) {
+        const c = { ...l.comprobante };
+        c.empleadoNombre = `${l.empleado?.primerNombre || ''} ${l.empleado?.segundoNombre || ''} ${l.empleado?.primerApellido || ''} ${l.empleado?.segundoApellido || ''}`.replace(/\s+/g, ' ').trim();
+        c.empleadoDocumento = l.empleado?.numeroDocumento || '';
+        c.netoPagar = l.netoPagar;
+        map.set(c.id, c);
+      }
+    });
+    return Array.from(map.values());
+  });
+
+  isComprobantesModalOpen = signal(false);
+
+  openComprobantesModal() {
+    this.isComprobantesModalOpen.set(true);
+  }
+
+  closeComprobantesModal() {
+    this.isComprobantesModalOpen.set(false);
+  }
+
   confirmModal = signal<ConfirmModalConfig | null>(null);
   private confirmCallback: (() => void) | null = null;
 

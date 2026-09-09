@@ -18,6 +18,7 @@ export interface Empresa {
   email?: string;
   logoUrl?: string;
   configuracionDian?: any;
+  arlId?: string;
 }
 
 @Injectable({ providedIn: 'root' })

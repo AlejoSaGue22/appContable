@@ -63,10 +63,10 @@ export class CxcComponent implements OnInit {
     slog: 'Facturas de venta a crédito pendientes de pago',
   });
 
-  activeTab = signal<string>('facturas');
+  activeTab = signal<string>('cobros');
   tabItems: TabItem[] = [
-    { id: 'facturas', label: 'Facturas Pendientes' },
     { id: 'cobros', label: 'Pagos Realizados' },
+    { id: 'facturas', label: 'Facturas Pendientes' },
     { id: 'estado-cuenta', label: 'Estado de Cuenta' },
   ];
 

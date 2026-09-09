@@ -1,0 +1,118 @@
+<div class="tesoreria-container">
+  <header class="tesoreria-header">
+    <div class="header-content">
+      <h1 class="page-title">Tesorería de Nómina</h1>
+      <p class="page-subtitle">Gestión y pago de obligaciones laborales pendientes.</p>
+    </div>
+  </header>
+
+  <div class="content-wrapper">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando obligaciones...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="error-state">
+      <p>{{ error }}</p>
+      <button class="btn-retry" (click)="loadObligaciones()">Reintentar</button>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && !error && obligacionesAgrupadas.length === 0" class="empty-state">
+      <div class="empty-icon">✓</div>
+      <h2>Todo al día</h2>
+      <p>No hay obligaciones de nómina pendientes de pago en este momento.</p>
+    </div>
+
+    <!-- List of Obligations grouped by Period -->
+    <div *ngIf="!loading && !error && obligacionesAgrupadas.length > 0" class="periodos-list">
+      <div class="periodo-card" *ngFor="let grupo of obligacionesAgrupadas">
+        <div class="periodo-header">
+          <div class="periodo-info">
+            <input 
+              type="checkbox" 
+              class="custom-checkbox"
+              [checked]="isAllSelected(grupo.periodoId)"
+              (change)="toggleGroupSelection(grupo.periodoId, $event)"
+            >
+            <h2 class="periodo-title">{{ grupo.periodoNombre }}</h2>
+          </div>
+          <div class="periodo-meta">
+            <span class="meta-label">{{ grupo.obligaciones.length }} obligaciones</span>
+          </div>
+        </div>
+
+        <div class="obligaciones-table-wrapper">
+          <table class="obligaciones-table">
+            <thead>
+              <tr>
+                <th class="col-checkbox"></th>
+                <th class="col-empleado">Empleado</th>
+                <th class="col-identificacion">Identificación</th>
+                <th class="col-estado">Estado</th>
+                <th class="col-saldo">Saldo a Pagar</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr 
+                *ngFor="let obs of grupo.obligaciones" 
+                class="obligacion-row"
+                [class.selected]="selectedObligaciones.has(obs.id)"
+                (click)="toggleSelection(obs.id)"
+              >
+                <td class="col-checkbox" (click)="$event.stopPropagation()">
+                  <input 
+                    type="checkbox" 
+                    class="custom-checkbox"
+                    [checked]="selectedObligaciones.has(obs.id)"
+                    (change)="toggleSelection(obs.id)"
+                  >
+                </td>
+                <td class="col-empleado">
+                  <span class="empleado-nombre">{{ obs.empleado?.nombres }} {{ obs.empleado?.apellidos }}</span>
+                </td>
+                <td class="col-identificacion">
+                  <span class="empleado-doc">{{ obs.empleado?.numeroDocumento }}</span>
+                </td>
+                <td class="col-estado">
+                  <span class="status-badge" [ngClass]="obs.estado.toLowerCase()">
+                    {{ obs.estado | titlecase }}
+                  </span>
+                </td>
+                <td class="col-saldo">
+                  <span class="saldo-amount">{{ obs.saldo | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sticky Footer / Payment Signature -->
+  <div class="payment-footer" [class.visible]="hasSelection">
+    <div class="footer-content">
+      <div class="selection-summary">
+        <span class="selection-count">{{ selectedObligaciones.size }} obligaciones seleccionadas</span>
+        <div class="selection-total">
+          <span class="total-label">Total a Pagar</span>
+          <span class="total-value">{{ totalSelectedAmount | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+        </div>
+      </div>
+      <div class="footer-actions">
+        <button class="btn-cancel" (click)="selectedObligaciones.clear()">Cancelar</button>
+        <button class="btn-primary" (click)="prepararPago()">Registrar Pago</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-registrar-pago-modal
+  *ngIf="showModal"
+  [lote]="selectedLote"
+  (cerrar)="showModal = false"
+  (pagoRegistrado)="onPagoRegistrado()"
+></app-registrar-pago-modal>

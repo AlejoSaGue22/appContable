@@ -9,6 +9,8 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { tap } from 'rxjs';
 import { LoaderComponent } from 'src/app/utils/components/loader/loader.component';
 import { FormErrorLabelComponent } from '@utils/components/form-error-label/form-error-label.component';
+import { NominaService } from '../../../../nomina/services/nomina.service';
+import { EntidadSeguridadSocial } from '../../../../nomina/interfaces/nomina.interface';
 
 @Component({
   selector: 'app-empresa',
@@ -20,6 +22,7 @@ export class EmpresaComponent implements OnInit {
   private fb = inject(FormBuilder);
   private empresaService = inject(EmpresaService);
   private notificationService = inject(NotificationService);
+  private nominaService = inject(NominaService);
 
   headTitle = signal<HeaderInput>({
     title: 'Configuración de Empresa',
@@ -42,7 +45,10 @@ export class EmpresaComponent implements OnInit {
     telefono: [''],
     email: ['', [Validators.email]],
     logoUrl: [''],
+    arlId: [''],
   });
+
+  arls = signal<EntidadSeguridadSocial[]>([]);
 
   empresaResource = rxResource({
     loader: () => this.empresaService.getEmpresa().pipe(
@@ -57,7 +63,12 @@ export class EmpresaComponent implements OnInit {
     )
   });
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.nominaService.getEntidadesSeguridad('ARL').subscribe({
+      next: (res) => this.arls.set(res),
+      error: () => this.notificationService.error('Error al cargar ARLs')
+    });
+  }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;

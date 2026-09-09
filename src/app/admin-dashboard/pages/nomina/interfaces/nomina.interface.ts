@@ -92,6 +92,7 @@ export interface PeriodoNomina {
   totalNeto: number;
   totalCostoEmpresa: number;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface CreatePeriodoDto {
@@ -124,6 +125,8 @@ export interface Liquidacion {
   totalAportes: number;
   provisiones: { concepto: string; valor: number }[];
   totalProvisiones: number;
+  comprobanteId?: string | null;
+  comprobante?: any | null;
 }
 
 export interface EntidadSeguridadSocial {
@@ -311,4 +314,39 @@ export interface ReporteResumenAportes {
     aportes: { concepto: string; valor: number }[];
     totalAportesEmpleado: number;
   }[];
+}
+
+export enum EstadoObligacionNomina {
+  PENDIENTE = 'PENDIENTE',
+  PARCIALMENTE_PAGADA = 'PARCIALMENTE_PAGADA',
+  PAGADA = 'PAGADA',
+}
+
+export interface ObligacionNomina {
+  id: string;
+  periodoId: string;
+  empleadoId: string;
+  terceroId: string | null;
+  valorTotal: string | number;
+  valorPagado: string | number;
+  saldo: string | number;
+  estado: EstadoObligacionNomina;
+  createdAt: string;
+  updatedAt: string;
+  periodo?: PeriodoNomina;
+  empleado?: Empleado;
+}
+
+export interface ObligacionPagoDetalleDto {
+  obligacionId: string;
+  valorAbono: number;
+}
+
+export interface PagarObligacionesDto {
+  fechaPago: string;
+  cuentaCodigoContable: string;
+  bancoId?: string;
+  numeroComprobante?: string;
+  observaciones?: string;
+  detalles: ObligacionPagoDetalleDto[];
 }

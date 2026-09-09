@@ -20,58 +20,71 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Razón Social -->
           <div class="space-y-2">
-            <label class="block text-xs font-bold text-gray-700 uppercase">Razón Social <span
+            <label class="block text-xs font-bold text-gray-700">Razón Social <span
                 class="text-red-500">*</span></label>
             <input type="text" formControlName="razonSocial"
               class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all"
               placeholder="Ej: ALVA Corp S.A.S" />
-            @if (formEmpresa.get('razonSocial')?.touched && formEmpresa.get('razonSocial')?.invalid) {
-            <p class="text-xs text-red-500">La razón social es obligatoria</p>
-            }
+            <form-error-label [errorType]="formEmpresa.get('razonSocial')!" />
           </div>
 
           <!-- NIT -->
           <div class="space-y-2">
-            <label class="block text-xs font-bold text-gray-700 uppercase">NIT / Identificación <span
+            <label class="block text-xs font-bold text-gray-700">NIT / Identificación <span
                 class="text-red-500">*</span></label>
             <input type="text" formControlName="nit"
               class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all font-mono"
               placeholder="Ej: 900.123.456-7" />
-            @if (formEmpresa.get('nit')?.touched && formEmpresa.get('nit')?.invalid) {
-            <p class="text-xs text-red-500">El NIT es obligatorio</p>
-            }
+            <form-error-label [errorType]="formEmpresa.get('nit')!" />
           </div>
 
           <!-- Correo Electrónico -->
           <div class="space-y-2">
-            <label class="block text-xs font-bold text-gray-700 uppercase">Correo Electrónico</label>
+            <label class="block text-xs font-bold text-gray-700">Correo Electrónico</label>
             <input type="email" formControlName="email"
               class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all"
               placeholder="correo@empresa.com" />
-            @if (formEmpresa.get('email')?.touched && formEmpresa.get('email')?.invalid) {
-            <p class="text-xs text-red-500">Ingresa un correo electrónico válido</p>
-            }
+            <form-error-label [errorType]="formEmpresa.get('email')!" />
           </div>
 
           <!-- Teléfono -->
           <div class="space-y-2">
-            <label class="block text-xs font-bold text-gray-700 uppercase">Teléfono / Celular</label>
+            <label class="block text-xs font-bold text-gray-700">Teléfono / Celular</label>
             <input type="text" formControlName="telefono"
               class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all"
               placeholder="Ej: +57 300 123 4567" />
           </div>
 
           <!-- Dirección -->
-          <div class="space-y-2 md:col-span-2">
-            <label class="block text-xs font-bold text-gray-700 uppercase">Dirección Principal</label>
+          <div class="space-y-2">
+            <label class="block text-xs font-bold text-gray-700">Dirección Principal</label>
             <input type="text" formControlName="direccion"
               class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all"
               placeholder="Ej: Calle 45 # 12 - 34" />
           </div>
 
+          <!-- ARL -->
+          <div class="space-y-2">
+            <label class="block text-xs font-bold text-gray-700">Aseguradora de Riesgos Laborales (ARL)</label>
+            <div class="relative">
+              <select formControlName="arlId"
+                class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all appearance-none pr-10 cursor-pointer">
+                <option value="">Seleccione una ARL</option>
+                @for (arl of arls(); track arl.id) {
+                <option [value]="arl.id">{{ arl.codigo }} - {{ arl.nombre }}</option>
+                }
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+
           <!-- Logo File Upload & Preview -->
           <div class="space-y-2 md:col-span-2 pt-2 border-t border-gray-100">
-            <label class="block text-xs font-bold text-gray-700 uppercase">Logo de la Empresa</label>
+            <label class="block text-xs font-bold text-gray-700">Logo de la Empresa</label>
             <div class="flex flex-col sm:flex-row gap-4 items-center">
               <div class="flex-1 w-full">
                 <label

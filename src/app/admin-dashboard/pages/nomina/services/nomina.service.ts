@@ -8,7 +8,7 @@ import {
   PeriodoNomina, CreatePeriodoDto, Liquidacion, PagoNomina,
   EntidadSeguridadSocial, Cargo, CentroCosto,
   PaginatedResponse, ConceptoNomina, EmpleadoConceptoRecurrente, CreateEmpleadoConceptoDto, PeriodoEmpleado, ParametroNominaVersion,
-  PeriodoEmpleadoConcepto, ConceptosConsolidadosResponse
+  PeriodoEmpleadoConcepto, ConceptosConsolidadosResponse, ObligacionNomina, PagarObligacionesDto
 } from '../interfaces/nomina.interface';
 
 
