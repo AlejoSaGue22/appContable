@@ -1,9 +1,9 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { NominaService } from '../../../services/nomina.service';
-import { ObligacionNomina, EstadoObligacionNomina } from '../../../interfaces/nomina.interface';
-import { RegistrarPagoModalComponent } from '../../components/registrar-pago-modal/registrar-pago-modal.component';
+import { RegistrarPagoModalComponent } from '../components/registrar-pago-modal/registrar-pago-modal.component';
+import { NominaService } from '../../services/nomina.service';
+import { EstadoObligacionNomina, ObligacionNomina } from '../../interfaces/nomina.interface';
 
 @Component({
   selector: 'app-tesoreria-page',
@@ -15,37 +15,37 @@ import { RegistrarPagoModalComponent } from '../../components/registrar-pago-mod
 export default class TesoreriaPageComponent implements OnInit {
   private nominaService = inject(NominaService);
 
-  obligaciones: ObligacionNomina[] = [];
-  obligacionesAgrupadas: { periodoId: string, periodoNombre: string, obligaciones: ObligacionNomina[] }[] = [];
-  
-  loading = false;
-  error = '';
+  obligaciones = signal<ObligacionNomina[]>([]);
+  obligacionesAgrupadas = signal<{ periodoId: string, periodoNombre: string, obligaciones: ObligacionNomina[] }[]>([]);
+
+  loading = signal(false);
+  error = signal('');
 
   // Selección
   selectedObligaciones: Set<string> = new Set();
-  
+
   // Modal state
-  showModal = false;
-  selectedLote: ObligacionNomina[] = [];
+  showModal = signal(false);
+  selectedLote = signal<ObligacionNomina[]>([]);
 
   ngOnInit() {
     this.loadObligaciones();
   }
 
   loadObligaciones() {
-    this.loading = true;
-    this.error = '';
-    
+    this.loading.set(true);
+    this.error.set('');
+
     // Solo cargamos las que no estén PAGADA
     this.nominaService.getObligaciones().subscribe({
       next: (res) => {
-        this.obligaciones = res.filter(o => o.estado !== EstadoObligacionNomina.PAGADA);
+        this.obligaciones.set(res.filter(o => o.estado !== EstadoObligacionNomina.PAGADA));
         this.agruparObligaciones();
-        this.loading = false;
+        this.loading.set(false);
       },
       error: (err) => {
-        this.error = 'Error al cargar las obligaciones';
-        this.loading = false;
+        this.error.set('Error al cargar las obligaciones');
+        this.loading.set(false);
         console.error(err);
       }
     });
@@ -53,8 +53,8 @@ export default class TesoreriaPageComponent implements OnInit {
 
   agruparObligaciones() {
     const grupos = new Map<string, { periodoId: string, periodoNombre: string, obligaciones: ObligacionNomina[] }>();
-    
-    this.obligaciones.forEach(o => {
+
+    this.obligaciones().forEach(o => {
       const periodoNombre = o.periodo?.nombre || 'Período Desconocido';
       if (!grupos.has(o.periodoId)) {
         grupos.set(o.periodoId, { periodoId: o.periodoId, periodoNombre, obligaciones: [] });
@@ -62,7 +62,7 @@ export default class TesoreriaPageComponent implements OnInit {
       grupos.get(o.periodoId)!.obligaciones.push(o);
     });
 
-    this.obligacionesAgrupadas = Array.from(grupos.values());
+    this.obligacionesAgrupadas.set(Array.from(grupos.values()));
   }
 
   toggleSelection(obligacionId: string) {
@@ -74,14 +74,14 @@ export default class TesoreriaPageComponent implements OnInit {
   }
 
   isAllSelected(periodoId: string): boolean {
-    const grupo = this.obligacionesAgrupadas.find(g => g.periodoId === periodoId);
+    const grupo = this.obligacionesAgrupadas().find(g => g.periodoId === periodoId);
     if (!grupo || grupo.obligaciones.length === 0) return false;
     return grupo.obligaciones.every(o => this.selectedObligaciones.has(o.id));
   }
 
   toggleGroupSelection(periodoId: string, event: Event) {
     const checked = (event.target as HTMLInputElement).checked;
-    const grupo = this.obligacionesAgrupadas.find(g => g.periodoId === periodoId);
+    const grupo = this.obligacionesAgrupadas().find(g => g.periodoId === periodoId);
     if (grupo) {
       grupo.obligaciones.forEach(o => {
         if (checked) {
@@ -94,7 +94,7 @@ export default class TesoreriaPageComponent implements OnInit {
   }
 
   get totalSelectedAmount(): number {
-    return this.obligaciones
+    return this.obligaciones()
       .filter(o => this.selectedObligaciones.has(o.id))
       .reduce((sum, o) => sum + Number(o.saldo), 0);
   }
@@ -105,7 +105,7 @@ export default class TesoreriaPageComponent implements OnInit {
 
   get periodosSeleccionados(): number {
     const periodos = new Set<string>();
-    this.obligaciones.forEach(o => {
+    this.obligaciones().forEach(o => {
       if (this.selectedObligaciones.has(o.id)) {
         periodos.add(o.periodoId);
       }
@@ -115,19 +115,19 @@ export default class TesoreriaPageComponent implements OnInit {
 
   prepararPago() {
     if (!this.hasSelection) return;
-    
+
     // Solo permitimos pagar obligaciones de un mismo período a la vez
     if (this.periodosSeleccionados > 1) {
       alert('Por favor, selecciona obligaciones de un solo período para agrupar el comprobante de pago.');
       return;
     }
 
-    this.selectedLote = this.obligaciones.filter(o => this.selectedObligaciones.has(o.id));
-    this.showModal = true;
+    this.selectedLote.set(this.obligaciones().filter(o => this.selectedObligaciones.has(o.id)));
+    this.showModal.set(true);
   }
 
   onPagoRegistrado() {
-    this.showModal = false;
+    this.showModal.set(false);
     this.selectedObligaciones.clear();
     this.loadObligaciones();
   }

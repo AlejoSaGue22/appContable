@@ -45,9 +45,9 @@ export default [
         path: 'reportes',
         loadComponent: () => import('./reportes/nomina-reportes-page.component'),
     },
-        {
+    {
         path: 'tesoreria',
-        loadComponent: () => import('./tesoreria/tesoreria-page.component')
+        loadComponent: () => import('./tesoreria/tesoreria-page/tesoreria-page.component')
     },
     {
         path: '**',

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import TesoreriaPageComponent from './tesoreria-page.component';
 
-import { TesoreriaPageComponent } from './tesoreria-page.component';
 
 describe('TesoreriaPageComponent', () => {
   let component: TesoreriaPageComponent;
@@ -10,7 +10,7 @@ describe('TesoreriaPageComponent', () => {
     await TestBed.configureTestingModule({
       imports: [TesoreriaPageComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(TesoreriaPageComponent);
     component = fixture.componentInstance;
