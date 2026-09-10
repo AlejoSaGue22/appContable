@@ -75,7 +75,8 @@ export class RegistrarPagoModalComponent {
 
     const periodoId = this.lote[0].periodoId;
     
-    const dto: PagarObligacionesDto = {
+    const dto: any = {
+      periodoId,
       fechaPago: this.fechaPago,
       cuentaBancariaId: this.cuentaBancariaId,
       numeroComprobante: this.numeroComprobante || undefined,

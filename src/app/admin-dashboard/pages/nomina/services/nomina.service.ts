@@ -131,10 +131,6 @@ export class NominaService {
     return this.http.post(`${this.base}/periodos/${id}/pagar`, dto).pipe(catchError(this.handleError));
   }
 
-  anularNomina(id: string): Observable<any> {
-    return this.http.post(`${this.base}/periodos/${id}/anular`, {}).pipe(catchError(this.handleError));
-  }
-
   reversarLiquidacion(id: string): Observable<any> {
     return this.http.post(`${this.base}/periodos/${id}/reversar`, {}).pipe(catchError(this.handleError));
   }

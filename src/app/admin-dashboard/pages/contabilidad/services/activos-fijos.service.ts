@@ -12,8 +12,8 @@ export class ActivosFijosService {
 
   constructor(private http: HttpClient) {}
 
-  getActivosFijos(): Observable<ActivoFijo[]> {
-    return this.http.get<ActivoFijo[]>(this.base);
+  getActivosFijos(params: any = {}): Observable<any> {
+    return this.http.get<any>(this.base, { params });
   }
 
   getActivoFijo(id: string): Observable<ActivoFijo> {

@@ -5,16 +5,39 @@
   <div class="max-w-7xl mx-auto space-y-6">
     <!-- Action Header -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-      <div class="relative w-full sm:w-96 text-slate-500">
-        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      <div class="flex flex-wrap gap-3 flex-1">
+        <!-- Búsqueda texto -->
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
+          <input [formControl]="filtroTexto"
+            class="pl-9 pr-3 py-2.5 text-sm bg-white border border-slate-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all w-full sm:w-52"
+            placeholder="Buscar comprobante...">
         </div>
-        <input type="text"
-          class="block w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-xl leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-shadow"
-          placeholder="Buscar comprobante...">
+
+        <!-- Filtro estado -->
+        <select [formControl]="filtroEstado"
+          class="text-sm bg-white border border-slate-200 rounded-xl py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm cursor-pointer transition-all">
+          <option value="">Todos los estados</option>
+          <option value="BORRADOR">Borrador</option>
+          <option value="CONTABILIZADO">Contabilizado</option>
+          <option value="ANULADO">Anulado</option>
+        </select>
+
+        <!-- Rango de fechas -->
+        <input type="date" [formControl]="filtroFechaInicio"
+          class="text-sm bg-white border border-slate-200 rounded-xl py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm transition-all" />
+        <input type="date" [formControl]="filtroFechaFin"
+          class="text-sm bg-white border border-slate-200 rounded-xl py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm transition-all" />
+
+        <!-- Limpiar -->
+        <button (click)="limpiarFiltros()"
+          class="px-3 py-2.5 text-sm font-bold border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-all shadow-sm">
+          Limpiar
+        </button>
       </div>
 
       <button routerLink="/panel/contabilidad/comprobantes/nuevo"
@@ -49,7 +72,7 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
-            @for (comp of service.comprobantes(); track comp.id) {
+            @for (comp of filteredComprobantes(); track comp.id) {
             <tr class="hover:bg-slate-50/80 transition-colors">
               <td class="px-6 py-4 text-slate-950">{{ comp.numero }}</td>
               <td class="px-6 py-4 text-slate-700">{{ comp.tipoComprobante?.nombre || 'Manual' }}</td>
@@ -149,6 +172,11 @@
             }
           </tbody>
         </table>
+      </div>
+
+      <!-- Paginación -->
+      <div class="p-4 border-t border-slate-100 bg-slate-50/50">
+        <app-pagination [length]="filteredComprobantes().length" />
       </div>
     </div>
   </div>

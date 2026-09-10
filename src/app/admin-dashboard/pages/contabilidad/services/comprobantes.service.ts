@@ -18,13 +18,13 @@ export class ComprobantesService {
   public comprobantes = signal<ComprobanteContableInterface[]>([]);
   public isLoading = signal<boolean>(false);
 
-  loadComprobantes(): Observable<ComprobanteContableInterface[]> {
+  loadComprobantes(params: any = {}): Observable<any> {
     this.isLoading.set(true);
     return this.http
-      .get<ComprobanteContableInterface[]>(`${this.baseUrl}/comprobantes`)
+      .get<any>(`${this.baseUrl}/comprobantes`, { params })
       .pipe(
         tap((data) => {
-          this.comprobantes.set(data);
+          this.comprobantes.set(data.items || []);
           this.isLoading.set(false);
         }),
       );

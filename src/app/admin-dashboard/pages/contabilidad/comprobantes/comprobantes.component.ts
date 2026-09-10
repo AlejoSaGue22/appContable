@@ -1,7 +1,9 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map, startWith, debounceTime, distinctUntilChanged } from 'rxjs';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ComprobantesService } from '../services/comprobantes.service';
 import { ComprobanteContableInterface, EstadoComprobante } from '../interfaces/comprobantes.interface';
 import { HeaderTitlePageComponent } from '@dashboard/components/header-title-page/header-title-page.component';
@@ -9,6 +11,8 @@ import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.co
 import { ModalComponents } from '@shared/components/modal.components/modal.components';
 import { NotificationService } from '@shared/services/notification.service';
 import { ConfirmModalComponent, ConfirmModalConfig } from '@shared/components/confirm-modal/confirm-modal.component';
+import { PaginationComponent } from '@shared/components/pagination/pagination';
+import { PaginationService } from '@shared/components/pagination/pagination.service';
 
 @Component({
   selector: 'app-comprobantes',
@@ -21,6 +25,7 @@ import { ConfirmModalComponent, ConfirmModalConfig } from '@shared/components/co
     BreadcrumbComponent,
     ModalComponents,
     ConfirmModalComponent,
+    PaginationComponent,
   ],
   templateUrl: './comprobantes.component.html',
 })
@@ -28,6 +33,7 @@ export class ComprobantesComponent implements OnInit {
   public service = inject(ComprobantesService);
   private toastService = inject(NotificationService);
   private fb = inject(FormBuilder);
+  private paginationService = inject(PaginationService);
 
   public headTitle = signal({
     title: 'Comprobantes Contables',
@@ -38,6 +44,34 @@ export class ComprobantesComponent implements OnInit {
     { label: 'Contabilidad', route: '/panel/contabilidad' },
     { label: 'Comprobantes Contables' },
   ];
+
+  // ── Filtros ──────────────────────────────────────────────────────
+  filtroTexto = new FormControl('');
+  filtroEstado = new FormControl<EstadoComprobante | ''>('');
+  filtroFechaInicio = new FormControl('');
+  filtroFechaFin = new FormControl('');
+
+  textoSignal = toSignal(
+    this.filtroTexto.valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      map(v => v?.trim() ?? ''),
+    ),
+    { initialValue: this.filtroTexto.value ?? '' }
+  );
+  estadoSignal = toSignal(this.filtroEstado.valueChanges, { initialValue: this.filtroEstado.value ?? '' });
+  fechaInicioSignal = toSignal(this.filtroFechaInicio.valueChanges, { initialValue: this.filtroFechaInicio.value ?? '' });
+  fechaFinSignal = toSignal(this.filtroFechaFin.valueChanges, { initialValue: this.filtroFechaFin.value ?? '' });
+
+  filteredComprobantes = computed(() => this.service.comprobantes());
+
+  limpiarFiltros(): void {
+    this.filtroTexto.setValue('', { emitEvent: false });
+    this.filtroEstado.setValue('', { emitEvent: false });
+    this.filtroFechaInicio.setValue('', { emitEvent: false });
+    this.filtroFechaFin.setValue('', { emitEvent: false });
+    this.cargar();
+  }
 
   // Modal de confirmación
   confirmModal = signal<ConfirmModalConfig | null>(null);
@@ -71,8 +105,35 @@ export class ComprobantesComponent implements OnInit {
     this.confirmCallback = null;
   }
 
+  constructor() {
+    effect(() => {
+      this.textoSignal();
+      this.estadoSignal();
+      this.fechaInicioSignal();
+      this.fechaFinSignal();
+      this.paginationService.currentPage();
+      this.cargar();
+    });
+  }
+
   ngOnInit(): void {
-    this.service.loadComprobantes().subscribe();
+    // cargar se llama en el effect
+  }
+
+  cargar(): void {
+    this.service.loadComprobantes({
+      page: this.paginationService.currentPage(),
+      limit: 10,
+      busqueda: this.textoSignal() || undefined,
+      estado: this.estadoSignal() || undefined,
+      fechaInicio: this.fechaInicioSignal() || undefined,
+      fechaFin: this.fechaFinSignal() || undefined
+    }).subscribe({
+      next: (res) => {
+        this.paginationService.totalItems.set(res.meta.total);
+        this.paginationService.pageSize.set(res.meta.totalPages);
+      }
+    });
   }
 
   contabilizar(id: string) {
@@ -162,3 +223,4 @@ export class ComprobantesComponent implements OnInit {
     return Array.isArray(val) ? val : [val];
   }
 }
+

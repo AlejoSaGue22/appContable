@@ -193,34 +193,6 @@ export default class PeriodoDetallePageComponent implements OnInit {
     );
   }
 
-  anularPeriodo() {
-    const periodo = this.periodo();
-    if (!periodo) return;
-    this.pedirConfirmacion(
-      {
-        title: 'Anular Nómina',
-        message: `¿Está seguro de anular la nómina del período "${periodo.nombre}"?`,
-        detail: 'Esta acción revertirá todos los asientos contables generados.',
-        icon: 'danger',
-        confirmLabel: 'Sí, Anular',
-        confirmClass: 'bg-red-600 hover:bg-red-700',
-      },
-      () => {
-        this.loader.show();
-        this.nominaService.anularNomina(periodo.id).subscribe({
-          next: () => {
-            this.notification.success('Nómina anulada exitosamente');
-            this.loadData(periodo.id);
-          },
-          error: (err) => {
-            this.notification.error('Error al anular nómina', err);
-            this.loader.hide();
-          },
-        });
-      }
-    );
-  }
-
   descargarDetalleExcel() {
     this.isDropdownOpen.set(false);
     const periodo = this.periodo();

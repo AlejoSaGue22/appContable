@@ -3,48 +3,126 @@
 .tesoreria-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
-  font-family: 'Inter', system-ui, sans-serif;
-  color: #1a1a1a;
-  background: #fdfdfc;
+  padding: 2.5rem 2rem;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: #1f2937;
+  background: #f9fafb;
   min-height: 100vh;
   position: relative;
   padding-bottom: 120px; /* Space for sticky footer */
 }
 
 .tesoreria-header {
-  margin-bottom: 3rem;
-  border-bottom: 1px solid #eaeaea;
-  padding-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .page-title {
-  font-size: 2.25rem;
-  font-weight: 600;
+  font-size: 2rem;
+  font-weight: 700;
   letter-spacing: -0.02em;
   margin: 0 0 0.5rem 0;
-  color: #111;
+  color: #111827;
 }
 
 .page-subtitle {
   font-size: 1rem;
-  color: #666;
+  color: #6b7280;
   margin: 0;
 }
 
+/* Summary Cards */
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.summary-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+  border: 1px solid #e5e7eb;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.blue-icon {
+  background-color: #eff6ff;
+  color: #3b82f6;
+}
+
+.purple-icon {
+  background-color: #f5f3ff;
+  color: #8b5cf6;
+}
+
+.green-icon {
+  background-color: #f0fdf4;
+  color: #10b981;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.card-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.card-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1;
+}
+
+.total-value-text {
+  font-family: 'Roboto Mono', monospace;
+  color: #047857;
+}
+
+
+/* States */
 .loading-state, .error-state, .empty-state {
   text-align: center;
   padding: 4rem 2rem;
-  background: #fff;
-  border: 1px dashed #ccc;
-  border-radius: 8px;
+  background: #ffffff;
+  border: 1px dashed #d1d5db;
+  border-radius: 12px;
 }
 
 .spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #333;
+  border: 3px solid #f3f4f6;
+  border-top: 3px solid #3b82f6;
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 1rem;
@@ -54,17 +132,17 @@
 
 .empty-icon {
   font-size: 3rem;
-  color: #4CAF50;
+  color: #10b981;
   margin-bottom: 1rem;
 }
 
 /* Listado de Periodos */
 .periodo-card {
-  background: #fff;
-  border: 1px solid #eaeaea;
-  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
   margin-bottom: 2rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   overflow: hidden;
 }
 
@@ -73,8 +151,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.25rem 1.5rem;
-  background: #fafafa;
-  border-bottom: 1px solid #eaeaea;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .periodo-info {
@@ -87,17 +165,25 @@
   margin: 0;
   font-size: 1.125rem;
   font-weight: 600;
+  color: #111827;
 }
 
 .periodo-meta .meta-label {
-  font-size: 0.875rem;
-  color: #666;
-  background: #f0f0f0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #374151;
+  background: #f3f4f6;
   padding: 0.25rem 0.75rem;
-  border-radius: 999px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 /* Tabla */
+.obligaciones-table-wrapper {
+  overflow-x: auto;
+}
+
 .obligaciones-table {
   width: 100%;
   border-collapse: collapse;
@@ -109,14 +195,15 @@
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #666;
-  font-weight: 500;
-  border-bottom: 1px solid #eaeaea;
+  color: #6b7280;
+  font-weight: 600;
+  border-bottom: 1px solid #e5e7eb;
+  background-color: #ffffff;
 }
 
 .obligaciones-table td {
-  padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid #f5f5f5;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #f3f4f6;
   vertical-align: middle;
 }
 
@@ -126,29 +213,50 @@
 }
 
 .obligacion-row:hover {
-  background-color: #fafafa;
+  background-color: #f9fafb;
 }
 
 .obligacion-row.selected {
-  background-color: #f0f7ff;
+  background-color: #eff6ff;
+}
+
+.empleado-info-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.empleado-avatar {
+  width: 32px;
+  height: 32px;
+  background-color: #e5e7eb;
+  color: #4b5563;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
 .empleado-nombre {
-  font-weight: 500;
-  color: #222;
+  font-weight: 600;
+  color: #111827;
+  font-size: 0.875rem;
 }
 
 .empleado-doc {
   font-size: 0.875rem;
-  color: #666;
+  color: #6b7280;
   font-family: 'Roboto Mono', monospace;
 }
 
 .saldo-amount {
   font-weight: 600;
   font-family: 'Roboto Mono', monospace;
-  font-size: 1.125rem;
-  color: #111;
+  font-size: 1rem;
+  color: #111827;
 }
 
 .col-saldo {
@@ -157,31 +265,84 @@
 
 /* Status Badge */
 .status-badge {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.025em;
 }
 
 .status-badge.pendiente {
-  background: #fff4e5;
-  color: #b26a00;
+  background: #fffbeb;
+  color: #b45309;
 }
 
 .status-badge.parcialmente_pagada {
-  background: #e3f2fd;
-  color: #1565c0;
+  background: #eff6ff;
+  color: #1d4ed8;
 }
 
 /* Custom Checkbox */
-.custom-checkbox {
-  width: 18px;
-  height: 18px;
+.custom-checkbox-container {
+  display: block;
+  position: relative;
+  padding-left: 20px;
   cursor: pointer;
-  accent-color: #000;
+  font-size: 22px;
+  user-select: none;
+}
+
+.custom-checkbox-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  height: 18px;
+  width: 18px;
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.custom-checkbox-container:hover input ~ .checkmark {
+  border-color: #9ca3af;
+}
+
+.custom-checkbox-container input:checked ~ .checkmark {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.custom-checkbox-container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.custom-checkbox-container .checkmark:after {
+  left: 5px;
+  top: 2px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 
 /* Sticky Footer (Signature) */
@@ -190,8 +351,8 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background: #111;
-  color: #fff;
+  background: #111827;
+  color: #ffffff;
   transform: translateY(100%);
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
@@ -205,7 +366,7 @@
 .footer-content {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1.5rem 2rem;
+  padding: 1.25rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -214,12 +375,13 @@
 .selection-summary {
   display: flex;
   align-items: center;
-  gap: 3rem;
+  gap: 2.5rem;
 }
 
 .selection-count {
   font-size: 0.875rem;
-  color: #aaa;
+  font-weight: 500;
+  color: #9ca3af;
 }
 
 .selection-total {
@@ -231,15 +393,15 @@
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #888;
+  color: #9ca3af;
   margin-bottom: 0.25rem;
 }
 
 .total-value {
-  font-size: 1.75rem;
-  font-weight: 600;
+  font-size: 1.5rem;
+  font-weight: 700;
   font-family: 'Roboto Mono', monospace;
-  color: #fff;
+  color: #ffffff;
   line-height: 1;
 }
 
@@ -250,31 +412,39 @@
 
 .btn-cancel {
   background: transparent;
-  border: 1px solid #444;
-  color: #fff;
-  padding: 0.75rem 1.5rem;
-  border-radius: 4px;
+  border: 1px solid #4b5563;
+  color: #d1d5db;
+  padding: 0.625rem 1.25rem;
+  border-radius: 6px;
   font-weight: 500;
+  font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .btn-cancel:hover {
-  background: #222;
-  border-color: #666;
+  background: #1f2937;
+  border-color: #6b7280;
+  color: #ffffff;
 }
 
 .btn-primary {
-  background: #fff;
-  color: #111;
+  background: #ffffff;
+  color: #111827;
   border: none;
-  padding: 0.75rem 2rem;
-  border-radius: 4px;
+  padding: 0.625rem 1.5rem;
+  border-radius: 6px;
   font-weight: 600;
+  font-size: 0.875rem;
   cursor: pointer;
-  transition: transform 0.1s;
+  transition: transform 0.1s, background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background: #f3f4f6;
 }
 
 .btn-primary:active {
   transform: scale(0.98);
 }
+

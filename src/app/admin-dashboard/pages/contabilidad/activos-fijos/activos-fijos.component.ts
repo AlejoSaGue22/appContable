@@ -1,9 +1,9 @@
 import { Component, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { rxResource } from '@angular/core/rxjs-interop';
-import { tap } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { tap, map, startWith, debounceTime, distinctUntilChanged } from 'rxjs';
 
 import { ActivosFijosService } from '../services/activos-fijos.service';
 import { CuentasContablesService } from '../services/cuentas-contables.service';
@@ -15,6 +15,8 @@ import { HeaderInput, HeaderTitlePageComponent } from '@dashboard/components/hea
 import { ModalComponent } from '@shared/components/modal/modal.component';
 import { NotificationService } from '@shared/services/notification.service';
 import { LoaderService } from '@utils/services/loader.service';
+import { PaginationComponent } from '@shared/components/pagination/pagination';
+import { PaginationService } from '@shared/components/pagination/pagination.service';
 
 import { ActivoFijo, DepreciacionActivoFijo } from '../interfaces/activos-fijos.interface';
 import { GetCuentasContables } from '../interfaces/cuentas-contables.interface';
@@ -29,6 +31,8 @@ import { GetCuentasContables } from '../interfaces/cuentas-contables.interface';
     HeaderTitlePageComponent,
     ModalComponent,
     FormsModule,
+    ReactiveFormsModule,
+    PaginationComponent,
   ],
   templateUrl: './activos-fijos.component.html',
 })
@@ -40,16 +44,34 @@ export class ActivosFijosComponent {
   private centrosCostosService = inject(CentrosCostosService);
   private notificationService = inject(NotificationService);
   private loaderService = inject(LoaderService);
+  private paginationService = inject(PaginationService);
 
   headTitle: HeaderInput = {
     title: 'Activos Fijos',
-    slog: 'Registro, depreciación acumulada y control de bienes y equipos',
+    slog: 'Registro, depreciacion acumulada y control de bienes y equipos',
   };
+
+  // --- Filtros ---
+  filtroTexto = new FormControl('');
+  filtroEstado = new FormControl('');
+  filtroTipo = new FormControl('');
+
+  textoSignal = toSignal(
+    this.filtroTexto.valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      map(v => v?.trim() ?? ''),
+    ),
+    { initialValue: this.filtroTexto.value ?? '' }
+  );
+  estadoSignal = toSignal(this.filtroEstado.valueChanges, { initialValue: this.filtroEstado.value ?? '' });
+  tipoSignal = toSignal(this.filtroTipo.valueChanges, { initialValue: this.filtroTipo.value ?? '' });
 
   // --- Signals & Modals ---
   isDepreciarModalOpen = signal(false);
   isRetirarModalOpen = signal(false);
   isDetailsModalOpen = signal(false);
+  loading = signal(false);
 
   selectedAsset = signal<ActivoFijo | null>(null);
   depreciaciones = signal<DepreciacionActivoFijo[]>([]);
@@ -75,17 +97,55 @@ export class ActivosFijosComponent {
   proveedoresList = signal<any[]>([]);
   centrosCostosList = signal<any[]>([]);
 
-  constructor() {
-    this.cargarCatalogos();
-  }
-
-  // --- Resources ---
-  activosResource = rxResource({
-    request: () => ({}),
-    loader: () => this.activosService.getActivosFijos()
+  // --- Data ---
+  activosData = signal<{ items: ActivoFijo[], meta: any }>({
+    items: [],
+    meta: { page: 1, limit: 10, total: 0, totalPages: 1 }
   });
 
-  activos = computed(() => this.activosResource.value() ?? []);
+  filteredActivos = computed(() => this.activosData().items);
+
+  constructor() {
+    this.cargarCatalogos();
+
+    // Reaccionar a cambios en filtros y paginacion
+    effect(() => {
+      this.textoSignal();
+      this.estadoSignal();
+      this.tipoSignal();
+      this.paginationService.currentPage();
+      this.cargar();
+    });
+  }
+
+  cargar(): void {
+    this.loading.set(true);
+    this.activosService.getActivosFijos({
+      page: this.paginationService.currentPage(),
+      limit: 10,
+      busqueda: this.textoSignal() || undefined,
+      estado: this.estadoSignal() || undefined,
+      tipo: this.tipoSignal() || undefined
+    }).subscribe({
+      next: (res) => {
+        this.activosData.set(res);
+        this.loading.set(false);
+        this.paginationService.totalItems.set(res.meta.total);
+        this.paginationService.pageSize.set(res.meta.totalPages);
+      },
+      error: () => this.loading.set(false)
+    });
+  }
+
+  // Se mantiene estatico por ahora o se puede cargar del backend, aqui lo dejamos simple:
+  tiposUnicos = signal<string[]>(['Muebles y Enseres', 'Equipos de Computacion', 'Maquinaria', 'Vehiculos', 'Edificios']);
+
+  limpiarFiltros(): void {
+    this.filtroTexto.setValue('', { emitEvent: false });
+    this.filtroEstado.setValue('', { emitEvent: false });
+    this.filtroTipo.setValue('', { emitEvent: false });
+    this.cargar();
+  }
 
   // --- Load Catalogs ---
   cargarCatalogos() {
@@ -149,18 +209,13 @@ export class ActivosFijosComponent {
     this.loaderService.show();
     this.activosService.depreciarPeriodo(this.depreciarForm).subscribe({
       next: (res) => {
-        this.notificationService.success(
-          `Depreciación mensual procesada correctamente. Se procesaron ${res.procesados} activo(s).`
-        );
+        this.notificationService.success(`Depreciacion mensual procesada correctamente. Se procesaron ${res.procesados} activo(s).`);
         this.isDepreciarModalOpen.set(false);
-        this.activosResource.reload();
+        this.cargar();
       },
       error: (err) => {
         this.loaderService.hide();
-        this.notificationService.error(
-          err.error?.message || 'Error al procesar la depreciación',
-          'Error'
-        );
+        this.notificationService.error(err.error?.message || 'Error al procesar la depreciacion', 'Error');
       },
       complete: () => {
         this.loaderService.hide();
@@ -221,7 +276,7 @@ export class ActivosFijosComponent {
       next: () => {
         this.notificationService.success('Activo fijo retirado correctamente del sistema contable.');
         this.isRetirarModalOpen.set(false);
-        this.activosResource.reload();
+        this.cargar();
       },
       error: (err) => {
         this.loaderService.hide();
@@ -236,3 +291,4 @@ export class ActivosFijosComponent {
     });
   }
 }
+

@@ -1,8 +1,8 @@
-@if (activosResource.hasValue() && !activosResource.isLoading()) {
+﻿@if (!loading()) {
 <div class="space-y-6 animate-fade-in">
   <header-title-page [titleHead]="headTitle">
     <div actions class="flex gap-2">
-      <button (click)="activosResource.reload()"
+      <button (click)="cargar()"
         class="inline-flex items-center justify-center cursor-pointer px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold rounded-xl transition-all active:scale-95 group">
         <svg class="mr-2 h-4 w-4 transition-transform group-hover:rotate-180 duration-500" fill="none"
           stroke="currentColor" viewBox="0 0 24 24">
@@ -32,8 +32,57 @@
     </div>
   </header-title-page>
 
+  <!-- Filter Bar -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+    <div class="flex flex-wrap gap-3 items-center">
+      <!-- Busqueda texto -->
+      <div class="relative">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input [formControl]="filtroTexto"
+          class="pl-9 pr-3 py-2.5 text-sm bg-white border border-gray-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all w-full sm:w-52"
+          placeholder="Buscar por codigo o nombre...">
+      </div>
+
+      <!-- Filtro estado -->
+      <select [formControl]="filtroEstado"
+        class="text-sm bg-white border border-gray-200 rounded-xl py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm cursor-pointer transition-all">
+        <option value="">Todos los estados</option>
+        <option value="ACTIVO">Activo</option>
+        <option value="DEPRECIADO">Depreciado</option>
+        <option value="RETIRADO">Retirado</option>
+        <option value="VENDIDO">Vendido</option>
+      </select>
+
+      <!-- Filtro tipo -->
+      <select [formControl]="filtroTipo"
+        class="text-sm bg-white border border-gray-200 rounded-xl py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-sm cursor-pointer transition-all">
+        <option value="">Todos los tipos</option>
+        @for (tipo of tiposUnicos(); track tipo) {
+        <option [value]="tipo">{{ tipo }}</option>
+        }
+      </select>
+
+      <!-- Limpiar -->
+      <button (click)="limpiarFiltros()"
+        class="px-3 py-2.5 text-sm font-bold border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-all shadow-sm">
+        Limpiar
+      </button>
+    </div>
+  </div>
+
   <!-- Table Card -->
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-500">
+  <div
+    class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden relative transition-all duration-500">
+    @if (loading()) {
+    <div class="absolute inset-0 bg-white/60 backdrop-blur-sm z-10 flex items-center justify-center">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+    </div>
+    }
+
     <div class="overflow-x-auto">
       <table class="ledger-table">
         <thead>
@@ -42,14 +91,14 @@
             <th class="text-left">Nombre / Adquisición</th>
             <th class="text-left">Vida Útil (Meses)</th>
             <th class="text-left">Valor Compra</th>
-            <th class="text-left">Depr. Acumulada</th>
+            <th class="text-left">Depreciación Acumulada</th>
             <th class="text-left">Valor Libros</th>
             <th class="text-left">Estado</th>
             <th class="text-center">Acciones</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100 text-sm text-gray-700">
-          @for (activo of activos(); track activo.id) {
+          @for (activo of filteredActivos(); track activo.id) {
           <tr class="hover:bg-gray-50 transition-colors group">
             <td class="px-6 py-4 font-mono text-blue-600">
               {{ activo.codigo }}
@@ -127,22 +176,27 @@
         </tbody>
       </table>
     </div>
+
+    <!-- Paginacion -->
+    <div class="p-4 border-t border-gray-100 bg-gray-50/50">
+      <app-pagination [length]="filteredActivos().length" />
+    </div>
   </div>
 </div>
 }
 
-@if (activosResource.isLoading()) {
+@if (loading()) {
 <div class="flex flex-col justify-center items-center h-80 space-y-4">
   <app-loader />
   <p class="text-sm font-medium text-gray-400 animate-pulse">Cargando activos fijos...</p>
 </div>
 }
 
-<!-- Modal de Depreciación Masiva -->
+<!-- Modal de Depreciacion Masiva -->
 <app-modal [(visible)]="isDepreciarModalOpen" title="Depreciar Periodo" size="md">
   <form (ngSubmit)="onSubmitDepreciar()" class="p-6 space-y-4">
     <p class="text-sm text-gray-500">
-      Este proceso ejecutará el cálculo de depreciación por el método de línea recta para todos los activos fijos
+      Este proceso ejecutara el calculo de depreciacion por el método de línea recta para todos los activos fijos
       elegibles. Se generarán automáticamente los asientos contables debidos.
     </p>
 
@@ -184,14 +238,14 @@
       </button>
       <button type="submit"
         class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 cursor-pointer">
-        Ejecutar Depreciación
+        Ejecutar Depreciacion
       </button>
     </div>
   </form>
 </app-modal>
 
 <!-- Modal de Historial / Detalle -->
-<app-modal [(visible)]="isDetailsModalOpen" [title]="'Historial de Depreciación: ' + (selectedAsset()?.nombre || '')"
+<app-modal [(visible)]="isDetailsModalOpen" [title]="'Historial de Depreciacion: ' + (selectedAsset()?.nombre || '')"
   size="lg">
   <div class="p-6 space-y-6">
     @if (selectedAsset(); as asset) {
@@ -201,7 +255,7 @@
         <div class="font-bold text-gray-900">{{ asset.valorAdquisicion | currency:'USD':'symbol':'1.2-2' }}</div>
       </div>
       <div>
-        <div class="text-gray-400 text-xs">Depreciación Acumulada</div>
+        <div class="text-gray-400 text-xs">Depreciacion Acumulada</div>
         <div class="font-bold text-red-600">{{ asset.depreciacionAcumulada | currency:'USD':'symbol':'1.2-2' }}</div>
       </div>
       <div>
@@ -216,7 +270,7 @@
     }
 
     <div>
-      <h4 class="text-xs font-bold text-gray-500 uppercase mb-3">Logs de Depreciación Mensual</h4>
+      <h4 class="text-xs font-bold text-gray-500 uppercase mb-3">Logs de Depreciacion Mensual</h4>
       <div class="border border-gray-100 rounded-xl overflow-hidden max-h-96 overflow-y-auto">
         <table class="w-full text-left text-sm">
           <thead>
@@ -225,7 +279,7 @@
               <th class="px-4 py-2.5">Fecha Proceso</th>
               <th class="px-4 py-2.5">Monto Depreciado</th>
               <th class="px-4 py-2.5">Comprobante Contable</th>
-              <th class="px-4 py-2.5 text-center">Acción</th>
+              <th class="px-4 py-2.5 text-center">Accion</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100 text-gray-700">
@@ -241,7 +295,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
-                  N° {{ dep.asientoContable?.numero || dep.asientoContable?.referencia || dep.asientoContableId }}
+                  NÂ° {{ dep.asientoContable?.numero || dep.asientoContable?.referencia || dep.asientoContableId }}
                 </span>
               </td>
               <td class="px-4 py-3 text-center">
@@ -280,13 +334,13 @@
                   </p>
                   }
 
-                  <!-- Tabla de Detalles de Cuenta (Débito y Crédito) -->
+                  <!-- Tabla de Detalles de Cuenta (Debito y Credito) -->
                   <div class="overflow-x-auto rounded-lg border border-slate-100">
                     <table class="w-full text-xs text-left">
                       <thead>
                         <tr class="bg-slate-100 text-slate-600 font-bold">
-                          <th class="px-3 py-2">Código Cuenta</th>
-                          <th class="px-3 py-2">Nombre Cuenta / Descripción</th>
+                          <th class="px-3 py-2">Codigo Cuenta</th>
+                          <th class="px-3 py-2">Nombre Cuenta / Descripcion</th>
                           <th class="px-3 py-2 text-right">Débito</th>
                           <th class="px-3 py-2 text-right">Crédito</th>
                         </tr>
@@ -294,13 +348,14 @@
                       <tbody class="divide-y divide-slate-100">
                         @for (det of dep.asientoContable?.detalles; track det.id) {
                         <tr class="hover:bg-slate-50">
-                          <td class="px-3 py-2 font-mono font-bold text-slate-800">{{ det.cuenta?.codigo || '—' }}</td>
-                          <td class="px-3 py-2 text-slate-700">{{ det.cuenta?.nombre || det.descripcion || '—' }}</td>
+                          <td class="px-3 py-2 font-mono font-bold text-slate-800">{{ det.cuenta?.codigo || 'â€”' }}
+                          </td>
+                          <td class="px-3 py-2 text-slate-700">{{ det.cuenta?.nombre || det.descripcion || 'â€”' }}</td>
                           <td class="px-3 py-2 text-right font-medium text-slate-900">
-                            {{ det.debito > 0 ? (det.debito | currency:'USD':'symbol':'1.2-2') : '—' }}
+                            {{ det.debito > 0 ? (det.debito | currency:'USD':'symbol':'1.2-2') : 'â€”' }}
                           </td>
                           <td class="px-3 py-2 text-right font-medium text-slate-900">
-                            {{ det.credito > 0 ? (det.credito | currency:'USD':'symbol':'1.2-2') : '—' }}
+                            {{ det.credito > 0 ? (det.credito | currency:'USD':'symbol':'1.2-2') : 'â€”' }}
                           </td>
                         </tr>
                         } @empty {
@@ -407,11 +462,11 @@
     }
 
     @if (retirarForm.valorVenta < (selectedAsset()?.valorLibros || 0)) { <div class="animate-fade-in">
-      <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Cuenta de Gasto/Pérdida (Opcional - por
+      <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Cuenta de Gasto/Perdida (Opcional - por
         defecto 5310)</label>
       <select [(ngModel)]="retirarForm.cuentaPerdidaRetiroId" name="cuentaPerdidaRetiroId"
         class="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
-        <option value="">Por Defecto (Otros Gastos / Pérdida Bienes)</option>
+        <option value="">Por Defecto (Otros Gastos / Perdida Bienes)</option>
         @for (cuenta of cuentasGasto; track cuenta.id) {
         <option [value]="cuenta.id">{{ cuenta.codigo }} - {{ cuenta.nombre }}</option>
         }

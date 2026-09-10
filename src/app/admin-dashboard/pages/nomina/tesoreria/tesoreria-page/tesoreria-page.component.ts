@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RegistrarPagoModalComponent } from '../components/registrar-pago-modal/registrar-pago-modal.component';
@@ -17,6 +17,11 @@ export default class TesoreriaPageComponent implements OnInit {
 
   obligaciones = signal<ObligacionNomina[]>([]);
   obligacionesAgrupadas = signal<{ periodoId: string, periodoNombre: string, obligaciones: ObligacionNomina[] }[]>([]);
+
+  // Computed Summaries
+  totalPeriodos = computed(() => this.obligacionesAgrupadas().length);
+  totalObligaciones = computed(() => this.obligaciones().length);
+  totalAPagar = computed(() => this.obligaciones().reduce((sum, o) => sum + Number(o.saldo), 0));
 
   loading = signal(false);
   error = signal('');

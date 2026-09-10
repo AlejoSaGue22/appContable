@@ -200,32 +200,6 @@ export default class PeriodosPageComponent {
     });
   }
 
-  anular(periodo: PeriodoNomina) {
-    this.pedirConfirmacion(
-      {
-        title: 'Anular Nómina',
-        message: `¿Está seguro de anular la nómina del período "${periodo.nombre}"?`,
-        detail: 'Esta acción revertirá todos los asientos contables generados y el período no podrá ser procesado de nuevo.',
-        icon: 'danger',
-        confirmLabel: 'Sí, Anular',
-        confirmClass: 'bg-red-600 hover:bg-red-700',
-      },
-      () => {
-        this.loader.show();
-        this.nominaService.anularNomina(periodo.id).subscribe({
-          next: () => {
-            this.notification.success('Nómina anulada exitosamente');
-            this.loadPeriodos();
-          },
-          error: (err) => {
-            this.notification.error('Error al anular nómina', err);
-            this.loader.hide();
-          },
-        });
-      }
-    );
-  }
-
   reversar(periodo: PeriodoNomina) {
     this.pedirConfirmacion(
       {

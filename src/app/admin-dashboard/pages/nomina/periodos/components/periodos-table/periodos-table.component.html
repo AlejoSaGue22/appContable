@@ -226,16 +226,7 @@
                 }
                 }
 
-                <!-- Anular (LIQUIDADA o PAGADA) -->
-                @if (p.estado === 'LIQUIDADA' || p.estado === 'PAGADA') {
-                <button (click)="anular.emit(p)"
-                  class="inline-flex items-center rounded-lg text-sm text-gray-600 hover:text-gray-900 cursor-pointer"
-                  title="Anular Nómina">
-                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-                }
+
               </div>
             </td>
           </tr>

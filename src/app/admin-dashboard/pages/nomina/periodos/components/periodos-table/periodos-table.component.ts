@@ -22,7 +22,6 @@ export class PeriodosTableComponent {
   liquidar = output<PeriodoNomina>();
   verDetalle = output<PeriodoNomina>();
   reversar = output<PeriodoNomina>();
-  anular = output<PeriodoNomina>();
   enviarDian = output<PeriodoNomina>();
   descargarXml = output<PeriodoNomina>();
   eliminar = output<PeriodoNomina>();
