@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ObligacionNomina, PagarObligacionesDto } from '../../../interfaces/nomina.interface';
 import { NominaService } from '../../../services/nomina.service';
+import { CuentasBancariasService } from '../../../../contabilidad/services/cuentas-bancarias.service';
+import { CuentaBancaria } from '../../../../contabilidad/interfaces/cuenta-bancaria.interface';
 
 @Component({
   selector: 'app-registrar-pago-modal',
@@ -13,6 +15,7 @@ import { NominaService } from '../../../services/nomina.service';
 })
 export class RegistrarPagoModalComponent {
   private nominaService = inject(NominaService);
+  private cuentasBancariasService = inject(CuentasBancariasService);
 
   @Input() lote: ObligacionNomina[] = [];
   @Output() cerrar = new EventEmitter<void>();
@@ -20,9 +23,12 @@ export class RegistrarPagoModalComponent {
 
   // Form State
   fechaPago: string = new Date().toISOString().substring(0, 10);
-  cuentaCodigoContable: string = '111005'; // Default for testing
+  cuentaBancariaId: string = '';
   numeroComprobante: string = '';
   observaciones: string = '';
+
+  cuentasBancarias: CuentaBancaria[] = [];
+  loadingCuentas = false;
 
   isSubmitting = false;
   error = '';
@@ -35,9 +41,30 @@ export class RegistrarPagoModalComponent {
     return this.lote.length > 0 ? (this.lote[0].periodo?.nombre || 'Período') : '';
   }
 
+  ngOnInit() {
+    this.cargarCuentasBancarias();
+  }
+
+  cargarCuentasBancarias() {
+    this.loadingCuentas = true;
+    this.cuentasBancariasService.getCuentasBancos({ estado: 'activo', limit: 100 }).subscribe({
+      next: (res) => {
+        this.cuentasBancarias = res.cuentas;
+        this.loadingCuentas = false;
+        if (this.cuentasBancarias.length > 0) {
+          this.cuentaBancariaId = this.cuentasBancarias[0].id;
+        }
+      },
+      error: () => {
+        this.loadingCuentas = false;
+        this.error = 'Error al cargar las cuentas bancarias';
+      }
+    });
+  }
+
   submit() {
-    if (!this.fechaPago || !this.cuentaCodigoContable) {
-      this.error = 'Fecha de pago y Cuenta Contable son obligatorias';
+    if (!this.fechaPago || !this.cuentaBancariaId) {
+      this.error = 'Fecha de pago y Cuenta Bancaria son obligatorias';
       return;
     }
 
@@ -50,7 +77,7 @@ export class RegistrarPagoModalComponent {
     
     const dto: PagarObligacionesDto = {
       fechaPago: this.fechaPago,
-      cuentaCodigoContable: this.cuentaCodigoContable,
+      cuentaBancariaId: this.cuentaBancariaId,
       numeroComprobante: this.numeroComprobante || undefined,
       observaciones: this.observaciones || undefined,
       detalles: this.lote.map(o => ({

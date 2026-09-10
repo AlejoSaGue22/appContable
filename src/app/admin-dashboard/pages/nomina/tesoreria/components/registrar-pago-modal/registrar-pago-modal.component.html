@@ -20,9 +20,14 @@
         </div>
 
         <div class="form-group">
-          <label>Cuenta Bancaria (Código) <span class="required">*</span></label>
-          <input type="text" [(ngModel)]="cuentaCodigoContable" class="form-control" placeholder="Ej. 111005">
-          <span class="help-text">Cuenta contable desde la cual saldrá el dinero.</span>
+          <label>Cuenta Bancaria de Origen <span class="required">*</span></label>
+          <select [(ngModel)]="cuentaBancariaId" class="form-control" [disabled]="loadingCuentas">
+            <option value="" disabled selected>Seleccione una cuenta bancaria</option>
+            <option *ngFor="let cb of cuentasBancarias" [value]="cb.id">
+              {{ cb.nombre }} {{ cb.numeroCuenta ? ' - ' + cb.numeroCuenta : '' }}
+            </option>
+          </select>
+          <span class="help-text">Cuenta bancaria desde la cual saldrá el dinero.</span>
         </div>
 
         <div class="form-group">

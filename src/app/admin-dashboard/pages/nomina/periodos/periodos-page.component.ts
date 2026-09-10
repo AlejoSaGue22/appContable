@@ -5,7 +5,6 @@ import { NominaService } from '../services/nomina.service';
 import { PeriodoNomina } from '../interfaces/nomina.interface';
 import { PeriodoFormModalComponent } from './components/periodo-form-modal/periodo-form-modal.component';
 import { PeriodosTableComponent } from './components/periodos-table/periodos-table.component';
-import { PagoModalComponent } from './components/pago-modal/pago-modal.component';
 import { HeaderTitlePageComponent } from '@dashboard/components/header-title-page/header-title-page.component';
 import { LoaderService } from '@utils/services/loader.service';
 import { NotificationService } from '@shared/services/notification.service';
@@ -19,7 +18,6 @@ import { PaginationService } from '@shared/components/pagination/pagination.serv
     CommonModule,
     PeriodoFormModalComponent,
     PeriodosTableComponent,
-    PagoModalComponent,
     HeaderTitlePageComponent,
     ConfirmModalComponent,
   ],
@@ -33,13 +31,11 @@ export default class PeriodosPageComponent {
   private router = inject(Router);
 
   periodos = signal<PeriodoNomina[]>([]);
-  periodoPagar = signal<PeriodoNomina | null>(null);
   periodoGestionar = signal<PeriodoNomina | null>(null);
 
   currentFilters = signal<any>({});
 
   showFormModal = signal(false);
-  showPagoModal = signal(false);
   showEmpleadosModal = signal(false);
 
   // Modal de confirmación genérico
@@ -158,28 +154,6 @@ export default class PeriodosPageComponent {
     this.router.navigate(['/panel/nomina/periodos', periodo.id, 'detalle']);
   }
 
-  prepararPago(periodo: PeriodoNomina) {
-    this.periodoPagar.set(periodo);
-    this.showPagoModal.set(true);
-  }
-
-  onPagoConfirmado(datos: { fechaPago: string; cuentaCodigoContable: string; numeroComprobante?: string; observaciones?: string }) {
-    const periodo = this.periodoPagar();
-    if (!periodo) return;
-
-    this.loader.show();
-    this.showPagoModal.set(false);
-    this.nominaService.pagarNomina(periodo.id, datos).subscribe({
-      next: () => {
-        this.notification.success('Nómina pagada exitosamente');
-        this.loadPeriodos();
-      },
-      error: (err) => {
-        this.notification.error('Error al pagar nómina', err);
-        this.loader.hide();
-      },
-    });
-  }
 
   enviarDian(periodo: PeriodoNomina) {
     this.pedirConfirmacion(

@@ -3,195 +3,279 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Liquidacion, PeriodoNomina, Empleado } from '../interfaces/nomina.interface';
 
-@Injectable({ providedIn: 'root' })
-export class PdfDesprendibleService {
+/**
+ * Patrón Builder: Separa la construcción de un objeto complejo (el PDF) de su representación.
+ * Permite crear diferentes representaciones o facilitar la lectura de la estructura.
+ * Principio SRP (Single Responsibility Principle): Cada método construye una única sección.
+ */
+class DesprendiblePdfBuilder {
+  private doc: jsPDF;
+  private startY: number = 20;
+  private readonly pageWidth: number;
+  private readonly marginX: number = 14;
 
-  generarDesprendible(liquidacion: Liquidacion, periodo: PeriodoNomina, empresa: any, asBlob: boolean = false): { blob?: Blob, fileName: string } | void {
-    const doc = new jsPDF();
-    const emp = liquidacion.empleado as any;
-    const pageWidth = doc.internal.pageSize.getWidth();
+  // Configuración de paleta de colores empresarial (escala de grises)
+  private lightBg = [247, 247, 247] as [number, number, number];
+  private borderColor = [200, 200, 200] as [number, number, number];
+  private textColor = [40, 40, 40] as [number, number, number];
 
-    // Header - Company info
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text(empresa?.razonSocial || 'Fintura', 14, 20);
+  constructor(
+    private liquidacion: Liquidacion,
+    private periodo: PeriodoNomina,
+    private empresa: any
+  ) {
+    this.doc = new jsPDF();
+    this.pageWidth = this.doc.internal.pageSize.getWidth();
+  }
 
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`NIT: ${empresa?.nit || ''}`, 14, 27);
-    doc.text(`Dirección: ${empresa?.direccion || ''}`, 14, 32);
-    doc.text(`Teléfono: ${empresa?.telefono || ''}`, 14, 37);
+  public buildHeader(): this {
+    // Título centrado en su propia fila
+    this.doc.setTextColor(0);
+    this.doc.setFontSize(13);
+    this.doc.setFont('helvetica', 'bold');
+    this.doc.text('COMPROBANTE DE PAGO DE NÓMINA', this.pageWidth / 2, this.startY, { align: 'center' });
 
-    // Title
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Desprendible de Pago de Nómina', pageWidth / 2, 20, { align: 'center' });
+    this.startY += 5;
+    this.drawLine();
+    this.startY += 6;
 
-    // Period info
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Período: ${periodo.nombre}`, pageWidth - 14, 27, { align: 'right' });
-    doc.text(`Fecha: ${periodo.fechaInicio} - ${periodo.fechaFin}`, pageWidth - 14, 32, { align: 'right' });
-    doc.text(`Tipo: ${periodo.tipo}`, pageWidth - 14, 37, { align: 'right' });
+    // Fila inferior: Empresa (izquierda) | Periodo (derecha)
+    this.doc.setTextColor(0);
+    this.doc.setFontSize(11);
+    this.doc.setFont('helvetica', 'bold');
+    this.doc.text(this.empresa?.razonSocial || 'Empresa', this.marginX, this.startY);
 
-    // Line separator
-    doc.setDrawColor(200, 200, 200);
-    doc.line(14, 42, pageWidth - 14, 42);
+    this.doc.setTextColor(this.textColor[0], this.textColor[1], this.textColor[2]);
+    this.doc.setFontSize(8);
+    this.doc.setFont('helvetica', 'normal');
+    this.doc.text(`NIT: ${this.empresa?.nit || ''}`, this.marginX, this.startY + 5);
 
-    // Employee info
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Empleado:', 14, 50);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`${emp?.primerNombre || ''} ${emp?.segundoNombre || ''} ${emp?.primerApellido || ''} ${emp?.segundoApellido || ''}`, 40, 50);
-    doc.text(`C.C. ${emp?.numeroDocumento || ''}`, 14, 57);
-    doc.text(`Cargo: ${emp?.cargo?.nombre || ''}`, 14, 64);
-    doc.text(`Días trabajados: ${liquidacion.diasTrabajados}`, pageWidth - 14, 57, { align: 'right' });
+    // Periodo alineado a la derecha
+    this.doc.setFont('helvetica', 'normal');
+    this.doc.text(`Período: ${this.periodo.nombre}`, this.pageWidth - this.marginX, this.startY, { align: 'right' });
+    this.doc.text(`Fecha: ${this.periodo.fechaInicio} a ${this.periodo.fechaFin}`, this.pageWidth - this.marginX, this.startY + 5, { align: 'right' });
 
-    // Ingresos table
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Ingresos', 14, 76);
+    this.startY += 10;
+    this.drawLine();
+    this.startY += 6;
+    return this;
+  }
 
+  public buildEmployeeInfo(): this {
+    const emp = this.liquidacion.empleado as any;
+    
+    this.doc.setTextColor(0);
+    this.doc.setFontSize(9);
+    this.doc.setFont('helvetica', 'bold');
+    this.doc.text('Datos del Empleado', this.marginX, this.startY);
+    this.startY += 6;
+
+    this.doc.setTextColor(this.textColor[0], this.textColor[1], this.textColor[2]);
+    this.doc.setFont('helvetica', 'normal');
+    
+    const employeeName = `${emp?.primerNombre || ''} ${emp?.segundoNombre || ''} ${emp?.primerApellido || ''} ${emp?.segundoApellido || ''}`.replace(/\s+/g, ' ').trim();
+    
+    // Grid 2x2 para los datos del empleado
+    const col1X = this.marginX;
+    const col2X = col1X + 25;
+    const col3X = this.pageWidth / 2;
+    const col4X = col3X + 25;
+
+    this.doc.setFont('helvetica', 'bold');
+    this.doc.text('Nombre:', col1X, this.startY);
+    this.doc.setFont('helvetica', 'normal');
+    this.doc.text(employeeName, col2X, this.startY);
+
+    this.doc.setFont('helvetica', 'bold');
+    this.doc.text('Documento:', col3X, this.startY);
+    this.doc.setFont('helvetica', 'normal');
+    this.doc.text(`${emp?.tipoDocumento || 'CC'} ${emp?.numeroDocumento || ''}`, col4X, this.startY);
+
+    this.startY += 5;
+
+    this.doc.setFont('helvetica', 'bold');
+    this.doc.text('Cargo:', col1X, this.startY);
+    this.doc.setFont('helvetica', 'normal');
+    this.doc.text(emp?.cargo?.nombre || '', col2X, this.startY);
+
+    this.doc.setFont('helvetica', 'bold');
+    this.doc.text('Días liquid.:', col3X, this.startY);
+    this.doc.setFont('helvetica', 'normal');
+    this.doc.text(String(this.liquidacion.diasTrabajados), col4X, this.startY);
+
+    this.startY += 5;
+
+    this.doc.setFont('helvetica', 'bold');
+    this.doc.text('Dirección:', col1X, this.startY);
+    this.doc.setFont('helvetica', 'normal');
+    this.doc.text(emp?.direccion || '-', col2X, this.startY);
+
+    this.startY += 8;
+    return this;
+  }
+
+  public buildIngresosTable(): this {
     const ingresosRows: any[] = [];
-    if (liquidacion.salarioDevengado > 0) {
-      ingresosRows.push(['Salario Básico', String(liquidacion.diasTrabajados), this.formatMoney(liquidacion.salarioDevengado)]);
-    }
-    if (liquidacion.auxilioTransporte > 0) {
-      ingresosRows.push(['Auxilio de Transporte', String(liquidacion.diasTrabajados), this.formatMoney(liquidacion.auxilioTransporte)]);
-    }
-    if (liquidacion.comisiones > 0) {
-      ingresosRows.push(['Comisiones', '-', this.formatMoney(liquidacion.comisiones)]);
-    }
-    if (liquidacion.totalBonificaciones > 0) {
-      ingresosRows.push(['Bonificaciones', '-', this.formatMoney(liquidacion.totalBonificaciones)]);
-    }
-    if (liquidacion.totalHorasExtras > 0) {
-      ingresosRows.push(['Horas Extras', '-', this.formatMoney(liquidacion.totalHorasExtras)]);
-    }
-    ingresosRows.push([{ content: 'Total Ingresos', styles: { fontStyle: 'bold' } }, '', { content: this.formatMoney(liquidacion.totalDevengado), styles: { fontStyle: 'bold' } }]);
+    if (this.liquidacion.salarioDevengado > 0) ingresosRows.push(['Salario Básico', String(this.liquidacion.diasTrabajados), this.formatMoney(this.liquidacion.salarioDevengado)]);
+    if (this.liquidacion.auxilioTransporte > 0) ingresosRows.push(['Auxilio de Transporte', String(this.liquidacion.diasTrabajados), this.formatMoney(this.liquidacion.auxilioTransporte)]);
+    if (this.liquidacion.comisiones > 0) ingresosRows.push(['Comisiones', '-', this.formatMoney(this.liquidacion.comisiones)]);
+    if (this.liquidacion.totalBonificaciones > 0) ingresosRows.push(['Bonificaciones', '-', this.formatMoney(this.liquidacion.totalBonificaciones)]);
+    if (this.liquidacion.totalHorasExtras > 0) ingresosRows.push(['Horas Extras', '-', this.formatMoney(this.liquidacion.totalHorasExtras)]);
+    
+    ingresosRows.push([{ content: 'TOTAL INGRESOS', styles: { fontStyle: 'bold' } }, '', { content: this.formatMoney(this.liquidacion.totalDevengado), styles: { fontStyle: 'bold' } }]);
 
-    autoTable(doc, {
-      startY: 80,
-      head: [['Concepto', 'Días/Cant.', 'Valor']],
-      body: ingresosRows,
-      theme: 'grid',
-      headStyles: { fillColor: [59, 130, 246], textColor: 255, fontSize: 8, fontStyle: 'bold' },
-      bodyStyles: { fontSize: 8 },
-      columnStyles: {
-        0: { cellWidth: 80 },
-        1: { cellWidth: 30, halign: 'center' },
-        2: { cellWidth: 50, halign: 'right' },
-      },
-      didParseCell: (data) => {
-        if (data.row.index === ingresosRows.length - 1) {
-          data.cell.styles.fillColor = [240, 240, 240];
-        }
-      },
-    });
+    this.startY = this.generateTable('INGRESOS', ['Concepto', 'Cantidad / Días', 'Valor'], ingresosRows, [100, 40, 40]);
+    return this;
+  }
 
-    // Deducciones table
-    const deduccionesStartY = (doc as any).lastAutoTable.finalY + 10;
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Deducciones', 14, deduccionesStartY);
-
+  public buildDeduccionesTable(): this {
     const deduccionesRows: any[] = [];
-    if (liquidacion.saludEmpleado > 0) {
-      deduccionesRows.push(['Salud (4%)', this.formatMoney(liquidacion.ibc), `-${this.formatMoney(liquidacion.saludEmpleado)}`]);
-    }
-    if (liquidacion.pensionEmpleado > 0) {
-      deduccionesRows.push(['Pensión (4%)', this.formatMoney(liquidacion.ibc), `-${this.formatMoney(liquidacion.pensionEmpleado)}`]);
-    }
-    if (liquidacion.retencionFuente > 0) {
-      deduccionesRows.push(['Retención en la Fuente', '-', `-${this.formatMoney(liquidacion.retencionFuente)}`]);
-    }
-    deduccionesRows.push([{ content: 'Total Deducciones', styles: { fontStyle: 'bold' } }, '', { content: `-${this.formatMoney(liquidacion.totalDeducciones)}`, styles: { fontStyle: 'bold', textColor: [220, 38, 38] } }]);
+    if (this.liquidacion.saludEmpleado > 0) deduccionesRows.push(['Salud (4%)', this.formatMoney(this.liquidacion.ibc), this.formatMoney(this.liquidacion.saludEmpleado)]);
+    if (this.liquidacion.pensionEmpleado > 0) deduccionesRows.push(['Pensión (4%)', this.formatMoney(this.liquidacion.ibc), this.formatMoney(this.liquidacion.pensionEmpleado)]);
+    if (this.liquidacion.retencionFuente > 0) deduccionesRows.push(['Retención en la Fuente', '-', this.formatMoney(this.liquidacion.retencionFuente)]);
+    
+    deduccionesRows.push([{ content: 'TOTAL DEDUCCIONES', styles: { fontStyle: 'bold' } }, '', { content: this.formatMoney(this.liquidacion.totalDeducciones), styles: { fontStyle: 'bold' } }]);
 
-    autoTable(doc, {
-      startY: deduccionesStartY + 4,
-      head: [['Concepto', 'Base (IBC)', 'Valor']],
-      body: deduccionesRows,
-      theme: 'grid',
-      headStyles: { fillColor: [239, 68, 68], textColor: 255, fontSize: 8, fontStyle: 'bold' },
-      bodyStyles: { fontSize: 8 },
+    this.startY = this.generateTable('DEDUCCIONES', ['Concepto', 'Base (IBC)', 'Valor'], deduccionesRows, [100, 40, 40]);
+    return this;
+  }
+
+  public buildNetoPagar(): this {
+    this.startY += 10;
+    
+    // Contenedor para el total neto
+    this.doc.setDrawColor(this.borderColor[0], this.borderColor[1], this.borderColor[2]);
+    this.doc.setFillColor(this.lightBg[0], this.lightBg[1], this.lightBg[2]);
+    this.doc.setLineWidth(0.3);
+    
+    const boxWidth = 90;
+    const boxHeight = 12;
+    const boxX = this.pageWidth - this.marginX - boxWidth;
+    
+    this.doc.rect(boxX, this.startY, boxWidth, boxHeight, 'FD');
+    
+    this.doc.setTextColor(0);
+    this.doc.setFontSize(11);
+    this.doc.setFont('helvetica', 'bold');
+    this.doc.text('NETO A PAGAR:', boxX + 5, this.startY + 8);
+    this.doc.text(this.formatMoney(this.liquidacion.netoPagar), boxX + boxWidth - 5, this.startY + 8, { align: 'right' });
+
+    this.startY += 20;
+    return this;
+  }
+
+
+
+  public buildFooter(): this {
+    const footerY = this.doc.internal.pageSize.getHeight() - 35;
+    
+    this.doc.setDrawColor(this.borderColor[0], this.borderColor[1], this.borderColor[2]);
+    this.doc.setLineWidth(0.2);
+    
+    // Líneas de firma
+    this.doc.line(this.marginX + 15, footerY - 15, this.marginX + 75, footerY - 15);
+    this.doc.line(this.pageWidth - this.marginX - 75, footerY - 15, this.pageWidth - this.marginX - 15, footerY - 15);
+    
+    this.doc.setTextColor(0);
+    this.doc.setFontSize(8);
+    this.doc.setFont('helvetica', 'normal');
+    this.doc.text('Firma Empleado', this.marginX + 45, footerY - 10, { align: 'center' });
+    this.doc.text('Representante Legal / Empresa', this.pageWidth - this.marginX - 45, footerY - 10, { align: 'center' });
+
+    // Texto legal en el pie de página
+    this.doc.line(this.marginX, footerY, this.pageWidth - this.marginX, footerY);
+    this.doc.setFontSize(7);
+    this.doc.setTextColor(120, 120, 120);
+    this.doc.text('Este documento es un soporte válido del pago de nómina.', this.pageWidth / 2, footerY + 5, { align: 'center' });
+    this.doc.text(`Generado el ${new Date().toLocaleDateString('es-CO')} - Fintura ERP`, this.pageWidth / 2, footerY + 9, { align: 'center' });
+
+    return this;
+  }
+
+  public getResult(): jsPDF {
+    return this.doc;
+  }
+
+  // --- Utilidades del Builder ---
+  private drawLine() {
+    this.doc.setDrawColor(this.borderColor[0], this.borderColor[1], this.borderColor[2]);
+    this.doc.setLineWidth(0.3);
+    this.doc.line(this.marginX, this.startY, this.pageWidth - this.marginX, this.startY);
+  }
+
+  private generateTable(title: string, head: string[], body: any[], columnWidths: number[]): number {
+    this.doc.setFontSize(9);
+    this.doc.setFont('helvetica', 'bold');
+    this.doc.setTextColor(0);
+    this.doc.text(title, this.marginX, this.startY);
+    
+    autoTable(this.doc, {
+      startY: this.startY + 3,
+      head: [head],
+      body: body,
+      theme: 'plain',
+      styles: {
+        fontSize: 8,
+        cellPadding: 4,
+        lineColor: this.borderColor,
+        lineWidth: 0.1,
+      },
+      headStyles: { 
+        fillColor: this.lightBg, 
+        textColor: [0,0,0], 
+        fontStyle: 'bold',
+        lineWidth: 0.1,
+        lineColor: this.borderColor
+      },
+      bodyStyles: {
+        textColor: this.textColor
+      },
       columnStyles: {
-        0: { cellWidth: 80 },
-        1: { cellWidth: 50, halign: 'right' },
-        2: { cellWidth: 50, halign: 'right' },
+        0: { cellWidth: columnWidths[0] || 'auto' },
+        1: { cellWidth: columnWidths[1] || 'auto', halign: head.length === 3 ? 'center' : 'right' },
+        2: { cellWidth: columnWidths[2] || 'auto', halign: 'right' },
       },
       didParseCell: (data) => {
-        if (data.row.index === deduccionesRows.length - 1) {
-          data.cell.styles.fillColor = [240, 240, 240];
+        // Estilo especial para la fila de totales
+        if (data.row.index === body.length - 1) {
+          data.cell.styles.fillColor = this.lightBg;
+          data.cell.styles.fontStyle = 'bold';
         }
       },
     });
 
-    // Neto a pagar
-    const netoStartY = (doc as any).lastAutoTable.finalY + 15;
-    doc.setFillColor(16, 185, 129);
-    doc.roundedRect(14, netoStartY, pageWidth - 28, 14, 2, 2, 'F');
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
-    doc.text('NETO A PAGAR', 20, netoStartY + 9);
-    doc.text(this.formatMoney(liquidacion.netoPagar), pageWidth - 20, netoStartY + 9, { align: 'right' });
-    doc.setTextColor(0, 0, 0);
-
-    // Aportes empleador
-    if (liquidacion.aportesEmpleador && liquidacion.aportesEmpleador.length > 0) {
-      const aportesStartY = netoStartY + 22;
-      doc.setFontSize(10);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Aportes del Empleador', 14, aportesStartY);
-
-      const aportesRows: any[] = liquidacion.aportesEmpleador.map((ap) => [ap.concepto, this.formatMoney(ap.valor)]);
-      aportesRows.push([{ content: 'Total Aportes', styles: { fontStyle: 'bold' } }, { content: this.formatMoney(liquidacion.totalAportes), styles: { fontStyle: 'bold' } }]);
-
-      autoTable(doc, {
-        startY: aportesStartY + 4,
-        head: [['Concepto', 'Valor']],
-        body: aportesRows,
-        theme: 'grid',
-        headStyles: { fillColor: [100, 116, 139], textColor: 255, fontSize: 8, fontStyle: 'bold' },
-        bodyStyles: { fontSize: 8 },
-        columnStyles: {
-          0: { cellWidth: 100 },
-          1: { cellWidth: 50, halign: 'right' },
-        },
-        didParseCell: (data) => {
-          if (data.row.index === aportesRows.length - 1) {
-            data.cell.styles.fillColor = [240, 240, 240];
-          }
-        },
-      });
-    }
-
-    // Footer
-    const footerY = doc.internal.pageSize.getHeight() - 30;
-    doc.setDrawColor(200, 200, 200);
-    doc.line(14, footerY, pageWidth - 14, footerY);
-    doc.setFontSize(7);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Este documento es un comprobante de pago de nómina electrónica.', pageWidth / 2, footerY + 6, { align: 'center' });
-    doc.text(`Generado el ${new Date().toLocaleDateString('es-CO')} - Fintura ERP`, pageWidth / 2, footerY + 12, { align: 'center' });
-
-    // Signature lines
-    doc.line(20, footerY - 20, 80, footerY - 20);
-    doc.line(pageWidth - 80, footerY - 20, pageWidth - 20, footerY - 20);
-    doc.text('Firma Empleado', 50, footerY - 15, { align: 'center' });
-    doc.text('Representante Legal', pageWidth - 50, footerY - 15, { align: 'center' });
-
-    const fileName = `Desprendible_${emp?.primerNombre}_${emp?.primerApellido}_${periodo.nombre.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
-    
-    if (asBlob) {
-      return { blob: doc.output('blob'), fileName };
-    }
-    
-    doc.save(fileName);
+    return (this.doc as any).lastAutoTable.finalY + 8;
   }
 
   private formatMoney(value: number): string {
     return `$${Math.round(value).toLocaleString('es-CO')}`;
   }
 }
+
+@Injectable({ providedIn: 'root' })
+export class PdfDesprendibleService {
+
+  generarDesprendible(liquidacion: Liquidacion, periodo: PeriodoNomina, empresa: any, asBlob: boolean = false): { blob?: Blob, fileName: string } | void {
+    const builder = new DesprendiblePdfBuilder(liquidacion, periodo, empresa);
+    
+    const doc = builder
+      .buildHeader()
+      .buildEmployeeInfo()
+      .buildIngresosTable()
+      .buildDeduccionesTable()
+      .buildNetoPagar()
+
+      .buildFooter()
+      .getResult();
+
+    const emp = liquidacion.empleado as any;
+    const fileName = `Desprendible_${emp?.primerNombre}_${emp?.primerApellido}_${periodo.nombre.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+
+    if (asBlob) {
+      return { blob: doc.output('blob'), fileName };
+    }
+
+    doc.save(fileName);
+  }
+}
+

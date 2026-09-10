@@ -344,8 +344,7 @@ export interface ObligacionPagoDetalleDto {
 
 export interface PagarObligacionesDto {
   fechaPago: string;
-  cuentaCodigoContable: string;
-  bancoId?: string;
+  cuentaBancariaId: string;
   numeroComprobante?: string;
   observaciones?: string;
   detalles: ObligacionPagoDetalleDto[];

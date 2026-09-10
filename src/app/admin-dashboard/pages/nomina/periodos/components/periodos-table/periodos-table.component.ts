@@ -20,7 +20,6 @@ export class PeriodosTableComponent {
 
   gestionarEmpleados = output<PeriodoNomina>();
   liquidar = output<PeriodoNomina>();
-  prepararPago = output<PeriodoNomina>();
   verDetalle = output<PeriodoNomina>();
   reversar = output<PeriodoNomina>();
   anular = output<PeriodoNomina>();

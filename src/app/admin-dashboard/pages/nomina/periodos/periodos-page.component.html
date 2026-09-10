@@ -17,7 +17,6 @@
     (filtersChanged)="onFiltersChanged($event)"
     (gestionarEmpleados)="gestionarEmpleados($event)"
     (liquidar)="liquidar($event)"
-    (prepararPago)="prepararPago($event)"
     (verDetalle)="verDetalle($event)"
     (reversar)="reversar($event)"
     (anular)="anular($event)"
@@ -34,14 +33,7 @@
   />
   }
 
-  <!-- Modal: Pagar Nómina -->
-  @if (showPagoModal() && periodoPagar()) {
-  <app-pago-modal
-    [periodo]="periodoPagar()!"
-    (close)="showPagoModal.set(false)"
-    (confirmar)="onPagoConfirmado($event)"
-  />
-  }
+
 
   <!-- Modal: Confirmación de Acción -->
   @if (confirmModal()) {

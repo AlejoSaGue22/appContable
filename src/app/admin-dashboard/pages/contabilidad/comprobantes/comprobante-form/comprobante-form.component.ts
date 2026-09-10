@@ -95,7 +95,6 @@ export class ComprobanteFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.initForm();
-    this.cargarCatalogos();
 
     const paramId = this.route.snapshot.paramMap.get('id');
     if (paramId) {
@@ -103,6 +102,7 @@ export class ComprobanteFormComponent implements OnInit {
       this.id.set(paramId);
       this.cargarComprobante(paramId);
     } else {
+      this.cargarCatalogos();
       this.agregarLinea();
       this.agregarLinea(); // Inicializar con 2 líneas vacías
     }
@@ -206,6 +206,7 @@ export class ComprobanteFormComponent implements OnInit {
           this.form.disable();
         }
 
+        this.cargarCatalogos(); // Fetch catalogs after confirming it exists
         this.loading.set(false);
       },
       error: () => {

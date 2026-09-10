@@ -99,6 +99,22 @@ export class NominaService {
     return this.http.get<PaginatedResponse<PagoNomina>>(`${this.base}/pagos`, { params: httpParams }).pipe(catchError(this.handleError));
   }
 
+  getObligaciones(params?: any): Observable<ObligacionNomina[]> {
+    let httpParams = new HttpParams();
+    if (params) {
+      Object.keys(params).forEach(key => {
+        if (params[key]) {
+          httpParams = httpParams.set(key, params[key]);
+        }
+      });
+    }
+    return this.http.get<ObligacionNomina[]>(`${this.base}/obligaciones`, { params: httpParams }).pipe(catchError(this.handleError));
+  }
+
+  pagarObligaciones(periodoId: string, dto: PagarObligacionesDto): Observable<any> {
+    return this.http.post<any>(`${this.base}/periodos/${periodoId}/pagar`, dto).pipe(catchError(this.handleError));
+  }
+
   getPagosByPeriodo(periodoId: string): Observable<PagoNomina[]> {
     return this.http.get<PagoNomina[]>(`${this.base}/pagos/periodo/${periodoId}`).pipe(catchError(this.handleError));
   }

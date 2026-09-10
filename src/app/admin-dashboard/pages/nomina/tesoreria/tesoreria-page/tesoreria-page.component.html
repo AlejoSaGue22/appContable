@@ -8,35 +8,31 @@
 
   <div class="content-wrapper">
     <!-- Loading State -->
-    <div *ngIf="loading" class="loading-state">
+    <div *ngIf="loading()" class="loading-state">
       <div class="spinner"></div>
       <p>Cargando obligaciones...</p>
     </div>
 
     <!-- Error State -->
-    <div *ngIf="error" class="error-state">
-      <p>{{ error }}</p>
+    <div *ngIf="error()" class="error-state">
+      <p>{{ error() }}</p>
       <button class="btn-retry" (click)="loadObligaciones()">Reintentar</button>
     </div>
 
     <!-- Empty State -->
-    <div *ngIf="!loading && !error && obligacionesAgrupadas.length === 0" class="empty-state">
+    <div *ngIf="!loading() && !error() && obligacionesAgrupadas().length === 0" class="empty-state">
       <div class="empty-icon">✓</div>
       <h2>Todo al día</h2>
       <p>No hay obligaciones de nómina pendientes de pago en este momento.</p>
     </div>
 
     <!-- List of Obligations grouped by Period -->
-    <div *ngIf="!loading && !error && obligacionesAgrupadas.length > 0" class="periodos-list">
-      <div class="periodo-card" *ngFor="let grupo of obligacionesAgrupadas">
+    <div *ngIf="!loading() && !error() && obligacionesAgrupadas().length > 0" class="periodos-list">
+      <div class="periodo-card" *ngFor="let grupo of obligacionesAgrupadas()">
         <div class="periodo-header">
           <div class="periodo-info">
-            <input 
-              type="checkbox" 
-              class="custom-checkbox"
-              [checked]="isAllSelected(grupo.periodoId)"
-              (change)="toggleGroupSelection(grupo.periodoId, $event)"
-            >
+            <input type="checkbox" class="custom-checkbox" [checked]="isAllSelected(grupo.periodoId)"
+              (change)="toggleGroupSelection(grupo.periodoId, $event)">
             <h2 class="periodo-title">{{ grupo.periodoNombre }}</h2>
           </div>
           <div class="periodo-meta">
@@ -56,22 +52,15 @@
               </tr>
             </thead>
             <tbody>
-              <tr 
-                *ngFor="let obs of grupo.obligaciones" 
-                class="obligacion-row"
-                [class.selected]="selectedObligaciones.has(obs.id)"
-                (click)="toggleSelection(obs.id)"
-              >
+              <tr *ngFor="let obs of grupo.obligaciones" class="obligacion-row"
+                [class.selected]="selectedObligaciones.has(obs.id)" (click)="toggleSelection(obs.id)">
                 <td class="col-checkbox" (click)="$event.stopPropagation()">
-                  <input 
-                    type="checkbox" 
-                    class="custom-checkbox"
-                    [checked]="selectedObligaciones.has(obs.id)"
-                    (change)="toggleSelection(obs.id)"
-                  >
+                  <input type="checkbox" class="custom-checkbox" [checked]="selectedObligaciones.has(obs.id)"
+                    (change)="toggleSelection(obs.id)">
                 </td>
                 <td class="col-empleado">
-                  <span class="empleado-nombre">{{ obs.empleado?.nombres }} {{ obs.empleado?.apellidos }}</span>
+                  <span class="empleado-nombre">{{ obs.empleado?.primerNombre }} {{ obs.empleado?.primerApellido
+                    }}</span>
                 </td>
                 <td class="col-identificacion">
                   <span class="empleado-doc">{{ obs.empleado?.numeroDocumento }}</span>
@@ -110,9 +99,5 @@
   </div>
 </div>
 
-<app-registrar-pago-modal
-  *ngIf="showModal"
-  [lote]="selectedLote"
-  (cerrar)="showModal = false"
-  (pagoRegistrado)="onPagoRegistrado()"
-></app-registrar-pago-modal>
+<app-registrar-pago-modal *ngIf="showModal()" [lote]="selectedLote()" (cerrar)="showModal.set(false)"
+  (pagoRegistrado)="onPagoRegistrado()"></app-registrar-pago-modal>
