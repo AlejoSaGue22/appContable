@@ -74,7 +74,7 @@ export class RegistrarPagoModalComponent {
     this.error = '';
 
     const periodoId = this.lote[0].periodoId;
-    
+
     const dto: any = {
       periodoId,
       fechaPago: this.fechaPago,

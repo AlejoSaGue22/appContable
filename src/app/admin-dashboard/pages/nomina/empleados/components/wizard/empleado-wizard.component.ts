@@ -100,7 +100,7 @@ export class EmpleadoWizardComponent implements OnInit {
     this.nominaService.getCargos().subscribe(r => this.cargos.set(r));
     this.nominaService.getCentrosCosto().subscribe(r => this.centrosCosto.set(r));
     this.nominaService.getTiposContrato().subscribe(r => this.tiposContrato.set(r));
-    this.nominaService.getBancos().subscribe(r => this.bancos.set(r));
+    this.nominaService.getBancos().subscribe(r => this.bancos.set(r.data));
 
     this.nominaService.getParametrosVigentes().subscribe(r => {
       if (r && r.smmlv) {

@@ -1,6 +1,6 @@
 export class HelpersUtils {
 
-    static readonly nameApp = 'Fintura';
+    static readonly nameApp = 'ALVA';
     static readonly logoApp = 'assets/images/logo_app.png';
     static readonly slogan = 'Software Contable, Nómina y Comercial';
 

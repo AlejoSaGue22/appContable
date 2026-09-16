@@ -30,19 +30,19 @@ export default class GenerarPagoPageComponent implements OnInit {
   periodo = signal<PeriodoNomina | null>(null);
   liquidaciones = signal<(Liquidacion & { seleccionado?: boolean })[]>([]);
   bancos = signal<any[]>([]);
-  
+
   isLoading = signal(true);
-  
+
   // Formulario
   bancoSeleccionado = signal<string>('');
   cuentaOrigen = signal<string>('');
   searchQuery = signal<string>('');
-  
+
   // Computed
   filteredLiquidaciones = computed(() => {
     const query = this.searchQuery().toLowerCase().trim();
     if (!query) return this.liquidaciones();
-    
+
     return this.liquidaciones().filter(l => {
       const emp = l.empleado as any;
       const nombreCompleto = `${emp.primerNombre} ${emp.segundoNombre || ''} ${emp.primerApellido} ${emp.segundoApellido || ''}`.toLowerCase();
@@ -78,9 +78,9 @@ export default class GenerarPagoPageComponent implements OnInit {
 
     this.nominaService.getBancos().subscribe({
       next: (bancos) => {
-        this.bancos.set(bancos);
+        this.bancos.set(bancos.data);
       },
-      error: () => {}
+      error: () => { }
     });
 
     this.nominaService.getPeriodo(id).subscribe({
@@ -129,7 +129,7 @@ export default class GenerarPagoPageComponent implements OnInit {
     }
 
     const seleccionados = this.liquidaciones().filter(l => l.seleccionado);
-    
+
     // Validar información bancaria de empleados
     const empleadosSinCuenta = seleccionados.filter(l => {
       const emp = l.empleado as any;
@@ -142,13 +142,13 @@ export default class GenerarPagoPageComponent implements OnInit {
     }
 
     this.loader.show();
-    
+
     // Simulación de generación de archivo de texto plano para pago bancario
     setTimeout(() => {
       try {
         const banco = this.bancos().find(b => b.id === this.bancoSeleccionado()) || { nombre: this.bancoSeleccionado() };
         let contenido = `ENCABEZADO,${banco.nombre},${this.cuentaOrigen()},${this.periodo()?.nombre},${this.totalSeleccionados()},${this.valorTotalSeleccionado()}\n`;
-        
+
         seleccionados.forEach(l => {
           const emp = l.empleado as any;
           const bancoEmp = this.bancos().find(b => b.id === emp.bancoId) || { nombre: emp.bancoId };
@@ -164,7 +164,7 @@ export default class GenerarPagoPageComponent implements OnInit {
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
-        
+
         this.notification.success('Archivo de pago generado exitosamente');
       } catch (err: any) {
         this.notification.error('Error al generar el archivo de pago', err?.message);

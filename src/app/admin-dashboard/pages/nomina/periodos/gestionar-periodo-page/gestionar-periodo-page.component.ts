@@ -40,6 +40,7 @@ export default class GestionarPeriodoPageComponent implements OnInit {
   searchQuery = signal('');
   loading = signal(true);
   empresa = signal<any>(null);
+  isLiquidando = signal(false);
 
   // Popover state
   showPopover = signal(false);
@@ -280,11 +281,13 @@ export default class GestionarPeriodoPageComponent implements OnInit {
     }
 
     // this.loader.show();
+    this.isLiquidando.set(true);
     try {
       await this.nominaService.liquidarPeriodo(p.id, { empleados: [] }).toPromise();
       this.notification.info('El proceso de liquidación ha comenzado en segundo plano...');
       this.pollJobStatus(p.id);
     } catch (err: any) {
+      this.isLiquidando.set(false);
       const msg = err.error?.message || err.message || 'Error desconocido';
       const finalMsg = Array.isArray(msg) ? msg.join(', ') : msg;
       this.notification.error(finalMsg, 'Error al encolar liquidación');
@@ -298,21 +301,25 @@ export default class GestionarPeriodoPageComponent implements OnInit {
         next: (res) => {
           if (res.estado === 'COMPLETADO') {
             clearInterval(intervalId);
+            this.isLiquidando.set(false);
             this.notification.success('Nómina liquidada y contabilizada exitosamente');
             this.router.navigate(['/panel/nomina/periodos']);
             this.loader.hide();
           } else if (res.estado === 'FALLIDO') {
             clearInterval(intervalId);
+            this.isLiquidando.set(false);
             const msg = res.errores?.message || 'Error en el procesamiento en segundo plano';
             this.notification.error(msg, 'Error en liquidación');
             this.loader.hide();
           } else if (res.estado === 'NINGUNO') {
             clearInterval(intervalId);
+            this.isLiquidando.set(false);
             this.loader.hide();
           }
         },
         error: () => {
           clearInterval(intervalId);
+          this.isLiquidando.set(false);
           this.loader.hide();
         }
       });

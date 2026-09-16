@@ -12,34 +12,20 @@
   </div>
 
   <!-- Tabla de períodos -->
-  <app-periodos-table
-    [periodos]="periodos()"
-    (filtersChanged)="onFiltersChanged($event)"
-    (gestionarEmpleados)="gestionarEmpleados($event)"
-    (liquidar)="liquidar($event)"
-    (verDetalle)="verDetalle($event)"
-    (reversar)="reversar($event)"
-    (enviarDian)="enviarDian($event)"
-    (descargarXml)="descargarXml($event)"
-    (eliminar)="eliminarPeriodo($event)"
-  />
+  <app-periodos-table [periodos]="periodos()" (filtersChanged)="onFiltersChanged($event)"
+    (gestionarEmpleados)="gestionarEmpleados($event)" (liquidar)="liquidar($event)" (verDetalle)="verDetalle($event)"
+    (reversar)="reversar($event)" (enviarDian)="enviarDian($event)" (descargarXml)="descargarXml($event)"
+    (eliminar)="eliminarPeriodo($event)" />
 
   <!-- Modal: Crear Período -->
   @if (showFormModal()) {
-  <app-periodo-form-modal
-    (close)="showFormModal.set(false)"
-    (saved)="onPeriodoSaved()"
-  />
+  <app-periodo-form-modal (close)="showFormModal.set(false)" (saved)="onPeriodoSaved()" />
   }
 
 
 
   <!-- Modal: Confirmación de Acción -->
   @if (confirmModal()) {
-  <app-confirm-modal
-    [config]="confirmModal()!"
-    (confirmed)="onConfirmado()"
-    (cancelled)="onCancelado()"
-  />
+  <app-confirm-modal [config]="confirmModal()!" (confirmed)="onConfirmado()" (cancelled)="onCancelado()" />
   }
 </div>

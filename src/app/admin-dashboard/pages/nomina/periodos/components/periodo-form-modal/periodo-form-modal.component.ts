@@ -84,8 +84,8 @@ export class PeriodoFormModalComponent implements OnInit, OnDestroy {
       nombreAuto = `Mensual - ${mesLabel} ${a}`;
     }
 
-    this.fechaInicio.set(this.toISO(inicio));
-    this.fechaFin.set(this.toISO(fin));
+    this.fechaInicio.set(inicio.toLocaleDateString());
+    this.fechaFin.set(fin.toLocaleDateString());
 
     if (!this.form.get('nombre')?.dirty) {
       this.form.get('nombre')?.setValue(nombreAuto, { emitEvent: false });

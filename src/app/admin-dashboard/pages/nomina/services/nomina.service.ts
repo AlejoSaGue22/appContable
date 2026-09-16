@@ -10,6 +10,7 @@ import {
   PaginatedResponse, ConceptoNomina, EmpleadoConceptoRecurrente, CreateEmpleadoConceptoDto, PeriodoEmpleado, ParametroNominaVersion,
   PeriodoEmpleadoConcepto, ConceptosConsolidadosResponse, ObligacionNomina, PagarObligacionesDto
 } from '../interfaces/nomina.interface';
+import { Banco } from '@dashboard/pages/contabilidad/interfaces/cuenta-bancaria.interface';
 
 
 @Injectable({ providedIn: 'root' })
@@ -154,8 +155,8 @@ export class NominaService {
     return this.http.get<any[]>(`${this.base}/tipos-contrato`).pipe(catchError(this.handleError));
   }
 
-  getBancos(): Observable<any[]> {
-    return this.http.get<any[]>(`${environment.baseUrl}/bancos`).pipe(catchError(this.handleError));
+  getBancos(): Observable<{ data: Banco[], message: string }> {
+    return this.http.get<{ data: Banco[], message: string }>(`${environment.baseUrl}/bancos`).pipe(catchError(this.handleError));
   }
 
   // ── Conceptos y Recurrentes ───────────────────────────────────────
