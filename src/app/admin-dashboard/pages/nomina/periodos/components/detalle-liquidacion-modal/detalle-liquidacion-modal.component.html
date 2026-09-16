@@ -23,19 +23,19 @@
       <div class="grid grid-cols-4 gap-4 text-center">
         <div>
           <p class="text-[11px] text-slate-400 uppercase font-semibold">Total Devengado</p>
-          <p class="text-lg font-extrabold text-slate-800 mt-0.5">${{ periodo().totalDevengado | number: '1.0-0' }}</p>
+          <p class="text-lg font-extrabold text-slate-800 mt-0.5">${{ periodo().totalDevengado | number: '1.2-2' }}</p>
         </div>
         <div>
           <p class="text-[11px] text-slate-400 uppercase font-semibold">Deducciones</p>
-          <p class="text-lg font-extrabold text-rose-600 mt-0.5">${{ periodo().totalDeducciones | number: '1.0-0' }}</p>
+          <p class="text-lg font-extrabold text-rose-600 mt-0.5">${{ periodo().totalDeducciones | number: '1.2-2' }}</p>
         </div>
         <div>
           <p class="text-[11px] text-slate-400 uppercase font-semibold">Neto a Pagar</p>
-          <p class="text-lg font-extrabold text-emerald-600 mt-0.5">${{ periodo().totalNeto | number: '1.0-0' }}</p>
+          <p class="text-lg font-extrabold text-emerald-600 mt-0.5">${{ periodo().totalNeto | number: '1.2-2' }}</p>
         </div>
         <div>
           <p class="text-[11px] text-slate-400 uppercase font-semibold">Costo Empresa</p>
-          <p class="text-lg font-extrabold text-blue-600 mt-0.5">${{ periodo().totalCostoEmpresa | number: '1.0-0' }}
+          <p class="text-lg font-extrabold text-blue-600 mt-0.5">${{ periodo().totalCostoEmpresa | number: '1.2-2' }}
           </p>
         </div>
       </div>
@@ -74,11 +74,11 @@
             <td class="px-3 py-2.5 font-mono text-right tabular-nums text-rose-500">${{ liq.retencionFuente | number:
               '1.0-0' }}</td>
             <td class="px-3 py-2.5 font-mono text-right tabular-nums font-semibold text-emerald-600">${{ liq.netoPagar |
-              number: '1.0-0' }}</td>
-            <td class="px-3 py-2.5 font-mono text-right tabular-nums text-slate-400">${{ liq.ibc | number: '1.0-0' }}
+              number: '1.2-2' }}</td>
+             <td class="px-3 py-2.5 font-mono text-right tabular-nums text-slate-400">${{ liq.ibc | number: '1.2-2' }}
             </td>
             <td class="px-3 py-2.5 font-mono text-right tabular-nums text-blue-600">
-              ${{ liq.totalDevengado + liq.totalAportes + liq.totalProvisiones | number: '1.0-0' }}
+               ${{ liq.totalDevengado + liq.totalAportes + liq.totalProvisiones | number: '1.2-2' }}
             </td>
           </tr>
           }
@@ -130,7 +130,7 @@
               <td class="px-3 py-2.5 font-mono text-xs text-slate-500">{{ p.cuentaCodigoContable }}</td>
               <td class="px-3 py-2.5 text-xs text-slate-500">{{ p.numeroComprobante || '-' }}</td>
               <td class="px-3 py-2.5 font-mono text-right tabular-nums font-semibold text-emerald-600">${{ p.valor |
-                number: '1.0-0' }}</td>
+                number: '1.2-2' }}</td>
               <td class="px-3 py-2.5 text-xs text-slate-400">{{ p.observaciones || '-' }}</td>
             </tr>
             }

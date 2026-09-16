@@ -8,6 +8,8 @@ export interface GetCuentasContables {
  nivel: number;
  cuentaPadreId: string | null;
  aceptaMovimiento: boolean;
+ requiereTercero: boolean;
+ requiereCentroCostos: boolean;
  isActive: boolean;
  isSystemAccount: boolean;
  totalDebito: number;

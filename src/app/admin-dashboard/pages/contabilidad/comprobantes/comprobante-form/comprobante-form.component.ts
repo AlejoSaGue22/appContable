@@ -1,21 +1,17 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormArray } from '@angular/forms';
+import { FormArray, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
-import { forkJoin } from 'rxjs';
 import { ComprobantesService } from '../../services/comprobantes.service';
-import { TipoComprobanteService } from '../../../administracion/configuraciones/pages/tipo-comprobantes/services/tipo-comprobante.service';
-import { CuentasContablesService } from '@dashboard/pages/contabilidad/services/cuentas-contables.service';
-import { ClientesService } from '../../../ventas/services/clientes.service';
-import { ProveedoresService } from '../../../compras/services/proveedores.service';
-import { CentrosCostosService } from '../../../administracion/configuraciones/pages/centros-costos/services/centros-costos.service';
-import { NominaService } from '../../../nomina/services/nomina.service';
 import { HeaderTitlePageComponent, HeaderInput } from '@dashboard/components/header-title-page/header-title-page.component';
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
 import { NotificationService } from '@shared/services/notification.service';
 import { FormErrorLabelComponent } from '@utils/components/form-error-label/form-error-label.component';
-import { EstadoComprobante } from '../../interfaces/comprobantes.interface';
+import { EstadoComprobante, ComprobanteDetalleInterface } from '../../interfaces/comprobantes.interface';
 import { ConfirmModalComponent, ConfirmModalConfig } from '@shared/components/confirm-modal/confirm-modal.component';
+import { ComprobanteCatalogosFacade } from './services/comprobante-catalogos.facade';
+import { ComprobanteFormStateService } from './services/comprobante-form-state.service';
+import { GetCuentasContables } from '../../interfaces/cuentas-contables.interface';
 
 @Component({
   selector: 'app-comprobante-form',
@@ -29,63 +25,36 @@ import { ConfirmModalComponent, ConfirmModalConfig } from '@shared/components/co
     FormErrorLabelComponent,
     ConfirmModalComponent,
   ],
+  providers: [ComprobanteCatalogosFacade, ComprobanteFormStateService],
   templateUrl: './comprobante-form.component.html',
 })
 export class ComprobanteFormComponent implements OnInit {
-  private fb = inject(FormBuilder);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly service = inject(ComprobantesService);
+  private readonly toastService = inject(NotificationService);
+  private readonly catalogos = inject(ComprobanteCatalogosFacade);
+  private readonly formState = inject(ComprobanteFormStateService);
 
-  // Modal de confirmación
   confirmModal = signal<ConfirmModalConfig | null>(null);
   private confirmCallback: (() => void) | null = null;
 
-  private pedirConfirmacion(config: ConfirmModalConfig, onConfirm: () => void) {
-    this.confirmModal.set(config);
-    this.confirmCallback = onConfirm;
-  }
-
-  onConfirmado() {
-    this.confirmCallback?.();
-    this.confirmModal.set(null);
-    this.confirmCallback = null;
-  }
-
-  onCancelado() {
-    this.confirmModal.set(null);
-    this.confirmCallback = null;
-  }
-  private toastService = inject(NotificationService);
-
-  private service = inject(ComprobantesService);
-  private tipoService = inject(TipoComprobanteService);
-  private cuentasService = inject(CuentasContablesService);
-  private clientesService = inject(ClientesService);
-  private proveedoresService = inject(ProveedoresService);
-  private centrosCostosService = inject(CentrosCostosService);
-  private nominaService = inject(NominaService);
-
-  public headTitle = signal<HeaderInput>({
+  headTitle = signal<HeaderInput>({
     title: 'Nuevo Comprobante Contable',
     slog: 'Registra un movimiento contable manual balanceando débitos y créditos',
   });
+  isEditing = signal(false);
+  id = signal<string | null>(null);
+  loading = signal(false);
+  submitting = signal(false);
+  estado = signal<EstadoComprobante>(EstadoComprobante.BORRADOR);
+  consecutivo = signal('Borrador');
 
-  public isEditing = signal(false);
-  public id = signal<string | null>(null);
-  public loading = signal(false);
-  public submitting = signal(false);
-
-  public form!: FormGroup;
-  public estado = signal<EstadoComprobante>(EstadoComprobante.BORRADOR);
-  public consecutivo = signal<string>('Borrador');
-
-  // Catálogos
-  public tiposComprobantes = signal<any[]>([]);
-  public cuentasContables = signal<any[]>([]);
-  public clientes = signal<any[]>([]);
-  public proveedores = signal<any[]>([]);
-  public terceros = signal<any[]>([]);
-  public centrosCostos = signal<any[]>([]);
+  form = this.formState.form;
+  tiposComprobantes = this.catalogos.tiposComprobantes;
+  cuentasContables = this.catalogos.cuentasContables;
+  terceros = this.catalogos.terceros;
+  centrosCostos = this.catalogos.centrosCostos;
 
   breadcrumbItems = [
     { label: 'Contabilidad', route: '/panel/contabilidad' },
@@ -94,7 +63,9 @@ export class ComprobanteFormComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    this.initForm();
+    this.catalogos.cargar().subscribe({
+      error: () => this.toastService.error('Error al cargar los catálogos del comprobante.'),
+    });
 
     const paramId = this.route.snapshot.paramMap.get('id');
     if (paramId) {
@@ -102,111 +73,37 @@ export class ComprobanteFormComponent implements OnInit {
       this.id.set(paramId);
       this.cargarComprobante(paramId);
     } else {
-      this.cargarCatalogos();
-      this.agregarLinea();
-      this.agregarLinea(); // Inicializar con 2 líneas vacías
+      this.formState.addLine();
+      this.formState.addLine();
     }
   }
 
-  private initForm(): void {
-    this.form = this.fb.group({
-      tipoComprobanteId: ['', [Validators.required]],
-      fechaDocumento: [new Date().toISOString().substring(0, 10), [Validators.required]],
-      observaciones: [''],
-      detalles: this.fb.array([]),
-    });
-
-    // Recalcular balance al cambiar líneas
-    this.form.get('detalles')?.valueChanges.subscribe(() => {
-      this.validarYBalancear();
-    });
-  }
-
   get detallesFormArray(): FormArray {
-    return this.form.get('detalles') as FormArray;
+    return this.formState.detalles;
   }
 
-  private cargarCatalogos(): void {
-    this.tipoService.loadTipos().subscribe((tipos) => {
-      this.tiposComprobantes.set(tipos.filter((t) => t.activo));
-    });
-
-    this.cuentasService.getCuentasContables().subscribe((res: any) => {
-      // Filtrar cuentas de movimiento activas
-      this.cuentasContables.set(res.filter((c: any) => c.aceptaMovimiento && c.isActive));
-    });
-
-    forkJoin({
-      clientes: this.clientesService.getClientes({ limit: 1000, offset: 0 }),
-      proveedores: this.proveedoresService.getProveedores({ limit: 1000, offset: 0 }),
-      entidades: this.nominaService.getEntidadesSeguridad(),
-    }).subscribe({
-      next: ({ clientes, proveedores, entidades }) => {
-        const list: any[] = [];
-        (clientes.clientes || []).forEach((c: any) => {
-          list.push({
-            id: c.id,
-            nombreDisplay: `${c.razonSocial?.trim() ? c.razonSocial : `${c.nombre || ''} ${c.apellido || ''}`.trim()} (Cliente)`,
-            tipo: 'CLIENTE',
-          });
-        });
-        (proveedores.proveedores || []).forEach((p: any) => {
-          list.push({
-            id: p.id,
-            nombreDisplay: `${p.razonSocial?.trim() ? p.razonSocial : `${p.nombre || ''} ${p.apellido || ''}`.trim()} (Proveedor)`,
-            tipo: 'PROVEEDOR',
-          });
-        });
-        (entidades || []).forEach((e: any) => {
-          list.push({
-            id: e.id,
-            nombreDisplay: `${e.nombre} (${e.tipo})`,
-            tipo: 'SEGURIDAD_SOCIAL',
-          });
-        });
-        this.terceros.set(list);
-      },
-      error: (err) => {
-        this.toastService.error('Error al cargar la lista unificada de terceros.');
-      }
-    });
-
-    this.centrosCostosService.loadCentrosCostos().subscribe((res) => {
-      this.centrosCostos.set(res.filter((cc) => cc.activo));
-    });
-  }
+  get totalDebitos(): number { return this.formState.totalDebitos; }
+  get totalCreditos(): number { return this.formState.totalCreditos; }
+  get diferencia(): number { return this.formState.diferencia; }
+  get estaBalanceado(): boolean { return this.formState.estaBalanceado; }
 
   private cargarComprobante(id: string): void {
     this.loading.set(true);
     this.service.findOne(id).subscribe({
-      next: (comp) => {
-        this.estado.set(comp.estado);
-        this.consecutivo.set(comp.numero);
+      next: (comprobante) => {
+        this.estado.set(comprobante.estado);
+        this.consecutivo.set(comprobante.numero);
         this.headTitle.set({
-          title: `Comprobante ${comp.numero}`,
-          slog: `Estado: ${comp.estado} | Creado por: ${comp.creadoPor?.fullName || ''}`,
+          title: `Comprobante ${comprobante.numero}`,
+          slog: `Estado: ${comprobante.estado} | Creado por: ${comprobante.creadoPor?.fullName || ''}`,
         });
-
         this.form.patchValue({
-          tipoComprobanteId: comp.tipoComprobanteId,
-          fechaDocumento: comp.fechaDocumento.substring(0, 10),
-          observaciones: comp.observaciones || '',
+          tipoComprobanteId: comprobante.tipoComprobanteId,
+          fechaDocumento: comprobante.fechaDocumento.substring(0, 10),
+          observaciones: comprobante.observaciones || '',
         });
-
-        // Cargar detalles
-        while (this.detallesFormArray.length) {
-          this.detallesFormArray.removeAt(0);
-        }
-
-        comp.detalles.forEach((det) => {
-          this.agregarLinea(det);
-        });
-
-        if (comp.estado !== EstadoComprobante.BORRADOR) {
-          this.form.disable();
-        }
-
-        this.cargarCatalogos(); // Fetch catalogs after confirming it exists
+        comprobante.detalles.forEach((detalle) => this.formState.addLine(detalle));
+        if (comprobante.estado !== EstadoComprobante.BORRADOR) this.form.disable();
         this.loading.set(false);
       },
       error: () => {
@@ -217,308 +114,128 @@ export class ComprobanteFormComponent implements OnInit {
     });
   }
 
-  agregarLinea(data?: any): void {
-    let terceroUnionId = '';
-    if (data?.clienteId) {
-      terceroUnionId = data.clienteId;
-    } else if (data?.proveedorId) {
-      terceroUnionId = data.proveedorId;
-    } else if (data?.entidadSSId) {
-      terceroUnionId = data.entidadSSId;
-    }
-
-    const group = this.fb.group({
-      cuentaContableId: [data?.cuentaContableId || '', [Validators.required]],
-      descripcion: [data?.descripcion || ''],
-      debito: [Number(data?.debito || 0), [Validators.required, Validators.min(0)]],
-      credito: [Number(data?.credito || 0), [Validators.required, Validators.min(0)]],
-      terceroUnionId: [terceroUnionId],
-      clienteId: [data?.clienteId || ''],
-      proveedorId: [data?.proveedorId || ''],
-      entidadSSId: [data?.entidadSSId || ''],
-      centroCostoId: [data?.centroCostoId || ''],
-      documentoReferencia: [data?.documentoReferencia || ''],
-    });
-
-    this.detallesFormArray.push(group);
-  }
+  agregarLinea(): void { this.formState.addLine(); }
 
   eliminarLinea(index: number): void {
-    if (this.detallesFormArray.length > 2) {
-      this.detallesFormArray.removeAt(index);
-    } else {
+    if (!this.formState.removeLine(index)) {
       this.toastService.error('Un comprobante debe tener al menos 2 movimientos.');
     }
   }
 
   onCuentaCambio(index: number): void {
-    const group = this.detallesFormArray.at(index);
-    const cuentaId = group.get('cuentaContableId')?.value;
-    const cuenta = this.cuentasContables().find((c) => c.id === cuentaId);
-
-    // Si la cuenta requiere tercero y no se ha especificado, limpiar para forzar ingreso
-    if (cuenta) {
-      // Si la cuenta es de gastos (5) o costos (6) y no tiene centro de costo, podríamos advertir
-      if (!cuenta.requiereTercero) {
-        group.get('terceroUnionId')?.setValue('');
-        group.get('clienteId')?.setValue('');
-        group.get('proveedorId')?.setValue('');
-        group.get('entidadSSId')?.setValue('');
-      }
-      if (!cuenta.requiereCentroCostos && !cuenta.codigo.startsWith('5') && !cuenta.codigo.startsWith('6')) {
-        group.get('centroCostoId')?.setValue('');
-      }
-    }
+    const control = this.detallesFormArray.at(index);
+    const cuenta = this.cuentaDeLinea(control.value.cuentaContableId);
+    if (!cuenta) return;
+    if (!cuenta.requiereTercero) control.get('terceroUnionId')?.setValue('');
+    if (!cuenta.requiereCentroCostos) control.get('centroCostoId')?.setValue('');
   }
 
   requiereTercero(index: number): boolean {
-    const group = this.detallesFormArray.at(index);
-    const cuentaId = group.get('cuentaContableId')?.value;
-    console.log("CuentaID: ", cuentaId);
-    const cuenta = this.cuentasContables().find((c) => c.id == cuentaId);
-    console.log("Cuenta: ", cuenta);
-    return cuenta ? cuenta.requiereTercero : false;
+    return this.cuentaDeLinea(this.detallesFormArray.at(index).value.cuentaContableId)?.requiereTercero ?? false;
   }
 
   requiereCentro(index: number): boolean {
-    const group = this.detallesFormArray.at(index);
-    const cuentaId = group.get('cuentaContableId')?.value;
-    const cuenta = this.cuentasContables().find((c) => c.id === cuentaId);
-    if (!cuenta) return false;
-    return cuenta.requiereCentroCostos || cuenta.codigo.startsWith('5') || cuenta.codigo.startsWith('6');
+    return this.cuentaDeLinea(this.detallesFormArray.at(index).value.cuentaContableId)?.requiereCentroCostos ?? false;
   }
 
   requiereRefDoc(): boolean {
-    const tipoId = this.form.get('tipoComprobanteId')?.value;
-    const tipo = this.tiposComprobantes().find((t) => t.id === tipoId);
-    return tipo ? tipo.docReferenciaObligatorio : false;
+    const tipo = this.tiposComprobantes().find((item) => item.id === this.form.get('tipoComprobanteId')?.value);
+    return tipo?.docReferenciaObligatorio ?? false;
   }
 
-  // Totales dinámicos calculados mediante getters
-  get totalDebitos(): number {
-    return this.detallesFormArray.controls.reduce(
-      (sum, ctrl) => sum + Number(ctrl.get('debito')?.value || 0),
-      0,
-    );
-  }
-
-  get totalCreditos(): number {
-    return this.detallesFormArray.controls.reduce(
-      (sum, ctrl) => sum + Number(ctrl.get('credito')?.value || 0),
-      0,
-    );
-  }
-
-  get diferencia(): number {
-    return Math.abs(this.totalDebitos - this.totalCreditos);
-  }
-
-  get estaBalanceado(): boolean {
-    return this.diferencia <= 0.01;
-  }
-
-  private validarYBalancear(): void {
-    // Lógica adicional para actualizaciones si fuesen requeridas
-  }
-
-  cuadrarAsiento(index: number): void {
-    const group = this.detallesFormArray.at(index);
-    const dif = this.totalDebitos - this.totalCreditos;
-
-    // Si débito es mayor, necesitamos agregar un crédito para balancear
-    if (dif > 0) {
-      const currentCredito = Number(group.get('credito')?.value || 0);
-      group.get('credito')?.setValue(currentCredito + dif);
-      group.get('debito')?.setValue(0);
-    } else if (dif < 0) {
-      // Si crédito es mayor, necesitamos agregar un débito para balancear
-      const currentDebito = Number(group.get('debito')?.value || 0);
-      group.get('debito')?.setValue(currentDebito + Math.abs(dif));
-      group.get('credito')?.setValue(0);
-    }
-  }
+  cuadrarAsiento(index: number): void { this.formState.squareLine(index); }
 
   guardarBorrador(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      this.toastService.error('Por favor complete los campos requeridos marcados en rojo.');
-      return;
-    }
+    this.guardar(false);
+  }
 
-    if (!this.estaBalanceado) {
-      this.toastService.error(
-        `El comprobante contable está descuadrado por $${this.diferencia.toLocaleString('es-CO')}. Débitos y Créditos deben sumar igual.`
-      );
-      return;
-    }
-
-    this.submitting.set(true);
-    const payload = this.form.getRawValue();
-
-    // Limpiar campos null/vacíos y mapear terceroUnionId
-    payload.detalles = payload.detalles.map((d: any) => {
-      let clienteId = null;
-      let proveedorId = null;
-      let entidadSSId = null;
-
-      if (d.terceroUnionId) {
-        const t = this.terceros().find(x => x.id === d.terceroUnionId);
-        if (t) {
-          if (t.tipo === 'CLIENTE') clienteId = t.id;
-          else if (t.tipo === 'PROVEEDOR') proveedorId = t.id;
-          else if (t.tipo === 'SEGURIDAD_SOCIAL') entidadSSId = t.id;
-        }
-      }
-
-      const { terceroUnionId, ...cleanDetalle } = d;
-
-      return {
-        ...cleanDetalle,
-        clienteId,
-        proveedorId,
-        entidadSSId,
-        centroCostoId: cleanDetalle.centroCostoId || null,
-        documentoReferencia: cleanDetalle.documentoReferencia || null,
-      };
-    });
-
-    if (this.isEditing() && this.id()) {
-      this.service.update(this.id()!, payload).subscribe({
-        next: (res) => {
-          this.toastService.success('Borrador de comprobante actualizado con éxito.');
-          this.submitting.set(false);
-          this.router.navigate(['/panel/contabilidad/comprobantes']);
-        },
-        error: (err) => {
-          this.toastService.error(err.error?.message || 'Error al guardar el borrador del comprobante.');
-          this.submitting.set(false);
-        },
-      });
-    } else {
-      this.service.create(payload).subscribe({
-        next: (res) => {
-          this.toastService.success(`Comprobante ${res.numero} creado en estado Borrador.`);
-          this.submitting.set(false);
-          this.router.navigate(['/panel/contabilidad/comprobantes']);
-        },
-        error: (err) => {
-          this.toastService.error(err.error?.message || 'Error al crear el comprobante contable.');
-          this.submitting.set(false);
-        },
-      });
-    }
+  guardarYContabilizar(): void {
+    this.guardar(true);
   }
 
   contabilizarComprobante(): void {
     if (!this.id()) return;
-    this.pedirConfirmacion(
-      {
-        title: 'Contabilizar Comprobante',
-        message: '¿Estás seguro de contabilizar este comprobante contable?',
-        detail: 'Se volverá inmutable y registrará los movimientos contables definitivos.',
-        icon: 'warning',
-        confirmLabel: 'Sí, Contabilizar',
-        confirmClass: 'bg-emerald-600 hover:bg-emerald-700',
-      },
-      () => {
-        this.loading.set(true);
-        this.service.contabilizar(this.id()!).subscribe({
-          next: () => {
-            this.toastService.success('Comprobante contabilizado con éxito.');
-            this.cargarComprobante(this.id()!);
-          },
-          error: (err) => {
-            this.toastService.error(err.error?.message || 'Error al contabilizar.');
-            this.loading.set(false);
-          },
-        });
-      }
-    );
+    this.pedirConfirmacion({
+      title: 'Contabilizar Comprobante',
+      message: '¿Estás seguro de contabilizar este comprobante contable?',
+      detail: 'Se volverá inmutable y registrará los movimientos contables definitivos.',
+      icon: 'warning',
+      confirmLabel: 'Sí, Contabilizar',
+      confirmClass: 'bg-emerald-600 hover:bg-emerald-700',
+    }, () => {
+      this.loading.set(true);
+      this.service.contabilizar(this.id()!).subscribe({
+        next: () => {
+          this.toastService.success('Comprobante contabilizado con éxito.');
+          this.cargarComprobante(this.id()!);
+        },
+        error: (err) => {
+          this.toastService.error(err.error?.message || 'Error al contabilizar.');
+          this.loading.set(false);
+        },
+      });
+    });
   }
 
-  guardarYContabilizar(): void {
+  onConfirmado(): void {
+    this.confirmCallback?.();
+    this.confirmModal.set(null);
+    this.confirmCallback = null;
+  }
+
+  onCancelado(): void {
+    this.confirmModal.set(null);
+    this.confirmCallback = null;
+  }
+
+  private guardar(contabilizar: boolean): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       this.toastService.error('Por favor complete los campos requeridos marcados en rojo.');
       return;
     }
-
     if (!this.estaBalanceado) {
-      this.toastService.error(
-        `El comprobante contable está descuadrado por $${this.diferencia.toLocaleString('es-CO')}. Débitos y Créditos deben sumar igual.`
-      );
+      this.toastService.error(`El comprobante está descuadrado por $${this.diferencia.toLocaleString('es-CO')}.`);
       return;
     }
 
     this.submitting.set(true);
-    const payload = this.form.getRawValue();
+    const payload = this.formState.buildPayload(this.terceros());
+    const request$ = this.isEditing() && this.id()
+      ? this.service.update(this.id()!, payload)
+      : this.service.create(payload);
 
-    payload.detalles = payload.detalles.map((d: any) => {
-      let clienteId = null;
-      let proveedorId = null;
-      let entidadSSId = null;
-
-      if (d.terceroUnionId) {
-        const t = this.terceros().find(x => x.id === d.terceroUnionId);
-        if (t) {
-          if (t.tipo === 'CLIENTE') clienteId = t.id;
-          else if (t.tipo === 'PROVEEDOR') proveedorId = t.id;
-          else if (t.tipo === 'SEGURIDAD_SOCIAL') entidadSSId = t.id;
+    request$.subscribe({
+      next: (comprobante) => {
+        if (!contabilizar) {
+          this.toastService.success(this.isEditing() ? 'Borrador actualizado con éxito.' : `Comprobante ${comprobante.numero} creado en estado Borrador.`);
+          this.router.navigate(['/panel/contabilidad/comprobantes']);
+          return;
         }
-      }
-
-      const { terceroUnionId, ...cleanDetalle } = d;
-
-      return {
-        ...cleanDetalle,
-        clienteId,
-        proveedorId,
-        entidadSSId,
-        centroCostoId: cleanDetalle.centroCostoId || null,
-        documentoReferencia: cleanDetalle.documentoReferencia || null,
-      };
+        this.service.contabilizar(comprobante.id).subscribe({
+          next: () => {
+            this.toastService.success('Comprobante guardado y contabilizado con éxito.');
+            this.router.navigate(['/panel/contabilidad/comprobantes']);
+          },
+          error: (err) => {
+            this.toastService.error(err.error?.message || 'Error al contabilizar.', 'Error Contable');
+            this.submitting.set(false);
+          },
+        });
+      },
+      error: (err) => {
+        this.toastService.error(err.error?.message || 'Error al guardar el comprobante.');
+        this.submitting.set(false);
+      },
     });
+  }
 
-    if (this.isEditing() && this.id()) {
-      this.service.update(this.id()!, payload).subscribe({
-        next: (res) => {
-          this.service.contabilizar(res.id).subscribe({
-            next: () => {
-              this.toastService.success(`Comprobante ${res.numero} guardado y contabilizado con éxito.`);
-              this.submitting.set(false);
-              this.router.navigate(['/panel/contabilidad/comprobantes']);
-            },
-            error: (err) => {
-              this.toastService.error(err.error?.message || 'Error al contabilizar.', 'Error Contable');
-              this.submitting.set(false);
-            }
-          });
-        },
-        error: (err) => {
-          this.toastService.error(err.error?.message || 'Error al actualizar el comprobante.');
-          this.submitting.set(false);
-        },
-      });
-    } else {
-      this.service.create(payload).subscribe({
-        next: (res) => {
-          this.service.contabilizar(res.id).subscribe({
-            next: () => {
-              this.toastService.success(`Comprobante creado y contabilizado con éxito.`);
-              this.submitting.set(false);
-              this.router.navigate(['/panel/contabilidad/comprobantes']);
-            },
-            error: (err) => {
-              this.toastService.error(err.error?.message || 'Error al contabilizar.', 'Error Contable');
-              this.submitting.set(false);
-            }
-          });
-        },
-        error: (err) => {
-          this.toastService.error(err.error?.message || 'Error al crear el comprobante contable.');
-          this.submitting.set(false);
-        },
-      });
-    }
+  private cuentaDeLinea(cuentaId: string): GetCuentasContables | undefined {
+    return this.cuentasContables().find((cuenta) => cuenta.id === cuentaId);
+  }
+
+  private pedirConfirmacion(config: ConfirmModalConfig, onConfirm: () => void): void {
+    this.confirmModal.set(config);
+    this.confirmCallback = onConfirm;
   }
 }

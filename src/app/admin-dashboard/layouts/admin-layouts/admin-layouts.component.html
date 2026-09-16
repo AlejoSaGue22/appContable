@@ -29,7 +29,7 @@
             <app-menu-perfil />
 
             <nav class="px-4 mt-6 space-y-1">
-                <p class="text-[10px] font-bold text-gray-200 uppercase px-4 mb-4 opacity-50">Menú Principal</p>
+                <p class="text-[13px] font-medium text-gray-200 px-4 mb-4 opacity-50">Menú Principal</p>
 
                 @for (option of menuItems(); track $index) {
                 <app-barralateral-menu [title]="option.title" [subItems]="option.children ?? []" [menuSection]="option"
@@ -56,7 +56,7 @@
                     {{ currentUser()?.fullName?.charAt(0) || 'U' }}
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-xs font-bold text-white truncate">{{ currentUser()?.fullName }}</p>
+                    <p class="text-xs font-semibold text-white truncate">{{ currentUser()?.fullName }}</p>
                     <p class="text-[10px] text-gray-500 truncate">{{ currentUser()?.email }}</p>
                 </div>
                 <button

@@ -31,6 +31,8 @@ export interface ComprobanteDetalleInterface {
     apellido?: string;
     razonSocial?: string;
   };
+  entidadSSId?: string;
+  empleadoId?: string;
   centroCostoId?: string;
   centroCosto?: {
     id: string;

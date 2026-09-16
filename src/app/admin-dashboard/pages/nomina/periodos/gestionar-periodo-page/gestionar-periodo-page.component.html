@@ -130,6 +130,11 @@
                 '' }}
               </div>
               <div class="text-[11px] text-slate-400 mt-0.5">{{ emp.cargo?.nombre || 'Sin cargo' }}</div>
+              @if (emp.liquidacionError) {
+              <div class="mt-1 text-[11px] font-medium text-rose-600" [title]="emp.liquidacionError">
+                Error de liquidación: {{ emp.liquidacionError }}
+              </div>
+              }
             </td>
             <td class="px-5 py-3.5 font-mono text-slate-500">{{ emp.tipoDocumento }} {{ emp.numeroDocumento }}</td>
             <td class="px-5 py-3.5 text-right tabular-nums font-semibold text-slate-800">${{ emp.salarioBase | number:

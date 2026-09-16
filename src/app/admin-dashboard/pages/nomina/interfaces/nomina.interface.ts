@@ -37,6 +37,10 @@ export interface Empleado {
   numeroCuentaBancaria?: string;
   createdAt: string;
   updatedAt: string;
+  liquidacionError?: string;
+  totalDevengado?: number | null;
+  totalDeducciones?: number | null;
+  netoPagar?: number | null;
 }
 
 export interface CreateEmpleadoDto {
@@ -230,6 +234,10 @@ export interface PeriodoEmpleado {
   diasNovedad: number;
   estado: string;
   conceptosOcasionales?: PeriodoEmpleadoConcepto[];
+  liquidacionError?: string;
+  totalDevengado?: number | null;
+  totalDeducciones?: number | null;
+  netoPagar?: number | null;
 }
 
 export interface ConceptoConsolidadoItem {
