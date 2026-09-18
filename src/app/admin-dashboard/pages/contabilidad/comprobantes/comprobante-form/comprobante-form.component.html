@@ -31,7 +31,7 @@
               Tipo de Comprobante <span class="text-red-500">*</span>
             </label>
             <select formControlName="tipoComprobanteId"
-              class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all cursor-pointer bg-white">
+              class="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all cursor-pointer bg-white">
               <option value="" disabled>Seleccione un tipo...</option>
               @for (tipo of tiposComprobantes(); track tipo.id) {
               <option [value]="tipo.id">{{ tipo.codigo }} - {{ tipo.nombre }}</option>
@@ -164,21 +164,21 @@
                 <!-- Ref Doc -->
                 <td class="px-2 py-3">
                   <input type="text" formControlName="documentoReferencia"
-                    class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-[11px] focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all bg-white"
+                    class="w-full px-3 py-2 border border-gray-200 rounded-xl text-[11px] focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all bg-white"
                     [placeholder]="requiereRefDoc() ? 'Requerido' : 'Opcional'" />
                 </td>
 
                 <!-- Debito -->
                 <td class="px-2 py-3">
-                  <input type="number" formControlName="debito"
-                    class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-[11px] focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all text-right font-mono font-semibold text-slate-800 bg-white"
+                  <input type="text" formControlName="debito" appCurrencyFormat
+                    class="w-full px-3 py-2 border border-gray-200 rounded-xl text-[11px] focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all text-right font-mono font-semibold text-slate-800 bg-white"
                     placeholder="0" />
                 </td>
 
                 <!-- Credito -->
                 <td class="px-2 py-3">
-                  <input type="number" formControlName="credito"
-                    class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-[11px] focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all text-right font-mono font-semibold text-slate-800 bg-white"
+                  <input type="text" formControlName="credito" appCurrencyFormat
+                    class="w-full px-3 py-2 border border-gray-200 rounded-xl text-[11px] focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all text-right font-mono font-semibold text-slate-800 bg-white"
                     placeholder="0" />
                 </td>
 

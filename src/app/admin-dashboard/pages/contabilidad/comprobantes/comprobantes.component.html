@@ -230,13 +230,13 @@
 
 <!-- Modal Previsualización de Asiento -->
 <app-modal [(visible)]="isPreviewModalOpen">
-  <div class="p-6 max-w-7xl mx-auto">
-    <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+  <div class="max-w-7xl mx-auto">
+    <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3 sticky top-0 z-50 p-8 bg-white">
       <div>
         <h3 class="text-lg font-bold text-slate-950">Asiento Contable</h3>
         <p class="text-xs text-slate-400">Previsualización del registro en Diario / Mayor</p>
       </div>
-      <button (click)="isPreviewModalOpen.set(false)" class="text-slate-400 hover:text-slate-500">
+      <button (click)="isPreviewModalOpen.set(false)" class="text-slate-400 hover:text-slate-500 cursor-pointer">
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>

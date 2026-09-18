@@ -9,6 +9,13 @@ interface ApiResponse<T> {
   message: string;
 }
 
+export interface EmpresaMunicipio {
+  id: number;
+  code: string;
+  name: string;
+  department: string;
+}
+
 export interface Empresa {
   id: string;
   nit: string;
@@ -19,6 +26,8 @@ export interface Empresa {
   logoUrl?: string;
   configuracionDian?: any;
   arlId?: string;
+  ciudad?: number | null;
+  ciudadRel?: EmpresaMunicipio | null;
 }
 
 @Injectable({ providedIn: 'root' })

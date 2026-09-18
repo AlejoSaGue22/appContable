@@ -41,10 +41,7 @@ export class ClientesService {
     getClientes(options: Options): Observable<ClientesResponse> {
         const { limit = 10, offset = 0, search } = options;
 
-        const params: any = {
-            limit,
-            offset
-        };
+        const params: any = { limit, offset };
 
         if (search) {
             params.search = search;

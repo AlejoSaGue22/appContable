@@ -12,6 +12,7 @@ import { ConfirmModalComponent, ConfirmModalConfig } from '@shared/components/co
 import { ComprobanteCatalogosFacade } from './services/comprobante-catalogos.facade';
 import { ComprobanteFormStateService } from './services/comprobante-form-state.service';
 import { GetCuentasContables } from '../../interfaces/cuentas-contables.interface';
+import { CurrencyFormatDirective } from '@shared/directives/currency-format.directive';
 
 @Component({
   selector: 'app-comprobante-form',
@@ -24,8 +25,9 @@ import { GetCuentasContables } from '../../interfaces/cuentas-contables.interfac
     BreadcrumbComponent,
     FormErrorLabelComponent,
     ConfirmModalComponent,
+    CurrencyFormatDirective
   ],
-  providers: [ComprobanteCatalogosFacade, ComprobanteFormStateService],
+  providers: [ComprobanteCatalogosFacade, ComprobanteFormStateService, CurrencyFormatDirective],
   templateUrl: './comprobante-form.component.html',
 })
 export class ComprobanteFormComponent implements OnInit {

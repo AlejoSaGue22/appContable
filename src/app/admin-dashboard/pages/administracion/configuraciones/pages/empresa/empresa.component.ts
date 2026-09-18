@@ -11,6 +11,7 @@ import { LoaderComponent } from 'src/app/utils/components/loader/loader.componen
 import { FormErrorLabelComponent } from '@utils/components/form-error-label/form-error-label.component';
 import { NominaService } from '../../../../nomina/services/nomina.service';
 import { EntidadSeguridadSocial } from '../../../../nomina/interfaces/nomina.interface';
+import { CatalogsStore } from '@dashboard/services/catalogs.store';
 
 @Component({
   selector: 'app-empresa',
@@ -23,6 +24,7 @@ export class EmpresaComponent implements OnInit {
   private empresaService = inject(EmpresaService);
   private notificationService = inject(NotificationService);
   private nominaService = inject(NominaService);
+  protected catalogsStore = inject(CatalogsStore);
 
   headTitle = signal<HeaderInput>({
     title: 'Configuración de Empresa',
@@ -46,6 +48,7 @@ export class EmpresaComponent implements OnInit {
     email: ['', [Validators.email]],
     logoUrl: [''],
     arlId: [''],
+    ciudad: [null as number | null],
   });
 
   arls = signal<EntidadSeguridadSocial[]>([]);

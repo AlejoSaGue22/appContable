@@ -107,9 +107,9 @@
                                 Impuesto <span class="text-red-500">*</span>
                             </label>
                             <div class="relative">
-                                <select [class.border-red-500]="formProductos.get('impuesto')?.errors ?? false" class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border rounded 
- pl-3 pr-8 py-2 transition duration-300 ease hover:border-slate-400 shadow-sm
- cursor-pointer" formControlName="impuesto">
+                                <select [class.border-red-500]="formProductos.get('impuesto')?.errors ?? false"
+                                    class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border rounded 
+                                    pl-3 pr-8 py-2 transition duration-300 ease hover:border-slate-400 shadow-sm cursor-pointer" formControlName="impuesto">
                                     <option value="">Selecciona un impuesto</option>
                                     @for (impuesto of catalogsStore.impuestos(); track impuesto.id) {
                                     <option [value]="impuesto.id">{{ impuesto.nombre }} ({{ impuesto.tarifa }}%)
@@ -138,25 +138,25 @@
 
                         <!-- Retencion -->
                         <!-- <div>
- <label class="block mb-2 text-sm text-slate-600">
- Retencion <span class="text-red-500">*</span>
- </label>
- <div class="relative">
- <select [class.border-red-500]="formProductos.get('retencion')?.errors ?? false" class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border
- rounded pl-3 pr-8 py-2 transition duration-300 ease hover:border-slate-400 shadow-sm
- cursor-pointer" formControlName="retencion">
- <option value="15">Retencion 15%</option>
- <option value="5">Retencion 5%</option>
- <option value="4">Retencion 4%</option>
- <option value="6">Retencion 6%</option>
- <option value="7">Retencion 7%</option>
- <option value="10">Retencion 10%</option>
- <option value="0">No aplica</option>
- </select>
- </div>
+                        <label class="block mb-2 text-sm text-slate-600">
+                        Retencion <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                        <select [class.border-red-500]="formProductos.get('retencion')?.errors ?? false" class="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border
+                        rounded pl-3 pr-8 py-2 transition duration-300 ease hover:border-slate-400 shadow-sm
+                        cursor-pointer" formControlName="retencion">
+                        <option value="15">Retencion 15%</option>
+                        <option value="5">Retencion 5%</option>
+                        <option value="4">Retencion 4%</option>
+                        <option value="6">Retencion 6%</option>
+                        <option value="7">Retencion 7%</option>
+                        <option value="10">Retencion 10%</option>
+                        <option value="0">No aplica</option>
+                        </select>
+                        </div>
 
- <form-error-label [errorType]="formProductos.get('retencion')!" />
- </div> -->
+                        <form-error-label [errorType]="formProductos.get('retencion')!" />
+                        </div> -->
                     </div>
 
 

@@ -91,12 +91,12 @@ export class ClientsFormPageComponent implements OnInit {
   getCityName() {
     const id = this.clientsForm.get('ciudad')?.value;
     if (!id) return '';
-    const city = this.catalogsStore.municipalities().find((m) => m.id == id);
+    const city = this.catalogsStore.municipalities().find((m) => m.code == id);
     return city ? `${city.name} - ${city.department}` : '';
   }
 
   onCitySelect(city: Municipality) {
-    this.clientsForm.patchValue({ ciudad: city.id });
+    this.clientsForm.patchValue({ ciudad: city.code });
   }
 
   clienteIdResource = rxResource({

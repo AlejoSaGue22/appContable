@@ -90,12 +90,12 @@ export class ProveedoresFormsPageComponent implements OnInit {
     if (!id) return '';
     const city = this.catalogsStore
       .municipalities()
-      .find((m: Municipality) => m.id == id);
+      .find((m: Municipality) => m.code == id);
     return city ? `${city.name} - ${city.department}` : '';
   }
 
   onCitySelect(city: Municipality) {
-    this.formProveedor.patchValue({ ciudad: city.id });
+    this.formProveedor.patchValue({ ciudad: city.code });
   }
 
   async ngOnInit() {
