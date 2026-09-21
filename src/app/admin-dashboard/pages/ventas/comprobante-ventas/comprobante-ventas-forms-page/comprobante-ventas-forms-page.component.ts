@@ -100,6 +100,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   refreshAsientoTrigger = signal<number>(0);
   anticiposDisponibles = signal<any[]>([]);
   anticiposAsociados = signal<{ anticipoId: string; numero: string; montoOriginal: number; saldoDisponible: number; montoAplicado: number }[]>([]);
+  isCloningLoading = false;
 
   InvoiceStatus = InvoiceStatus;
 
@@ -179,6 +180,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   }
 
   loadInvoiceForClone(id: string): void {
+    this.isCloningLoading = true;
     this.ventaServices.getInvoiceById(id).subscribe({
       next: (response) => {
         const invoice = response.data[0];
@@ -217,10 +219,14 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
           this.cargarAnticiposDisponibles(invoice.clientId);
         }
         this.loaderservice.hide();
+        setTimeout(() => {
+          this.isCloningLoading = false;
+        }, 100);
       },
       error: (err) => {
         this.notificacionService.error('Error al cargar factura para clonar', 'Error');
         this.loaderservice.hide();
+        this.isCloningLoading = false;
       },
     });
   }
@@ -388,7 +394,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       ivaControl?.enable();
     }
 
-    if (this.invoiceID() == 'new-Item') {
+    if (this.invoiceID() == 'new-Item' && !this.isCloningLoading) {
       this.productSeleccionados.set([]);
     }
   });

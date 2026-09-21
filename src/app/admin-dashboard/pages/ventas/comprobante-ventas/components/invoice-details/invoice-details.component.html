@@ -111,7 +111,7 @@
           Volver
         </a>
 
-        @if (factura()!.status !== "draft" && factura()!.status !== "cancelled") {
+        @if (factura()!.status !== "draft" && factura()!.status !== "anulada") {
         <a [routerLink]="['/panel/ventas/notas-ajuste/new']" [queryParams]="{ facturaId: factura()!.id }"
           class="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-orange-200 bg-orange-50 px-4 py-2 text-sm font-medium text-orange-700 hover:bg-orange-100 transition-colors">
           <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -435,7 +435,7 @@
     <!-- ── SECCIÓN CONTABLE (no imprime) ──────────────────────────── -->
     <div class="print:hidden space-y-4">
       <!-- Estado de cartera (solo crédito) -->
-      @if (factura()!.formaPago === "CREDITO") {
+      <!-- @if (factura()!.formaPago === "CREDITO") { -->
       <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
         <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-gray-50/50">
           <h3 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
@@ -526,7 +526,7 @@
           }
         </div>
       </div>
-      }
+      <!-- } -->
 
       <!-- Asientos contables -->
       <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">

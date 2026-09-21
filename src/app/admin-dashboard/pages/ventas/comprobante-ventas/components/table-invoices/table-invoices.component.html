@@ -152,9 +152,7 @@
               {{ invoice.fecha }}
             </td>
             <td class="text-center">
-              <span class="font-semibold text-slate-900">{{
-                invoice.comprobante_completo
-                }}</span>
+              <span class="font-semibold text-slate-900">{{ invoice.comprobante_completo }}</span>
             </td>
             <td class="text-center">
               <span class="px-2.5 py-1 text-[10px] font-semibold uppercase rounded-lg border"
@@ -168,41 +166,32 @@
               </span>
             </td>
             <td class="text-center">
-              <span class="text-gray-900">{{
-                (invoice.client.razonSocial ||
-                invoice.client.nombre + " " + invoice.client.apellido)
-                | titlecase
+              <span class="text-gray-900">
+                {{ (invoice.client.razonSocial || invoice.client.nombre + " " + invoice.client.apellido) | titlecase
                 }}</span>
             </td>
             <td class="text-center">
               <span class="px-2.5 py-1 text-[10px] font-semibold uppercase rounded-lg border"
                 [class]="getStatusClass(invoice.status)" [class.bg-gray-50]="invoice.status === 'draft'"
-                [class.text-gray-600]="invoice.status === 'draft'"
-                [class.border-gray-100]="invoice.status === 'draft'"
+                [class.text-gray-600]="invoice.status === 'draft'" [class.border-gray-100]="invoice.status === 'draft'"
                 [class.bg-yellow-50]="invoice.status === 'pending_dian'"
                 [class.text-yellow-600]="invoice.status === 'pending_dian'"
-                [class.border-yellow-100]="invoice.status === 'pending_dian'"
-                [class.bg-emerald-50]="
+                [class.border-yellow-100]="invoice.status === 'pending_dian'" [class.bg-emerald-50]="
                     invoice.status === 'accepted' || invoice.status === 'issued'
                   " [class.text-emerald-600]="
                     invoice.status === 'accepted' || invoice.status === 'issued'
                   " [class.border-emerald-100]="
                     invoice.status === 'accepted' || invoice.status === 'issued'
-                  " [class.bg-blue-50]="invoice.status === 'paid'"
-                [class.text-blue-600]="invoice.status === 'paid'"
+                  " [class.bg-blue-50]="invoice.status === 'paid'" [class.text-blue-600]="invoice.status === 'paid'"
                 [class.border-blue-100]="invoice.status === 'paid'" [class.bg-red-50]="
                     invoice.status === 'rejected' ||
-                    invoice.status === 'cancelled' ||
-                    invoice.status === 'error_asiento'
-                  " [class.text-red-500]="
+                    invoice.status === 'anulada' ||
+                    invoice.status === 'error_asiento'" [class.text-red-500]="invoice.status === 'rejected' ||
+                    invoice.status === 'anulada' ||
+                    invoice.status === 'error_asiento'" [class.border-red-100]="
                     invoice.status === 'rejected' ||
-                    invoice.status === 'cancelled' ||
-                    invoice.status === 'error_asiento'
-                  " [class.border-red-100]="
-                    invoice.status === 'rejected' ||
-                    invoice.status === 'cancelled' ||
-                    invoice.status === 'error_asiento'
-                  ">
+                    invoice.status === 'anulada' ||
+                    invoice.status === 'error_asiento'">
                 {{ getStatusLabel(invoice.status) }}
               </span>
             </td>
@@ -210,25 +199,22 @@
               <span class="font-mono">{{ invoice.formaPago | titlecase }}</span>
             </td>
             <td class="text-right tabular-nums">
-              <span class="font-semibold text-slate-900">{{
-                invoice.total | currency: "" : "$" : "1.0-0"
-                }}</span>
+              <span class="font-semibold text-slate-900">{{ invoice.total | currency: "" : "$" : "1.0-0" }}</span>
             </td>
             <td class="text-right tabular-nums">
-              @if (invoice.formaPago === 'CREDITO') {
+              @if (invoice.status !='draft') {
               <div class="flex flex-col items-end">
-                <span class="text-xs text-gray-400"
-                  >Pagado:
-                  {{ invoice.totalPagado | currency: "" : "$" : "1.0-0" }}</span
-                >
-                <span class="font-semibold text-xs mt-1"
-                  [class.text-red-500]="invoice.saldoPendiente > 0"
+                <span class="text-xs text-gray-400">Pagado:
+                  {{ invoice.totalPagado | currency: "" : "$" : "1.0-0" }}</span>
+                <span class="font-semibold text-xs mt-1" [class.text-red-500]="invoice.saldoPendiente > 0"
                   [class.text-emerald-500]="invoice.saldoPendiente === 0">
-                  {{ invoice.saldoPendiente | currency: "" : "$" : "1.0-0" }}
+                  Saldo: {{ invoice.saldoPendiente | currency: "" : "$" : "1.0-0" }}
                 </span>
               </div>
-              } @else {
-              <span class="text-xs text-slate-400">—</span>
+              }@else{
+              <div class="flex flex-col items-end">
+                <span>-</span>
+              </div>
               }
             </td>
             <td>
@@ -344,21 +330,10 @@
           <tr>
             <td colspan="9" class="text-center">
               <div class="flex flex-col items-center justify-center py-14">
-                <div
-                  class="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center mb-4"
-                >
-                  <svg
-                    class="h-10 w-10 text-gray-200"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="1.5"
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                    />
+                <div class="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
+                  <svg class="h-10 w-10 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
                 <p class="text-sm font-bold text-gray-900">

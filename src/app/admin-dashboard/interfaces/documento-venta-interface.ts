@@ -167,7 +167,7 @@ export enum InvoiceStatus {
     ACCEPTED = 'accepted', // Aceptada por DIAN (tiene CUFE)
     REJECTED = 'rejected', // Rechazada por DIAN (corregir y reenviar)
     PAID = 'paid', // Pagada
-    CANCELLED = 'cancelled', // Anulada (requiere nota crédito)
+    CANCELLED = 'anulada', // Anulada (requiere nota crédito)
     ISSUED = 'issued', // Emitida (para facturas comunes)
     ERROR_ASIENTO = 'error_asiento' // Error generado el asiento
 }

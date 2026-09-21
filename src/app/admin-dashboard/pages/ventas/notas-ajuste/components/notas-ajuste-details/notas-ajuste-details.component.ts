@@ -1,12 +1,11 @@
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { NotaAjuste, NotaAjusteStatus } from '@dashboard/interfaces/notas-ajuste-interface';
+import { NotaAjuste, NotaAjusteStatus, NotaDianStatus } from '@dashboard/interfaces/notas-ajuste-interface';
 import { NotasAjusteService } from '@dashboard/pages/ventas/services/notas-ajuste.service';
 import { AsientosHttpService } from '@dashboard/services/asientos-http.service';
 import { NotificationService } from '@shared/services/notification.service';
 import { PrintService } from '@shared/services/print.service';
-import { DianStatus } from '@dashboard/interfaces/documento-venta-interface';
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
 
 @Component({
@@ -74,6 +73,8 @@ export class NotasAjusteDetailsComponent {
     getStatusClass(status: NotaAjusteStatus): string {
         const classes: Record<NotaAjusteStatus, string> = {
             [NotaAjusteStatus.DRAFT]: 'bg-gray-100 text-gray-800 border-gray-300',
+            [NotaAjusteStatus.ISSUED]: 'bg-teal-100 text-teal-800 border-teal-300',
+            [NotaAjusteStatus.PROCESSING]: 'bg-blue-100 text-blue-800 border-blue-300 animate-pulse',
             [NotaAjusteStatus.SENT]: 'bg-blue-100 text-blue-800 border-blue-300',
             [NotaAjusteStatus.ACCEPTED]: 'bg-green-100 text-green-800 border-green-300',
             [NotaAjusteStatus.REJECTED]: 'bg-red-100 text-red-800 border-red-300',
@@ -86,6 +87,8 @@ export class NotasAjusteDetailsComponent {
     getStatusLabel(status: NotaAjusteStatus): string {
         const labels: Record<NotaAjusteStatus, string> = {
             [NotaAjusteStatus.DRAFT]: 'Borrador',
+            [NotaAjusteStatus.ISSUED]: 'Emitida',
+            [NotaAjusteStatus.PROCESSING]: 'Procesando',
             [NotaAjusteStatus.SENT]: 'Enviada',
             [NotaAjusteStatus.ACCEPTED]: 'Aceptada',
             [NotaAjusteStatus.REJECTED]: 'Rechazada',
@@ -95,26 +98,46 @@ export class NotasAjusteDetailsComponent {
         return labels[status] || status;
     }
 
-    getDianStatusClass(status: DianStatus): string {
-        const classes: Record<DianStatus, string> = {
-            [DianStatus.PENDING]: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-            [DianStatus.SENT]: 'bg-blue-50 text-blue-700 border-blue-200',
-            [DianStatus.PROCESSING]: 'bg-blue-100 text-blue-800 border-blue-300 animate-pulse',
-            [DianStatus.ACCEPTED]: 'bg-green-100 text-green-800 border-green-300',
-            [DianStatus.REJECTED]: 'bg-red-100 text-red-800 border-red-300',
-            [DianStatus.CANCELLED]: 'bg-gray-100 text-gray-800 border-gray-300'
+    /** Estado DIAN efectivo: el backend envía `estadoDIAN` (español). */
+    getNotaDianStatus(nota: NotaAjuste | null): string {
+        return (nota as any)?.estadoDIAN ?? (nota as any)?.dianStatus ?? '';
+    }
+
+    getDianStatusClass(status: string): string {
+        const classes: Record<string, string> = {
+            [NotaDianStatus.PENDIENTE]: 'bg-yellow-100 text-yellow-800 border-yellow-300',
+            [NotaDianStatus.NO_APLICA]: 'bg-gray-100 text-gray-600 border-gray-200',
+            [NotaDianStatus.ENVIADA]: 'bg-blue-50 text-blue-700 border-blue-200',
+            [NotaDianStatus.PROCESANDO]: 'bg-blue-100 text-blue-800 border-blue-300 animate-pulse',
+            [NotaDianStatus.ACEPTADA]: 'bg-green-100 text-green-800 border-green-300',
+            [NotaDianStatus.RECHAZADA]: 'bg-red-100 text-red-800 border-red-300',
+            [NotaDianStatus.ANULADA]: 'bg-gray-100 text-gray-800 border-gray-300',
+            // Tolerancia a valores legacy en inglés (DianStatus de facturas)
+            ['pending']: 'bg-yellow-100 text-yellow-800 border-yellow-300',
+            ['sent']: 'bg-blue-50 text-blue-700 border-blue-200',
+            ['processing']: 'bg-blue-100 text-blue-800 border-blue-300 animate-pulse',
+            ['accepted']: 'bg-green-100 text-green-800 border-green-300',
+            ['rejected']: 'bg-red-100 text-red-800 border-red-300',
+            ['cancelled']: 'bg-gray-100 text-gray-800 border-gray-300'
         };
         return classes[status] || 'bg-gray-100 text-gray-800';
     }
 
-    getDianStatusLabel(status: DianStatus): string {
-        const labels: Record<DianStatus, string> = {
-            [DianStatus.PENDING]: 'Pendiente envío',
-            [DianStatus.SENT]: 'Enviada',
-            [DianStatus.PROCESSING]: 'Procesando',
-            [DianStatus.ACCEPTED]: 'Aceptada por DIAN',
-            [DianStatus.REJECTED]: 'Rechazada por DIAN',
-            [DianStatus.CANCELLED]: 'Anulada'
+    getDianStatusLabel(status: string): string {
+        const labels: Record<string, string> = {
+            [NotaDianStatus.PENDIENTE]: 'Pendiente envío',
+            [NotaDianStatus.NO_APLICA]: 'No aplica',
+            [NotaDianStatus.ENVIADA]: 'Enviada',
+            [NotaDianStatus.PROCESANDO]: 'Procesando',
+            [NotaDianStatus.ACEPTADA]: 'Aceptada por DIAN',
+            [NotaDianStatus.RECHAZADA]: 'Rechazada por DIAN',
+            [NotaDianStatus.ANULADA]: 'Anulada',
+            ['pending']: 'Pendiente envío',
+            ['sent']: 'Enviada',
+            ['processing']: 'Procesando',
+            ['accepted']: 'Aceptada por DIAN',
+            ['rejected']: 'Rechazada por DIAN',
+            ['cancelled']: 'Anulada'
         };
         return labels[status] || status;
     }

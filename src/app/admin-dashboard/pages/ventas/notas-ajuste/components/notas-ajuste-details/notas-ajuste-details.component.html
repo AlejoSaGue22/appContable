@@ -34,9 +34,9 @@
  <span [class]="'inline-flex rounded-full px-3 py-1 text-xs font-semibold border ' + getStatusClass(nota()!.estado)">
  {{ getStatusLabel(nota()!.estado) }}
  </span>
- @if (nota()!.dianStatus) {
- <span [class]="'inline-flex rounded-full px-3 py-1 text-xs font-semibold border ' + getDianStatusClass(nota()!.dianStatus)">
- DIAN: {{ getDianStatusLabel(nota()!.dianStatus) }}
+ @if (getNotaDianStatus(nota())) {
+ <span [class]="'inline-flex rounded-full px-3 py-1 text-xs font-semibold border ' + getDianStatusClass(getNotaDianStatus(nota()))">
+ DIAN: {{ getDianStatusLabel(getNotaDianStatus(nota())) }}
  </span>
  }
  </div>

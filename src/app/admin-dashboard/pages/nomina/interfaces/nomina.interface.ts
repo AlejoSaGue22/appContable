@@ -73,7 +73,7 @@ export interface CreateEmpleadoDto {
   numeroCuentaBancaria?: string;
 }
 
-export interface UpdateEmpleadoDto extends Partial<CreateEmpleadoDto> {}
+export interface UpdateEmpleadoDto extends Partial<CreateEmpleadoDto> { }
 
 export interface PeriodoNomina {
   id: string;

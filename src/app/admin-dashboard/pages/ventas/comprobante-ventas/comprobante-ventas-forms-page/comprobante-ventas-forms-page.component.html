@@ -117,8 +117,8 @@
                 class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all cursor-pointer"
                 formControlName="metodoPago">
                 <option value="">Selecciona un método de pago</option>
-                @for (method of catalogsStore.paymentMethods(); track method.id) {
-                <option [value]="method.id">{{ method.nombre }}</option>
+                @for (method of catalogsStore.paymentMethods(); track method.codigo) {
+                <option [value]="method.codigo">{{ method.nombre }}</option>
                 }
               </select>
             </div>

@@ -37,7 +37,8 @@ export interface NotaAjuste {
  esReembolsoAbono?: boolean; // true si la NC es un reembolso de un abono previo en factura crédito
  observaciones?: string;
  estado: NotaAjusteStatus;
- dianStatus: DianStatus;
+ dianStatus?: DianStatus | string;
+ estadoDIAN?: NotaDianStatus | string;
  fechaAceptacionDIAN?: Date;
  fechaEnvioDIAN?: Date;
  numero: string;
@@ -76,11 +77,27 @@ export interface NotaAjusteItem {
 
 export enum NotaAjusteStatus {
  DRAFT = 'borrador',
+ ISSUED = 'emitida',
  SENT = 'enviada',
+ PROCESSING = 'procesando',
  ACCEPTED = 'aceptada',
  REJECTED = 'rechazada',
  CANCELLED = 'anulada',
  ERROR_ASIENTO = 'error_asiento'
+}
+
+/**
+ * Estados DIAN de la nota (valores del backend: EstadoDIANNota).
+ * Se mantiene separado de DianStatus (facturas, en inglés).
+ */
+export enum NotaDianStatus {
+ NO_APLICA = 'no_aplica',
+ PENDIENTE = 'pendiente',
+ ENVIADA = 'enviada',
+ PROCESANDO = 'procesando',
+ ACEPTADA = 'aceptada',
+ RECHAZADA = 'rechazada',
+ ANULADA = 'anulada'
 }
 
 
