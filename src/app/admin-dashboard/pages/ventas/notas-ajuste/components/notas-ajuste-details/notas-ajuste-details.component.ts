@@ -1,12 +1,14 @@
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { Observable } from 'rxjs';
 import { NotaAjuste, NotaAjusteStatus, NotaDianStatus } from '@dashboard/interfaces/notas-ajuste-interface';
 import { NotasAjusteService } from '@dashboard/pages/ventas/services/notas-ajuste.service';
 import { AsientosHttpService } from '@dashboard/services/asientos-http.service';
 import { NotificationService } from '@shared/services/notification.service';
 import { PrintService } from '@shared/services/print.service';
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
+import { LoaderService } from '@utils/services/loader.service';
 
 @Component({
     selector: 'app-notas-ajuste-details',
@@ -27,6 +29,7 @@ export class NotasAjusteDetailsComponent {
     private notificationService = inject(NotificationService);
     private printService = inject(PrintService);
     private catalogs = inject(CatalogsStore);
+    private loaderService = inject(LoaderService);
 
     ngOnInit(): void {
         const id = this.route.snapshot.params['id'];
@@ -55,11 +58,7 @@ export class NotasAjusteDetailsComponent {
         if (!n) return;
 
         this.loadingAsientos = true;
-        // Usamos el número completo (prefijo + numero) para buscar los asientos
-        console.log("Nota: ", n);
-        const referencia = `${n.prefijo}-${n.numero}`;
-
-        this.asientosService.getByReferencia(n.numeroCompleto || '').subscribe({
+        this.asientosService.getByReferencia(n.numeroCompleto || `${n.prefijo}-${n.numero}`).subscribe({
             next: (a) => {
                 this.asientos = a;
                 this.loadingAsientos = false;
@@ -183,32 +182,81 @@ export class NotasAjusteDetailsComponent {
     onDownloadPDF(): void {
         const n = this.nota();
         if (!n) return;
-        this.notasService.downloadPDF(n.id).subscribe({
-            next: (blob) => {
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${n.prefijo}${n.numero}.pdf`;
-                a.click();
-                window.URL.revokeObjectURL(url);
-            },
-            error: (err) => this.notificationService.error('Error al descargar PDF', err.message)
-        });
+        this.handleDownloadBlob(
+            this.notasService.downloadPDF(n.id),
+            `${n.prefijo}${n.numero}.pdf`,
+            'Preparando descarga de PDF...',
+            'PDF descargado con éxito',
+            'Error al descargar PDF'
+        );
     }
 
     onDownloadXML(): void {
         const n = this.nota();
         if (!n) return;
-        this.notasService.downloadXML(n.id).subscribe({
-            next: (blob) => {
+        this.handleDownloadBlob(
+            this.notasService.downloadXML(n.id),
+            `${n.prefijo}${n.numero}.xml`,
+            'Preparando descarga de XML...',
+            'XML descargado con éxito',
+            'Error al descargar XML'
+        );
+    }
+
+    private handleDownloadBlob(
+        observable: Observable<Blob>,
+        filename: string,
+        loadingMessage: string,
+        successMessage: string,
+        errorTitle: string
+    ): void {
+        this.loaderService.show(loadingMessage);
+        observable.subscribe({
+            next: async (blob) => {
+                if (blob.type === 'application/json') {
+                    try {
+                        const text = await blob.text();
+                        const json = JSON.parse(text);
+                        this.loaderService.hide();
+                        const message = Array.isArray(json.message)
+                            ? json.message.join(', ')
+                            : json.message;
+                        this.notificationService.error(
+                            message || 'Error al descargar el archivo',
+                            errorTitle
+                        );
+                        return;
+                    } catch {
+                        // Continuar si falla el parseo
+                    }
+                }
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `${n.prefijo}${n.numero}.xml`;
+                a.download = filename;
                 a.click();
                 window.URL.revokeObjectURL(url);
+                this.loaderService.hide();
+                this.notificationService.success(successMessage, 'Éxito');
             },
-            error: (err) => this.notificationService.error('Error al descargar XML', err.message)
+            error: async (err) => {
+                this.loaderService.hide();
+                let message = 'Error al descargar el archivo';
+                if (err?.error instanceof Blob) {
+                    try {
+                        const text = await err.error.text();
+                        const json = JSON.parse(text);
+                        message = Array.isArray(json.message)
+                            ? json.message.join(', ')
+                            : json.message || message;
+                    } catch {
+                        // fall through
+                    }
+                } else if (err?.message) {
+                    message = err.message;
+                }
+                this.notificationService.error(message, errorTitle);
+            }
         });
     }
 }

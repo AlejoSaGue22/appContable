@@ -35,6 +35,8 @@ export class FacturaCompraComponent {
     isModalItem = signal<boolean>(false);
     idItem = signal<string>('');
     action = signal<string>('');
+    // Bloquea doble submit y muestra loader mientras se procesa la acción confirmada
+    isProcessing = signal<boolean>(false);
 
     // Filtros
     filters = signal<PurchaseInvoiceFilters>({});
@@ -77,6 +79,7 @@ export class FacturaCompraComponent {
     }
 
     onAction(): void {
+        if (this.isProcessing()) return;
         switch (this.action()) {
             case 'anular':
                 this.onAnular();
@@ -99,10 +102,11 @@ export class FacturaCompraComponent {
     }
 
     onRetryAsiento(id: string): void {
-        this.isModalItem.set(false);
+        if (this.isProcessing()) return;
+        this.isProcessing.set(true);
         this.facturaService.retryAsiento(id).subscribe((res: ResponseResult) => {
+            this.isProcessing.set(false);
             if (res.success) {
-                this.isModalItem.set(false);
                 this.notificacionService.success('Asiento reintentado con éxito', 'Éxito');
                 this.facturasCompraResource.reload();
             } else {
@@ -113,10 +117,12 @@ export class FacturaCompraComponent {
     }
 
     onRegister(): void {
-        this.isModalItem.set(false);
+        if (this.isProcessing()) return;
+        this.isProcessing.set(true);
         this.facturaService.registrarFacturaCompra(this.idItem()).subscribe((res: ResponseResult) => {
+            this.isProcessing.set(false);
+            this.isModalItem.set(false);
             if (res.success) {
-                this.isModalItem.set(false);
                 this.notificacionService.success('Factura registrada con éxito', 'Éxito');
                 this.facturasCompraResource.reload();
             } else {
@@ -127,10 +133,12 @@ export class FacturaCompraComponent {
     }
 
     onAnular(): void {
-        this.isModalItem.set(false);
+        if (this.isProcessing()) return;
+        this.isProcessing.set(true);
         this.facturaService.anularFacturaCompra(this.idItem()).subscribe((res: ResponseResult) => {
+            this.isProcessing.set(false);
+            this.isModalItem.set(false);
             if (res.success) {
-                this.isModalItem.set(false);
                 this.notificacionService.success('Factura anulada con éxito', 'Éxito');
                 this.facturasCompraResource.reload();
             } else {
@@ -141,10 +149,12 @@ export class FacturaCompraComponent {
     }
 
     onDelete(): void {
-        this.isModalItem.set(false);
+        if (this.isProcessing()) return;
+        this.isProcessing.set(true);
         this.facturaService.deleteFacturaCompra(this.idItem()).subscribe((res: ResponseResult) => {
+            this.isProcessing.set(false);
+            this.isModalItem.set(false);
             if (res.success) {
-                this.isModalItem.set(false);
                 this.notificacionService.success('Factura eliminada con éxito', 'Éxito');
                 this.facturasCompraResource.reload();
             } else {

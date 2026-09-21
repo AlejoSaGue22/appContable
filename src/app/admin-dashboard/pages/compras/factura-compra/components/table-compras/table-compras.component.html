@@ -196,8 +196,8 @@
                 (userAuth()?.role === "Contador" ||
                 userAuth()?.role === "Super Admin")
                 ) {
-                <button (click)="onRetryAsiento(compra.id)"
-                  class="inline-flex items-center rounded-lg text-sm text-yellow-600 hover:text-yellow-900 cursor-pointer"
+                <button (click)="onRetryAsiento(compra.id)" [disabled]="busy()"
+                  class="inline-flex items-center rounded-lg text-sm text-yellow-600 hover:text-yellow-900 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                   title="Reintentar Asiento">
                   <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -219,8 +219,8 @@
                   </svg>
                 </a>
 
-                <button (click)="onRegister(compra.id)"
-                  class="inline-flex items-center rounded-lg text-sm text-purple-600 hover:text-purple-900 cursor-pointer"
+                <button (click)="onRegister(compra.id)" [disabled]="busy()"
+                  class="inline-flex items-center rounded-lg text-sm text-purple-600 hover:text-purple-900 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                   title="Registrar Factura">
                   <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -228,8 +228,8 @@
                   </svg>
                 </button>
 
-                <button (click)="onDelete(compra.id)"
-                  class="inline-flex items-center rounded-lg text-sm text-gray-600 hover:text-gray-900 cursor-pointer"
+                <button (click)="onDelete(compra.id)" [disabled]="busy()"
+                  class="inline-flex items-center rounded-lg text-sm text-gray-600 hover:text-gray-900 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                   title="Eliminar Factura">
                   <svg class="h-5 w-5 text-red-600 dark:text-red-500" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">
@@ -240,8 +240,8 @@
                 }
 
                 @if (compra.estado === "registrado") {
-                <button (click)="onAnular(compra.id)"
-                  class="inline-flex items-center rounded-lg text-sm text-gray-600 hover:text-gray-900 cursor-pointer"
+                <button (click)="onAnular(compra.id)" [disabled]="busy()"
+                  class="inline-flex items-center rounded-lg text-sm text-gray-600 hover:text-gray-900 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                   title="Anular Transacción">
                   <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

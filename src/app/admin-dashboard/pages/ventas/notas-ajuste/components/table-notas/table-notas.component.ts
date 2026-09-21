@@ -113,16 +113,16 @@ export class TableNotasComponent {
 
     getStatusClass(status: NotaAjusteStatus): string {
         const classes: Record<NotaAjusteStatus, string> = {
-            [NotaAjusteStatus.DRAFT]: 'bg-gray-100 text-gray-800',
+            [NotaAjusteStatus.DRAFT]: 'bg-gray-100 text-gray-800 border-gray-200',
             [NotaAjusteStatus.ISSUED]: 'bg-teal-100 text-teal-800',
             [NotaAjusteStatus.PROCESSING]: 'bg-blue-100 text-blue-800 animate-pulse',
             [NotaAjusteStatus.SENT]: 'bg-yellow-100 text-yellow-800',
-            [NotaAjusteStatus.ACCEPTED]: 'bg-green-100 text-green-800',
-            [NotaAjusteStatus.REJECTED]: 'bg-red-100 text-red-800',
+            [NotaAjusteStatus.ACCEPTED]: 'bg-green-100 text-green-800 bg-emerald-50 text-emerald-600 border-emerald-100',
+            [NotaAjusteStatus.REJECTED]: 'bg-red-50 text-red-500 border-red-100',
             [NotaAjusteStatus.CANCELLED]: 'bg-gray-500 text-white',
             [NotaAjusteStatus.ERROR_ASIENTO]: 'bg-red-600 text-white'
         };
-        return classes[status] || 'bg-gray-100 text-gray-800';
+        return classes[status] || 'bg-gray-100 text-gray-800 border-gray-200';
     }
 
     getStatusLabel(status: NotaAjusteStatus): string {

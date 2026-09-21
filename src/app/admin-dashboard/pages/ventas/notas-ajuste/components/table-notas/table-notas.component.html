@@ -137,13 +137,17 @@
                     <td>{{ nota.facturaOriginal?.comprobante_completo || '-' }}</td>
                     <td>{{ nota.facturaOriginal?.tipoFactura }}</td>
                     <td>{{ nota.cliente?.razonSocial || nota.cliente?.nombre + ' ' + nota.cliente?.apellido }}</td>
-                    <td>
-                        <span [class]="'inline-flex rounded-full px-2 py-1 text-xs' + getStatusClass(nota.estado)">
+                    <td class="text-center">
+                        <span
+                            [class]="'px-2.5 py-1 text-[10px] font-semibold uppercase rounded-lg ' + getStatusClass(nota.estado)">
                             {{ getStatusLabel(nota.estado) }}
                         </span>
                     </td>
-                    <td class="text-right tabular-nums"><span class="font-semibold text-slate-900">{{ nota.total |
-                            currency: '' : 'symbol' : '0.0-0' }}</span></td>
+                    <td class="text-right tabular-nums">
+                        <span class="font-semibold text-slate-900">
+                            {{ nota.total | currency: '' : 'symbol' : '0.0-0' }}
+                        </span>
+                    </td>
                     <td>
                         <div class="flex justify-center gap-2">
                             @if (nota.estado == 'borrador' || nota.estado == 'rechazada') {

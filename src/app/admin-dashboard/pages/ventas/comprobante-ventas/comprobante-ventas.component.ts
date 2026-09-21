@@ -4,7 +4,7 @@ import { CardsTotales, NumCardsTotalesComponent } from "@shared/components/num-c
 import { ComprobantesVentasService } from '../services/comprobantes-ventas.service';
 import { PaginationService } from '@shared/components/pagination/pagination.service';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { tap } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { LoaderComponent } from "src/app/utils/components/loader/loader.component";
 import { ErrorPages } from "@shared/components/error-pages/error-pages.component";
 import { HeaderTitleInvoices } from "./components/header-title-invoices/header-title-invoices.component";
@@ -180,29 +180,80 @@ export class ComprobanteVentasComponent {
     }
 
     onDownloadPDF(id: string): void {
-        this.loaderService.show('Preparando descarga de PDF...');
-        this.comprobantesVentasService.downloadPDF(id).subscribe((blob) => {
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `factura-${id}.pdf`;
-            a.click();
-            window.URL.revokeObjectURL(url);
-            this.loaderService.hide();
-        }, () => this.loaderService.hide());
+        this.handleDownloadBlob(
+            this.comprobantesVentasService.downloadPDF(id),
+            `factura-${id}.pdf`,
+            'Preparando descarga de PDF...',
+            'PDF descargado con éxito',
+            'Error al descargar PDF'
+        );
     }
 
     onDownloadXML(id: string): void {
-        this.loaderService.show('Preparando descarga de XML...');
-        this.comprobantesVentasService.downloadXML(id).subscribe((blob) => {
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `factura-${id}.xml`;
-            a.click();
-            window.URL.revokeObjectURL(url);
-            this.loaderService.hide();
-        }, () => this.loaderService.hide());
+        this.handleDownloadBlob(
+            this.comprobantesVentasService.downloadXML(id),
+            `factura-${id}.xml`,
+            'Preparando descarga de XML...',
+            'XML descargado con éxito',
+            'Error al descargar XML'
+        );
+    }
+
+    private handleDownloadBlob(
+        observable: Observable<Blob>,
+        filename: string,
+        loadingMessage: string,
+        successMessage: string,
+        errorTitle: string
+    ): void {
+        this.loaderService.show(loadingMessage);
+        observable.subscribe({
+            next: async (blob) => {
+                if (blob.type === 'application/json') {
+                    try {
+                        const text = await blob.text();
+                        const json = JSON.parse(text);
+                        this.loaderService.hide();
+                        const message = Array.isArray(json.message)
+                            ? json.message.join(', ')
+                            : json.message;
+                        this.notificacionService.error(
+                            message || 'Error al descargar el archivo',
+                            errorTitle
+                        );
+                        return;
+                    } catch {
+                        // Continuar si falla el parseo
+                    }
+                }
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+                window.URL.revokeObjectURL(url);
+                this.loaderService.hide();
+                this.notificacionService.success(successMessage, 'Éxito');
+            },
+            error: async (err) => {
+                this.loaderService.hide();
+                let message = 'Error al descargar el archivo';
+                if (err?.error instanceof Blob) {
+                    try {
+                        const text = await err.error.text();
+                        const json = JSON.parse(text);
+                        message = Array.isArray(json.message)
+                            ? json.message.join(', ')
+                            : json.message || message;
+                    } catch {
+                        // fall through
+                    }
+                } else if (err?.message) {
+                    message = err.message;
+                }
+                this.notificacionService.error(message, errorTitle);
+            }
+        });
     }
 
 }

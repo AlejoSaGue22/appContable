@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { tap } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   HeaderInput,
@@ -142,34 +142,79 @@ export class NotasAjusteComponent {
   }
 
   onDownloadPDF(id: string): void {
-    this.loaderService.show('Preparando PDF...');
-    this.notasService.downloadPDF(id).subscribe({
-      next: (blob) => {
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `nota-${id}.pdf`;
-        a.click();
-        window.URL.revokeObjectURL(url);
-        this.loaderService.hide();
-      },
-      error: () => this.loaderService.hide(),
-    });
+    this.handleDownloadBlob(
+      this.notasService.downloadPDF(id),
+      `nota-${id}.pdf`,
+      'Preparando descarga de PDF...',
+      'PDF descargado con éxito',
+      'Error al descargar PDF',
+    );
   }
 
   onDownloadXML(id: string): void {
-    this.loaderService.show('Preparando XML...');
-    this.notasService.downloadXML(id).subscribe({
-      next: (blob) => {
+    this.handleDownloadBlob(
+      this.notasService.downloadXML(id),
+      `nota-${id}.xml`,
+      'Preparando descarga de XML...',
+      'XML descargado con éxito',
+      'Error al descargar XML',
+    );
+  }
+
+  private handleDownloadBlob(
+    observable: Observable<Blob>,
+    filename: string,
+    loadingMessage: string,
+    successMessage: string,
+    errorTitle: string,
+  ): void {
+    this.loaderService.show(loadingMessage);
+    observable.subscribe({
+      next: async (blob) => {
+        if (blob.type === 'application/json') {
+          try {
+            const text = await blob.text();
+            const json = JSON.parse(text);
+            this.loaderService.hide();
+            const message = Array.isArray(json.message)
+              ? json.message.join(', ')
+              : json.message;
+            this.notificationService.error(
+              message || 'Error al descargar el archivo',
+              errorTitle,
+            );
+            return;
+          } catch {
+            // Continuar si falla el parseo
+          }
+        }
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `nota-${id}.xml`;
+        a.download = filename;
         a.click();
         window.URL.revokeObjectURL(url);
         this.loaderService.hide();
+        this.notificationService.success(successMessage, 'Éxito');
       },
-      error: () => this.loaderService.hide(),
+      error: async (err) => {
+        this.loaderService.hide();
+        let message = 'Error al descargar el archivo';
+        if (err?.error instanceof Blob) {
+          try {
+            const text = await err.error.text();
+            const json = JSON.parse(text);
+            message = Array.isArray(json.message)
+              ? json.message.join(', ')
+              : json.message || message;
+          } catch {
+            // fall through
+          }
+        } else if (err?.message) {
+          message = err.message;
+        }
+        this.notificationService.error(message, errorTitle);
+      },
     });
   }
 

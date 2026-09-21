@@ -90,7 +90,7 @@
                 class="block w-full px-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all appearance-none pr-10 cursor-pointer">
                 <option [ngValue]="null">Seleccione el municipio de la sede</option>
                 @for (m of catalogsStore.municipalities(); track m.id) {
-                <option [ngValue]="m.id">{{ m.name }} - {{ m.department }} ({{ m.code }})</option>
+                <option [ngValue]="m.id">{{ m.name }} - {{ m.department }}</option>
                 }
               </select>
               <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
@@ -99,7 +99,8 @@
                 </svg>
               </div>
             </div>
-            <p class="text-xs text-gray-400">Se usa como <span class="font-mono">municipality_code</span> del establecimiento en facturas y notas electrónicas.</p>
+            <p class="text-xs text-gray-400">Se usa como <span class="font-mono">municipality_code</span> del
+              establecimiento en facturas y notas electrónicas.</p>
           </div>
 
           <!-- Logo File Upload & Preview -->

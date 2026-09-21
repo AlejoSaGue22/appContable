@@ -24,9 +24,11 @@ export interface PurchaseInvoiceFilters {
  standalone: true
 })
 export class TableComprasComponent {
- compraData = input<FacturaCompra[]>([]);
+  compraData = input<FacturaCompra[]>([]);
+  // Deshabilita las acciones de fila mientras el padre procesa una acción
+  busy = input<boolean>(false);
 
- activeFilters = input<PurchaseInvoiceFilters>({});
+  activeFilters = input<PurchaseInvoiceFilters>({});
  userAuth = input<UserAuth | null>(null);
  anular = output<string>();
  delete = output<string>();

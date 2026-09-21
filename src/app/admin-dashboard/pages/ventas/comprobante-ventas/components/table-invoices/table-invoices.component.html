@@ -176,21 +176,14 @@
                 [class.text-gray-600]="invoice.status === 'draft'" [class.border-gray-100]="invoice.status === 'draft'"
                 [class.bg-yellow-50]="invoice.status === 'pending_dian'"
                 [class.text-yellow-600]="invoice.status === 'pending_dian'"
-                [class.border-yellow-100]="invoice.status === 'pending_dian'" [class.bg-emerald-50]="
-                    invoice.status === 'accepted' || invoice.status === 'issued'
-                  " [class.text-emerald-600]="
-                    invoice.status === 'accepted' || invoice.status === 'issued'
-                  " [class.border-emerald-100]="
-                    invoice.status === 'accepted' || invoice.status === 'issued'
-                  " [class.bg-blue-50]="invoice.status === 'paid'" [class.text-blue-600]="invoice.status === 'paid'"
-                [class.border-blue-100]="invoice.status === 'paid'" [class.bg-red-50]="
-                    invoice.status === 'rejected' ||
-                    invoice.status === 'anulada' ||
-                    invoice.status === 'error_asiento'" [class.text-red-500]="invoice.status === 'rejected' ||
-                    invoice.status === 'anulada' ||
-                    invoice.status === 'error_asiento'" [class.border-red-100]="
-                    invoice.status === 'rejected' ||
-                    invoice.status === 'anulada' ||
+                [class.border-yellow-100]="invoice.status === 'pending_dian'"
+                [class.bg-emerald-50]="invoice.status === 'accepted' || invoice.status === 'issued'"
+                [class.text-emerald-600]="invoice.status === 'accepted' || invoice.status === 'issued'"
+                [class.border-emerald-100]="invoice.status === 'accepted' || invoice.status === 'issued'"
+                [class.bg-blue-50]="invoice.status === 'paid'" [class.text-blue-600]="invoice.status === 'paid'"
+                [class.border-blue-100]="invoice.status === 'paid'" [class.bg-red-50]="invoice.status === 'rejected' || invoice.status === 'anulada' ||
+                    invoice.status === 'error_asiento'" [class.text-red-500]="invoice.status === 'rejected' || invoice.status === 'anulada' ||
+                    invoice.status === 'error_asiento'" [class.border-red-100]="invoice.status === 'rejected' || invoice.status === 'anulada' ||
                     invoice.status === 'error_asiento'">
                 {{ getStatusLabel(invoice.status) }}
               </span>
