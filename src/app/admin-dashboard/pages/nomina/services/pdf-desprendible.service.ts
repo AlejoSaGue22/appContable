@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Liquidacion, PeriodoNomina, Empleado } from '../interfaces/nomina.interface';
+import { HelpersUtils } from '@utils/helpers.utils';
 
 /**
  * Patrón Builder: Separa la construcción de un objeto complejo (el PDF) de su representación.
@@ -18,6 +19,7 @@ class DesprendiblePdfBuilder {
   private lightBg = [247, 247, 247] as [number, number, number];
   private borderColor = [200, 200, 200] as [number, number, number];
   private textColor = [40, 40, 40] as [number, number, number];
+  private logoDataUrl: string | null = null;
 
   constructor(
     private liquidacion: Liquidacion,
@@ -26,6 +28,11 @@ class DesprendiblePdfBuilder {
   ) {
     this.doc = new jsPDF();
     this.pageWidth = this.doc.internal.pageSize.getWidth();
+  }
+
+  public setLogo(dataUrl: string | null): this {
+    this.logoDataUrl = dataUrl;
+    return this;
   }
 
   public buildHeader(): this {
@@ -40,15 +47,29 @@ class DesprendiblePdfBuilder {
     this.startY += 6;
 
     // Fila inferior: Empresa (izquierda) | Periodo (derecha)
+    // Logo de la empresa (si se pudo cargar como base64)
+    let textX = this.marginX;
+    if (this.logoDataUrl) {
+      try {
+        const fmt = this.logoDataUrl.includes('data:image/jpeg') || this.logoDataUrl.includes('data:image/jpg')
+          ? 'JPEG'
+          : 'PNG';
+        this.doc.addImage(this.logoDataUrl, fmt, this.marginX, this.startY - 6, 18, 18);
+        textX = this.marginX + 22;
+      } catch {
+        textX = this.marginX;
+      }
+    }
+
     this.doc.setTextColor(0);
     this.doc.setFontSize(11);
     this.doc.setFont('helvetica', 'bold');
-    this.doc.text(this.empresa?.razonSocial || 'Empresa', this.marginX, this.startY);
+    this.doc.text(this.empresa?.razonSocial || 'Empresa', textX, this.startY);
 
     this.doc.setTextColor(this.textColor[0], this.textColor[1], this.textColor[2]);
     this.doc.setFontSize(8);
     this.doc.setFont('helvetica', 'normal');
-    this.doc.text(`NIT: ${this.empresa?.nit || ''}`, this.marginX, this.startY + 5);
+    this.doc.text(`NIT: ${this.empresa?.nit || ''}`, textX, this.startY + 5);
 
     // Periodo alineado a la derecha
     this.doc.setFont('helvetica', 'normal');
@@ -255,9 +276,15 @@ class DesprendiblePdfBuilder {
 @Injectable({ providedIn: 'root' })
 export class PdfDesprendibleService {
 
-  generarDesprendible(liquidacion: Liquidacion, periodo: PeriodoNomina, empresa: any, asBlob: boolean = false): { blob?: Blob, fileName: string } | void {
+  async generarDesprendible(liquidacion: Liquidacion, periodo: PeriodoNomina, empresa: any, asBlob: boolean = false): Promise<{ blob?: Blob, fileName: string } | void> {
     const builder = new DesprendiblePdfBuilder(liquidacion, periodo, empresa);
-    
+
+    // Resolver logo de la empresa (relativo /uploads/... => absoluta) y cargarlo como base64
+    const rawLogo = empresa?.logoUrlFormated || empresa?.logoUrl;
+    const resolvedLogo = HelpersUtils.resolveLogoUrl(rawLogo);
+    const logoBase64 = await HelpersUtils.logoToBase64(resolvedLogo);
+    builder.setLogo(logoBase64);
+
     const doc = builder
       .buildHeader()
       .buildEmployeeInfo()

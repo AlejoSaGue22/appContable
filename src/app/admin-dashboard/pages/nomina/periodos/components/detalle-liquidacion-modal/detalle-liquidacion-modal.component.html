@@ -105,6 +105,12 @@
             <p class="text-[11px] text-slate-400 uppercase font-semibold">No. Nómina</p>
             <p class="font-mono text-slate-600 mt-0.5">{{ periodo().dianNumero || '-' }}</p>
           </div>
+          @if (periodo().factusNumberingRangeId) {
+          <div>
+            <p class="text-[11px] text-slate-400 uppercase font-semibold">Rango DIAN</p>
+            <p class="font-mono text-slate-600 mt-0.5">#{{ periodo().factusNumberingRangeId }}@if (periodo().factusRangePrefix) { ({{ periodo().factusRangePrefix }}) }@if (periodo().factusResolutionNumber) { · Res. {{ periodo().factusResolutionNumber }} }</p>
+          </div>
+          }
         </div>
       </div>
       }

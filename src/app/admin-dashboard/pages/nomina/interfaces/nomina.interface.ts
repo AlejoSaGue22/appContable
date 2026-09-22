@@ -91,6 +91,9 @@ export interface PeriodoNomina {
   dianQrUrl?: string;
   dianFechaEnvio?: string;
   dianFechaAceptacion?: string;
+  factusNumberingRangeId?: number | null;
+  factusResolutionNumber?: string | null;
+  factusRangePrefix?: string | null;
   totalDevengado: number;
   totalDeducciones: number;
   totalNeto: number;

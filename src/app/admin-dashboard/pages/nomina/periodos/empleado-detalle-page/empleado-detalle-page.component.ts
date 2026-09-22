@@ -8,7 +8,6 @@ import { HeaderTitlePageComponent } from '@dashboard/components/header-title-pag
 import { LoaderService } from '@utils/services/loader.service';
 import { NotificationService } from '@shared/services/notification.service';
 import { EmpresaService } from '@dashboard/services/empresa.service';
-import { environment } from 'src/app/environments/environment';
 import { HelpersUtils } from '@utils/helpers.utils';
 
 @Component({
@@ -54,8 +53,7 @@ export default class EmpleadoDetallePageComponent implements OnInit {
       next: (res: any) => {
         const d = res?.data || res;
         if (d) {
-          const origin = environment.baseUrl.replace(/\/api\/v1\/?$/, '');
-          const logoUrlFormated = d.logoUrl ? (d.logoUrl.startsWith('/') ? `${origin}${d.logoUrl}` : d.logoUrl) : `/${HelpersUtils.logoApp}`;
+          const logoUrlFormated = HelpersUtils.resolveLogoUrl(d.logoUrl);
           this.empresa.set({ ...d, logoUrlFormated });
         }
       },
@@ -96,12 +94,12 @@ export default class EmpleadoDetallePageComponent implements OnInit {
     }
   }
 
-  descargarColilla() {
+  async descargarColilla() {
     const liq = this.liquidacion();
     const per = this.periodo();
     if (!liq || !per) return;
     try {
-      this.pdfService.generarDesprendible(liq, per, this.empresa());
+      await this.pdfService.generarDesprendible(liq, per, this.empresa());
       this.notification.success('Colilla de pago generada exitosamente');
     } catch (err) {
       this.notification.error('Error al generar la colilla');

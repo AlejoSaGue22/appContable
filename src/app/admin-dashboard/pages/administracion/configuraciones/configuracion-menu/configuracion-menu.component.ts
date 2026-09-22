@@ -45,7 +45,7 @@ export class ConfiguracionMenuComponent {
       description: 'Configura la información que se mostrará en tus facturas y procesos de venta.',
       options: [
         // { label: 'Términos de pago', route: 'terminos-pago' },
-        // { label: 'Numeraciones', route: 'numeraciones' },
+        { label: 'Rangos DIAN (Factus)', route: 'rangos-dian' },
         // { label: 'Configuración de documentos', route: 'config-documentos' },
         { label: 'Vendedores', route: 'vendedores' },
         // { label: 'Propinas', route: 'propinas' },

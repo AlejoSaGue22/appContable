@@ -5,6 +5,7 @@ import { HeaderInput, HeaderTitlePageComponent } from '@dashboard/components/hea
 import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
 import { EmpresaService, Empresa } from '@dashboard/services/empresa.service';
 import { NotificationService } from '@shared/services/notification.service';
+import { HelpersUtils } from '@utils/helpers.utils';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { tap } from 'rxjs';
 import { LoaderComponent } from 'src/app/utils/components/loader/loader.component';
@@ -39,6 +40,7 @@ export class EmpresaComponent implements OnInit {
   isSubmitting = signal<boolean>(false);
   selectedFile = signal<File | null>(null);
   logoPreviewUrl = signal<string | null>(null);
+  protected readonly logoFallback = `/${HelpersUtils.logoApp}`;
 
   formEmpresa: FormGroup = this.fb.group({
     nit: ['', [Validators.required]],
@@ -59,7 +61,9 @@ export class EmpresaComponent implements OnInit {
         if (res.success && res.data) {
           this.formEmpresa.patchValue(res.data);
           if (res.data.logoUrl) {
-            this.logoPreviewUrl.set(res.data.logoUrl);
+            this.logoPreviewUrl.set(HelpersUtils.resolveLogoUrl(res.data.logoUrl));
+          } else {
+            this.logoPreviewUrl.set(null);
           }
         }
       })
@@ -85,6 +89,10 @@ export class EmpresaComponent implements OnInit {
       };
       reader.readAsDataURL(file);
     }
+  }
+
+  onLogoImgError(): void {
+    this.logoPreviewUrl.set(this.logoFallback);
   }
 
   onSubmit(): void {

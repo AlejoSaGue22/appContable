@@ -65,6 +65,9 @@ export interface FacturaVenta {
     createdById: string;
     createdAt: Date;
     saveAsDraft?: boolean;
+    factusNumberingRangeId?: number | null;
+    factusResolutionNumber?: string | null;
+    factusRangePrefix?: string | null;
 }
 
 export interface CatalogsItems {
@@ -115,6 +118,9 @@ export interface GetFacturaRequest {
     fechaAceptacionDIAN: string | null;
     intentosEnvio: number;
     observaciones: string | null;
+    factusNumberingRangeId?: number | null;
+    factusResolutionNumber?: string | null;
+    factusRangePrefix?: string | null;
     createdBy: CreatedBy;
     createdById: string;
     createdAt: string; // ISO datetime

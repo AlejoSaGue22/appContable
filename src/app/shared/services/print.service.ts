@@ -5,7 +5,6 @@ import { NotaAjuste } from '@dashboard/interfaces/notas-ajuste-interface';
 import { NotaAjusteCompra } from '@dashboard/interfaces/notas-ajuste-compra-interface';
 import { HelpersUtils } from '@utils/helpers.utils';
 import { EmpresaService } from '@dashboard/services/empresa.service';
-import { environment } from 'src/app/environments/environment';
 
 export interface EmpresaInfo {
   nombre: string;
@@ -47,8 +46,7 @@ export class PrintService {
       next: (res) => {
         if (res.success && res.data) {
           const d = res.data;
-          const origin = environment.baseUrl.replace(/\/api\/v1\/?$/, '');
-          const formattedLogoUrl = d.logoUrl ? (d.logoUrl.startsWith('/') ? `${origin}${d.logoUrl}` : d.logoUrl) : `/${HelpersUtils.logoApp}`;
+          const formattedLogoUrl = HelpersUtils.resolveLogoUrl(d.logoUrl);
 
           this.empresa = {
             nombre: d.razonSocial || EMPRESA_DEFAULT.nombre,
@@ -76,9 +74,10 @@ export class PrintService {
   // ──────────────────────────────────────────────────────────────────────
   // IMPRIMIR FACTURA DE VENTA
   // ──────────────────────────────────────────────────────────────────────
-  printInvoice(factura: GetFacturaRequest): void {
-    const html = this.buildInvoiceHtml(factura);
-    this.openPrintWindow(html, `Factura ${factura.comprobante_completo}`);
+  printInvoice(factura: GetFacturaRequest): Promise<void> {
+    return this.buildInvoiceHtml(factura).then((html) => {
+      this.openPrintWindow(html, `Factura ${factura.comprobante_completo}`);
+    });
   }
 
   // ──────────────────────────────────────────────────────────────────────
@@ -100,10 +99,11 @@ export class PrintService {
   // ──────────────────────────────────────────────────────────────────────
   // IMPRIMIR NOTA DE AJUSTE (CRÉDITO/DÉBITO)
   // ──────────────────────────────────────────────────────────────────────
-  printAdjustmentNote(nota: NotaAjuste, conceptoLabel?: string): void {
-    const html = this.buildAdjustmentNoteHtml(nota, conceptoLabel);
-    const title = nota.tipo === 'credito' ? 'Nota Crédito' : 'Nota Débito';
-    this.openPrintWindow(html, `${title} ${nota.prefijo}${nota.numero}`);
+  printAdjustmentNote(nota: NotaAjuste, conceptoLabel?: string): Promise<void> {
+    return this.buildAdjustmentNoteHtml(nota, conceptoLabel).then((html) => {
+      const title = nota.tipo === 'credito' ? 'Nota Crédito' : 'Nota Débito';
+      this.openPrintWindow(html, `${title} ${nota.prefijo}${nota.numero}`);
+    });
   }
 
   // ──────────────────────────────────────────────────────────────────────
@@ -142,7 +142,7 @@ export class PrintService {
   // ══════════════════════════════════════════════════════════════════════
   // PRIVATE — Construir HTML de Factura
   // ══════════════════════════════════════════════════════════════════════
-  private buildInvoiceHtml(f: GetFacturaRequest): string {
+  private async buildInvoiceHtml(f: GetFacturaRequest): Promise<string> {
     const tipoLabel = f.tipoFactura === 'ELECTRONICA'
       ? 'FACTURA ELECTRÓNICA DE VENTA'
       : 'FACTURA DE VENTA';
@@ -166,9 +166,14 @@ export class PrintService {
  `,
     ).join('');
 
-    const qrBlock = f.qrCode ? `<td style="width:100px;text-align:center;vertical-align:top;padding:6px;">
- <img src="${f.qrCode}" alt="QR DIAN" style="width:88px;height:88px;"/>
- </td>` : '';
+    const qrRaw = HelpersUtils.resolveQrText(f);
+    const qrDataUrl = qrRaw ? await HelpersUtils.toQrDataUrl(qrRaw) : null;
+    const qrBlock = qrDataUrl ? `<td style="width:100px;text-align:center;vertical-align:top;padding:6px;">
+  <img src="${qrDataUrl}" alt="QR DIAN" style="width:88px;height:88px;"/>
+  <div style="font-size:7px;color:#64748b;word-break:break-all;margin-top:4px;max-width:100px;">${this.escapeHtml(qrRaw || '')}</div>
+  </td>` : (qrRaw ? `<td style="width:100px;text-align:center;vertical-align:top;padding:6px;">
+  <div style="font-size:7px;color:#64748b;word-break:break-all;max-width:100px;">${this.escapeHtml(qrRaw)}</div>
+  </td>` : '');
 
     const cufeSection = f.cufe ? `<tr><td colspan="2" style="padding:6px 0;">
  <div style="background:#f8fafc;border:1px solid #cbd5e1;padding:6px 10px;font-size:10px;color:#000000;word-break:break-all;text-align:center;">
@@ -437,6 +442,7 @@ export class PrintService {
             <div class="asiento-header">
             <div class="header-side">Asiento contable</div>
             <div class="header-center">
+            <img src="${this.logoApp}" alt="Logo" style="width:64px;height:64px;object-fit:contain;margin:0 auto 6px;display:block;"/>
             <div class="empresa">${this.empresa.nombre}</div>
             <div class="fecha-section">
             <strong>FECHA</strong>
@@ -808,10 +814,10 @@ export class PrintService {
   // ══════════════════════════════════════════════════════════════════════
   // PRIVATE — Construir HTML de Nota de Ajuste
   // ══════════════════════════════════════════════════════════════════════
-  private buildAdjustmentNoteHtml(
+  private async buildAdjustmentNoteHtml(
     n: NotaAjuste,
     conceptoLabel?: string,
-  ): string {
+  ): Promise<string> {
     const tipoLabel =
       n.tipo === 'credito'
         ? 'NOTA CRÉDITO ELECTRÓNICA'
@@ -843,11 +849,16 @@ export class PrintService {
       )
       .join('');
 
-    const qrBlock = n.qrCode
+    const qrRawNota = HelpersUtils.resolveQrText(n);
+    const qrDataUrlNota = qrRawNota ? await HelpersUtils.toQrDataUrl(qrRawNota) : null;
+    const qrBlock = qrDataUrlNota
       ? `<td style="width:100px;text-align:center;vertical-align:top;padding:6px;">
- <img src="${n.qrCode}" alt="QR DIAN" style="width:88px;height:88px;"/>
- </td>`
-      : '';
+  <img src="${qrDataUrlNota}" alt="QR DIAN" style="width:88px;height:88px;"/>
+  <div style="font-size:7px;color:#64748b;word-break:break-all;margin-top:4px;max-width:100px;">${this.escapeHtml(qrRawNota || '')}</div>
+  </td>`
+      : (qrRawNota ? `<td style="width:100px;text-align:center;vertical-align:top;padding:6px;">
+  <div style="font-size:7px;color:#64748b;word-break:break-all;max-width:100px;">${this.escapeHtml(qrRawNota)}</div>
+  </td>` : '');
 
     const cufeSection =
       n.cufe || n.cude
@@ -1221,6 +1232,14 @@ export class PrintService {
   // ══════════════════════════════════════════════════════════════════════
   // PRIVATE — Helpers
   // ══════════════════════════════════════════════════════════════════════
+  private escapeHtml(value: string): string {
+    return (value || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
   private fmt(value: number): string {
     return new Intl.NumberFormat('es-CO', {
       style: 'currency',
@@ -1243,8 +1262,7 @@ export class PrintService {
     return `${dd}-${mm}-${yyyy}`;
   }
 
-  private formatDateTimePrint(date: string | Date): string {
-    if (!date) return '—';
+  private formatDateTimePrint(date: string | Date): string {    if (!date) return '—';
     // Evitar que JS reste un día al interpretar YYYY-MM-DD como UTC
     const d =
       typeof date === 'string' && date.includes('-') && !date.includes('T')

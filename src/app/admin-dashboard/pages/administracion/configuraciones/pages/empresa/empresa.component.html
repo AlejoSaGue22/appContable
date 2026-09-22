@@ -123,7 +123,7 @@
               <div
                 class="w-16 h-16 rounded-xl border border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-inner p-1">
                 @if (logoPreviewUrl()) {
-                <img [src]="logoPreviewUrl()" alt="Vista previa del logo"
+                <img [src]="logoPreviewUrl()" (error)="onLogoImgError()" alt="Vista previa del logo"
                   class="max-h-full max-w-full object-contain" />
                 } @else {
                 <span class="text-[10px] text-gray-400 font-bold text-center">Sin Logo</span>

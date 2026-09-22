@@ -1,0 +1,318 @@
+@if (loading()) {
+<app-loader />
+}
+
+@if (!loading()) {
+<header-title-page [titleHead]="headTitle()" />
+<app-breadcrumb [items]="breadcrumbItems" class="block px-4 sm:px-6 lg:px-8" />
+
+<div class="w-full px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+  <div class="max-w-7xl mx-auto space-y-4">
+
+    <!-- Domain tabs + actions -->
+    <div class="flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+      <div class="inline-flex rounded-xl border border-gray-200 bg-white p-1 w-fit">
+        <button (click)="setDomain('billing')"
+          [class]="domain() === 'billing' ? 'bg-slate-900 text-white' : 'text-gray-600 hover:bg-gray-50'"
+          class="px-4 py-2 text-xs font-bold rounded-lg cursor-pointer transition-all">
+          Facturación (FE / NC / ND)
+        </button>
+        <button (click)="setDomain('payroll')"
+          [class]="domain() === 'payroll' ? 'bg-slate-900 text-white' : 'text-gray-600 hover:bg-gray-50'"
+          class="px-4 py-2 text-xs font-bold rounded-lg cursor-pointer transition-all">
+          Nómina
+        </button>
+      </div>
+      <div class="flex gap-2">
+        <button (click)="onSync()" [disabled]="syncing()"
+          class="inline-flex items-center px-4 py-2 bg-white border border-gray-200 rounded-xl font-bold text-xs text-slate-700 hover:bg-gray-50 cursor-pointer disabled:opacity-50 transition-all">
+          @if (syncing()) {
+          <svg class="animate-spin w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+          Sincronizando...
+          } @else {
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 4v5h5M20 20v-5h-5M5 9a7 7 0 0112-3m1 11a7 7 0 01-12-3" />
+          </svg>
+          Sincronizar con Factus
+          }
+        </button>
+        <button (click)="openCreate()"
+          class="inline-flex items-center px-4 py-2 bg-slate-900 border border-transparent rounded-xl font-bold text-xs text-white hover:bg-slate-800 cursor-pointer transition-all shadow-lg shadow-slate-200">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+          </svg>
+          Nuevo rango
+        </button>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="flex flex-col sm:flex-row gap-3">
+      <select [ngModel]="documentFilter()" (ngModelChange)="documentFilter.set($event)"
+        class="px-3 py-2 text-xs border border-gray-200 rounded-xl bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-slate-200">
+        <option value="">Todos los documentos</option>
+        @for (d of documentsAvailable(); track d) {
+        <option [value]="d">{{ docLabel(d) }} ({{ d }})</option>
+        }
+      </select>
+      <select [ngModel]="healthFilter()" (ngModelChange)="healthFilter.set($event)"
+        class="px-3 py-2 text-xs border border-gray-200 rounded-xl bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-slate-200">
+        <option value="">Todos los estados</option>
+        <option value="ok">Vigentes</option>
+        <option value="warning">Por vencer / agotar</option>
+        <option value="expired">Vencidos</option>
+        <option value="inactive">Inactivos</option>
+      </select>
+      <span class="text-xs text-gray-400 self-center">{{ filtered().length }} rango(s) en caché</span>
+    </div>
+
+    <!-- Table -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-100 text-xs">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase tracking-wider">ID / Prefijo</th>
+              <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase tracking-wider">Documento</th>
+              <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase tracking-wider">Resolución</th>
+              <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase tracking-wider">Numeración / Consumo</th>
+              <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase tracking-wider">Vigencia</th>
+              <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase tracking-wider">Estado</th>
+              <th class="px-4 py-3 text-left font-bold text-gray-500 uppercase tracking-wider">Sincronizado</th>
+              <th class="px-4 py-3 text-right font-bold text-gray-500 uppercase tracking-wider">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-50">
+            @for (r of filtered(); track r.id) {
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-3">
+                <div class="font-bold text-slate-800">#{{ r.factusId }}</div>
+                <div class="text-gray-400">{{ r.prefix || '—' }}</div>
+              </td>
+              <td class="px-4 py-3 text-gray-700">{{ docLabel(r.document) }}</td>
+              <td class="px-4 py-3 text-gray-700 font-mono">{{ r.resolutionNumber || '—' }}</td>
+              <td class="px-4 py-3 min-w-52">
+                <div class="text-gray-700">{{ rangeSpan(r) }}</div>
+                @if (pctOf(r) !== null) {
+                <div class="mt-1 h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                  <div class="h-full rounded-full"
+                    [class]="pctOf(r)! >= 90 ? 'bg-red-500' : pctOf(r)! >= 75 ? 'bg-amber-500' : 'bg-green-500'"
+                    [style.width.%]="pctOf(r)"></div>
+                </div>
+                <div class="text-gray-400 mt-0.5">Actual: {{ r.currentNumber!.toLocaleString() }} · {{ pctOf(r) }}%
+                  usado · quedan {{ remainingOf(r)!.toLocaleString() }}</div>
+                } @else if (r.currentNumber !== null) {
+                <div class="text-gray-400 mt-0.5">Actual: {{ r.currentNumber.toLocaleString() }}</div>
+                }
+              </td>
+              <td class="px-4 py-3 text-gray-700">
+                {{ fmtDate(r.validFrom) }} → {{ fmtDate(r.validTo) }}
+                @if (daysLeftOf(r) !== null) {
+                <div
+                  [class]="daysLeftOf(r)! < 0 ? 'text-red-600 font-bold' : daysLeftOf(r)! <= 30 ? 'text-amber-600 font-bold' : 'text-gray-400'">
+                  @if (daysLeftOf(r)! < 0) { Vencido } @else { {{ daysLeftOf(r) }} días restantes } </div>
+                    }
+              </td>
+              <td class="px-4 py-3">
+                <span class="inline-block px-2 py-1 rounded-lg font-bold" [class]="healthBadge(healthOf(r))">
+                  {{ HEALTH_LABELS[healthOf(r)] }}
+                </span>
+                @if (r.lastUsedAt) {
+                <div class="text-gray-400 mt-0.5" title="Última emisión que usó este rango">Usado: {{
+                  fmtDateTime(r.lastUsedAt) }}</div>
+                }
+              </td>
+              <td class="px-4 py-3 text-gray-400">{{ fmtDateTime(r.syncedAt) }}</td>
+              <td class="px-4 py-3">
+                <div class="flex justify-end gap-1">
+                  <button (click)="openDetail(r)" title="Ver detalle / JSON"
+                    class="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  </button>
+                  <button (click)="onRefreshOne(r)" [disabled]="processing()" title="Actualizar desde Factus"
+                    class="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 cursor-pointer disabled:opacity-40">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 4v5h5M20 20v-5h-5M5 9a7 7 0 0112-3m1 11a7 7 0 01-12-3" />
+                    </svg>
+                  </button>
+                  <button (click)="openCurrent(r)" title="Actualizar consecutivo"
+                    class="p-1.5 rounded-lg text-amber-600 hover:bg-amber-50 cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                    </svg>
+                  </button>
+                  <button (click)="openConfirm(r, 'toggle')" title="Activar / desactivar"
+                    class="p-1.5 rounded-lg text-purple-600 hover:bg-purple-50 cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                    </svg>
+                  </button>
+                  <button (click)="openConfirm(r, 'delete')" title="Eliminar"
+                    class="p-1.5 rounded-lg text-red-600 hover:bg-red-50 cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            } @empty {
+            <tr>
+              <td colspan="8" class="px-4 py-10 text-center text-gray-400">
+                Sin rangos en caché para este dominio. Use «Sincronizar con Factus».
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Detail modal -->
+@if (modalMode() === 'detail' && selected()) {
+<app-modal [visible]="true" (visibleChange)="!$event && closeModal()"
+  [title]="'Rango #' + selected()!.factusId + ' — ' + docLabel(selected()!.document)" size="lg">
+  <div class="grid grid-cols-2 gap-3 text-xs">
+    <div><span class="text-gray-400">Prefijo:</span> <span class="font-bold">{{ selected()!.prefix || '—' }}</span>
+    </div>
+    <div><span class="text-gray-400">Resolución:</span> <span class="font-bold font-mono">{{
+        selected()!.resolutionNumber || '—' }}</span></div>
+    <div><span class="text-gray-400">Clave técnica:</span> <span class="font-mono break-all">{{ selected()!.technicalKey
+        || '—' }}</span></div>
+    <div><span class="text-gray-400">Numeración:</span> <span class="font-bold">{{ rangeSpan(selected()!) }}</span>
+    </div>
+    <div><span class="text-gray-400">Actual:</span> <span class="font-bold">{{ selected()!.currentNumber ?? '—'
+        }}</span></div>
+    <div><span class="text-gray-400">Vigencia:</span> <span class="font-bold">{{ fmtDate(selected()!.validFrom) }} → {{
+        fmtDate(selected()!.validTo) }}</span></div>
+    <div><span class="text-gray-400">Sincronizado:</span> {{ fmtDateTime(selected()!.syncedAt) }}</div>
+    <div><span class="text-gray-400">Último uso:</span> {{ fmtDateTime(selected()!.lastUsedAt) }}</div>
+  </div>
+  <div class="mt-3 text-xs text-gray-400 font-bold">Payload crudo Factus:</div>
+  <pre class="mt-1 max-h-64 overflow-auto bg-slate-900 text-green-200 text-[11px] rounded-xl p-3">{{ rawJson() }}</pre>
+  <div class="flex justify-end mt-4">
+    <button (click)="closeModal()"
+      class="px-4 py-2 text-xs font-bold text-gray-500 border border-gray-200 rounded-xl hover:bg-gray-50 cursor-pointer">Cerrar</button>
+  </div>
+</app-modal>
+}
+
+<!-- Create modal -->
+@if (modalMode() === 'create') {
+<app-modal [visible]="true" (visibleChange)="!$event && closeModal()"
+  [title]="'Nuevo rango (' + (domain() === 'billing' ? 'facturación' : 'nómina') + ')'" size="lg">
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+    <label class="flex flex-col gap-1">Documento (nombre Factus)
+      <select [ngModel]="newRange().document" (ngModelChange)="updateNewRangeField('document', $event)"
+        class="px-3 py-2 border border-gray-200 rounded-xl">
+        <option>Factura de Venta</option>
+        <option>Nota Crédito</option>
+        <option>Nota Débito</option>
+        <option>Documento Soporte</option>
+        <option>Nota de Ajuste Documento Soporte</option>
+      </select>
+    </label>
+    <label class="flex flex-col gap-1">Prefijo
+      <input [ngModel]="newRange().prefix" (ngModelChange)="updateNewRangeField('prefix', $event)"
+        class="px-3 py-2 border border-gray-200 rounded-xl" placeholder="SETP" />
+    </label>
+    <label class="flex flex-col gap-1">Desde
+      <input type="number" [ngModel]="newRange().from" (ngModelChange)="updateNewRangeField('from', $event)"
+        class="px-3 py-2 border border-gray-200 rounded-xl" />
+    </label>
+    <label class="flex flex-col gap-1">Hasta
+      <input type="number" [ngModel]="newRange().to" (ngModelChange)="updateNewRangeField('to', $event)"
+        class="px-3 py-2 border border-gray-200 rounded-xl" />
+    </label>
+    <label class="flex flex-col gap-1">N° Resolución
+      <input [ngModel]="newRange().resolution_number"
+        (ngModelChange)="updateNewRangeField('resolution_number', $event)"
+        class="px-3 py-2 border border-gray-200 rounded-xl" />
+    </label>
+    <label class="flex flex-col gap-1">Clave técnica
+      <input [ngModel]="newRange().technical_key"
+        (ngModelChange)="updateNewRangeField('technical_key', $event)"
+        class="px-3 py-2 border border-gray-200 rounded-xl" />
+    </label>
+    <label class="flex flex-col gap-1">Vigente desde
+      <input type="date" [ngModel]="newRange().start_date"
+        (ngModelChange)="updateNewRangeField('start_date', $event)"
+        class="px-3 py-2 border border-gray-200 rounded-xl" />
+    </label>
+    <label class="flex flex-col gap-1">Vigente hasta
+      <input type="date" [ngModel]="newRange().end_date"
+        (ngModelChange)="updateNewRangeField('end_date', $event)"
+        class="px-3 py-2 border border-gray-200 rounded-xl" />
+    </label>
+  </div>
+  <p class="mt-2 text-[11px] text-gray-400">El payload se envía tal cual a Factus y luego se sincroniza al caché.</p>
+  <div class="flex justify-end gap-2 mt-4">
+    <button (click)="closeModal()" [disabled]="processing()"
+      class="px-4 py-2 text-xs font-bold text-gray-500 border border-gray-200 rounded-xl hover:bg-gray-50 cursor-pointer disabled:opacity-50">Cancelar</button>
+    <button (click)="onCreate()" [disabled]="processing()"
+      class="px-4 py-2 text-xs font-bold text-white bg-slate-900 rounded-xl hover:bg-slate-800 cursor-pointer disabled:opacity-50">
+      {{ processing() ? 'Creando...' : 'Crear en Factus' }}
+    </button>
+  </div>
+</app-modal>
+}
+
+<!-- Current modal -->
+@if (modalMode() === 'current' && selected()) {
+<app-modal [visible]="true" (visibleChange)="!$event && closeModal()"
+  [title]="'Actualizar consecutivo — rango #' + selected()!.factusId" size="sm">
+  <label class="flex flex-col gap-1 text-xs">Consecutivo actual
+    <input type="number" [ngModel]="newCurrent()" (ngModelChange)="newCurrent.set($event)"
+      class="px-3 py-2 border border-gray-200 rounded-xl" />
+  </label>
+  <div class="flex justify-end gap-2 mt-4">
+    <button (click)="closeModal()" [disabled]="processing()"
+      class="px-4 py-2 text-xs font-bold text-gray-500 border border-gray-200 rounded-xl hover:bg-gray-50 cursor-pointer disabled:opacity-50">Cancelar</button>
+    <button (click)="onUpdateCurrent()" [disabled]="processing()"
+      class="px-4 py-2 text-xs font-bold text-white bg-slate-900 rounded-xl hover:bg-slate-800 cursor-pointer disabled:opacity-50">
+      {{ processing() ? 'Guardando...' : 'Guardar' }}
+    </button>
+  </div>
+</app-modal>
+}
+
+<!-- Confirm modal -->
+@if (modalMode() === 'confirm' && selected()) {
+<app-modal [visible]="true" (visibleChange)="!$event && closeModal()"
+  [title]="confirmAction() === 'delete' ? 'Eliminar rango' : 'Cambiar estado'" size="sm">
+  <p class="text-xs text-gray-600">
+    @if (confirmAction() === 'delete') {
+    ¿Eliminar el rango <b>#{{ selected()!.factusId }} ({{ selected()!.prefix || 'sin prefijo' }})</b> en Factus y del
+    caché? Esta acción no se puede deshacer.
+    } @else {
+    ¿Cambiar el estado (activo/inactivo) del rango <b>#{{ selected()!.factusId }}
+      ({{ selected()!.prefix || 'sin prefijo' }})</b> en Factus ?
+    }
+  </p>
+  <div class="flex justify-end gap-2 mt-4">
+    <button (click)="closeModal()" [disabled]="processing()"
+      class="px-4 py-2 text-xs font-bold text-gray-500 border border-gray-200 rounded-xl hover:bg-gray-50 cursor-pointer disabled:opacity-50">Cancelar</button>
+    <button (click)="onConfirm()" [disabled]="processing()"
+      [class]="confirmAction() === 'delete' ? 'bg-red-600 hover:bg-red-700' : 'bg-slate-900 hover:bg-slate-800'"
+      class="px-4 py-2 text-xs font-bold text-white rounded-xl cursor-pointer disabled:opacity-50">
+      {{ processing() ? 'Procesando...' : 'Confirmar' }}
+    </button>
+  </div>
+</app-modal>
+}

@@ -22,6 +22,8 @@ export class InvoiceDetailsComponent {
     factura = signal<GetFacturaRequest | null>(null);
     loading = signal(true);
     error = signal<string | null>(null);
+    qrDataUrl = signal<string | null>(null);
+    qrRawUrl = signal<string | null>(null);
     asientos: any[] = [];
     cobros: PagoHistorial[] = [];
     loadingAsientos = false;
@@ -131,7 +133,9 @@ export class InvoiceDetailsComponent {
 
         this.facturasService.getInvoiceById(id).subscribe({
             next: (response) => {
-                this.factura.set(response.data[0]);
+                const f = response.data[0];
+                this.factura.set(f);
+                this.resolveQr(f);
                 this.loading.set(false);
                 this.cargarDatosContables();
             },
@@ -222,7 +226,7 @@ export class InvoiceDetailsComponent {
 
     printInvoice(): void {
         const f = this.factura();
-        if (f) this.printService.printInvoice(f);
+        if (f) void this.printService.printInvoice(f);
     }
 
     printAsiento(): void {
@@ -271,5 +275,19 @@ export class InvoiceDetailsComponent {
         this.router.navigate(['/panel/ventas/comprobantes/new-Item'], {
             queryParams: { cloneFrom: f.id }
         });
+    }
+
+    private resolveQr(f: GetFacturaRequest | null): void {
+        const raw = HelpersUtils.resolveQrText(f);
+        this.qrRawUrl.set(raw);
+        this.qrDataUrl.set(null);
+        if (raw) {
+            void HelpersUtils.toQrDataUrl(raw).then((dataUrl) => {
+                // Evita race si el usuario navegó a otra factura mientras se generaba
+                if (HelpersUtils.resolveQrText(this.factura()) === raw) {
+                    this.qrDataUrl.set(dataUrl);
+                }
+            });
+        }
     }
 }

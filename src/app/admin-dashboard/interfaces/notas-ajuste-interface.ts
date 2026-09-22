@@ -56,9 +56,12 @@ export interface NotaAjuste {
  subtotal: number;
  cliente?: ClientesInterfaceResponse;
  clienteId: string;
- createdBy?: CreatedBy;
- createdAt: string;
- mensajeError?: string;
+  createdBy?: CreatedBy;
+  createdAt: string;
+  mensajeError?: string;
+  factusNumberingRangeId?: number | null;
+  factusResolutionNumber?: string | null;
+  factusRangePrefix?: string | null;
 }
 
 export interface NotaAjusteItem {

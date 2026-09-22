@@ -7,6 +7,7 @@ import { ParametrizacionContable } from "./pages/parametrizacion-contable/parame
 import { CargosComponent } from "./pages/cargos/cargos.component";
 import { CentrosCostosComponent } from "./pages/centros-costos/centros-costos.component";
 import { TipoComprobantesComponent } from "./pages/tipo-comprobantes/tipo-comprobantes.component";
+import { RangosDianComponent } from "./pages/rangos-dian/rangos-dian.component";
 
 const configuracionesRoutes: Routes = [
     {
@@ -40,6 +41,10 @@ const configuracionesRoutes: Routes = [
     {
         path: 'tipos-comprobantes',
         component: TipoComprobantesComponent
+    },
+    {
+        path: 'rangos-dian',
+        component: RangosDianComponent
     },
     {
         path: 'configuracion-contable',

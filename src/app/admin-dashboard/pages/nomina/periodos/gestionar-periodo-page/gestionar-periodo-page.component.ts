@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NominaService } from '../../services/nomina.service';
 import { PdfDesprendibleService } from '../../services/pdf-desprendible.service';
 import { EmpresaService } from '@dashboard/services/empresa.service';
+import { HelpersUtils } from '@utils/helpers.utils';
 import { PeriodoNomina, Empleado, PeriodoEmpleado, Liquidacion } from '../../interfaces/nomina.interface';
 import { ConceptoPeriodoPopoverComponent } from '../components/concepto-periodo-popover/concepto-periodo-popover.component';
 import { HeaderTitlePageComponent } from '@dashboard/components/header-title-page/header-title-page.component';
@@ -167,7 +168,10 @@ export default class GestionarPeriodoPageComponent implements OnInit {
 
     this.empresaService.getEmpresa().subscribe({
       next: (res: any) => {
-        this.empresa.set(res?.data || res);
+        const d = res?.data || res;
+        if (d) {
+          this.empresa.set({ ...d, logoUrlFormated: HelpersUtils.resolveLogoUrl(d.logoUrl) });
+        }
       },
       error: () => { },
     });
@@ -355,7 +359,7 @@ export default class GestionarPeriodoPageComponent implements OnInit {
       let count = 0;
       for (const liq of selectedLiquidaciones) {
         try {
-          this.pdfService.generarDesprendible(liq, p, this.empresa());
+          await this.pdfService.generarDesprendible(liq, p, this.empresa());
           count++;
         } catch (err) {
           console.error(`Error generando desprendible para ${liq.empleadoId}`, err);

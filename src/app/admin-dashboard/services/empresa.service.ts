@@ -52,6 +52,7 @@ export class EmpresaService {
   }
 
   uploadLogo(file: File): Observable<{ success: boolean; logoUrl: string; message: string }> {
+    this.empresaCache$ = undefined; // clear cache on upload
     const formData = new FormData();
     formData.append('file', file);
     return this.http.post<{ success: boolean; logoUrl: string; message: string }>(`${this.base}/upload-logo`, formData);

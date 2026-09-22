@@ -10,6 +10,7 @@ import { LoaderService } from '@utils/services/loader.service';
 import { NotificationService } from '@shared/services/notification.service';
 import { ConfirmModalComponent, ConfirmModalConfig } from '@shared/components/confirm-modal/confirm-modal.component';
 import { EmpresaService } from '@dashboard/services/empresa.service';
+import { HelpersUtils } from '@utils/helpers.utils';
 import * as XLSX from 'xlsx';
 import JSZip from 'jszip';
 
@@ -112,7 +113,10 @@ export default class PeriodoDetallePageComponent implements OnInit {
 
     this.empresaService.getEmpresa().subscribe({
       next: (res: any) => {
-        this.empresa.set(res?.data || res);
+        const d = res?.data || res;
+        if (d) {
+          this.empresa.set({ ...d, logoUrlFormated: HelpersUtils.resolveLogoUrl(d.logoUrl) });
+        }
       },
       error: () => { },
     });
@@ -257,7 +261,7 @@ export default class PeriodoDetallePageComponent implements OnInit {
       let count = 0;
       for (const liq of liqs) {
         try {
-          const result = this.pdfService.generarDesprendible(liq, periodo, this.empresa(), true) as { blob: Blob, fileName: string };
+          const result = await this.pdfService.generarDesprendible(liq, periodo, this.empresa(), true) as { blob: Blob, fileName: string };
           if (result && result.blob) {
             folder!.file(result.fileName, result.blob);
             count++;

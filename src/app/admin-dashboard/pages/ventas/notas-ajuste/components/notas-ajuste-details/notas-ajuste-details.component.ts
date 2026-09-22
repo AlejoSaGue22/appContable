@@ -7,6 +7,7 @@ import { NotasAjusteService } from '@dashboard/pages/ventas/services/notas-ajust
 import { AsientosHttpService } from '@dashboard/services/asientos-http.service';
 import { NotificationService } from '@shared/services/notification.service';
 import { PrintService } from '@shared/services/print.service';
+import { HelpersUtils } from '@utils/helpers.utils';
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
 import { LoaderService } from '@utils/services/loader.service';
 
@@ -20,6 +21,8 @@ export class NotasAjusteDetailsComponent {
     nota = signal<NotaAjuste | null>(null);
     loading = signal(true);
     error = signal<string | null>(null);
+    qrDataUrl = signal<string | null>(null);
+    qrRawUrl = signal<string | null>(null);
     asientos: any[] = [];
     loadingAsientos = false;
 
@@ -42,7 +45,9 @@ export class NotasAjusteDetailsComponent {
 
         this.notasService.getNotaAjusteById(id).subscribe({
             next: (response) => {
-                this.nota.set(response.data);
+                const n = response.data;
+                this.nota.set(n);
+                this.resolveQr(n);
                 this.loading.set(false);
                 this.cargarDatosContables();
             },
@@ -162,7 +167,7 @@ export class NotasAjusteDetailsComponent {
         const n = this.nota();
         if (n) {
             const conceptoLabel = this.getConceptoLabel(n.tipo, n.concepto);
-            this.printService.printAdjustmentNote(n, conceptoLabel);
+            void this.printService.printAdjustmentNote(n, conceptoLabel);
         }
     }
 
@@ -177,6 +182,19 @@ export class NotasAjusteDetailsComponent {
     getConceptoLabel(tipo: string, concepto: string): string {
         const list = tipo === 'credito' ? this.catalogs.conceptsNotes() : [];
         return list.find(c => c.codigo === concepto)?.nombre || concepto;
+    }
+
+    private resolveQr(n: NotaAjuste | null): void {
+        const raw = HelpersUtils.resolveQrText(n);
+        this.qrRawUrl.set(raw);
+        this.qrDataUrl.set(null);
+        if (raw) {
+            void HelpersUtils.toQrDataUrl(raw).then((dataUrl) => {
+                if (HelpersUtils.resolveQrText(this.nota()) === raw) {
+                    this.qrDataUrl.set(dataUrl);
+                }
+            });
+        }
     }
 
     onDownloadPDF(): void {
