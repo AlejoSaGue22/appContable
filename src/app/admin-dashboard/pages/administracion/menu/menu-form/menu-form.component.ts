@@ -78,7 +78,7 @@ export class MenuFormComponent implements OnInit {
         if (!icon.trim()) return '';
         if (icon.trim().startsWith('<')) return icon;
         if (icon.includes('fa-')) return `<i class="${icon}" style="font-size:16px"></i>`;
-        return `<span class="material-icons" style="font-size:18px">${icon}</span>`;
+        return `<span class="material-symbols-outlined" style="font-size:18px">${icon}</span>`;
     }
 
     // ── Submit ────────────────────────────────────────────────────────

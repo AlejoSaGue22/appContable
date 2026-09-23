@@ -170,7 +170,6 @@ export class PrintService {
     const qrDataUrl = qrRaw ? await HelpersUtils.toQrDataUrl(qrRaw) : null;
     const qrBlock = qrDataUrl ? `<td style="width:100px;text-align:center;vertical-align:top;padding:6px;">
   <img src="${qrDataUrl}" alt="QR DIAN" style="width:88px;height:88px;"/>
-  <div style="font-size:7px;color:#64748b;word-break:break-all;margin-top:4px;max-width:100px;">${this.escapeHtml(qrRaw || '')}</div>
   </td>` : (qrRaw ? `<td style="width:100px;text-align:center;vertical-align:top;padding:6px;">
   <div style="font-size:7px;color:#64748b;word-break:break-all;max-width:100px;">${this.escapeHtml(qrRaw)}</div>
   </td>` : '');
@@ -851,192 +850,189 @@ export class PrintService {
 
     const qrRawNota = HelpersUtils.resolveQrText(n);
     const qrDataUrlNota = qrRawNota ? await HelpersUtils.toQrDataUrl(qrRawNota) : null;
-    const qrBlock = qrDataUrlNota
-      ? `<td style="width:100px;text-align:center;vertical-align:top;padding:6px;">
-  <img src="${qrDataUrlNota}" alt="QR DIAN" style="width:88px;height:88px;"/>
-  <div style="font-size:7px;color:#64748b;word-break:break-all;margin-top:4px;max-width:100px;">${this.escapeHtml(qrRawNota || '')}</div>
-  </td>`
+    const qrBlock = qrDataUrlNota ? `<td style="width:100px;text-align:center;vertical-align:top;padding:6px;">
+                                        <img src="${qrDataUrlNota}" alt="QR DIAN" style="width:88px;height:88px;"/>
+                                    </td>`
       : (qrRawNota ? `<td style="width:100px;text-align:center;vertical-align:top;padding:6px;">
-  <div style="font-size:7px;color:#64748b;word-break:break-all;max-width:100px;">${this.escapeHtml(qrRawNota)}</div>
-  </td>` : '');
+                                                        <div style="font-size:7px;color:#64748b;word-break:break-all;max-width:100px;">${this.escapeHtml(qrRawNota)}</div>
+                                                    </td>` : '');
 
-    const cufeSection =
-      n.cufe || n.cude
-        ? `<tr><td colspan="2" style="padding:6px 0;">
- <div style="background:#f8fafc;border:1px solid #cbd5e1;padding:6px 10px;font-size:10px;color:#000000;word-break:break-all;text-align:center;">
- ${n.tipo === 'credito' ? 'CUDE' : 'CUDE/CUFE'}: ${n.cufe || n.cude}
- </div>
- </td></tr>`
-        : '';
+    const cufeSection = n.cufe || n.cude ? `<tr>
+                                                <td colspan="2" style="padding:6px 0;">
+                                                    <div style="background:#f8fafc;border:1px solid #cbd5e1;padding:6px 10px;font-size:10px;color:#000000;word-break:break-all;text-align:center;">
+                                                        ${n.tipo === 'credito' ? 'CUDE' : 'CUDE/CUFE'}: ${n.cufe || n.cude}
+                                                    </div>
+                                                </td>
+                                            </tr>` : '';
 
     return `<!DOCTYPE html>
-<html lang="es">
-<head>
- <meta charset="UTF-8"/>
- <title>${tipoLabel} ${n.prefijo}${n.numero}</title>
- <style>
- @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
- * { margin:0; padding:0; box-sizing:border-box; }
- body { font-family:system-ui,-apple-system,'Segoe UI',sans-serif; font-size:11px; color:#1e293b; background:#fff; }
+        <html lang="es">
+        <head>
+        <meta charset="UTF-8"/>
+        <title>${tipoLabel} ${n.prefijo}${n.numero}</title>
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:system-ui,-apple-system,'Segoe UI',sans-serif; font-size:11px; color:#1e293b; background:#fff; }
 
- @media print {
- @page { margin:0; size:A4; }
- body { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
- table { page-break-inside:avoid; }
- thead { display:table-header-group; }
- }
- </style>
-</head>
-<body>
+        @media print {
+        @page { margin:0; size:A4; }
+        body { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+        table { page-break-inside:avoid; }
+        thead { display:table-header-group; }
+        }
+        </style>
+        </head>
+        <body>
 
-<table cellpadding="0" cellspacing="0" style="width:210mm;min-height:297mm;margin:0 auto;border-collapse:collapse;">
-<tr>
- <td style="vertical-align:top;padding:28px 36px 20px 20px;">
+        <table cellpadding="0" cellspacing="0" style="width:210mm;min-height:297mm;margin:0 auto;border-collapse:collapse;">
+        <tr>
+        <td style="vertical-align:top;padding:28px 36px 20px 20px;">
 
- <!-- ═══════ HEADER ═══════ -->
- <table cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:16px;">
- <tr>
- <td style="width:140px;vertical-align:top;padding-right:16px;">
- <img src="${this.logoApp}" alt="Logo" style="width:100px;height:100px;"/>
- </td>
+        <!-- ═══════ HEADER ═══════ -->
+        <table cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:16px;">
+        <tr>
+        <td style="width:140px;vertical-align:top;padding-right:16px;">
+        <img src="${this.logoApp}" alt="Logo" style="width:100px;height:100px;"/>
+        </td>
 
- <td style="vertical-align:top;text-align:center;">
- <div style="font-size:13px;font-weight:800;color:#000000;text-transform:uppercase;letter-spacing:0.5px;">${tipoLabel}</div>
- <div style="font-size:12px;font-weight:700;color:#000000;margin-top:2px;">NÚMERO ${n.prefijo}${n.numero}</div>
- <div style="margin-top:6px;line-height:1.5;color:#475569;font-size:9.5px;">
- <strong style="color:#334155;">${this.empresa.sucursal}</strong><br/>
- NIT: ${this.empresa.nit}<br/>
- ${this.empresa.telefono}<br/>
- ${this.empresa.email}<br/>
- ${this.empresa.direccion}<br/>
- ${this.empresa.ciudad}
- ${this.empresa.textoAdicional ? '<br/>' + this.empresa.textoAdicional : ''}
- </div>
- </td>
- ${qrBlock}
- </tr>
- </table>
+        <td style="vertical-align:top;text-align:center;">
+        <div style="font-size:13px;font-weight:800;color:#000000;text-transform:uppercase;letter-spacing:0.5px;">${tipoLabel}</div>
+        <div style="font-size:12px;font-weight:700;color:#000000;margin-top:2px;">NÚMERO ${n.prefijo}${n.numero}</div>
+        <div style="margin-top:6px;line-height:1.5;color:#475569;font-size:9.5px;">
+        <strong style="color:#334155;">${this.empresa.sucursal}</strong><br/>
+        NIT: ${this.empresa.nit}<br/>
+        ${this.empresa.telefono}<br/>
+        ${this.empresa.email}<br/>
+        ${this.empresa.direccion}<br/>
+        ${this.empresa.ciudad}
+        ${this.empresa.textoAdicional ? '<br/>' + this.empresa.textoAdicional : ''}
+        </div>
+        </td>
+        ${qrBlock}
+        </tr>
+        </table>
 
- <!-- ═══════ CLIENT + REF INFO ═══════ -->
- <table cellpadding="0" cellspacing="0" style="width:100%;border:1.5px solid #cbd5e1;border-radius:4px;margin-bottom:16px;border-collapse:separate;overflow:hidden;">
- <tr>
- <td style="vertical-align:top;padding:10px 14px;width:55%;">
- <table cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;">
- <tr>
- <td style="padding:3px 0;font-size:10px;font-weight:600;color:#000000;width:90px;">${tipoDocLabel}:</td>
- <td style="padding:3px 0;font-size:10px;color:#334155;">${n.cliente?.numeroDocumento || '—'}</td>
- </tr>
- <tr>
- <td style="padding:3px 0;font-size:10px;font-weight:600;color:#000000;">Cliente:</td>
- <td style="padding:3px 0;font-size:10px;color:#334155;font-weight:500;">${clienteNombre}</td>
- </tr>
- <tr>
- <td style="padding:3px 0;font-size:10px;font-weight:600;color:#000000;">Dirección:</td>
- <td style="padding:3px 0;font-size:10px;color:#334155;">${n.cliente?.direccion || '—'}</td>
- </tr>
- <tr>
- <td style="padding:3px 0;font-size:10px;font-weight:600;color:#000000;">Factura Ref:</td>
- <td style="padding:3px 0;font-size:10px;color:#000000;">${n.facturaOriginalNumero}</td>
- </tr>
- </table>
- </td>
+        <!-- ═══════ CLIENT + REF INFO ═══════ -->
+        <table cellpadding="0" cellspacing="0" style="width:100%;border:1.5px solid #cbd5e1;border-radius:4px;margin-bottom:16px;border-collapse:separate;overflow:hidden;">
+        <tr>
+        <td style="vertical-align:top;padding:10px 14px;width:55%;">
+        <table cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;">
+        <tr>
+        <td style="padding:3px 0;font-size:10px;font-weight:600;color:#000000;width:90px;">${tipoDocLabel}:</td>
+        <td style="padding:3px 0;font-size:10px;color:#334155;">${n.cliente?.numeroDocumento || '—'}</td>
+        </tr>
+        <tr>
+        <td style="padding:3px 0;font-size:10px;font-weight:600;color:#000000;">Cliente:</td>
+        <td style="padding:3px 0;font-size:10px;color:#334155;font-weight:500;">${clienteNombre}</td>
+        </tr>
+        <tr>
+        <td style="padding:3px 0;font-size:10px;font-weight:600;color:#000000;">Dirección:</td>
+        <td style="padding:3px 0;font-size:10px;color:#334155;">${n.cliente?.direccion || '—'}</td>
+        </tr>
+        <tr>
+        <td style="padding:3px 0;font-size:10px;font-weight:600;color:#000000;">Factura Ref:</td>
+        <td style="padding:3px 0;font-size:10px;color:#000000;">${n.facturaOriginalNumero}</td>
+        </tr>
+        </table>
+        </td>
 
- <td style="vertical-align:top;padding:10px 14px;width:45%;border-left:1.5px solid #cbd5e1;background:#f8fafc;">
- <table cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;">
- <tr>
- <td style="padding:3px 0;font-size:10px;font-weight:600;color:#64748b;">Fecha generación:</td>
- <td style="padding:3px 0;font-size:10px;font-weight:500;color:#334155;text-align:right;">${fechaGen}</td>
- </tr>
- <tr>
- <td style="padding:3px 0;font-size:10px;font-weight:600;color:#64748b;">Fecha validación:</td>
- <td style="padding:3px 0;font-size:10px;font-weight:500;color:#334155;text-align:right;">${fechaVal}</td>
- </tr>
- <tr>
- <td style="padding:3px 0;font-size:10px;font-weight:600;color:#000000;text-transform:uppercase;letter-spacing:1px;padding-top:8px;">CONCEPTO:</td>
- </tr>
- <tr>
- <td colspan="2" style="padding:2px 0;font-size:10px;color:#1e293b;font-weight:600;">${conceptoLabel || n.concepto || '—'}</td>
- </tr>
- <tr>
- <td style="padding:3px 0;font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:1px;padding-top:4px;">Motivo detallado:</td>
- </tr>
- <tr>
- <td colspan="2" style="padding:2px 0;font-size:10px;color:#475569;font-weight:500;">${n.motivo || '—'}</td>
- </tr>
- </table>
- </td>
- </tr>
- </table>
+        <td style="vertical-align:top;padding:10px 14px;width:45%;border-left:1.5px solid #cbd5e1;background:#f8fafc;">
+        <table cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;">
+        <tr>
+        <td style="padding:3px 0;font-size:10px;font-weight:600;color:#64748b;">Fecha generación:</td>
+        <td style="padding:3px 0;font-size:10px;font-weight:500;color:#334155;text-align:right;">${fechaGen}</td>
+        </tr>
+        <tr>
+        <td style="padding:3px 0;font-size:10px;font-weight:600;color:#64748b;">Fecha validación:</td>
+        <td style="padding:3px 0;font-size:10px;font-weight:500;color:#334155;text-align:right;">${fechaVal}</td>
+        </tr>
+        <tr>
+        <td style="padding:3px 0;font-size:10px;font-weight:600;color:#000000;text-transform:uppercase;letter-spacing:1px;padding-top:8px;">CONCEPTO:</td>
+        </tr>
+        <tr>
+        <td colspan="2" style="padding:2px 0;font-size:10px;color:#1e293b;font-weight:600;">${conceptoLabel || n.concepto || '—'}</td>
+        </tr>
+        <tr>
+        <td style="padding:3px 0;font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:1px;padding-top:4px;">Motivo detallado:</td>
+        </tr>
+        <tr>
+        <td colspan="2" style="padding:2px 0;font-size:10px;color:#475569;font-weight:500;">${n.motivo || '—'}</td>
+        </tr>
+        </table>
+        </td>
+        </tr>
+        </table>
 
- <!-- ═══════ ITEMS TABLE ═══════ -->
- <table cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;margin-bottom:16px;">
- <thead>
- <tr style="background:#efefef;">
- <th style="padding:8px 5px;font-size:9px;font-weight:600;color:#000000;text-transform:uppercase;text-align:center;width:30px;">#</th>
- <th style="padding:8px 5px;font-size:9px;font-weight:600;color:#000000;text-transform:uppercase;text-align:left;">Código</th>
- <th style="padding:8px 5px;font-size:9px;font-weight:600;color:#000000;text-transform:uppercase;text-align:left;">Descripción</th>
- <th style="padding:8px 5px;font-size:9px;font-weight:600;color:#000000;text-transform:uppercase;text-align:right;">Val. Unit</th>
- <th style="padding:8px 5px;font-size:9px;font-weight:600;color:#000000;text-transform:uppercase;text-align:center;">Cant</th>
- <th style="padding:8px 5px;font-size:9px;font-weight:600;color:#000000;text-transform:uppercase;text-align:center;">Desc</th>
- <th style="padding:8px 5px;font-size:9px;font-weight:600;color:#000000;text-transform:uppercase;text-align:center;">IVA</th>
- <th style="padding:8px 5px;font-size:9px;font-weight:600;color:#000000;text-transform:uppercase;text-align:right;">Subtotal</th>
- </tr>
- </thead>
- <tbody>
- ${itemsRows}
- </tbody>
- </table>
+        <!-- ═══════ ITEMS TABLE ═══════ -->
+        <table cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;margin-bottom:16px;">
+        <thead>
+        <tr style="background:#efefef;">
+        <th style="padding:8px 5px;font-size:9px;font-weight:600;color:#000000;text-transform:uppercase;text-align:center;width:30px;">#</th>
+        <th style="padding:8px 5px;font-size:9px;font-weight:600;color:#000000;text-transform:uppercase;text-align:left;">Código</th>
+        <th style="padding:8px 5px;font-size:9px;font-weight:600;color:#000000;text-transform:uppercase;text-align:left;">Descripción</th>
+        <th style="padding:8px 5px;font-size:9px;font-weight:600;color:#000000;text-transform:uppercase;text-align:right;">Val. Unit</th>
+        <th style="padding:8px 5px;font-size:9px;font-weight:600;color:#000000;text-transform:uppercase;text-align:center;">Cant</th>
+        <th style="padding:8px 5px;font-size:9px;font-weight:600;color:#000000;text-transform:uppercase;text-align:center;">Desc</th>
+        <th style="padding:8px 5px;font-size:9px;font-weight:600;color:#000000;text-transform:uppercase;text-align:center;">IVA</th>
+        <th style="padding:8px 5px;font-size:9px;font-weight:600;color:#000000;text-transform:uppercase;text-align:right;">Subtotal</th>
+        </tr>
+        </thead>
+        <tbody>
+        ${itemsRows}
+        </tbody>
+        </table>
 
- <!-- ═══════ OBSERVACIONES + TOTALES ═══════ -->
- <table cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:30px;">
- <tr>
- <td style="vertical-align:top;padding-right:16px;width:55%;">
- <div style="border:1px solid #cbd5e1;border-radius:4px;padding:10px;min-height:80px;">
- <div style="font-size:10px;font-weight:600;color:#334155;margin-bottom:4px;">Observaciones</div>
- <div style="font-size:10px;color:#64748b;line-height:1.5;">${n.observaciones || ''}</div>
- </div>
- </td>
+        <!-- ═══════ OBSERVACIONES + TOTALES ═══════ -->
+        <table cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:30px;">
+        <tr>
+        <td style="vertical-align:top;padding-right:16px;width:55%;">
+        <div style="border:1px solid #cbd5e1;border-radius:4px;padding:10px;min-height:80px;">
+        <div style="font-size:10px;font-weight:600;color:#334155;margin-bottom:4px;">Observaciones</div>
+        <div style="font-size:10px;color:#64748b;line-height:1.5;">${n.observaciones || ''}</div>
+        </div>
+        </td>
 
- <td style="vertical-align:top;width:45%;">
- <table cellpadding="0" cellspacing="0" style="width:100%;border:1px solid #cbd5e1;border-radius:4px;border-collapse:separate;overflow:hidden;">
- <tr>
- <td style="padding:6px 12px;font-size:10px;color:#475569;border-bottom:1px solid #f1f5f9;">Subtotal</td>
- <td style="padding:6px 12px;font-size:10px;color:#1e293b;text-align:right;border-bottom:1px solid #f1f5f9;">${this.fmt(n.subtotal)}</td>
- </tr>
- <tr>
- <td style="padding:6px 12px;font-size:10px;color:#475569;border-bottom:1px solid #f1f5f9;">IVA</td>
- <td style="padding:6px 12px;font-size:10px;color:#1e293b;text-align:right;border-bottom:1px solid #f1f5f9;">${this.fmt(n.iva)}</td>
- </tr>
- ${n.descuento > 0
+        <td style="vertical-align:top;width:45%;">
+        <table cellpadding="0" cellspacing="0" style="width:100%;border:1px solid #cbd5e1;border-radius:4px;border-collapse:separate;overflow:hidden;">
+        <tr>
+        <td style="padding:6px 12px;font-size:10px;color:#475569;border-bottom:1px solid #f1f5f9;">Subtotal</td>
+        <td style="padding:6px 12px;font-size:10px;color:#1e293b;text-align:right;border-bottom:1px solid #f1f5f9;">${this.fmt(n.subtotal)}</td>
+        </tr>
+        <tr>
+        <td style="padding:6px 12px;font-size:10px;color:#475569;border-bottom:1px solid #f1f5f9;">IVA</td>
+        <td style="padding:6px 12px;font-size:10px;color:#1e293b;text-align:right;border-bottom:1px solid #f1f5f9;">${this.fmt(n.iva)}</td>
+        </tr>
+        ${n.descuento > 0
         ? `<tr>
- <td style="padding:6px 12px;font-size:10px;color:#475569;border-bottom:1px solid #f1f5f9;">Descuento</td>
- <td style="padding:6px 12px;font-size:10px;color:#dc2626;text-align:right;border-bottom:1px solid #f1f5f9;">-${this.fmt(n.descuento)}</td>
- </tr>`
+        <td style="padding:6px 12px;font-size:10px;color:#475569;border-bottom:1px solid #f1f5f9;">Descuento</td>
+        <td style="padding:6px 12px;font-size:10px;color:#dc2626;text-align:right;border-bottom:1px solid #f1f5f9;">-${this.fmt(n.descuento)}</td>
+        </tr>`
         : ''
       }
- <tr>
- <td style="padding:8px 12px;font-size:11px;font-weight:500;color:#000000;background:#efefef;">Total Ajuste</td>
- <td style="padding:8px 12px;font-size:12px;color:#000000;text-align:right;background:#efefef;font-weight:500;">${this.fmt(n.total)}</td>
- </tr>
- </table>
- </td>
- </tr>
- </table>
+        <tr>
+        <td style="padding:8px 12px;font-size:11px;font-weight:500;color:#000000;background:#efefef;">Total Ajuste</td>
+        <td style="padding:8px 12px;font-size:12px;color:#000000;text-align:right;background:#efefef;font-weight:500;">${this.fmt(n.total)}</td>
+        </tr>
+        </table>
+        </td>
+        </tr>
+        </table>
 
- <!-- ═══════ CUDE ═══════ -->
- ${cufeSection}
+        <!-- ═══════ CUDE ═══════ -->
+        ${cufeSection}
 
- </td>
- <td style="width:22px;position:relative;">
- <div style="position:absolute;top:50%;left:99%;transform:translate(-50%,-50%) rotate(90deg);color:#000000;font-size:10px;letter-spacing:1px;font-weight:600;white-space:nowrap;opacity:0.3;">
- Documento electrónico generado con Factus Software Contable
- </div>
- </td>
-</tr>
-</table>
+        </td>
+        <td style="width:22px;position:relative;">
+        <div style="position:absolute;top:50%;left:99%;transform:translate(-50%,-50%) rotate(90deg);color:#000000;font-size:10px;letter-spacing:1px;font-weight:600;white-space:nowrap;opacity:0.3;">
+        Documento electrónico generado con Factus Software Contable
+        </div>
+        </td>
+        </tr>
+        </table>
 
-</body>
-</html>`;
+        </body>
+        </html>`;
   }
 
   // ══════════════════════════════════════════════════════════════════════
@@ -1262,7 +1258,8 @@ export class PrintService {
     return `${dd}-${mm}-${yyyy}`;
   }
 
-  private formatDateTimePrint(date: string | Date): string {    if (!date) return '—';
+  private formatDateTimePrint(date: string | Date): string {
+    if (!date) return '—';
     // Evitar que JS reste un día al interpretar YYYY-MM-DD como UTC
     const d =
       typeof date === 'string' && date.includes('-') && !date.includes('T')

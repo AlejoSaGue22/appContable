@@ -1,7 +1,7 @@
 // core/services/menu.service.ts
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError, map, shareReplay, tap } from 'rxjs/operators';
+import { catchError, finalize, map, shareReplay, tap } from 'rxjs/operators';
 import { Observable, of, BehaviorSubject } from 'rxjs';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { environment } from 'src/app/environments/environment';
@@ -47,9 +47,12 @@ export class MenuService {
  isLoading = computed(() => this.loadingSignal());
  error = computed(() => this.errorSignal());
  
- // Subject para cambios de menú
- private menuChanges = new BehaviorSubject<MenuItem[]>([]);
- menuChanges$ = this.menuChanges.asObservable();
+  // Subject para cambios de menú
+  private menuChanges = new BehaviorSubject<MenuItem[]>([]);
+  menuChanges$ = this.menuChanges.asObservable();
+
+  // Deduplica llamadas concurrentes (authEvents$ + AdminLayouts.ngOnInit)
+  private fetchInFlight$?: Observable<MenuItem[]>;
  
  // Mapeo de íconos de Material
  private iconMap: { [key: string]: string } = {
@@ -65,40 +68,49 @@ export class MenuService {
  settings: 'settings'
  };
 
- menuReset(){
- this.menuItemsSignal.set([]);
- this.loadingSignal.set(false);
- this.errorSignal.set(null);
- }
+  menuReset(){
+  this.menuItemsSignal.set([]);
+  this.loadingSignal.set(false);
+  this.errorSignal.set(null);
+  this.fetchInFlight$ = undefined;
+  }
 
- // Obtener menú desde backend
- fetchMenu(): Observable<MenuItem[]> {
- console.log('fetchMenu');
- 
- this.loadingSignal.set(true);
- this.errorSignal.set(null);
- 
- return this.http.get<MenuResponse>(`${apiUrl}/menu`).pipe(
- map(response => {
- if (response.success) {
- const menu = this.transformIcons(response.data);
- this.menuItemsSignal.set(menu);
- this.menuChanges.next(menu);
- return menu;
- }
- throw new Error(response.message || 'Error al cargar el menú');
- }),
- tap({
- next: () => this.loadingSignal.set(false),
- error: (error) => {
- this.loadingSignal.set(false);
- this.errorSignal.set(error.message);
- console.error('Error fetching menu:', error);
- }
- }),
- shareReplay(1)
- );
- }
+  // Obtener menú desde backend (deduplicado: una sola petición en vuelo)
+  fetchMenu(): Observable<MenuItem[]> {
+  if (this.fetchInFlight$) {
+  return this.fetchInFlight$;
+  }
+
+  this.loadingSignal.set(true);
+  this.errorSignal.set(null);
+
+  const request$ = this.http.get<MenuResponse>(`${apiUrl}/menu`).pipe(
+  map(response => {
+  if (response.success) {
+  const menu = this.transformIcons(response.data);
+  this.menuItemsSignal.set(menu);
+  this.menuChanges.next(menu);
+  return menu;
+  }
+  throw new Error(response.message || 'Error al cargar el menú');
+  }),
+  tap({
+  error: (error) => {
+  this.errorSignal.set(error.message);
+  console.error('Error fetching menu:', error);
+  }
+  }),
+  catchError(() => of(this.menuItemsSignal())),
+  finalize(() => {
+  this.loadingSignal.set(false);
+  this.fetchInFlight$ = undefined;
+  }),
+  shareReplay({ bufferSize: 1, refCount: true })
+  );
+
+  this.fetchInFlight$ = request$;
+  return request$;
+  }
 
  // Transformar íconos del backend a Material
  private transformIcons(menuItems: MenuItem[]): MenuItem[] {

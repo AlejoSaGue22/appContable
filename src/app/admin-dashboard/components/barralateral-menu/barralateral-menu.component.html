@@ -13,10 +13,10 @@
  '!bg-blue-600 !text-white !shadow-lg': isActive()
  }">
 
- <div class="flex-shrink-0 w-5 h-5 transition-all duration-300 group-hover:scale-110" 
- [innerHTML]="menuSection()?.icon"
- [class.text-blue-500]="isOpen">
- </div>
+  <div class="flex-shrink-0 w-5 h-5 transition-all duration-300 group-hover:scale-110 flex items-center justify-center"
+  [class.text-blue-500]="isOpen">
+  <app-icon [icon]="menuSection()?.icon" />
+  </div>
  
  <span class="flex-1 ml-3 text-left whitespace-nowrap">
  {{ menuSection()?.title }}
@@ -34,7 +34,7 @@
  <div class="overflow-hidden transition-all duration-300 ease-in-out" 
  [style.max-height]="isOpen ? '500px' : '0'">
  <nav class="flex flex-col gap-1 py-1 ml-4 border-l border-white/5 pl-2">
- @for (item of subItems(); track $index) {
+  @for (item of subItems(); track item.id) {
  <a [routerLink]="item.route" 
  routerLinkActive="!text-blue-400 !bg-blue-500/5"
  [routerLinkActiveOptions]="{ exact: false }"

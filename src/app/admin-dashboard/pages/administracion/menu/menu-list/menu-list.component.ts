@@ -199,7 +199,7 @@ export class MenuListComponent implements OnInit {
             return `<i class="${icon}"></i>`;
         }
 
-        // Es un nombre de Material Icon
-        return `<span class="material-icons" style="font-size:18px">${icon}</span>`;
+        // Es un nombre de Material Symbols (self-host, sin CDN)
+        return `<span class="material-symbols-outlined" style="font-size:18px">${icon}</span>`;
     }
 }

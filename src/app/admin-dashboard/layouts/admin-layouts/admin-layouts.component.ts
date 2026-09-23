@@ -46,6 +46,7 @@ export default class AdminLayoutsComponent implements OnInit, OnDestroy {
     menuItems = computed(() => this.menuService.menuItems());
     menuItemsOther = computed(() => this.menuService.menuItems().filter(item => item.other === 'SI').sort((a, b) => a.order! - b.order!));
     isLoading = this.menuService.isLoading;
+    menuError = this.menuService.error;
     currentUser = this.authService.user;
 
     // Estado local
@@ -54,7 +55,7 @@ export default class AdminLayoutsComponent implements OnInit, OnDestroy {
     isMobileMenuOpen = signal<boolean>(false);
 
     ngOnInit(): void {
-        if (this.authService.authStatus() === 'authenticated' && this.menuItems().length === 0) {
+        if (this.authService.authStatus() === 'authenticated' && this.menuItems().length === 0 && !this.isLoading()) {
             this.menuService.fetchMenu().subscribe();
         }
 
@@ -86,6 +87,10 @@ export default class AdminLayoutsComponent implements OnInit, OnDestroy {
 
     toggleMobileMenu() {
         this.isMobileMenuOpen.update(v => !v);
+    }
+
+    retryMenu(): void {
+        this.menuService.fetchMenu().subscribe();
     }
 
     async cerrarSesion() {

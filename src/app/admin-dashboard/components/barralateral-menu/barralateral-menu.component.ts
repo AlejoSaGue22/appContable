@@ -1,13 +1,13 @@
 import { NgClass } from '@angular/common';
-import { Component, computed, inject, input, linkedSignal, output, signal } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { MenuOption } from '@dashboard/layouts/admin-layouts/admin-layouts.component';
 import { MenuItem } from '@utils/menu.config';
+import { AppIconComponent } from '@shared/components/app-icon/app-icon.component';
 
 @Component({
- selector: 'app-barralateral-menu',
- imports: [RouterLink, NgClass, RouterLinkActive],
- templateUrl: './barralateral-menu.component.html',
+  selector: 'app-barralateral-menu',
+  imports: [RouterLink, NgClass, RouterLinkActive, AppIconComponent],
+  templateUrl: './barralateral-menu.component.html',
 })
 export class BarralateralMenuComponent {
 
