@@ -76,6 +76,18 @@ export interface NotaAjusteItem {
  descuento?: number;
  subtotal?: number;
  total?: number;
+ // ===== Capas NC V2 (guía 2026): snapshot + input + disponibilidad =====
+ /** Congelado de la factura fuente (solo lectura). */
+ cantidadOriginal?: number;
+ precioOriginal?: number;
+ subtotalOriginal?: number;
+ /** Disponible por concepto (viene de GET disponibilidad). */
+ cantidadDisponible?: number;
+ descuentoDisponible?: number;
+ ajusteDisponible?: number;
+ /** Input del usuario según concepto. */
+ precioNuevo?: number;
+ descuentoValor?: number;
 }
 
 export enum NotaAjusteStatus {
@@ -104,13 +116,70 @@ export enum NotaDianStatus {
 }
 
 
+/**
+ * Conceptos NC según DIAN (alineado con backend ConceptoNotaCredito 1-6).
+ * El concepto controla la grilla: columnas, campos editables y cálculo.
+ */
 export const ConceptosNotaCredito = [
- { value: '1', label: 'Descuento comercial por volumen de ventas' },
- { value: '2', label: 'Ajuste de precio' },
- { value: '3', label: 'Devolución de bienes' },
- { value: '4', label: 'Ajuste de precio' },
- { value: '5', label: 'Otros conceptos' },
+ { value: '1', label: '1 - Devolución parcial / no aceptación parcial' },
+ { value: '2', label: '2 - Anulación total' },
+ { value: '3', label: '3 - Rebaja o descuento' },
+ { value: '4', label: '4 - Ajuste de precio' },
+ { value: '5', label: '5 - Descuento comercial por pronto pago' },
+ { value: '6', label: '6 - Descuento comercial por volumen' },
 ];
+
+/** Disponibilidad por concepto (GET /notas-ajuste/disponibilidad/:facturaId). */
+export interface DisponibilidadLinea {
+ articuloId: string;
+ cantidadOriginal: number;
+ precioOriginal: number;
+ baseOriginal: number;
+ ivaOriginal: number;
+ totalOriginal: number;
+ cantidadAcreditada: number;
+ cantidadDisponible: number;
+ descuentoAplicado: number;
+ descuentoDisponible: number;
+ ajusteAplicado: number;
+ ajusteDisponible: number;
+}
+
+export interface DisponibilidadFactura {
+ facturaId: string;
+ facturaNumero: string;
+ lineas: DisponibilidadLinea[];
+ documento: {
+  totalFactura: number;
+  totalAcreditado: number;
+  saldoDisponible: number;
+  anulada: boolean;
+  bloqueada: boolean;
+ };
+}
+
+/** Item del DTO V2 (solo el input del concepto). */
+export interface NotaCreditoV2Item {
+ articuloId: string;
+ cantidad?: number;
+ precioNuevo?: number;
+ descuentoTasa?: number;
+ descuentoValor?: number;
+}
+
+export interface CreateNotaCreditoV2 {
+ facturaOriginalId: string;
+ concepto: string;
+ motivo: string;
+ fecha: string;
+ isDraft?: boolean;
+ esReembolsoAbono?: boolean;
+ aplicarDescuentoATodo?: boolean;
+ descuentoTasaGlobal?: number;
+ descuentoValorGlobal?: number;
+ observaciones?: string;
+ items?: NotaCreditoV2Item[];
+}
 
 export const ConceptosNotaDebito = [
  { value: '1', label: 'Intereses de mora' },

@@ -53,6 +53,21 @@ export class NotasAjusteService {
         );
     }
 
+    /** NC V2 por concepto DIAN (guía 2026): sin formaPago, cálculo en backend. */
+    createNotaCreditoV2(data: any): Observable<ResponseResult> {
+        return this.http.post<NotaAjusteResponse>(`${baseUrl}/notas-ajuste/credito/v2`, data).pipe(
+            map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+            catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+        );
+    }
+
+    /** Disponibilidad por concepto de una factura (cantidad/descuento/ajuste/documento). */
+    getDisponibilidad(facturaId: string): Observable<{ success: boolean; data: import('../../../interfaces/notas-ajuste-interface').DisponibilidadFactura; message?: string }> {
+        return this.http.get<{ success: boolean; data: import('../../../interfaces/notas-ajuste-interface').DisponibilidadFactura; message?: string }>(`${baseUrl}/notas-ajuste/disponibilidad/${facturaId}`).pipe(
+            catchError((error: any) => of({ success: false, data: null as any, message: error.error?.message }))
+        );
+    }
+
     createNotaDebito(data: any): Observable<ResponseResult> {
         return this.http.post<NotaAjusteResponse>(`${baseUrl}/notas-ajuste/debito`, data).pipe(
             map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
@@ -62,6 +77,14 @@ export class NotasAjusteService {
 
     updateNotaAjuste(id: string, data: any): Observable<ResponseResult> {
         return this.http.patch<NotaAjusteResponse>(`${baseUrl}/notas-ajuste/${id}`, data).pipe(
+            map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
+            catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+        );
+    }
+
+    /** Edición de borrador NC V2 (recalcula por concepto en backend). */
+    updateNotaCreditoV2(id: string, data: any): Observable<ResponseResult> {
+        return this.http.patch<NotaAjusteResponse>(`${baseUrl}/notas-ajuste/${id}/v2`, data).pipe(
             map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
             catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
         );

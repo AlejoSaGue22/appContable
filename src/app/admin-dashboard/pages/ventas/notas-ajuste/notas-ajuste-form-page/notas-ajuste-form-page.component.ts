@@ -1,7 +1,7 @@
-import { Component, inject, OnInit, signal, effect, computed } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { forkJoin, map, of, switchMap } from 'rxjs';
+import { map } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { CurrencyPipe } from '@angular/common';
 
@@ -12,19 +12,26 @@ import { LoaderService } from '@utils/services/loader.service';
 import { ListGroupDropdownComponent } from "@shared/components/list-group-dropdown/list-group-dropdown.component";
 import { ComprobantesVentasService } from '../../services/comprobantes-ventas.service';
 import { NotasAjusteService } from '../../services/notas-ajuste.service';
+import { InventarioService } from '@dashboard/services/inventario.service';
+import { firstValueFrom } from 'rxjs';
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
-import { ConceptosNotaCredito, ConceptosNotaDebito, NotaAjusteItem, NotaAjuste } from "../../../../interfaces/notas-ajuste-interface";
-import { GetFacturaRequest, FormaPago } from '@dashboard/interfaces/documento-venta-interface';
+import { ConceptosNotaCredito, ConceptosNotaDebito, CreateNotaCreditoV2, DisponibilidadFactura, NotaAjusteItem } from "../../../../interfaces/notas-ajuste-interface";
+import { GetFacturaRequest } from '@dashboard/interfaces/documento-venta-interface';
 import { PreviewAsientoComponent } from '@dashboard/components/preview-asiento/preview-asiento.component';
 
+/**
+ * Formulario NC por concepto DIAN (guía 2026, estilo Alegra):
+ * el concepto controla columnas, campos editables y cálculo.
+ * Sin Forma de Pago en UI: el backend espeja la factura (espejo-factura).
+ */
 @Component({
  selector: 'app-notas-ajuste-form-page',
  standalone: true,
  imports: [
- HeaderTitlePageComponent, 
- ReactiveFormsModule, 
- FormErrorLabelComponent, 
- RouterLink, 
+ HeaderTitlePageComponent,
+ ReactiveFormsModule,
+ FormErrorLabelComponent,
+ RouterLink,
  CurrencyPipe,
  ListGroupDropdownComponent,
  PreviewAsientoComponent
@@ -44,42 +51,50 @@ export class NotasAjusteFormPageComponent implements OnInit {
  private fb = inject(FormBuilder);
  private route = inject(ActivatedRoute);
  private router = inject(Router);
- private notasService = inject(NotasAjusteService);
- private ventasService = inject(ComprobantesVentasService);
+  private notasService = inject(NotasAjusteService);
+  private ventasService = inject(ComprobantesVentasService);
+  private inventarioService = inject(InventarioService);
  private notificationService = inject(NotificationService);
  private loaderService = inject(LoaderService);
  public catalogsStore = inject(CatalogsStore);
 
  notaId = toSignal(this.route.params.pipe(map(p => p['id'])));
  facturaIdFromQuery = toSignal(this.route.queryParams.pipe(map(p => p['facturaId'])));
- 
+
  tipoNota = signal<'credito' | 'debito'>('credito');
- conceptos = computed(() => this.tipoNota() === 'credito' ? ConceptosNotaCredito : ConceptosNotaDebito);
+ /** Catálogo DIAN fijo 1-6 (no depende del store para la UX por concepto). */
+ conceptosFijos = computed(() => this.tipoNota() === 'credito' ? ConceptosNotaCredito : ConceptosNotaDebito);
+ conceptoActual = signal<string>('');
  isDraft = signal<boolean>(false);
- 
+
  facturasDisponibles = signal<GetFacturaRequest[]>([]);
  itemsSeleccionados = signal<NotaAjusteItem[]>([]);
  facturaSeleccionada = signal<GetFacturaRequest | null>(null);
- refreshAsientoTrigger = signal<number>(0);
+  disponibilidad = signal<DisponibilidadFactura | null>(null);
+  /** Stock físico actual por artículo (kardex): solo informativo en devolución/anulación. */
+  stockFisico = signal<Record<string, number>>({});
+  refreshAsientoTrigger = signal<number>(0);
 
- // Computed signals for payment logic
- facturaEsCredito = computed(() => this.facturaSeleccionada()?.formaPago === FormaPago.CREDITO);
- facturaConAbonos = computed(() => (this.facturaSeleccionada()?.totalPagado ?? 0) > 0);
- 
- formaPagoBloqueada = computed(() => {
- const factura = this.facturaSeleccionada();
- if (!factura) return false;
- 
- // Concepto de Anulación (valor '2') siempre bloquea para espejar
- if (this.form.get('concepto')?.value == '2') return true;
+ // "Aplicar descuento a todo" (conceptos 3/5/6)
+ tasaGlobal: number = 0;
+ valorGlobal: number = 0;
+ usoAplicarTodo = signal<boolean>(false);
 
- // Crédito sin abonos: bloqueada a CREDITO
- if (factura.formaPago === FormaPago.CREDITO && (factura.totalPagado ?? 0) === 0) return true;
- 
- // Contado: bloqueada a CONTADO
- if (factura.formaPago === FormaPago.CONTADO) return true;
- 
- return false;
+ /** Config de grilla según concepto DIAN. */
+ conceptoConfig = computed(() => {
+  const c = this.conceptoActual();
+  const esDescuento = c === '3' || c === '5' || c === '6';
+  return {
+   esDevolucion: c === '1',
+   esAnulacion: c === '2',
+   esDescuento,
+   esAjustePrecio: c === '4',
+   permiteCantidad: c === '1',
+   permitePrecioNuevo: c === '4',
+   permiteDescuento: esDescuento,
+   permiteQuitar: c !== '2' && c !== '',
+   muestraAplicarTodo: esDescuento,
+  };
  });
 
  form = this.fb.group({
@@ -87,67 +102,111 @@ export class NotasAjusteFormPageComponent implements OnInit {
  facturaSearch: [''],
  tipo: ['credito', Validators.required],
  concepto: ['', Validators.required],
- formaPago: ['', Validators.required],
- metodoPago: [''],
  esReembolsoAbono: [false],
  motivo: ['', [Validators.required, Validators.maxLength(1000)]],
  fecha: [new Date().toISOString().split('T')[0], Validators.required],
- fechaVencimiento: [''],
  observaciones: [''],
  });
 
- // Watchers for reactive logic
- paymentLogic = effect(() => {
- const formaPago = this.form.get('formaPago')?.value;
- const metodoPagoControl = this.form.get('metodoPago');
- 
- if (formaPago === FormaPago.CONTADO) {
- metodoPagoControl?.setValidators([Validators.required]);
- } else {
- metodoPagoControl?.clearValidators();
- // Opcional: limpiar si no es contado
- if (formaPago === FormaPago.CREDITO) metodoPagoControl?.setValue('');
- }
- metodoPagoControl?.updateValueAndValidity();
- });
+  dispDe = (articuloId: string) => this.disponibilidad()?.lineas.find(l => l.articuloId === articuloId);
+  stockDe = (articuloId: string) => this.stockFisico()[articuloId];
 
- // Effect to handle "Anulación" logic
- anulacionLogic = effect(() => {
- const concepto = this.form.get('concepto')?.value;
- const factura = this.facturaSeleccionada();
- 
- if (concepto === '2' && factura) {
- this.form.patchValue({
- formaPago: factura.formaPago,
- metodoPago: factura.metodoPago ?? ''
- }, { emitEvent: false });
- }
- });
+  /** Stock físico (kardex) para conceptos con efecto inventario (1/2). Informativo. */
+  async cargarStockFisico() {
+  const c = this.conceptoActual();
+  if (c !== '1' && c !== '2') { this.stockFisico.set({}); return; }
+  const ids = [...new Set((this.itemsSeleccionados() || []).map(i => i.articuloId).filter(Boolean))];
+  if (!ids.length) { this.stockFisico.set({}); return; }
+  const acc: Record<string, number> = {};
+  await Promise.all(ids.map(async (id) => {
+  try {
+  const res = await firstValueFrom(this.inventarioService.getStock(id));
+  if (res.success) acc[id] = Number((res.data as any)?.stock ?? 0);
+  } catch { /* sin stock: se omite el hint */ }
+  }));
+  this.stockFisico.set(acc);
+  }
 
  totales = computed(() => {
- const items = this.itemsSeleccionados();
- let subtotal = 0;
- let totalDescuento = 0;
- let totalIVA = 0;
+  const items = this.itemsSeleccionados();
+  const cfg = this.conceptoConfig();
+  let subtotal = 0;
+  let totalDescuento = 0;
+  let totalIVA = 0;
 
- items.forEach(item => {
- const gross = item.cantidad * item.valorUnitario;
- const discount = gross * ((item.descuento || 0) / 100);
- const afterDiscount = gross - discount;
- const iva = afterDiscount * (item.porcentajeIVA / 100);
+  items.forEach(item => {
+   const qty = Number(item.cantidad) || 0;
+   const price = Number(item.valorUnitario) || 0;
+   const tasaIva = Number(item.porcentajeIVA) || 0;
 
- subtotal += gross;
- totalDescuento += discount;
- totalIVA += iva;
+   if (cfg.esDescuento) {
+    // D por línea (tasa sobre base original o valor directo) + IVA(D)
+    const base = (Number(item.cantidadOriginal) || qty) * (Number(item.precioOriginal) || price);
+    const tasa = Number(item.descuento) || 0;
+    const d = tasa > 0 ? base * (tasa / 100) : (Number(item.descuentoValor) || 0);
+    const iva = d * (tasaIva / 100);
+    subtotal += d;
+    totalDescuento += d;
+    totalIVA += iva;
+   } else if (cfg.esAjustePrecio) {
+    // difference = original − nuevo; base = diff × qty
+    const orig = Number(item.precioOriginal) || price;
+    const nuevo = item.precioNuevo !== undefined && item.precioNuevo !== null ? Number(item.precioNuevo) : orig;
+    const diff = Math.max(0, orig - nuevo);
+    const base = diff * qty;
+    const iva = base * (tasaIva / 100);
+    subtotal += base;
+    totalIVA += iva;
+   } else {
+    // Devolución / anulación: qty × precio − desc + IVA
+    const gross = qty * price;
+    const discount = gross * ((Number(item.descuento) || 0) / 100);
+    const afterDiscount = gross - discount;
+    const iva = afterDiscount * (tasaIva / 100);
+    subtotal += gross;
+    totalDescuento += discount;
+    totalIVA += iva;
+   }
+  });
+
+  const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
+  return {
+   subtotal: round2(subtotal),
+   descuento: round2(totalDescuento),
+   iva: round2(totalIVA),
+   total: round2(subtotal - (cfg.esDescuento || cfg.esAjustePrecio ? 0 : totalDescuento) + totalIVA)
+  };
  });
 
- return {
- subtotal,
- descuento: totalDescuento,
- iva: totalIVA,
- total: subtotal - totalDescuento + totalIVA
- };
- });
+ /** Monto acreditado de una línea (columna "Monto devuelto"). */
+ montoDe(item: NotaAjusteItem): number {
+  const cfg = this.conceptoConfig();
+  const qty = Number(item.cantidad) || 0;
+  const price = Number(item.valorUnitario) || 0;
+  const tasaIva = Number(item.porcentajeIVA) || 0;
+  const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
+  if (cfg.esDescuento) {
+   const base = (Number(item.cantidadOriginal) || qty) * (Number(item.precioOriginal) || price);
+   const tasa = Number(item.descuento) || 0;
+   const d = tasa > 0 ? base * (tasa / 100) : (Number(item.descuentoValor) || 0);
+   return round2(d * (1 + tasaIva / 100));
+  }
+  if (cfg.esAjustePrecio) {
+   const orig = Number(item.precioOriginal) || price;
+   const nuevo = item.precioNuevo !== undefined && item.precioNuevo !== null ? Number(item.precioNuevo) : orig;
+   const base = Math.max(0, orig - nuevo) * qty;
+   return round2(base * (1 + tasaIva / 100));
+  }
+  const gross = qty * price;
+  const after = gross - gross * ((Number(item.descuento) || 0) / 100);
+  return round2(after * (1 + tasaIva / 100));
+ }
+
+ diferenciaDe(item: NotaAjusteItem): number {
+  const orig = Number(item.precioOriginal) || Number(item.valorUnitario) || 0;
+  const nuevo = item.precioNuevo !== undefined && item.precioNuevo !== null ? Number(item.precioNuevo) : orig;
+  return Math.round(((orig - nuevo) + Number.EPSILON) * 100) / 100;
+ }
 
  ngOnInit(): void {
  this.loaderService.show();
@@ -181,38 +240,35 @@ export class NotasAjusteFormPageComponent implements OnInit {
  facturaOriginalId: nota.facturaOriginalId,
  tipo: nota.tipo,
  concepto: nota.concepto,
- formaPago: nota.formaPago,
- metodoPago: nota.metodoPago?.toString(),
  esReembolsoAbono: nota.esReembolsoAbono,
  motivo: nota.motivo,
- fecha: nota.fecha,
- fechaVencimiento: nota.fechaVencimiento,
+ fecha: typeof nota.fecha === 'string' ? nota.fecha : new Date(nota.fecha).toISOString().split('T')[0],
  observaciones: nota.observaciones
  });
  this.tipoNota.set(nota.tipo);
- const mappedItems = nota.items.map(item => {
- const cantidad = item.cantidad;
- const valorUnitario = item.valorUnitario;
- const gross = cantidad * valorUnitario;
- const discountVal = gross * ((item.descuento || 0) / 100);
- const afterDiscount = gross - discountVal;
- const ivaVal = afterDiscount * (item.porcentajeIVA / 100);
- return {
- articuloId: item.articuloId,
- descripcion: item.articulo?.nombre || '',
- descuento: item.descuento,
- impuestoId: item.impuestoId,
- subtotal: gross,
- total: afterDiscount + ivaVal,
- cantidad: item.cantidad,
- valorUnitario: item.valorUnitario,
- porcentajeIVA: item.porcentajeIVA,
- };
- });
+ this.conceptoActual.set(nota.concepto || '');
+ const mappedItems: NotaAjusteItem[] = (nota.items || []).map((item: any) => ({
+  articuloId: item.articuloId,
+  descripcion: item.articulo?.nombre || '',
+  descuento: item.descuento,
+  descuentoValor: item.descuentoValorInput ?? undefined,
+  impuestoId: item.impuestoId,
+  subtotal: item.subtotal,
+  total: item.total,
+  cantidad: item.cantidad,
+  valorUnitario: item.valorUnitario,
+  porcentajeIVA: item.porcentajeIVA,
+  cantidadOriginal: item.cantidadOriginal ?? item.cantidad,
+  precioOriginal: item.precioOriginal ?? item.valorUnitario,
+  subtotalOriginal: item.subtotalOriginal,
+  precioNuevo: item.precioNuevo ?? undefined,
+ }));
  this.itemsSeleccionados.set(mappedItems);
  const factura = { ...nota.facturaOriginal, client: nota.cliente } as GetFacturaRequest;
- this.facturaSeleccionada.set(factura);
- this.loaderService.hide();
+  this.facturaSeleccionada.set(factura);
+  this.cargarDisponibilidad(nota.facturaOriginalId);
+  this.cargarStockFisico();
+  this.loaderService.hide();
  } catch (error) {
  console.log('Error al cargar la nota de ajuste 2', error);
  this.loaderService.hide();
@@ -225,41 +281,92 @@ export class NotasAjusteFormPageComponent implements OnInit {
  this.notificationService.error(error.error.message || 'Error al cargar la nota de ajuste', 'Error');
  }
  });
- 
+
  }
 
  onFacturaSeleccionada(factura: GetFacturaRequest) {
  const f = factura;
  this.facturaSeleccionada.set(f);
+ this.disponibilidad.set(null);
+ this.usoAplicarTodo.set(false);
  this.isDraft.set(false);
- if(factura.tipoFactura == 'ESTANDAR') {
+ if (factura.tipoFactura == 'ESTANDAR') {
  this.isDraft.set(true);
  }
  this.form.patchValue({
  facturaOriginalId: f.id,
  facturaSearch: f.comprobante_completo,
- formaPago: f.formaPago,
- metodoPago: f.formaPago === FormaPago.CONTADO ? f.metodoPago : '',
  esReembolsoAbono: false
  });
- 
- // Auto-load items from invoice
- const items: NotaAjusteItem[] = f.items.map(item => {
- const gross = item.quantity * item.unitPrice;
- const discountVal = gross * ((item.discount || 0) / 100);
- const afterDiscount = gross - discountVal;
- const ivaVal = afterDiscount * (item.iva / 100);
 
+  this.resetItemsPorConcepto();
+  this.cargarDisponibilidad(f.id);
+  this.cargarStockFisico();
+  }
+
+ cargarDisponibilidad(facturaId: string) {
+ this.notasService.getDisponibilidad(facturaId).subscribe(res => {
+ if (res.success && res.data) {
+ this.disponibilidad.set(res.data);
+ // Enriquecer líneas con disponibilidad
+ this.itemsSeleccionados.update(items => items.map(it => {
+ const d = res.data.lineas.find(l => l.articuloId === it.articuloId);
+ if (!d) return it;
  return {
- descripcion: item.articulo.nombre,
+  ...it,
+  cantidadDisponible: d.cantidadDisponible,
+  descuentoDisponible: d.descuentoDisponible,
+  ajusteDisponible: d.ajusteDisponible,
+  // Clampar cantidad inicial al disponible en devolución
+  cantidad: this.conceptoActual() === '1' ? Math.min(Number(it.cantidad) || 0, d.cantidadDisponible) : it.cantidad,
+ };
+ }));
+ if (res.data.documento.bloqueada) {
+ this.notificationService.error(
+  res.data.documento.anulada
+   ? 'La factura ya fue anulada: no admite más notas crédito.'
+   : 'La factura no tiene saldo disponible para acreditar.',
+  'Factura bloqueada'
+ );
+ }
+ }
+ });
+ }
+
+  /** Cambio de concepto DIAN: resetea la grilla a los valores de la factura. */
+  onConceptoChange(concepto: string) {
+  this.conceptoActual.set(concepto);
+  this.form.patchValue({ concepto }, { emitEvent: false });
+  this.usoAplicarTodo.set(false);
+  this.resetItemsPorConcepto();
+  this.cargarStockFisico();
+  }
+
+ /** Reconstruye las líneas desde la factura según el concepto activo. */
+ resetItemsPorConcepto() {
+ const f = this.facturaSeleccionada();
+ if (!f) { this.itemsSeleccionados.set([]); return; }
+ const c = this.conceptoActual();
+ const items: NotaAjusteItem[] = (f.items || []).map((item: any) => {
+ const disp = this.dispDe(item.articuloId);
+ return {
+ descripcion: item.articulo?.nombre || item.description || 'Ítem',
  articuloId: item.articuloId,
- impuestoId: (item as any).impuestoId || undefined,
+ impuestoId: item.impuestoId || undefined,
  cantidad: item.quantity,
  valorUnitario: item.unitPrice,
  porcentajeIVA: item.iva,
- descuento: item.discount || 0,
- subtotal: gross,
- total: afterDiscount + ivaVal
+ descuento: 0,
+ descuentoValor: 0,
+ precioNuevo: c === '4' ? item.unitPrice : undefined,
+ subtotal: item.quantity * item.unitPrice,
+ total: 0,
+ cantidadOriginal: item.quantity,
+ precioOriginal: item.unitPrice,
+ subtotalOriginal: item.quantity * item.unitPrice,
+ cantidadDisponible: disp?.cantidadDisponible,
+ descuentoDisponible: disp?.descuentoDisponible,
+ ajusteDisponible: disp?.ajusteDisponible,
  };
  });
  this.itemsSeleccionados.set(items);
@@ -274,99 +381,228 @@ export class NotasAjusteFormPageComponent implements OnInit {
  }
 
  removeItem(index: number) {
+ if (this.conceptoConfig().esAnulacion) return;
  this.itemsSeleccionados.update(items => items.filter((_, i) => i !== index));
  }
 
- updateItemField(index: number, field: keyof NotaAjusteItem, value: any) {
- this.itemsSeleccionados.update(items => {
- const newItems = [...items];
- newItems[index] = { 
- ...newItems[index], 
- [field]: (field === 'descripcion') ? value : Number(value) 
- };
- 
- // Recalculate subtotal and total for the row item if needed (though computed totales handles global)
- const item = newItems[index];
- const gross = item.cantidad * item.valorUnitario;
- const discount = gross * ((item.descuento || 0) / 100);
- const afterDiscount = gross - discount;
- const iva = afterDiscount * (item.porcentajeIVA / 100);
- 
- newItems[index].subtotal = gross;
- newItems[index].total = afterDiscount + iva;
- 
- return newItems;
+ /** Cantidad (solo concepto 1): 0 < q <= disponible. */
+ updateCantidad(index: number, value: any) {
+ const qty = Number(value);
+ const items = this.itemsSeleccionados();
+ const item = items[index];
+ if (!item) return;
+ const disp = this.dispDe(item.articuloId)?.cantidadDisponible;
+ if (!(qty > 0)) {
+ this.notificationService.error('La cantidad a devolver debe ser mayor a 0.', 'Validación');
+ return;
+ }
+ if (disp !== undefined && qty > disp) {
+ this.notificationService.error(`Cantidad máxima disponible: ${disp}.`, 'Validación');
+ this.itemsSeleccionados.update(list => {
+ const next = [...list];
+ next[index] = { ...next[index], cantidad: disp };
+ return next;
+ });
+ return;
+ }
+ this.itemsSeleccionados.update(list => {
+ const next = [...list];
+ next[index] = { ...next[index], cantidad: qty };
+ return next;
  });
  }
 
- updateItemQuantity(index: number, quantity: number) {
- this.updateItemField(index, 'cantidad', quantity);
+ /** Precio nuevo (solo concepto 4): 0 <= p < original. */
+ updatePrecioNuevo(index: number, value: any) {
+ const p = Number(value);
+ const items = this.itemsSeleccionados();
+ const item = items[index];
+ if (!item) return;
+ const orig = Number(item.precioOriginal) || Number(item.valorUnitario) || 0;
+ if (!Number.isFinite(p) || p < 0) {
+ this.notificationService.error('Precio nuevo inválido.', 'Validación');
+ return;
  }
-
- onImpuestoChange(index: number, impuestoId: string) {
- const impuesto = this.catalogsStore.impuestos().find(i => i.id === impuestoId);
- if (impuesto) {
- this.itemsSeleccionados.update(items => {
- const newItems = [...items];
- newItems[index] = { 
- ...newItems[index], 
- impuestoId: impuesto.id,
- porcentajeIVA: impuesto?.tarifa ? parseInt(impuesto.tarifa) : 0,
- };
- const item = newItems[index];
- const gross = item.cantidad * item.valorUnitario;
- const discount = gross * ((item.descuento || 0) / 100);
- const afterDiscount = gross - discount;
- const iva = afterDiscount * (item.porcentajeIVA / 100);
- newItems[index].subtotal = gross;
- newItems[index].total = afterDiscount + iva;
- return newItems;
+ if (p >= orig) {
+ this.notificationService.error(`El precio nuevo ($${p}) debe ser menor al original ($${orig}).`, 'Validación');
+ return;
+ }
+ this.itemsSeleccionados.update(list => {
+ const next = [...list];
+ next[index] = { ...next[index], precioNuevo: p };
+ return next;
  });
  }
+
+ /** Descuento % (conceptos 3/5/6): D <= disponible. */
+ updateDescuentoTasa(index: number, value: any) {
+ const tasa = Number(value);
+ const items = this.itemsSeleccionados();
+ const item = items[index];
+ if (!item) return;
+ if (tasa < 0 || tasa > 100) {
+ this.notificationService.error('La tasa debe estar entre 0 y 100%.', 'Validación');
+ return;
+ }
+ const base = (Number(item.cantidadOriginal) || Number(item.cantidad) || 0) * (Number(item.precioOriginal) || Number(item.valorUnitario) || 0);
+ const d = base * (tasa / 100);
+ const disp = this.dispDe(item.articuloId)?.descuentoDisponible;
+ if (disp !== undefined && d > disp) {
+ this.notificationService.error(`Descuento máximo disponible: $${disp}.`, 'Validación');
+ return;
+ }
+ this.usoAplicarTodo.set(false);
+ this.itemsSeleccionados.update(list => {
+ const next = [...list];
+ next[index] = { ...next[index], descuento: tasa, descuentoValor: 0 };
+ return next;
+ });
  }
 
- onSubmit(isDraft: boolean) { 
- if (this.form.invalid || this.itemsSeleccionados().length === 0) {
+ /** Descuento $ (conceptos 3/5/6): D <= disponible. */
+ updateDescuentoValor(index: number, value: any) {
+ const d = Number(value);
+ const items = this.itemsSeleccionados();
+ const item = items[index];
+ if (!item) return;
+ if (!(d >= 0)) {
+ this.notificationService.error('Descuento inválido.', 'Validación');
+ return;
+ }
+ const disp = this.dispDe(item.articuloId)?.descuentoDisponible;
+ if (disp !== undefined && d > disp) {
+ this.notificationService.error(`Descuento máximo disponible: $${disp}.`, 'Validación');
+ return;
+ }
+ this.usoAplicarTodo.set(false);
+ this.itemsSeleccionados.update(list => {
+ const next = [...list];
+ next[index] = { ...next[index], descuento: 0, descuentoValor: d };
+ return next;
+ });
+ }
+
+ /** "Aplicar descuento a todo" (conceptos 3/5/6). */
+ aplicarDescuentoATodo() {
+ const tasa = Number(this.tasaGlobal) || 0;
+ const valor = Number(this.valorGlobal) || 0;
+ if (!(tasa > 0) && !(valor > 0)) {
+ this.notificationService.error('Indique una tasa (%) o un valor ($) para aplicar a todo.', 'Validación');
+ return;
+ }
+ if (tasa > 0 && valor > 0) {
+ this.notificationService.error('Use tasa o valor, no ambos.', 'Validación');
+ return;
+ }
+ // Validar contra disponibilidad antes de aplicar
+ for (const it of this.itemsSeleccionados()) {
+ const base = (Number(it.cantidadOriginal) || 0) * (Number(it.precioOriginal) || 0);
+ const d = valor > 0 ? valor : base * (tasa / 100);
+ const disp = this.dispDe(it.articuloId)?.descuentoDisponible;
+ if (disp !== undefined && d > disp) {
+ this.notificationService.error(`"${it.descripcion}" excede su descuento disponible ($${disp}).`, 'Validación');
+ return;
+ }
+ }
+ this.itemsSeleccionados.update(list => list.map(it => ({
+ ...it,
+ descuento: valor > 0 ? 0 : tasa,
+ descuentoValor: valor > 0 ? valor : 0,
+ })));
+ this.usoAplicarTodo.set(true);
+ this.notificationService.success('Descuento aplicado a todas las líneas.', 'Completado');
+ }
+
+ validarFormulario(): string | null {
+ if (this.form.invalid) return 'Por favor completa todos los campos.';
+ if (!this.facturaSeleccionada()) return 'Seleccione una factura.';
+ const c = this.conceptoActual();
+ if (!c) return 'Seleccione el concepto DIAN.';
+ const items = this.itemsSeleccionados();
+ if (c !== '2' && items.length === 0) return 'La nota no tiene ítems.';
+ if (c === '2' && items.length === 0) return 'La factura no tiene ítems para anular.';
+
+ if (c === '1') {
+ for (const it of items) {
+ const q = Number(it.cantidad) || 0;
+ const disp = this.dispDe(it.articuloId)?.cantidadDisponible;
+ if (!(q > 0)) return `Cantidad inválida en "${it.descripcion}".`;
+ if (disp !== undefined && q > disp) return `"${it.descripcion}" excede lo disponible (${disp}).`;
+ }
+ }
+ if (c === '3' || c === '5' || c === '6') {
+ if (!this.usoAplicarTodo()) {
+ for (const it of items) {
+ const tasa = Number(it.descuento) || 0;
+ const val = Number(it.descuentoValor) || 0;
+ if (!(tasa > 0) && !(val > 0)) return `Indique descuento en "${it.descripcion}".`;
+ }
+ }
+ }
+ if (c === '4') {
+ for (const it of items) {
+ const orig = Number(it.precioOriginal) || 0;
+ const p = Number(it.precioNuevo);
+ if (!Number.isFinite(p) || p < 0 || p >= orig) return `Precio nuevo inválido en "${it.descripcion}".`;
+ }
+ }
+ const dispDoc = this.disponibilidad()?.documento;
+ if (dispDoc && this.totales().total > dispDoc.saldoDisponible) {
+ return `El total ($${this.totales().total}) excede el saldo disponible ($${dispDoc.saldoDisponible}).`;
+ }
+ return null;
+ }
+
+ onSubmit(isDraft: boolean) {
+ const error = this.validarFormulario();
+ if (error) {
  this.form.markAllAsTouched();
- this.notificationService.error('Por favor completa todos los campos y agrega al menos un item.', 'Formulario inválido');
+ this.notificationService.error(error, 'Formulario inválido');
  return;
  }
 
  this.loaderService.show();
- const data = {
- isDraft: isDraft,
- tipo: this.tipoNota(),
- facturaOriginalId: this.form.value.facturaOriginalId,
- formaPago: this.form.value.formaPago,
- metodoPago: this.form.value.metodoPago,
- esReembolsoAbono: this.form.value.esReembolsoAbono,
- concepto: this.form.value.concepto,
- motivo: this.form.value.motivo,
- fecha: this.form.value.fecha,
- fechaVencimiento: this.form.value.fechaVencimiento,
- items: this.itemsSeleccionados(),
- observaciones: this.form.value.observaciones,
- subtotal: this.totales().subtotal,
- descuento: this.totales().descuento,
- iva: this.totales().iva,
- total: this.totales().total
+ const c = this.conceptoActual();
+ const t = this.totales();
+
+ const data: CreateNotaCreditoV2 = {
+ isDraft,
+ facturaOriginalId: this.form.value.facturaOriginalId!,
+ concepto: c,
+ motivo: this.form.value.motivo!,
+ fecha: this.form.value.fecha!,
+ esReembolsoAbono: this.form.value.esReembolsoAbono ?? false,
+ observaciones: this.form.value.observaciones || undefined,
  };
 
- // Validación de Saldo (Impedir envío si excede el saldo pendiente)
- const saldoPendiente = this.facturaSeleccionada()?.saldoPendiente ?? 0;
- if (data.total > saldoPendiente && data.formaPago === FormaPago.CREDITO) {
- this.notificationService.error(
- `El valor de la nota (${this.totales().total}) no puede ser mayor al saldo pendiente (${saldoPendiente}) para ajustes de cartera.`,
- 'Error de Validación'
- );
- this.loaderService.hide();
- return;
+ if (c === '2') {
+ data.items = [];
+ } else if ((c === '3' || c === '5' || c === '6') && this.usoAplicarTodo()) {
+ data.aplicarDescuentoATodo = true;
+ if (Number(this.tasaGlobal) > 0) data.descuentoTasaGlobal = Number(this.tasaGlobal);
+ if (Number(this.valorGlobal) > 0) data.descuentoValorGlobal = Number(this.valorGlobal);
+ data.items = [];
+ } else {
+ data.items = this.itemsSeleccionados().map(it => {
+ const base: any = { articuloId: it.articuloId };
+ if (c === '1') base.cantidad = Number(it.cantidad);
+ if (c === '4') base.precioNuevo = Number(it.precioNuevo);
+ if (c === '3' || c === '5' || c === '6') {
+ if (Number(it.descuentoValor) > 0) base.descuentoValor = Number(it.descuentoValor);
+ else base.descuentoTasa = Number(it.descuento) || 0;
+ }
+ return base;
+ });
  }
 
+ // Log de auditoría: lo que verá el backend como fuente de verdad
+ console.log('[NC V2] concepto', c, 'totales', t, 'payload', data);
+
  const id = this.notaId();
- const request = (id && id !== 'new') 
- ? this.notasService.updateNotaAjuste(id, data)
- : (this.tipoNota() === 'credito' ? this.notasService.createNotaCredito(data) : this.notasService.createNotaDebito(data));
+ // Los borradores V2 se editan por /v2 (recálculo por concepto en backend).
+ const request = (id && id !== 'new')
+ ? this.notasService.updateNotaCreditoV2(id, data)
+ : this.notasService.createNotaCreditoV2(data);
 
  request.subscribe({
  next: (res) => {
@@ -374,17 +610,17 @@ export class NotasAjusteFormPageComponent implements OnInit {
  if (res.success) {
  this.notificationService.success('Nota guardada con éxito', 'Completado');
  if (isDraft) {
-    if (this.notaId() === 'new' || !this.notaId()) {
-      this.router.navigate(['/panel/ventas/notas-ajuste', res.data.id]);
-    } else {
-      this.refreshAsientoTrigger.update(v => v + 1);
-    }
+  if (this.notaId() === 'new' || !this.notaId()) {
+   this.router.navigate(['/panel/ventas/notas-ajuste', (res.data as any).id]);
   } else {
-    this.router.navigate(['/panel/ventas/notas-ajuste']);
+   this.refreshAsientoTrigger.update(v => v + 1);
   }
  } else {
+  this.router.navigate(['/panel/ventas/notas-ajuste']);
+ }
+ } else {
  const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
- this.notificationService.error(message || 'Error al guardar la nota', 'Error');
+ this.notificationService.error(message || (res as any).error?.error?.message || 'Error al guardar la nota', 'Error');
  }
  },
  error: () => this.loaderService.hide()

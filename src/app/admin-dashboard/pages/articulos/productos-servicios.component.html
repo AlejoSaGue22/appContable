@@ -46,6 +46,14 @@
 
         <!-- Actions -->
         <div class="flex items-center gap-3">
+            <a routerLink="/panel/articles/saldos-iniciales"
+                class="inline-flex items-center justify-center px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95">
+                <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M20 7l-8-4-8 4m16 0v10l-8 4m8-14l-8 4m0 10V11m0 10l-8-4V7m8 4L4 7" />
+                </svg>
+                Carga inicial
+            </a>
             <a routerLink="/panel/articles/new-Item"
                 class="inline-flex items-center justify-center px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 group">
                 <svg class="mr-2 h-4 w-4 transition-transform group-hover:rotate-90" fill="none" stroke="currentColor"
@@ -59,7 +67,7 @@
 
     <!-- Table Section -->
     <div class="space-y-4 transition-opacity duration-300" [class.opacity-50]="productorxResource.isLoading()">
-        <app-table-productos [productosData]="productorxResource.value().articulos" (delete)="openModal($event)" />
+        <app-table-productos [productosData]="productorxResource.value().articulos" (delete)="openModal($event)" (kardex)="openKardex($event)" />
 
         @if (productorxResource.value().articulos.length > 0) {
         <app-pagination [length]="productorxResource.value().articulos.length" />
@@ -91,5 +99,11 @@
                 </button>
             </div>
         </div>
+    </app-modal>
+
+    <!-- Kardex Modal -->
+    <app-modal [(visible)]="isKardexOpen">
+        <app-kardex-modal [articuloId]="kardexArticuloId()" [articuloNombre]="kardexArticuloNombre()"
+            (ajustado)="onKardexAjustado()" />
     </app-modal>
 </div>

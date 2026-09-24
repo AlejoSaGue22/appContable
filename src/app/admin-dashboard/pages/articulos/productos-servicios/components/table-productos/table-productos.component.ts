@@ -14,8 +14,13 @@ export class TableProductosComponent {
 
     productosData = input<GetProductosDetalle[]>([]);
     @Output() delete = new EventEmitter<modalOpen>();
+    @Output() kardex = new EventEmitter<modalOpen>();
 
     onDeleteProducto(id: string) {
         this.delete.emit({ open: true, id });
+    }
+
+    onKardexProducto(id: string) {
+        this.kardex.emit({ open: true, id });
     }
 }

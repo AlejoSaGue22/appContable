@@ -82,7 +82,8 @@ export interface GetProductosDetalle {
  cuentaContableId: string;
  cuentaIva: CuentasIvaRel;
  cuentaIvaId: string;
- ind: string;
- isInventariable?: boolean;
- afectaInventario?: boolean;
+  ind: string;
+  isInventariable?: boolean;
+  afectaInventario?: boolean;
+  stock?: number;
 }

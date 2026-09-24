@@ -12,10 +12,11 @@ import { PaginationComponent } from '@shared/components/pagination/pagination';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { ProductosService } from '@dashboard/pages/ventas/services/productos.service';
 import { TableProductosComponent } from './productos-servicios/components/table-productos/table-productos.component';
+import { KardexModalComponent } from './productos-servicios/components/kardex-modal/kardex-modal.component';
 
 @Component({
     selector: 'app-productos-servicios',
-    imports: [HeaderTitlePageComponent, TableProductosComponent, LoaderComponent, ModalComponents, PaginationComponent, RouterLink],
+    imports: [HeaderTitlePageComponent, TableProductosComponent, KardexModalComponent, LoaderComponent, ModalComponents, PaginationComponent, RouterLink],
     templateUrl: './productos-servicios.component.html',
     standalone: true
 })
@@ -34,6 +35,9 @@ export class ProductosServiciosComponent {
     totalProducto = signal(0);
     idProductoToModal = signal<string>('');
     isModalEdit = false;
+    isKardexOpen = false;
+    kardexArticuloId = signal<string>('');
+    kardexArticuloNombre = signal<string>('');
     cardValor = signal<CardsTotales[]>([])
     searchTerm = signal<string>(this.route.snapshot.queryParams['search'] || '');
     appliedSearchTerm = signal<string>(this.route.snapshot.queryParams['search'] || '');
@@ -78,6 +82,17 @@ export class ProductosServiciosComponent {
     openModal(event: modalOpen) {
         this.isModalEdit = event.open;
         this.idProductoToModal.set(event.id);
+    }
+
+    openKardex(event: modalOpen) {
+        const art = this.productorxResource.value()?.articulos.find(a => a.id === event.id);
+        this.kardexArticuloId.set(event.id);
+        this.kardexArticuloNombre.set(art?.nombre || '');
+        this.isKardexOpen = event.open;
+    }
+
+    onKardexAjustado() {
+        this.productorxResource.reload();
     }
 
     async deleteProducto() {

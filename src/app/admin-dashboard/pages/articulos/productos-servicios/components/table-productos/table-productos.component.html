@@ -9,6 +9,7 @@
                     <th class="text-center">Categoría</th>
                     <th class="text-center">Unidad</th>
                     <th class="text-center">Precio</th>
+                    <th class="text-center">Stock</th>
                     <th class="text-center">Estado</th>
                     <th class="text-center">Acciones</th>
                 </tr>
@@ -16,7 +17,7 @@
             <tbody>
                 @if (productosData().length === 0) {
                 <tr>
-                    <td colspan="7" class="text-center">
+                    <td colspan="8" class="text-center">
                         <div class="flex flex-col items-center justify-center py-14">
                             <div class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
                                 <svg class="h-8 w-8 text-gray-200" fill="none" stroke="currentColor"
@@ -56,6 +57,15 @@
                         <span class="font-normal text-gray-900">{{ art.precio | currency:'$':'symbol':'1.0-0' }}</span>
                     </td>
                     <td class="text-center">
+                        @if (art.isInventariable !== false) {
+                        <span class="tabular-nums font-semibold"
+                            [class.text-red-600]="(art.stock ?? 0) < 0"
+                            [class.text-gray-900]="(art.stock ?? 0) >= 0">{{ art.stock ?? 0 }}</span>
+                        } @else {
+                        <span class="text-gray-300">—</span>
+                        }
+                    </td>
+                    <td class="text-center">
                         @if (art.isActive !== false) {
                         <span
                             class="px-2.5 py-1 text-[10px] font-semibold uppercase er bg-emerald-50 text-emerald-600 rounded-lg border border-emerald-100">Activo</span>
@@ -66,6 +76,16 @@
                     </td>
                     <td class="text-center">
                         <div class="flex items-center justify-center gap-2">
+                            @if (art.isInventariable !== false) {
+                            <button (click)="onKardexProducto(art.id)"
+                                class="text-emerald-600 hover:text-emerald-900 cursor-pointer" title="Kardex / ajustar stock">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M20 7l-8-4-8 4m16 0v10l-8 4m8-14l-8 4m0 10V11m0 10l-8-4V7m8 4L4 7" />
+                                </svg>
+                            </button>
+                            }
+
                             <a [routerLink]="['/panel/articles', art.id]" class="text-blue-600 hover:text-blue-900"
                                 title="Editar">
                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

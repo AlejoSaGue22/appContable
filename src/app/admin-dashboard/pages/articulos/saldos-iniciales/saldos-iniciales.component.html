@@ -1,0 +1,124 @@
+<div class="space-y-6 animate-fade-in">
+    <header-title-page [titleHead]="headTitle" />
+
+    <div class="flex flex-col md:flex-row md:items-center gap-3">
+        <a routerLink="/panel/articles"
+            class="inline-flex items-center gap-2 px-4 py-2 border border-gray-200 text-xs font-bold text-gray-500 rounded-xl hover:bg-gray-50 transition-all">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Volver a productos
+        </a>
+
+        <div class="relative flex-1 max-w-md">
+            <input #txtSearch (input)="searchTerm.set(txtSearch.value)" [value]="searchTerm()" type="text"
+                placeholder="Filtrar por nombre o código..."
+                class="block w-full pl-4 pr-4 py-2.5 bg-white border border-gray-100 rounded-2xl text-sm placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/50 transition-all shadow-sm" />
+        </div>
+
+        <label class="inline-flex items-center gap-2 text-xs font-bold text-gray-500 cursor-pointer select-none">
+            <input type="checkbox" [checked]="soloPendientes()" (change)="soloPendientes.set($any($event.target).checked)"
+                class="h-4 w-4 accent-emerald-600" />
+            Solo pendientes (stock 0)
+        </label>
+
+        <button (click)="fileInput.click()" [disabled]="importando() || cargando()"
+            class="inline-flex items-center justify-center px-6 py-2.5 bg-white border border-gray-200 text-gray-700 text-sm font-bold rounded-xl transition-all hover:bg-gray-50 active:scale-95 disabled:opacity-50 cursor-pointer">
+            <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            {{ importando() ? 'Leyendo...' : 'Importar CSV/Excel' }}
+        </button>
+        <input #fileInput type="file" accept=".csv,.xls,.xlsx" class="hidden"
+            (change)="onArchivoSeleccionado($event)" />
+
+        <button (click)="procesar()" [disabled]="procesando() || !aProcesar().length"
+            class="inline-flex items-center justify-center px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg active:scale-95 disabled:opacity-50 cursor-pointer">
+            {{ procesando() ? 'Procesando...' : 'Cargar saldos (' + aProcesar().length + ')' }}
+        </button>
+    </div>
+
+    <p class="text-xs text-gray-400">
+        El archivo debe tener columna de <b>código</b> (codigo, sku o referencia) y columna de
+        <b>cantidad</b> (cantidad, stock o saldo), con encabezados en la primera fila.
+    </p>
+
+    @if (noEncontrados().length) {
+    <div class="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-xl px-4 py-2">
+        <p class="font-bold mb-1">{{ noEncontrados().length }} filas del archivo no se aplicaron:</p>
+        <ul class="max-h-28 overflow-y-auto list-disc pl-5 space-y-0.5">
+            @for (e of noEncontrados().slice(0, 50); track $index) {
+            <li><span class="font-mono">{{ e.codigo }}</span> — {{ e.motivo }}</li>
+            }
+        </ul>
+        @if (noEncontrados().length > 50) {
+        <p class="mt-1 text-amber-600">... y {{ noEncontrados().length - 50 }} más.</p>
+        }
+    </div>
+    }
+
+    @if (cargando()) {
+    <div class="flex flex-col gap-3 justify-center items-center py-20">
+        <app-loader />
+        <p class="text-sm text-gray-400 animate-pulse">Cargando artículos inventariables...</p>
+    </div>
+    } @else {
+    @if (totalRegistros() > filas().length) {
+    <p class="text-xs text-amber-600 bg-amber-50 border border-amber-100 rounded-xl px-4 py-2">
+        Mostrando {{ filas().length }} de {{ totalRegistros() }} artículos. Use el filtro para ubicar el resto.
+    </p>
+    }
+
+    <div class="relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+        <div class="overflow-x-auto">
+            <table class="ledger-table">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Artículo</th>
+                        <th class="text-center">Stock actual</th>
+                        <th class="text-center">Saldo deseado</th>
+                        <th class="text-center">Resultado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!visibles().length) {
+                    <tr>
+                        <td colspan="5" class="text-center">
+                            <p class="py-10 text-sm text-gray-400">Sin artículos para mostrar.</p>
+                        </td>
+                    </tr>
+                    }
+
+                    @for (f of visibles(); track f.id) {
+                    <tr>
+                        <td class="font-mono">{{ f.codigo }}</td>
+                        <td>{{ f.nombre }}</td>
+                        <td class="text-center tabular-nums font-semibold"
+                            [class.text-red-600]="f.stockActual < 0">{{ f.stockActual }}</td>
+                        <td class="text-center">
+                            <input type="number" min="0" step="0.01" placeholder="0"
+                                [value]="f.deseado ?? ''"
+                                (change)="setDeseado(f.id, $any($event.target).value)"
+                                class="w-32 px-2 py-1 bg-white border border-gray-300 rounded text-right text-xs focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-900 dark:border-gray-600 dark:text-white" />
+                        </td>
+                        <td class="text-center">
+                            @if (f.resultado) {
+                            <span class="px-2 py-0.5 text-[10px] font-bold uppercase rounded-md"
+                                [class.bg-emerald-50]="f.resultado === 'cargado'"
+                                [class.text-emerald-600]="f.resultado === 'cargado'"
+                                [class.bg-gray-100]="f.resultado !== 'cargado'"
+                                [class.text-gray-500]="f.resultado !== 'cargado'">{{ f.resultado }}</span>
+                            } @else {
+                            <span class="text-gray-300">—</span>
+                            }
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    }
+</div>
