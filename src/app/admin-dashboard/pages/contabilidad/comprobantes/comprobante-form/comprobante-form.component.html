@@ -94,21 +94,21 @@
           <table class="w-full text-xs text-left border-collapse min-w-[1000px]">
             <thead class="bg-gray-50 text-gray-500 border-b border-gray-100">
               <tr>
-                <th class="px-4 py-3 w-1/4 font-medium uppercase text-[10px]">Cuenta Contable <span
-                    class="text-red-500">*</span></th>
-                <th class="px-4 py-3 w-1/4 font-medium uppercase text-[10px]">Descripción / Concepto</th>
-                <th class="px-4 py-3 font-medium uppercase text-[10px]">Tercero</th>
+                <th class="px-4 py-3 w-1/4 font-medium  text-[10px]">Cuenta Contable <span class="text-red-500">*</span>
+                </th>
+                <th class="px-4 py-3 w-1/4 font-medium  text-[10px]">Descripción / Concepto</th>
+                <th class="px-4 py-3 font-medium  text-[10px]">Tercero</th>
                 @if (centrosCostos().length > 0) {
-                <th class="px-4 py-3 font-medium uppercase text-[10px]">C. Costo</th>
+                <th class="px-4 py-3 font-medium  text-[10px]">C. Costo</th>
                 }
-                <th class="px-4 py-3 font-medium uppercase text-[10px]">Ref. Doc. @if (requiereRefDoc()) { <span
+                <th class="px-4 py-3 font-medium  text-[10px]">Ref. Doc. @if (requiereRefDoc()) { <span
                     class="text-red-500">*</span> }</th>
-                <th class="px-4 py-3 text-right w-40 font-medium uppercase text-[10px]">Débito <span
+                <th class="px-4 py-3 text-right w-40 font-medium  text-[10px]">Débito <span
                     class="text-red-500">*</span></th>
-                <th class="px-4 py-3 text-right w-40 font-medium uppercase text-[10px]">Crédito <span
+                <th class="px-4 py-3 text-right w-40 font-medium  text-[10px]">Crédito <span
                     class="text-red-500">*</span></th>
                 @if (estado() === 'BORRADOR') {
-                <th class="px-4 py-3 text-center w-24 font-medium uppercase text-[10px]">Acción</th>
+                <th class="px-4 py-3 text-center w-24 font-medium  text-[10px]">Acción</th>
                 }
               </tr>
             </thead>
@@ -117,13 +117,9 @@
               <tr [formGroupName]="i" class="hover:bg-slate-50/30">
                 <!-- Cuenta -->
                 <td class="px-2 py-3">
-                  <select formControlName="cuentaContableId" (change)="onCuentaCambio(i)"
-                    class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-[11px] focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all cursor-pointer bg-white">
-                    <option value="" disabled>Seleccione cuenta...</option>
-                    @for (cta of cuentasContables(); track cta.id) {
-                    <option [value]="cta.id">{{ cta.codigo }} - {{ cta.nombre }}</option>
-                    }
-                  </select>
+                  <app-searchable-select formControlName="cuentaContableId" [items]="cuentasContables()"
+                    [labelKeys]="['codigo', 'nombre']" valueKey="id" placeholder="Buscar cuenta..."
+                    emptyLabel="Seleccione cuenta..." size="sm" />
                 </td>
 
                 <!-- Concepto -->
@@ -135,13 +131,9 @@
 
                 <!-- Tercero -->
                 <td class="px-2 py-3">
-                  <select formControlName="terceroUnionId"
-                    class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-[11px] focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all cursor-pointer bg-white">
-                    <option value="">-- Seleccione Tercero --</option>
-                    @for (t of terceros(); track t.id) {
-                    <option [value]="t.id">{{ t.nombreDisplay }}</option>
-                    }
-                  </select>
+                  <app-searchable-select formControlName="terceroUnionId" [items]="terceros()"
+                    [labelKeys]="['nombreDisplay']" valueKey="id" placeholder="Buscar tercero..."
+                    emptyLabel="-- Seleccione Tercero --" size="sm" />
                 </td>
 
                 <!-- Centro de Costo -->
@@ -170,14 +162,14 @@
 
                 <!-- Debito -->
                 <td class="px-2 py-3">
-                  <input type="text" formControlName="debito" appCurrencyFormat
+                  <input type="text" inputmode="numeric" formControlName="debito" appCurrencyFormat
                     class="w-full px-3 py-2 border border-gray-200 rounded-xl text-[11px] focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all text-right font-mono font-semibold text-slate-800 bg-white"
                     placeholder="0" />
                 </td>
 
                 <!-- Credito -->
                 <td class="px-2 py-3">
-                  <input type="text" formControlName="credito" appCurrencyFormat
+                  <input type="text" inputmode="numeric" formControlName="credito" appCurrencyFormat
                     class="w-full px-3 py-2 border border-gray-200 rounded-xl text-[11px] focus:ring-2 focus:ring-slate-500/10 focus:border-slate-500 outline-none transition-all text-right font-mono font-semibold text-slate-800 bg-white"
                     placeholder="0" />
                 </td>
@@ -214,7 +206,7 @@
             <tfoot class="bg-gray-50 font-bold border-t border-gray-100 text-gray-900">
               <tr class="text-right">
                 <td [attr.colspan]="centrosCostos().length > 0 ? 5 : 4"
-                  class="px-4 py-3 text-xs uppercase text-gray-500 font-medium">Suma Totales</td>
+                  class="px-4 py-3 text-xs  text-gray-500 font-medium">Suma Totales</td>
                 <td class="px-4 py-3 font-mono text-emerald-600 text-sm font-bold">{{ totalDebitos | currency }}</td>
                 <td class="px-4 py-3 font-mono text-blue-600 text-sm font-bold">{{ totalCreditos | currency }}</td>
                 @if (estado() === 'BORRADOR') {

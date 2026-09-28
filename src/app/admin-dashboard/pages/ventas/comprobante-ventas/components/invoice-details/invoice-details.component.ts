@@ -2,6 +2,7 @@ import { CommonModule, CurrencyPipe } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DianStatus, FormaPago, GetFacturaRequest, InvoiceStatus, TipoFactura } from '@dashboard/interfaces/documento-venta-interface';
+import { FacturaNotasResumen } from '@dashboard/interfaces/documento-venta-interface';
 import { PagoHistorial, PaymentStatus } from '@dashboard/interfaces/pagos-interface';
 import { RegistrarPagoModalData } from '@dashboard/pages/pagos/components/modal-registrarpago/modal-registrarpago.component';
 import { PagosHttpService } from '@dashboard/pages/pagos/services/pagos.service';
@@ -27,6 +28,7 @@ export class InvoiceDetailsComponent {
     asientos: any[] = [];
     cobros: PagoHistorial[] = [];
     loadingAsientos = false;
+    notasResumen = signal<FacturaNotasResumen | null>(null);
     modalCobroVisible = false;
     modalCobroData: RegistrarPagoModalData | null = null;
 
@@ -66,6 +68,12 @@ export class InvoiceDetailsComponent {
                 next: c => { this.cobros = c; },
             });
         }
+
+        // Resumen de notas crédito/débito aplicadas (Fase 1: lectura)
+        this.facturasService.getNotasResumen(id).subscribe({
+            next: r => { this.notasResumen.set(r.data ?? null); },
+            error: () => { this.notasResumen.set(null); },
+        });
     }
 
     // ── Modal de cobro ────────────────────────────────────────────────────

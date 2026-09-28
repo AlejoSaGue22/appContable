@@ -178,9 +178,14 @@ export class NotasAjusteComprasFormPageComponent implements OnInit {
                         const discountVal = gross * ((item.descuento || 0) / 100);
                         const afterDiscount = gross - discountVal;
                         const ivaVal = afterDiscount * (item.porcentajeIVA / 100);
+                        const cuenta = (item as any).cuentaContable;
                         return {
-                            articuloId: item.articuloId,
-                            descripcion: item.articulo?.nombre || '',
+                            articuloId: item.articuloId ?? null,
+                            cuentaContableId: (item as any).cuentaContableId ?? cuenta?.id ?? null,
+                            descripcion: item.descripcion
+                                || (item as any).articulo?.nombre
+                                || (cuenta ? `${cuenta.codigo} - ${cuenta.nombre}` : '')
+                                || '',
                             descuento: item.descuento,
                             impuestoId: item.impuestoId,
                             subtotal: gross,
@@ -221,17 +226,21 @@ export class NotasAjusteComprasFormPageComponent implements OnInit {
             esReembolsoAbono: false
         });
 
-        // Auto-load items from invoice
-        const items: NotaAjusteCompraItem[] = f.items.map((item: any) => {
+        // Auto-load items from invoice (soporta gasto directo a cuenta contable: articulo null)
+        const items: NotaAjusteCompraItem[] = (f.items ?? []).map((item: any) => {
             const gross = item.quantity * item.unitPrice;
             const discountVal = gross * ((item.descuento || 0) / 100);
             const afterDiscount = gross - discountVal;
             const ivaVal = afterDiscount * (item.porcentajeIva / 100);
 
             return {
-                descripcion: item.articulo.nombre,
-                articuloId: item.articuloId,
-                impuestoId: item.impuestoId || undefined,
+                descripcion: item.descripcion
+                    || item.articulo?.nombre
+                    || (item.cuentaContable ? `${item.cuentaContable.codigo} - ${item.cuentaContable.nombre}` : '')
+                    || '',
+                articuloId: item.articuloId ?? null,
+                cuentaContableId: item.cuentaContableId ?? item.cuentaContable?.id ?? null,
+                impuestoId: item.impuestoId || item.impuestoRel?.id || undefined,
                 cantidad: item.quantity,
                 valorUnitario: item.unitPrice,
                 porcentajeIVA: item.porcentajeIva,

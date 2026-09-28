@@ -14,9 +14,14 @@ export class TableBancoComponent {
  openEditModal = output<CuentaBancaria>();
  deleteCuenta = output<string>();
  toggleStatus = output<string>();
+ movimiento = output<CuentaBancaria>();
 
  onEdit(cuenta: CuentaBancaria) {
  this.openEditModal.emit(cuenta);
+ }
+
+ onMovimiento(cuenta: CuentaBancaria) {
+ this.movimiento.emit(cuenta);
  }
 
  onDelete(id: string) {

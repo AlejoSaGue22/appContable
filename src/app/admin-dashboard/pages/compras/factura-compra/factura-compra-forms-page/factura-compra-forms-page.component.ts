@@ -17,6 +17,7 @@ import { GetProductosDetalle } from '@dashboard/interfaces/productos-interface';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FacturaCompraService } from '../../services/factura-compra.service';
 import { FacturaCompra, ItemFacturaResponse } from '@dashboard/interfaces/factura-compra-interface';
+import { FacturaNotasResumen } from '@dashboard/interfaces/documento-venta-interface';
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
 import { HelpersUtils } from '@utils/helpers.utils';
 import { FormaPago } from '@dashboard/interfaces/documento-venta-interface';
@@ -99,6 +100,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     activosFijosList = signal<any[]>([]);
     refreshAsientoTrigger = signal<number>(0);
     factura = signal<FacturaCompra | null>(null);
+    notasResumen = signal<FacturaNotasResumen | null>(null);
     anticiposDisponibles = signal<any[]>([]);
     anticiposAsociados = signal<{ anticipoId: string; numero: string; montoOriginal: number; saldoDisponible: number; montoAplicado: number }[]>([]);
 
@@ -294,6 +296,13 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                 if (factura.success) {
                     const invoice = factura.data.data[0]!;
                     this.factura.set(invoice);
+                    this.notasResumen.set(invoice.notasResumen ?? null);
+                    if (!invoice.notasResumen) {
+                        this.facturaService.getNotasResumen(id).subscribe({
+                            next: r => this.notasResumen.set(r.data ?? null),
+                            error: () => this.notasResumen.set(null),
+                        });
+                    }
 
                     while (this.items.length > 0) {
                         this.items.removeAt(0);

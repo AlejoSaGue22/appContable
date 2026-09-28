@@ -13,10 +13,10 @@ export interface ClientesFormInterface {
  apellido: string;
  tipoPersona: string;
  razonSocial: string;
- tipoDocumento: string;
+ tipoDocumento: number | string;
  numeroDocumento: string;
  direccion: string;
- ciudad: string;
+ ciudad: number | string;
  telefono: string;
  email: string;
  tributo: string;
@@ -24,6 +24,7 @@ export interface ClientesFormInterface {
  observacion: string;
  responsableFiscal: string;
  dv?: string;
+ cuentaContableId?: string | null;
 }
 
 export interface ClientesInterfaceResponse {

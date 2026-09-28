@@ -11,6 +11,7 @@ import { NotificationService } from '@shared/services/notification.service';
 import { firstValueFrom } from 'rxjs';
 // import { LoaderService } from '@utils/services/loader.service';
 import { ParametrizacionContableService } from './services/parametrizacion-contable.service';
+import { SearchableSelectComponent } from '@shared/components/searchable-select/searchable-select.component';
 
 @Component({
   selector: 'app-parametrizacion-contable',
@@ -20,6 +21,7 @@ import { ParametrizacionContableService } from './services/parametrizacion-conta
     ReactiveFormsModule,
     HeaderTitlePageComponent,
     BreadcrumbComponent,
+    SearchableSelectComponent,
   ],
   templateUrl: './parametrizacion-contable.html',
 })

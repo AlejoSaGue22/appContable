@@ -43,6 +43,13 @@ export interface CreateTransferenciaDto {
     observaciones?: string;
 }
 
+export interface CreateMovimientoBancarioDto {
+    tipo: 'ingreso' | 'egreso';
+    monto: number;
+    cuentaContrapartidaCodigo: string;
+    observaciones?: string;
+}
+
 export interface ResponseCuentasBancarias {
     cuentas: CuentaBancaria[];
     message: string;

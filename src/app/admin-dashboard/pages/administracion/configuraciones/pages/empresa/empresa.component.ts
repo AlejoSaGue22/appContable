@@ -13,11 +13,12 @@ import { FormErrorLabelComponent } from '@utils/components/form-error-label/form
 import { NominaService } from '../../../../nomina/services/nomina.service';
 import { EntidadSeguridadSocial } from '../../../../nomina/interfaces/nomina.interface';
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
+import { SearchableSelectComponent } from '@shared/components/searchable-select/searchable-select.component';
 
 @Component({
   selector: 'app-empresa',
   standalone: true,
-  imports: [CommonModule, HeaderTitlePageComponent, BreadcrumbComponent, ReactiveFormsModule, LoaderComponent, FormErrorLabelComponent],
+  imports: [CommonModule, HeaderTitlePageComponent, BreadcrumbComponent, ReactiveFormsModule, LoaderComponent, FormErrorLabelComponent, SearchableSelectComponent],
   templateUrl: './empresa.component.html',
 })
 export class EmpresaComponent implements OnInit {
@@ -144,4 +145,3 @@ export class EmpresaComponent implements OnInit {
     });
   }
 }
-

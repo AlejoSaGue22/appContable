@@ -1,6 +1,7 @@
 import { PaymentMethod } from "./catalogs-interface";
 import { CuentaBancaria, PaymentStatus } from "./pagos-interface";
-import { ArticulosInterface } from "./productos-interface";
+import { ArticulosInterface, CuentasContablesRel } from "./productos-interface";
+import { FacturaNotasResumen } from "./documento-venta-interface";
 import { ProveedoresInterface } from "./proveedores-interface";
 
 export interface ComprobanteCompraResponseTemp {
@@ -44,6 +45,7 @@ export interface FacturaCompra {
     proveedor: ProveedoresInterface;
     subtotal: number;
     total: number;
+    notasResumen?: FacturaNotasResumen;
     createdBy?: CreatedBy;
     createdById: string;
     createdAt: Date;
@@ -51,8 +53,11 @@ export interface FacturaCompra {
 
 export interface ItemFactura {
     id?: string;
-    articuloId: string;
-    articulo?: ArticulosInterface;
+    articuloId?: string | null;
+    articulo?: ArticulosInterface | null;
+    cuentaContableId?: string | null;
+    cuentaContable?: CuentasContablesRel | null;
+    impuestoRel?: { id: string };
     descripcion?: string;
     unitPrice: number;
     iva: number;
@@ -92,6 +97,7 @@ export interface FacturaCompraResponse {
     proveedor: ProveedoresInterface;
     subtotal: number;
     total: number;
+    notasResumen?: FacturaNotasResumen;
     createdBy?: CreatedBy;
     createdById: string;
     createdAt: Date;
@@ -99,8 +105,11 @@ export interface FacturaCompraResponse {
 
 export interface ItemFacturaResponse {
     id?: string;
-    articuloId: string;
-    articulo?: ArticulosInterface;
+    articuloId?: string | null;
+    articulo?: ArticulosInterface | null;
+    cuentaContableId?: string | null;
+    cuentaContable?: CuentasContablesRel | null;
+    impuestoRel?: { id: string };
     facturaCompraId: string;
     descripcion?: string;
     unitPrice: number;

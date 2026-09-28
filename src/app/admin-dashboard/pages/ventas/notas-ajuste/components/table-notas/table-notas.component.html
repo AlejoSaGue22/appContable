@@ -54,13 +54,13 @@
     @if (showFilters()) {
     <div class="mt-4 border-t border-gray-200 pt-4 dark:border-gray-700">
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <!-- Filtro Tipo -->
+            <!-- Filtro Tipo Factura -->
             <div>
-                <label for="tipo" class="mb-2 block text-xs font-medium text-gray-900 dark:text-gray-300">Tipo de
-                    Nota</label>
-                <select id="tipo" [(ngModel)]="tipo"
+                <label for="tipoFactura" class="mb-2 block text-xs font-medium text-gray-900 dark:text-gray-300">Tipo de
+                    factura</label>
+                <select id="tipoFactura" [(ngModel)]="tipoFactura"
                     class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white">
-                    @for (t of tipos; track t.value) {
+                    @for (t of tiposFactura; track t.value) {
                     <option [value]="t.value">{{ t.label }}</option>
                     }
                 </select>

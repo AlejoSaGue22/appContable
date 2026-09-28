@@ -52,7 +52,7 @@ export class CuentaFormModalComponent implements OnInit {
     tipoCuenta: [TipoCuentaBancaria.BANCO, [Validators.required]],
     numeroCuenta: ['', [Validators.maxLength(30)]],
     codigoCuentaContable: ['', [Validators.required]],
-    saldoInicial: [0, [Validators.required, Validators.min(0)]],
+    saldoInicial: [0, [Validators.required]],
     cuentaContrapartidaCodigo: [''],
     observaciones: ['', [Validators.maxLength(500)]],
   });
@@ -65,12 +65,35 @@ export class CuentaFormModalComponent implements OnInit {
   cuentasContableActivos = computed(() => {
     const cuentasContables = this.cuentasContables();
     return cuentasContables.filter(
-      (c) => c.aceptaMovimiento && c.codigo.startsWith('11'),
+      (c) => c.aceptaMovimiento && c.codigo.startsWith('13') ||
+        c.aceptaMovimiento && c.codigo.startsWith('3') ||
+        c.aceptaMovimiento && c.codigo.startsWith('11')
     );
+  });
+
+  /** Saldo contable actual de la cuenta asociada elegida (fuente de verdad). */
+  cuentaAsociadaSaldo = computed<number | null>(() => {
+    const codigo = this.form.get('codigoCuentaContable')?.value as string | null;
+    if (!codigo) return null;
+    const found = this.cuentasContables().find((c) => c.codigo === codigo);
+    return found?.saldo ?? null;
+  });
+
+  /** Saldo final proyectado = saldo contable + aporte inicial (acepta negativos). */
+  saldoProyectado = computed<number | null>(() => {
+    const base = this.cuentaAsociadaSaldo();
+    if (base === null) return null;
+    const aporte = Number(this.form.get('saldoInicial')?.value ?? 0);
+    return Math.round((base + aporte) * 100) / 100;
   });
 
   get esBanco(): boolean {
     return this.form.get('tipoCuenta')?.value === TipoCuentaBancaria.BANCO;
+  }
+
+  /** La contrapartida se exige con cualquier aporte distinto de cero (positivo o negativo). */
+  get requiereContrapartida(): boolean {
+    return Number(this.form.get('saldoInicial')?.value ?? 0) !== 0;
   }
 
   getCuentaContableDisplay(): string {
@@ -97,7 +120,7 @@ export class CuentaFormModalComponent implements OnInit {
 
     this.form.get('saldoInicial')?.valueChanges.subscribe((saldo) => {
       const contrapartidaControl = this.form.get('cuentaContrapartidaCodigo');
-      if (saldo > 0) {
+      if (Number(saldo ?? 0) !== 0) {
         contrapartidaControl?.setValidators([Validators.required]);
       } else {
         contrapartidaControl?.clearValidators();
@@ -163,9 +186,22 @@ export class CuentaFormModalComponent implements OnInit {
 
     this.isSubmitting.set(true);
     this.loaderService.show();
-    const dto = this.form.getRawValue();
 
     if (this.account) {
+      // Edición: solo campos editables. El saldo y la subcuenta se mueven
+      // vía transferencia/movimiento (el backend rechaza esos campos por PATCH).
+      const raw = this.form.getRawValue() as {
+        nombre?: string | null;
+        bancoId?: string | null;
+        numeroCuenta?: string | null;
+        observaciones?: string | null;
+      };
+      const dto = {
+        nombre: raw.nombre ?? '',
+        bancoId: raw.bancoId || undefined,
+        numeroCuenta: raw.numeroCuenta ?? '',
+        observaciones: raw.observaciones ?? '',
+      };
       this.cuentasService.updateCuenta(this.account.id, dto).subscribe({
         next: () => {
           this.submit.emit('update');
@@ -180,7 +216,7 @@ export class CuentaFormModalComponent implements OnInit {
         },
       });
     } else {
-      this.cuentasService.createCuenta(dto).subscribe({
+      this.cuentasService.createCuenta(this.form.getRawValue()).subscribe({
         next: () => {
           this.submit.emit('create');
           this.isSubmitting.set(false);

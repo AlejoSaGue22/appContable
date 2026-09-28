@@ -12,6 +12,7 @@ import { CuentaBancaria } from '../interfaces/cuenta-bancaria.interface';
 
 import { CuentaFormModalComponent } from './components/cuenta-form-modal/cuenta-form-modal.component';
 import { TransferenciaModalComponent } from './components/transferencia-modal/transferencia-modal.component';
+import { MovimientoModalComponent } from './components/movimiento-modal/movimiento-modal.component';
 import { ModalComponent } from '@shared/components/modal/modal.component';
 import { PaginationService } from '@shared/components/pagination/pagination.service';
 import { tap } from 'rxjs';
@@ -29,6 +30,7 @@ import { TableBancoComponent } from './components/table-banco/table-banco.compon
     CurrencyPipe,
     CuentaFormModalComponent,
     TransferenciaModalComponent,
+    MovimientoModalComponent,
     HeaderTitlePageComponent,
     ModalComponent,
     PaginationComponent,
@@ -49,7 +51,9 @@ export default class CuentasBancariasComponent {
 
   isModalOpen = signal(false);
   isTransferenciaModalOpen = signal(false);
+  isMovimientoModalOpen = signal(false);
   selectedAccount = signal<CuentaBancaria | null>(null);
+  selectedMovimientoAccount = signal<CuentaBancaria | null>(null);
   isDeleteModalVisible = signal(false);
   idToDelete = signal<string | null>(null);
 
@@ -106,6 +110,23 @@ export default class CuentasBancariasComponent {
 
   onTransferenciaSubmit() {
     this.closeTransferenciaModal();
+    setTimeout(() => {
+      this.cuentasResource.reload();
+    }, 1000);
+  }
+
+  openMovimientoModal(cuenta: CuentaBancaria) {
+    this.selectedMovimientoAccount.set(cuenta);
+    this.isMovimientoModalOpen.set(true);
+  }
+
+  closeMovimientoModal() {
+    this.isMovimientoModalOpen.set(false);
+    this.selectedMovimientoAccount.set(null);
+  }
+
+  onMovimientoSubmit() {
+    this.closeMovimientoModal();
     setTimeout(() => {
       this.cuentasResource.reload();
     }, 1000);

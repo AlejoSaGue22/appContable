@@ -2,12 +2,12 @@ import { Component, computed, input, output, signal, effect, inject } from '@ang
 import { RouterLink } from "@angular/router";
 import { FormsModule } from '@angular/forms';
 import { PaginationComponent } from '@shared/components/pagination/pagination';
-import { NotaAjuste, NotaAjusteStatus, ConceptosNotaCredito, ConceptosNotaDebito } from '../../../../../interfaces/notas-ajuste-interface';
+import { NotaAjuste, NotaAjusteStatus } from '../../../../../interfaces/notas-ajuste-interface';
 import { CurrencyPipe } from '@angular/common';
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
 
 export interface NotaFilters {
-    tipo?: string;
+    tipoFactura?: string;
     estado?: string;
     facturaNumero?: string;
     clienteNombre?: string;
@@ -40,14 +40,14 @@ export class TableNotasComponent {
     // Filter signals
     clienteNombre = signal<string>('');
     estado = signal<string>('');
-    tipo = signal<string>('');
+    tipoFactura = signal<string>('');
     facturaNumero = signal<string>('');
 
     activeFiltersCount = computed(() => {
         let count = 0;
         if (this.clienteNombre()) count++;
         if (this.estado()) count++;
-        if (this.tipo()) count++;
+        if (this.tipoFactura()) count++;
         if (this.facturaNumero()) count++;
         return count;
     });
@@ -59,10 +59,10 @@ export class TableNotasComponent {
             const filters = this.activeFilters();
             this.clienteNombre.set(filters.clienteNombre ?? '');
             this.estado.set(filters.estado ?? '');
-            this.tipo.set(filters.tipo ?? '');
+            this.tipoFactura.set(filters.tipoFactura ?? '');
             this.facturaNumero.set(filters.facturaNumero ?? '');
 
-            if (filters.estado || filters.tipo || filters.facturaNumero) {
+            if (filters.estado || filters.tipoFactura || filters.facturaNumero) {
                 this.showFilters.set(true);
             }
         }, { allowSignalWrites: true });
@@ -88,17 +88,17 @@ export class TableNotasComponent {
         { value: NotaAjusteStatus.ERROR_ASIENTO, label: 'Error asiento' }
     ];
 
-    readonly tipos = [
+    readonly tiposFactura = [
         { value: '', label: 'Todos los tipos' },
-        { value: 'credito', label: 'Nota Crédito' },
-        { value: 'debito', label: 'Nota Débito' }
+        { value: 'ELECTRONICA', label: 'Electrónica' },
+        { value: 'ESTANDAR', label: 'Estándar' }
     ];
 
     applyFilters(): void {
         const filters: NotaFilters = {};
         if (this.clienteNombre()) filters.clienteNombre = this.clienteNombre();
         if (this.estado()) filters.estado = this.estado();
-        if (this.tipo()) filters.tipo = this.tipo();
+        if (this.tipoFactura()) filters.tipoFactura = this.tipoFactura();
         if (this.facturaNumero()) filters.facturaNumero = this.facturaNumero();
         this.filterChange.emit(filters);
     }
@@ -106,7 +106,7 @@ export class TableNotasComponent {
     clearFilters(): void {
         this.clienteNombre.set('');
         this.estado.set('');
-        this.tipo.set('');
+        this.tipoFactura.set('');
         this.facturaNumero.set('');
         this.filterChange.emit({});
     }
@@ -140,8 +140,14 @@ export class TableNotasComponent {
     }
 
     getConceptoLabel(tipo: string, concepto: string): string {
-        const list = tipo == 'credito' ? this.catalogs.conceptsNotes() : []; // TODO: Implementar conceptos de nota debito
-        return list.find(c => c.codigo === concepto)?.nombre || concepto;
+        const t = (tipo || '').toLowerCase();
+        const list = t === 'debito'
+            ? this.catalogs.conceptsNotesDebito()
+            : t === 'credito'
+                ? this.catalogs.conceptsNotesCredito()
+                : this.catalogs.conceptsNotes();
+        const found = list.find(c => c.codigo === concepto);
+        return found ? `${found.codigo} - ${found.nombre}` : (concepto ?? '');
     }
 
     onEmitir(id: string): void {

@@ -20,7 +20,7 @@
         </div>
 
         <div class="flex-1 min-w-0">
-            <p class="text-xs font-semibold uppercase text-slate-500">
+            <p class="text-xs font-semibold  text-slate-500">
                 {{ data.tipo === "cobro" ? "Cobro sobre factura" : "Pago de compra" }}
             </p>
             <p class="text-sm font-bold text-slate-700 truncate">
@@ -40,7 +40,7 @@
     <form [formGroup]="form" class="space-y-4">
         <!-- Monto -->
         <div>
-            <label class="block mb-1 text-xs font-semibold text-slate-500 uppercase">
+            <label class="block mb-1 text-xs font-semibold text-slate-500 ">
                 Monto a {{ data.tipo === "cobro" ? "cobrar" : "pagar" }}
                 <span class="text-red-500">*</span>
             </label>
@@ -48,7 +48,7 @@
                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium">$</span>
                 <input appCurrencyFormat
                     class="w-full bg-transparent text-slate-700 text-sm border rounded-md pl-7 pr-24 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
-                    [class.border-red-400]="form.get('monto')?.invalid && form.get('monto')?.touched" type="number"
+                    [class.border-red-400]="form.get('monto')?.invalid && form.get('monto')?.touched" type="text" inputmode="numeric"
                     formControlName="monto" min="1" [max]="data.saldoPendiente" placeholder="0" />
                 <button type="button" (click)="pagarTotal()"
                     class="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-blue-600 hover:text-blue-800 font-semibold px-2 py-0.5 rounded bg-blue-50 hover:bg-blue-100 transition-colors">
@@ -68,7 +68,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- Fecha -->
             <div>
-                <label class="block mb-1 text-xs font-semibold text-slate-500 uppercase">
+                <label class="block mb-1 text-xs font-semibold text-slate-500 ">
                     Fecha <span class="text-red-500">*</span>
                 </label>
                 <input
@@ -78,7 +78,7 @@
 
             <!-- Medio de pago -->
             <div>
-                <label class="block mb-1 text-xs font-semibold text-slate-500 uppercase">
+                <label class="block mb-1 text-xs font-semibold text-slate-500 ">
                     Medio de pago <span class="text-red-500">*</span>
                 </label>
                 <select
@@ -95,7 +95,7 @@
         <!-- Cuenta bancaria (solo si no es caja) -->
 
         <div>
-            <label class="block mb-1 text-xs font-semibold text-slate-500 uppercase">
+            <label class="block mb-1 text-xs font-semibold text-slate-500 ">
                 Cuenta Bancaria <span class="text-red-500">*</span>
             </label>
             <select
@@ -122,7 +122,7 @@
 
         <!-- Referencia -->
         <div>
-            <label class="block mb-1 text-xs font-semibold text-slate-500 uppercase">
+            <label class="block mb-1 text-xs font-semibold text-slate-500 ">
                 Referencia / Comprobante
             </label>
             <input
@@ -132,7 +132,7 @@
 
         <!-- Notas -->
         <div>
-            <label class="block mb-1 text-xs font-semibold text-slate-500 uppercase">
+            <label class="block mb-1 text-xs font-semibold text-slate-500 ">
                 Notas (opcional)
             </label>
             <textarea

@@ -6,7 +6,7 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
   HeaderInput,
   HeaderTitlePageComponent,
@@ -28,6 +28,17 @@ import { Municipality } from '@dashboard/interfaces/catalogs-interface';
 import { HelpersUtils } from '@utils/helpers.utils';
 import { ListGroupDropdownComponent } from '@shared/components/list-group-dropdown/list-group-dropdown.component';
 import { CuentasContablesService } from '@dashboard/pages/contabilidad/services/cuentas-contables.service';
+import type { GetCuentasContables } from '@dashboard/pages/contabilidad/interfaces/cuentas-contables.interface';
+import {
+  applyPersonaValidations,
+  calculateNitDv,
+  filterCuentasByPrefix,
+  findMunicipality,
+  formatMunicipality,
+  getUnknownErrorMessage,
+  toMunicipalityId,
+  toTipoDocumentoId,
+} from '@dashboard/services/tercero-form.helpers';
 
 @Component({
   selector: 'app-clients-form-page',
@@ -68,35 +79,33 @@ export class ClientsFormPageComponent implements OnInit {
   };
   loading = signal<boolean>(false);
 
-  cuentasContables = signal<any[]>([]);
-  cuentasFiltradas = signal<any[]>([]);
+  cuentasContables = signal<GetCuentasContables[]>([]);
+  cuentasFiltradas = signal<GetCuentasContables[]>([]);
 
   clientsForm = this.fb.group({
-    nombre: ['', Validators.required],
-    apellido: ['', Validators.required],
-    tipoDocumento: ['', Validators.required],
-    numeroDocumento: ['', Validators.required],
-    tipoPersona: ['', Validators.required],
-    razonSocial: ['', Validators.required],
-    direccion: ['', Validators.required],
-    ciudad: ['', Validators.required],
-    telefono: [''],
-    email: [''],
-    observacion: [''],
-    tributo: ['', Validators.required],
-    dv: [''],
-    cuentaContableId: [null],
+    nombre: new FormControl<string | null>('', Validators.required),
+    apellido: new FormControl<string | null>('', Validators.required),
+    tipoDocumento: new FormControl<number | string | null>(null, Validators.required),
+    numeroDocumento: new FormControl<string | null>('', Validators.required),
+    tipoPersona: new FormControl<string | null>('', Validators.required),
+    razonSocial: new FormControl<string | null>('', Validators.required),
+    direccion: new FormControl<string | null>('', Validators.required),
+    ciudad: new FormControl<number | string | null>(null, Validators.required),
+    telefono: new FormControl<string | null>(''),
+    email: new FormControl<string | null>(''),
+    observacion: new FormControl<string | null>(''),
+    tributo: new FormControl<string | null>('', Validators.required),
+    dv: new FormControl<string | null>(''),
+    cuentaContableId: new FormControl<string | null>(null),
   });
 
-  getCityName() {
-    const id = this.clientsForm.get('ciudad')?.value;
-    if (!id) return '';
-    const city = this.catalogsStore.municipalities().find((m) => m.code == id);
-    return city ? `${city.name} - ${city.department}` : '';
+  getCityName(): string {
+    const ref = this.clientsForm.get('ciudad')?.value as number | string | null | undefined;
+    return formatMunicipality(findMunicipality(this.catalogsStore.municipalities(), ref));
   }
 
-  onCitySelect(city: Municipality) {
-    this.clientsForm.patchValue({ ciudad: city.code });
+  onCitySelect(city: Municipality): void {
+    this.clientsForm.patchValue({ ciudad: city.id });
   }
 
   clienteIdResource = rxResource({
@@ -144,46 +153,25 @@ export class ClientsFormPageComponent implements OnInit {
         this.cuentasService.getCuentasContables(),
       );
       this.cuentasContables.set(accounts);
-      this.cuentasFiltradas.set(
-        accounts.filter(
-          (c: any) => c.aceptaMovimiento && c.codigo.startsWith('13'),
-        ),
-      );
-    } catch (e) {
-      console.error('Error al cargar cuentas contables', e);
+      this.cuentasFiltradas.set(filterCuentasByPrefix(accounts, '13'));
+    } catch {
+      this.notificationService.error('Error al cargar cuentas contables', 'Error');
     }
   }
 
-  getCuentaContableDisplay() {
-    const id = this.clientsForm.get('cuentaContableId')?.value;
+  getCuentaContableDisplay(): string {
+    const id = this.clientsForm.get('cuentaContableId')?.value as string | null;
     if (!id) return '';
     const account = this.cuentasContables().find((c) => c.id === id);
     return account ? `${account.codigo} - ${account.nombre}` : '';
   }
 
-  onCuentaSelect(account: any) {
+  onCuentaSelect(account: GetCuentasContables): void {
     this.clientsForm.patchValue({ cuentaContableId: account.id });
   }
 
-  toggleValidations(tipo: string) {
-    const nombreControl = this.clientsForm.get('nombre');
-    const apellidoControl = this.clientsForm.get('apellido');
-    const razonSocialControl = this.clientsForm.get('razonSocial');
-
-    if (tipo === 'PN') {
-      nombreControl?.setValidators([Validators.required]);
-      apellidoControl?.setValidators([Validators.required]);
-      razonSocialControl?.clearValidators();
-    } else if (tipo === 'PJ') {
-      // Si el tipo es 'juridica', se requiere 'razonSocial'
-      razonSocialControl?.setValidators([Validators.required]);
-      nombreControl?.clearValidators();
-      apellidoControl?.clearValidators();
-    }
-
-    nombreControl?.updateValueAndValidity();
-    apellidoControl?.updateValueAndValidity();
-    razonSocialControl?.updateValueAndValidity();
+  toggleValidations(tipo: string): void {
+    applyPersonaValidations(this.clientsForm, tipo);
   }
 
   async onSubmit() {
@@ -198,9 +186,22 @@ export class ClientsFormPageComponent implements OnInit {
     this.loading.set(true);
 
     try {
-      const formValue = {
-        ...this.clientsForm.value,
-        telefono: this.clientsForm.get('telefono')?.value?.toString(),
+      const raw = this.clientsForm.getRawValue();
+      const formValue: Partial<ClientesFormInterface> = {
+        nombre: raw.nombre ?? '',
+        apellido: raw.apellido ?? '',
+        tipoDocumento: toTipoDocumentoId(raw.tipoDocumento),
+        numeroDocumento: raw.numeroDocumento ?? '',
+        tipoPersona: raw.tipoPersona ?? '',
+        razonSocial: raw.razonSocial ?? '',
+        direccion: raw.direccion ?? '',
+        ciudad: toMunicipalityId(raw.ciudad),
+        telefono: raw.telefono?.toString() ?? '',
+        email: raw.email ?? '',
+        observacion: raw.observacion ?? '',
+        tributo: raw.tributo ?? '',
+        dv: raw.dv ?? '',
+        cuentaContableId: raw.cuentaContableId ?? '',
       };
 
       if (this.clienteID() == 'new-Item' || this.isModal()) {
@@ -250,8 +251,8 @@ export class ClientsFormPageComponent implements OnInit {
         );
         await this.router.navigateByUrl('/panel/ventas/clients');
       }
-    } catch (error: any) {
-      this.notificationService.error(error.message, 'Error');
+    } catch (error: unknown) {
+      this.notificationService.error(getUnknownErrorMessage(error), 'Error');
     } finally {
       this.loading.set(false);
     }
@@ -266,9 +267,9 @@ export class ClientsFormPageComponent implements OnInit {
     this.clientsForm.reset();
   }
 
-  private handleTipoDocumentoChange(tipo: string | null | undefined) {
+  private handleTipoDocumentoChange(tipo: number | string | null | undefined): void {
     const dvControl = this.clientsForm.get('dv');
-    if (tipo === '6') {
+    if (String(tipo ?? '') === '6') {
       // NIT
       dvControl?.setValidators([Validators.required]);
       this.updateDV(this.clientsForm.get('numeroDocumento')?.value);
@@ -279,33 +280,11 @@ export class ClientsFormPageComponent implements OnInit {
     dvControl?.updateValueAndValidity();
   }
 
-  private updateDV(nit: string | null | undefined) {
+  private updateDV(nit: string | null | undefined): void {
     if (!nit) {
       this.clientsForm.get('dv')?.setValue('');
       return;
     }
-    const dv = this.calculateDV(nit);
-    console.log('dv', dv);
-    this.clientsForm.get('dv')?.setValue(dv);
-  }
-
-  private calculateDV(nit: string): string {
-    const cleanNit = nit.replace(/\D/g, ''); // Solo números
-    const vpri = [3, 7, 13, 17, 19, 23, 29, 37, 41, 43, 47, 53, 59, 67, 71];
-    const z = cleanNit.length;
-    let x = 0;
-    let y = 0;
-
-    for (let i = 0; i < z; i++) {
-      y = parseInt(cleanNit.substring(i, i + 1));
-      x += y * vpri[z - 1 - i];
-    }
-
-    y = x % 11;
-    if (y > 1) {
-      return (11 - y).toString();
-    } else {
-      return y.toString();
-    }
+    this.clientsForm.get('dv')?.setValue(calculateNitDv(nit));
   }
 }

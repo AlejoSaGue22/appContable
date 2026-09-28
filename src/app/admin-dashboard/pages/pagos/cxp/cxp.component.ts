@@ -90,7 +90,6 @@ export class CxpComponent {
   volanteItem = signal<MovimientoItem | null>(null);
 
   constructor() {
-    this.cargar();
     this.pagosFiltroTexto.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged())
       .subscribe(() => {
@@ -101,10 +100,14 @@ export class CxpComponent {
 
     effect(() => {
       const tab = this.activeTab();
+      const page = this.paginationService.currentPage(); // Read to track page changes
+
       if (tab === 'pagos') {
         this.cargarPagos();
+      } else if (tab === 'facturas') {
+        this.cargar();
       }
-    });
+    }, { allowSignalWrites: true });
   }
 
   cambiarTab(tab: string): void {

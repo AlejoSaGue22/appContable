@@ -1,6 +1,6 @@
 import { FacturaCompra } from "./factura-compra-interface";
 import { CreatedBy } from "./factura-compra-interface";
-import { GetProductosDetalle } from "./productos-interface";
+import { CuentasContablesRel, GetProductosDetalle } from "./productos-interface";
 import { ProveedoresInterface } from "./proveedores-interface";
 
 export interface NotaAjusteCompraResponse {
@@ -53,8 +53,10 @@ export interface NotaAjusteCompra {
 export interface NotaAjusteCompraItem {
  id?: string;
  descripcion: string;
- articuloId: string;
- articulo?: GetProductosDetalle;
+ articuloId?: string | null;
+ articulo?: GetProductosDetalle | null;
+ cuentaContableId?: string | null;
+ cuentaContable?: CuentasContablesRel | null;
  impuestoId?: string;
  cantidad: number;
  valorUnitario: number;

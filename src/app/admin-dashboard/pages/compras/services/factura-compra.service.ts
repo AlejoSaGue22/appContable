@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { ComprobanteCompraResponse, FacturaCompra } from '@dashboard/interfaces/factura-compra-interface';
+import { FacturaNotasResumenResponse } from '@dashboard/interfaces/documento-venta-interface';
 import { Options, ResponseResult } from '@shared/interfaces/services.interfaces';
 import { environment } from 'src/app/environments/environment';
 import { catchError, delay, map, Observable, of } from 'rxjs';
@@ -93,6 +94,10 @@ export class FacturaCompraService {
 
  getAplicacionesAnticipo(facturaId: string): Observable<any> {
  return this.http.get<any>(`${baseUrl}/pagos/aplicaciones/factura-compra/${facturaId}`);
+ }
+
+ getNotasResumen(id: string): Observable<FacturaNotasResumenResponse> {
+ return this.http.get<FacturaNotasResumenResponse>(`${baseUrl}/facturas-compras/${id}/notas-resumen`);
  }
 
 }

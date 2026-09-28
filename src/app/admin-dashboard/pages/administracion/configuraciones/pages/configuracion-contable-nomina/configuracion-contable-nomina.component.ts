@@ -13,6 +13,7 @@ import { LoaderService } from '@utils/services/loader.service';
 import { firstValueFrom } from 'rxjs';
 import { ConceptoNomina } from '@dashboard/pages/nomina/interfaces/nomina.interface';
 import { RouterLink } from '@angular/router';
+import { SearchableSelectComponent } from '@shared/components/searchable-select/searchable-select.component';
 
 @Component({
   selector: 'app-configuracion-contable-nomina',
@@ -23,6 +24,7 @@ import { RouterLink } from '@angular/router';
     RouterLink,
     HeaderTitlePageComponent,
     BreadcrumbComponent,
+    SearchableSelectComponent,
   ],
   templateUrl: './configuracion-contable-nomina.component.html',
 })

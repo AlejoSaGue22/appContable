@@ -65,13 +65,10 @@
               <div class="space-y-1.5">
                 <label class="block text-xs font-semibold text-slate-500">Cuenta Salarios por Pagar <span
                     class="text-red-400">*</span></label>
-                <select formControlName="cuentaObligacionesLabId"
-                  class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all cursor-pointer">
-                  <option [value]="null">Seleccionar cuenta de pasivo...</option>
-                  @for (c of cuentasPasivos(); track c.id) {
-                  <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
-                  }
-                </select>
+                <app-searchable-select formControlName="cuentaObligacionesLabId"
+                  [items]="cuentasPasivos()" [labelKeys]="['codigo', 'nombre']" valueKey="id" size="sm"
+                  placeholder="Buscar cuenta de pasivo..." emptyLabel="Seleccionar cuenta de pasivo..."
+                />
               </div>
             </div>
           </div>
@@ -201,13 +198,10 @@
                         class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-slate-100 text-slate-400">FIJO</span>
                     </div>
                   </div>
-                  <select formControlName="cuentaId"
-                    class="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all cursor-pointer">
-                    <option [value]="null">Seleccionar cuenta de gasto...</option>
-                    @for (c of cuentasGastos(); track c.id) {
-                    <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
-                    }
-                  </select>
+                  <app-searchable-select formControlName="cuentaId"
+                    [items]="cuentasGastos()" [labelKeys]="['codigo', 'nombre']" valueKey="id" size="sm"
+                    placeholder="Buscar cuenta de gasto..." emptyLabel="Seleccionar cuenta de gasto..."
+                  />
                   <div class="w-8"></div> <!-- spacer to align with remove buttons -->
                 </div>
 
@@ -222,13 +216,10 @@
                         class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-slate-100 text-slate-400">FIJO</span>
                     </div>
                   </div>
-                  <select formControlName="cuentaId"
-                    class="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all cursor-pointer">
-                    <option [value]="null">Seleccionar cuenta de gasto...</option>
-                    @for (c of cuentasGastos(); track c.id) {
-                    <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
-                    }
-                  </select>
+                  <app-searchable-select formControlName="cuentaId"
+                    [items]="cuentasGastos()" [labelKeys]="['codigo', 'nombre']" valueKey="id" size="sm"
+                    placeholder="Buscar cuenta de gasto..." emptyLabel="Seleccionar cuenta de gasto..."
+                  />
                   <div class="w-8"></div>
                 </div>
 
@@ -242,13 +233,10 @@
                       <span class="text-xs font-semibold text-slate-700">{{ concepto.nombre }}</span>
                     </div>
                   </div>
-                  <select formControlName="cuentaId"
-                    class="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all cursor-pointer">
-                    <option [value]="null">Seleccionar cuenta de gasto...</option>
-                    @for (c of cuentasGastos(); track c.id) {
-                    <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
-                    }
-                  </select>
+                  <app-searchable-select formControlName="cuentaId"
+                    [items]="cuentasGastos()" [labelKeys]="['codigo', 'nombre']" valueKey="id" size="sm"
+                    placeholder="Buscar cuenta de gasto..." emptyLabel="Seleccionar cuenta de gasto..."
+                  />
                   <button type="button" (click)="clearConceptoCuenta(concepto.id)"
                     class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all cursor-pointer"
                     title="Limpiar cuenta asignada">
@@ -410,13 +398,10 @@
                           class="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-slate-100 text-slate-400">LEY</span>
                       </div>
                     </div>
-                    <select formControlName="cuentaPasivoId"
-                      class="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-400 transition-all cursor-pointer">
-                      <option [value]="null">Seleccionar cuenta de pasivo...</option>
-                      @for (c of cuentasPasivos(); track c.id) {
-                      <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
-                      }
-                    </select>
+                    <app-searchable-select formControlName="cuentaPasivoId"
+                      [items]="cuentasPasivos()" [labelKeys]="['codigo', 'nombre']" valueKey="id" size="sm"
+                      placeholder="Buscar cuenta de pasivo..." emptyLabel="Seleccionar cuenta de pasivo..."
+                    />
                     <div class="w-8"></div>
                   </div>
                   }
@@ -437,13 +422,10 @@
                         <span class="text-xs font-semibold text-slate-700">{{ concepto.nombre }}</span>
                       </div>
                     </div>
-                    <select formControlName="cuentaId"
-                      class="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-400 transition-all cursor-pointer">
-                      <option [value]="null">Seleccionar cuenta de pasivo...</option>
-                      @for (c of cuentasPasivos(); track c.id) {
-                      <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
-                      }
-                    </select>
+                    <app-searchable-select formControlName="cuentaId"
+                      [items]="cuentasPasivos()" [labelKeys]="['codigo', 'nombre']" valueKey="id" size="sm"
+                      placeholder="Buscar cuenta de pasivo..." emptyLabel="Seleccionar cuenta de pasivo..."
+                    />
                     <button type="button" (click)="clearConceptoCuenta(concepto.id)"
                       class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all cursor-pointer"
                       title="Limpiar cuenta asignada">
@@ -582,24 +564,18 @@
                     <div class="space-y-1">
                       <label class="block text-[9px] font-bold text-slate-400 uppercase">Cuenta de Gasto
                         (Débito)</label>
-                      <select formControlName="cuentaGastoId"
-                        class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all cursor-pointer">
-                        <option [value]="null">Seleccionar cuenta de gasto...</option>
-                        @for (c of cuentasGastos(); track c.id) {
-                        <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
-                        }
-                      </select>
+                      <app-searchable-select formControlName="cuentaGastoId"
+                        [items]="cuentasGastos()" [labelKeys]="['codigo', 'nombre']" valueKey="id" size="sm"
+                        placeholder="Buscar cuenta de gasto..." emptyLabel="Seleccionar cuenta de gasto..."
+                      />
                     </div>
                     <div class="space-y-1">
                       <label class="block text-[9px] font-bold text-slate-400 uppercase">Cuenta por Pagar
                         (Crédito)</label>
-                      <select formControlName="cuentaPasivoId"
-                        class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all cursor-pointer">
-                        <option [value]="null">Seleccionar cuenta de pasivo...</option>
-                        @for (c of cuentasPasivos(); track c.id) {
-                        <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
-                        }
-                      </select>
+                      <app-searchable-select formControlName="cuentaPasivoId"
+                        [items]="cuentasPasivos()" [labelKeys]="['codigo', 'nombre']" valueKey="id" size="sm"
+                        placeholder="Buscar cuenta de pasivo..." emptyLabel="Seleccionar cuenta de pasivo..."
+                      />
                     </div>
                   </div>
                 </div>
@@ -732,24 +708,18 @@
                     <div class="space-y-1">
                       <label class="block text-[9px] font-bold text-slate-400 uppercase">Cuenta de Gasto
                         (Débito)</label>
-                      <select formControlName="cuentaGastoId"
-                        class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 transition-all cursor-pointer">
-                        <option [value]="null">Seleccionar cuenta de gasto...</option>
-                        @for (c of cuentasGastos(); track c.id) {
-                        <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
-                        }
-                      </select>
+                      <app-searchable-select formControlName="cuentaGastoId"
+                        [items]="cuentasGastos()" [labelKeys]="['codigo', 'nombre']" valueKey="id" size="sm"
+                        placeholder="Buscar cuenta de gasto..." emptyLabel="Seleccionar cuenta de gasto..."
+                      />
                     </div>
                     <div class="space-y-1">
                       <label class="block text-[9px] font-bold text-slate-400 uppercase">Cuenta por Pagar
                         (Crédito)</label>
-                      <select formControlName="cuentaPasivoId"
-                        class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 transition-all cursor-pointer">
-                        <option [value]="null">Seleccionar cuenta de pasivo...</option>
-                        @for (c of cuentasPasivos(); track c.id) {
-                        <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
-                        }
-                      </select>
+                      <app-searchable-select formControlName="cuentaPasivoId"
+                        [items]="cuentasPasivos()" [labelKeys]="['codigo', 'nombre']" valueKey="id" size="sm"
+                        placeholder="Buscar cuenta de pasivo..." emptyLabel="Seleccionar cuenta de pasivo..."
+                      />
                     </div>
                   </div>
                 </div>
@@ -880,24 +850,18 @@
                     <div class="space-y-1">
                       <label class="block text-[9px] font-bold text-slate-400 uppercase">Cuenta de Gasto
                         (Débito)</label>
-                      <select formControlName="cuentaGastoId"
-                        class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all cursor-pointer">
-                        <option [value]="null">Seleccionar cuenta de gasto...</option>
-                        @for (c of cuentasGastos(); track c.id) {
-                        <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
-                        }
-                      </select>
+                      <app-searchable-select formControlName="cuentaGastoId"
+                        [items]="cuentasGastos()" [labelKeys]="['codigo', 'nombre']" valueKey="id" size="sm"
+                        placeholder="Buscar cuenta de gasto..." emptyLabel="Seleccionar cuenta de gasto..."
+                      />
                     </div>
                     <div class="space-y-1">
                       <label class="block text-[9px] font-bold text-slate-400 uppercase">Cuenta de Provisión
                         (Crédito)</label>
-                      <select formControlName="cuentaPasivoId"
-                        class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-400 transition-all cursor-pointer">
-                        <option [value]="null">Seleccionar cuenta de pasivo...</option>
-                        @for (c of cuentasPasivos(); track c.id) {
-                        <option [value]="c.id">{{ c.codigo }} - {{ c.nombre }}</option>
-                        }
-                      </select>
+                      <app-searchable-select formControlName="cuentaPasivoId"
+                        [items]="cuentasPasivos()" [labelKeys]="['codigo', 'nombre']" valueKey="id" size="sm"
+                        placeholder="Buscar cuenta de pasivo..." emptyLabel="Seleccionar cuenta de pasivo..."
+                      />
                     </div>
                   </div>
                 </div>

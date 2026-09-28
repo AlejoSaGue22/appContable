@@ -37,7 +37,8 @@
 
         @if (cuentasResource.hasValue() && !cuentasResource.isLoading()) {
         <app-table-banco [cuentas]="cuentas()" (openEditModal)="openEditModal($event)"
-            (deleteCuenta)="deleteCuenta($event)" (toggleStatus)="onToggleStatus($event)" />
+            (deleteCuenta)="deleteCuenta($event)" (toggleStatus)="onToggleStatus($event)"
+            (movimiento)="openMovimientoModal($event)" />
 
         <app-pagination [length]="cuentas().length" />
         }
@@ -62,6 +63,12 @@
 @if (isTransferenciaModalOpen()) {
 <app-transferencia-modal [isOpen]="isTransferenciaModalOpen()" [cuentas]="cuentas()" (close)="closeTransferenciaModal()"
     (submit)="onTransferenciaSubmit()"></app-transferencia-modal>
+}
+
+<!-- Modal Movimiento (ingreso/egreso) -->
+@if (isMovimientoModalOpen()) {
+<app-movimiento-modal [isOpen]="isMovimientoModalOpen()" [cuenta]="selectedMovimientoAccount()"
+    (close)="closeMovimientoModal()" (submit)="onMovimientoSubmit()"></app-movimiento-modal>
 }
 
 <!-- Modal de Eliminación -->

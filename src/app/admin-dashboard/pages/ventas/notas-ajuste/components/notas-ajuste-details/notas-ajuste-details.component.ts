@@ -180,8 +180,14 @@ export class NotasAjusteDetailsComponent {
     }
 
     getConceptoLabel(tipo: string, concepto: string): string {
-        const list = tipo === 'credito' ? this.catalogs.conceptsNotes() : [];
-        return list.find(c => c.codigo === concepto)?.nombre || concepto;
+        const t = (tipo || '').toLowerCase();
+        const list = t === 'debito'
+            ? this.catalogs.conceptsNotesDebito()
+            : t === 'credito'
+                ? this.catalogs.conceptsNotesCredito()
+                : this.catalogs.conceptsNotes();
+        const found = list.find(c => c.codigo === concepto);
+        return found ? `${found.codigo} - ${found.nombre}` : (concepto ?? '');
     }
 
     private resolveQr(n: NotaAjuste | null): void {

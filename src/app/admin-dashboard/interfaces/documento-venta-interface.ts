@@ -107,6 +107,7 @@ export interface GetFacturaRequest {
     totalPagado: number;
     saldoPendiente: number;
     paymentStatus: PaymentStatus;
+    notasResumen?: FacturaNotasResumen;
     cufe: string | null;
     xmlUrl: string | null;
     pdfUrl: string | null;
@@ -143,6 +144,41 @@ interface GetFacturaItemRequest {
     total: number;
     facturaId: string;
     createdAt: string; // ISO datetime
+}
+
+export interface NotaAjusteResumenItem {
+    id: string;
+    tipo: 'credito' | 'debito';
+    numeroCompleto: string | null;
+    fecha: string;
+    concepto?: string | null;
+    motivo: string;
+    total: number;
+    estado: string;
+    estadoDIAN?: string;
+    afectaSaldo: boolean;
+    valorAplicadoCartera: number;
+    esReembolsoAbono: boolean;
+}
+
+export interface FacturaNotasResumen {
+    facturaId: string;
+    totalFactura: number;
+    totalNCAplicado: number;
+    totalNDAplicado?: number;
+    netoExigible: number;
+    tieneNota: boolean;
+    countNC: number;
+    countND: number;
+    countBorrador?: number;
+    notaDebitoPendienteFase2?: boolean;
+    items?: NotaAjusteResumenItem[];
+}
+
+export interface FacturaNotasResumenResponse {
+    success: boolean;
+    data: FacturaNotasResumen;
+    message?: string;
 }
 
 export interface InvoiceFilters {

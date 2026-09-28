@@ -3,11 +3,12 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { CatalogsService } from '../../../../../services/catalogs.service';
 import { CategoryArticle, GetCuentasContables } from '../../../../../interfaces/catalogs-interface';
 import { NotificationService } from '@shared/services/notification.service';
+import { SearchableSelectComponent } from '@shared/components/searchable-select/searchable-select.component';
 
 @Component({
  selector: 'app-categoria-form-modal',
  standalone: true,
- imports: [ReactiveFormsModule],
+ imports: [ReactiveFormsModule, SearchableSelectComponent],
  templateUrl: './categoria-form-modal.component.html'
 })
 export class CategoriaFormModalComponent {

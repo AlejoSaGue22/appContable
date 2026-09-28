@@ -9,7 +9,7 @@ export interface ProveedoresResponse {
 
 export interface ProveedoresInterface {
  id: string;
- tipoDocumento: string;
+ tipoDocumento: number | string;
  identificacion: string;
  tipoPersona: string;
  razonSocial: string;
@@ -19,13 +19,14 @@ export interface ProveedoresInterface {
  email: string;
  telefono: string;
  direccion: string;
- ciudad: string;
+ ciudad: number | string;
  nombreContacto: string;
  telefonoContacto: string;
  observaciones: string;
  isActive: boolean;
  createdAt?: string;
  updatedAt?: string;
+ cuentaContableId?: string | null;
 }
 
 export interface ProveedoresRequest {

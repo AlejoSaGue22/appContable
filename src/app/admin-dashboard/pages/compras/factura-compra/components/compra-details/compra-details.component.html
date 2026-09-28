@@ -55,6 +55,14 @@
             <h1 class="text-xl font-bold text-gray-900">
               {{ compra()!.numero }}
             </h1>
+            @if (notasResumen()?.tieneNota) {
+              <span
+                class="inline-flex rounded-full px-3 py-1 text-xs font-bold uppercase border bg-amber-50 text-amber-700 border-amber-200"
+                title="Factura con notas crédito/débito aplicadas"
+              >
+                Con NC/ND
+              </span>
+            }
             <span
               class="inline-flex rounded-full px-3 py-1 text-xs font-semibold border"
               [ngClass]="{
@@ -528,6 +536,100 @@
                   Sin pagos registrados aún
                 </p>
               }
+              @if (notasResumen()?.tieneNota) {
+                <div class="mt-4 rounded-lg border border-amber-200 bg-amber-50/60 px-4 py-3 text-sm">
+                  <div class="flex justify-between">
+                    <span class="text-gray-600">NC aplicadas a la deuda:</span>
+                    <span class="font-semibold text-amber-700">−{{
+                      notasResumen()!.totalNCAplicado | currency: "" : "symbol" : "0.0-0"
+                    }}</span>
+                  </div>
+                  @if ((notasResumen()!.totalNDAplicado ?? 0) > 0) {
+                    <div class="flex justify-between mt-1">
+                      <span class="text-gray-600">ND aplicadas a la deuda:</span>
+                      <span class="font-semibold text-blue-700">+{{
+                        notasResumen()!.totalNDAplicado | currency: "" : "symbol" : "0.0-0"
+                      }}</span>
+                    </div>
+                  }
+                  <div class="flex justify-between mt-1">
+                    <span class="text-gray-600">Neto exigible:</span>
+                    <span class="font-bold text-gray-900">{{
+                      notasResumen()!.netoExigible | currency: "" : "symbol" : "0.0-0"
+                    }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        @if (notasResumen()?.tieneNota) {
+          <div
+            class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden"
+          >
+            <div
+              class="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-gray-50/50"
+            >
+              <h3
+                class="text-sm font-semibold text-gray-700 flex items-center gap-2"
+              >
+                Ajustes aplicados (NC / ND)
+              </h3>
+              <span
+                class="text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-100 text-amber-700"
+              >
+                {{ notasResumen()!.countNC }} NC · {{ notasResumen()!.countND }} ND
+              </span>
+            </div>
+            <div class="p-5">
+              <div class="overflow-x-auto">
+                <table class="ledger-table">
+                  <thead>
+                    <tr>
+                      <th>Tipo</th>
+                      <th>Número</th>
+                      <th>Fecha</th>
+                      <th class="text-right">Total</th>
+                      <th>Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (n of notasResumen()!.items; track n.id) {
+                      <tr>
+                        <td>
+                          <span
+                            class="px-2 py-0.5 text-[10px] font-bold uppercase rounded-full border"
+                            [class.bg-amber-50]="n.tipo === 'credito'"
+                            [class.text-amber-700]="n.tipo === 'credito'"
+                            [class.border-amber-200]="n.tipo === 'credito'"
+                            [class.bg-blue-50]="n.tipo === 'debito'"
+                            [class.text-blue-700]="n.tipo === 'debito'"
+                            [class.border-blue-200]="n.tipo === 'debito'"
+                          >
+                            {{ n.tipo === 'credito' ? 'NC' : 'ND' }}
+                          </span>
+                          @if (!n.afectaSaldo) {
+                            <span
+                              class="ml-1 text-[10px] text-gray-400"
+                              title="Borrador/anulada: no afecta el saldo"
+                            >(informativa)</span>
+                          }
+                        </td>
+                        <td class="font-mono text-xs">{{ n.numeroCompleto || 'Borrador' }}</td>
+                        <td class="text-xs">{{ n.fecha }}</td>
+                        <td class="text-right tabular-nums font-medium">{{
+                          n.total | currency: "" : "symbol" : "0.0-0"
+                        }}</td>
+                        <td class="text-xs capitalize">{{ n.estado }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+              <p class="mt-2 text-[11px] text-gray-400">
+                Solo las notas registradas mueven el saldo; borradores y anuladas son informativos.
+              </p>
             </div>
           </div>
         }

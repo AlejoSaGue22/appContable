@@ -1,4 +1,4 @@
-import { ComprobanteVentaResponse, FacturaVenta, InvoiceFilters } from './../../../interfaces/documento-venta-interface';
+import { ComprobanteVentaResponse, FacturaNotasResumenResponse, FacturaVenta, InvoiceFilters } from './../../../interfaces/documento-venta-interface';
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Options, ResponseResult } from '@shared/interfaces/services.interfaces';
@@ -52,6 +52,10 @@ export class ComprobantesVentasService {
 
   getInvoiceById(id: string) {
     return this.http.get<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}`)
+  }
+
+  getNotasResumen(id: string): Observable<FacturaNotasResumenResponse> {
+    return this.http.get<FacturaNotasResumenResponse>(`${baseUrl}/facturas-ventas/${id}/notas-resumen`);
   }
 
   emitirInvoice(id: string) {

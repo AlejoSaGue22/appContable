@@ -78,7 +78,8 @@ export class NotasAjusteComponent {
     this.filters.set(filters);
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { ...filters, page: 1 },
+      // `tipo` legacy se elimina de la URL (el módulo ahora filtra por tipoFactura y pinea tipo=credito)
+      queryParams: { ...filters, page: 1, tipo: null },
       queryParamsHandling: 'merge',
     });
   }

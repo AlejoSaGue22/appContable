@@ -50,8 +50,10 @@ export class CatalogsService {
  });
  }
 
- findAllConceptsNotes(): Observable<ConceptNote[]> {
- return this.http.get<ConceptNote[]>(`${this.baseUrl}/catalogs/concepts-notes`);
+ findAllConceptsNotes(tipo?: 'credito' | 'debito'): Observable<ConceptNote[]> {
+ return this.http.get<ConceptNote[]>(`${this.baseUrl}/catalogs/concepts-notes`, {
+ params: tipo ? { tipo } : {}
+ });
  }
 
  createCategoryArticle(category: any): Observable<any> {

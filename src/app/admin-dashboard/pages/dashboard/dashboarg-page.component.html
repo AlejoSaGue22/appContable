@@ -180,17 +180,17 @@
     }
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        @if (chartData().length > 0) {
+        <!-- @if (chartData().length > 0) { -->
         <app-flujo-caja-card [chartData]="chartData()" />
-        } @else {
+        <!-- } @else {
         <app-skeleton variant="chart" />
-        }
+        } -->
 
-        @if (recentTransactions().length > 0) {
+        <!-- @if (recentTransactions().length > 0) { -->
         <app-transacciones-recientes-card [recentTransactions]="recentTransactions()" />
-        } @else {
+        <!-- } @else {
         <app-skeleton variant="table" />
-        }
+        } -->
     </div>
 
     <app-quick-access [accesoRapido]="accesoRapido" />

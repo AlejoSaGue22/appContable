@@ -13,6 +13,7 @@ import { ComprobanteCatalogosFacade } from './services/comprobante-catalogos.fac
 import { ComprobanteFormStateService } from './services/comprobante-form-state.service';
 import { GetCuentasContables } from '../../interfaces/cuentas-contables.interface';
 import { CurrencyFormatDirective } from '@shared/directives/currency-format.directive';
+import { SearchableSelectComponent } from '@shared/components/searchable-select/searchable-select.component';
 
 @Component({
   selector: 'app-comprobante-form',
@@ -25,7 +26,8 @@ import { CurrencyFormatDirective } from '@shared/directives/currency-format.dire
     BreadcrumbComponent,
     FormErrorLabelComponent,
     ConfirmModalComponent,
-    CurrencyFormatDirective
+    CurrencyFormatDirective,
+    SearchableSelectComponent
   ],
   providers: [ComprobanteCatalogosFacade, ComprobanteFormStateService, CurrencyFormatDirective],
   templateUrl: './comprobante-form.component.html',

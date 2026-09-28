@@ -10,6 +10,7 @@ import {
   ResponseCuentasBancarias,
   ResponseBancos,
   CreateTransferenciaDto,
+  CreateMovimientoBancarioDto,
 } from '../interfaces/cuenta-bancaria.interface';
 import { Options } from '@shared/interfaces/services.interfaces';
 
@@ -71,5 +72,9 @@ export class CuentasBancariasService {
 
   transferir(dto: CreateTransferenciaDto): Observable<any> {
     return this.http.post<any>(`${this.base}/transferir`, dto);
+  }
+
+  registrarMovimiento(id: string, dto: CreateMovimientoBancarioDto): Observable<any> {
+    return this.http.post<any>(`${this.base}/${id}/movimiento`, dto);
   }
 }

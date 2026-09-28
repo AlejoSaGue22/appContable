@@ -47,6 +47,8 @@ export class CatalogsStore {
     unitsMeasure = computed(() => this.state().unitsMeasure);
     municipalities = computed(() => this.state().municipalities);
     conceptsNotes = computed(() => this.state().conceptsNotes);
+    conceptsNotesCredito = computed(() => this.state().conceptsNotes.filter(c => !c.tipo || c.tipo === 'credito'));
+    conceptsNotesDebito = computed(() => this.state().conceptsNotes.filter(c => c.tipo === 'debito'));
     impuestos = computed(() => this.state().impuestos);
     vendedores = computed(() => this.state().vendedores);
     tiposActivo = computed(() => this.state().tiposActivo);

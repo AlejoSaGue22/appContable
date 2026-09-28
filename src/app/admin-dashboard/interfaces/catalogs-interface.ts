@@ -45,13 +45,14 @@ export interface ConceptNote {
     id: string;
     codigo: string;
     nombre: string;
+    tipo?: string;
     state: boolean;
 }
 
 export interface PaymentMethod extends CatalogItem { }
 export interface UnitMeasure extends CatalogItem { }
 export interface Municipality {
-    id: string;
+    id: number;
     name: string;
     code: string;
     department: string;

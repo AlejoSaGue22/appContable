@@ -1,5 +1,14 @@
 <header-title-page [titleHead]="headTitle" />
 
+@if (notasResumen()?.tieneNota) {
+<div class="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-3 text-sm text-amber-800 flex flex-wrap items-center gap-x-4 gap-y-1">
+  <span class="font-bold uppercase text-xs tracking-wide">Con NC/ND</span>
+  <span>NC aplicadas: <strong>−{{ notasResumen()!.totalNCAplicado }}</strong></span>
+  <span>Neto exigible: <strong>{{ notasResumen()!.netoExigible }}</strong></span>
+  <span class="text-xs text-amber-600">{{ notasResumen()!.countNC }} NC · {{ notasResumen()!.countND }} ND — ver detalle para el desglose</span>
+</div>
+}
+
 <div class="w-full">
   <form [formGroup]="formVentas" class="space-y-6">
     <!-- Sección: Información básica -->

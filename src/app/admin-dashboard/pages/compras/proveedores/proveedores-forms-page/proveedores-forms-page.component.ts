@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
   HeaderInput,
   HeaderTitlePageComponent,
@@ -26,6 +26,17 @@ import { HelpersUtils } from '@utils/helpers.utils';
 import { ListGroupDropdownComponent } from '@shared/components/list-group-dropdown/list-group-dropdown.component';
 import { Municipality } from '@dashboard/interfaces/catalogs-interface';
 import { CuentasContablesService } from '@dashboard/pages/contabilidad/services/cuentas-contables.service';
+import type { GetCuentasContables } from '@dashboard/pages/contabilidad/interfaces/cuentas-contables.interface';
+import {
+  applyPersonaValidations,
+  calculateNitDv,
+  filterCuentasByPrefix,
+  findMunicipality,
+  formatMunicipality,
+  getUnknownErrorMessage,
+  toOptionalMunicipalityId,
+  toTipoDocumentoId,
+} from '@dashboard/services/tercero-form.helpers';
 
 @Component({
   selector: 'app-proveedores-forms-page',
@@ -60,42 +71,38 @@ export class ProveedoresFormsPageComponent implements OnInit {
   cancel = output<void>();
   loading = signal<boolean>(false);
 
-  cuentasContables = signal<any[]>([]);
-  cuentasFiltradas = signal<any[]>([]);
+  cuentasContables = signal<GetCuentasContables[]>([]);
+  cuentasFiltradas = signal<GetCuentasContables[]>([]);
 
   proveedorId = toSignal(
     this.activatedRoute.params.pipe(map((param) => param['id'])),
   );
 
   formProveedor = this.fb.group({
-    tipoDocumento: ['', Validators.required],
-    identificacion: ['', Validators.required],
-    tipoPersona: ['', Validators.required],
-    nombre: ['', Validators.required],
-    apellido: ['', Validators.required],
-    razonSocial: ['', Validators.required],
-    dv: [''],
-    email: ['', [Validators.required, Validators.email]],
-    telefono: ['', Validators.required],
-    direccion: [''],
-    ciudad: [''],
-    nombreContacto: [''],
-    telefonoContacto: [''],
-    observaciones: [''],
-    cuentaContableId: [null],
+    tipoDocumento: new FormControl<number | string | null>(null, Validators.required),
+    identificacion: new FormControl<string | null>('', Validators.required),
+    tipoPersona: new FormControl<string | null>('', Validators.required),
+    nombre: new FormControl<string | null>('', Validators.required),
+    apellido: new FormControl<string | null>('', Validators.required),
+    razonSocial: new FormControl<string | null>('', Validators.required),
+    dv: new FormControl<string | null>(''),
+    email: new FormControl<string | null>('', [Validators.required, Validators.email]),
+    telefono: new FormControl<string | null>('', Validators.required),
+    direccion: new FormControl<string | null>(''),
+    ciudad: new FormControl<number | string | null>(null),
+    nombreContacto: new FormControl<string | null>(''),
+    telefonoContacto: new FormControl<string | null>(''),
+    observaciones: new FormControl<string | null>(''),
+    cuentaContableId: new FormControl<string | null>(null),
   });
 
-  getCityName() {
-    const id = this.formProveedor.get('ciudad')?.value;
-    if (!id) return '';
-    const city = this.catalogsStore
-      .municipalities()
-      .find((m: Municipality) => m.code == id);
-    return city ? `${city.name} - ${city.department}` : '';
+  getCityName(): string {
+    const ref = this.formProveedor.get('ciudad')?.value as number | string | null | undefined;
+    return formatMunicipality(findMunicipality(this.catalogsStore.municipalities(), ref));
   }
 
-  onCitySelect(city: Municipality) {
-    this.formProveedor.patchValue({ ciudad: city.code });
+  onCitySelect(city: Municipality): void {
+    this.formProveedor.patchValue({ ciudad: city.id });
   }
 
   async ngOnInit() {
@@ -132,50 +139,30 @@ export class ProveedoresFormsPageComponent implements OnInit {
         this.cuentasService.getCuentasContables(),
       );
       this.cuentasContables.set(accounts);
-      this.cuentasFiltradas.set(
-        accounts.filter(
-          (c: any) => c.aceptaMovimiento && c.codigo.startsWith('22'),
-        ),
-      );
-    } catch (e) {
-      console.error('Error al cargar cuentas contables', e);
+      this.cuentasFiltradas.set(filterCuentasByPrefix(accounts, '22'));
+    } catch {
+      this.notificationService.error('Error al cargar cuentas contables', 'Error');
     }
   }
 
-  getCuentaContableDisplay() {
-    const id = this.formProveedor.get('cuentaContableId')?.value;
+  getCuentaContableDisplay(): string {
+    const id = this.formProveedor.get('cuentaContableId')?.value as string | null;
     if (!id) return '';
     const account = this.cuentasContables().find((c) => c.id === id);
     return account ? `${account.codigo} - ${account.nombre}` : '';
   }
 
-  onCuentaSelect(account: any) {
+  onCuentaSelect(account: GetCuentasContables): void {
     this.formProveedor.patchValue({ cuentaContableId: account.id });
   }
 
-  toggleValidations(tipo: string) {
-    const nombreControl = this.formProveedor.get('nombre');
-    const apellidoControl = this.formProveedor.get('apellido');
-    const razonSocialControl = this.formProveedor.get('razonSocial');
-
-    if (tipo === 'PN') {
-      nombreControl?.setValidators([Validators.required]);
-      apellidoControl?.setValidators([Validators.required]);
-      razonSocialControl?.clearValidators();
-    } else if (tipo === 'PJ') {
-      razonSocialControl?.setValidators([Validators.required]);
-      nombreControl?.clearValidators();
-      apellidoControl?.clearValidators();
-    }
-
-    nombreControl?.updateValueAndValidity();
-    apellidoControl?.updateValueAndValidity();
-    razonSocialControl?.updateValueAndValidity();
+  toggleValidations(tipo: string): void {
+    applyPersonaValidations(this.formProveedor, tipo);
   }
 
-  private handleTipoDocumentoChange(tipo: string | null | undefined) {
+  private handleTipoDocumentoChange(tipo: number | string | null | undefined): void {
     const dvControl = this.formProveedor.get('dv');
-    if (tipo == '6') {
+    if (String(tipo ?? '') === '6') {
       // NIT
       dvControl?.setValidators([Validators.required]);
       this.updateDV(this.formProveedor.get('identificacion')?.value);
@@ -186,33 +173,12 @@ export class ProveedoresFormsPageComponent implements OnInit {
     dvControl?.updateValueAndValidity();
   }
 
-  private updateDV(nit: string | null | undefined) {
+  private updateDV(nit: string | null | undefined): void {
     if (!nit) {
       this.formProveedor.get('dv')?.setValue('');
       return;
     }
-    const dv = this.calculateDV(nit);
-    this.formProveedor.get('dv')?.setValue(dv);
-  }
-
-  private calculateDV(nit: string): string {
-    const cleanNit = nit.replace(/\D/g, ''); // Solo números
-    const vpri = [3, 7, 13, 17, 19, 23, 29, 37, 41, 43, 47, 53, 59, 67, 71];
-    const z = cleanNit.length;
-    let x = 0;
-    let y = 0;
-
-    for (let i = 0; i < z; i++) {
-      y = parseInt(cleanNit.substring(i, i + 1));
-      x += y * vpri[z - 1 - i];
-    }
-
-    y = x % 11;
-    if (y > 1) {
-      return (11 - y).toString();
-    } else {
-      return y.toString();
-    }
+    this.formProveedor.get('dv')?.setValue(calculateNitDv(nit));
   }
 
   proveedorIdResource = rxResource({
@@ -232,10 +198,9 @@ export class ProveedoresFormsPageComponent implements OnInit {
     },
   });
 
-  loadProveedor(proveedor: ProveedoresInterface) {
+  loadProveedor(proveedor: ProveedoresInterface): void {
     this.loaderService.show();
     this.formProveedor.patchValue(proveedor);
-    // this.formProveedor.get("estado")?.setValue(proveedor.isActive ? 'A' : 'I');
     this.loaderService.hide();
   }
 
@@ -254,9 +219,23 @@ export class ProveedoresFormsPageComponent implements OnInit {
     this.loading.set(true);
 
     try {
-      const formValue = {
-        ...this.formProveedor.value,
-        telefono: this.formProveedor.get('telefono')?.value?.toString(),
+      const raw = this.formProveedor.getRawValue();
+      const formValue: Partial<ProveedoresInterface> = {
+        tipoDocumento: toTipoDocumentoId(raw.tipoDocumento),
+        identificacion: raw.identificacion ?? '',
+        tipoPersona: raw.tipoPersona ?? '',
+        nombre: raw.nombre ?? '',
+        apellido: raw.apellido ?? '',
+        razonSocial: raw.razonSocial ?? '',
+        dv: raw.dv ?? '',
+        email: raw.email ?? '',
+        telefono: raw.telefono?.toString() ?? '',
+        direccion: raw.direccion ?? '',
+        ciudad: toOptionalMunicipalityId(raw.ciudad),
+        nombreContacto: raw.nombreContacto ?? '',
+        telefonoContacto: raw.telefonoContacto ?? '',
+        observaciones: raw.observaciones ?? '',
+        cuentaContableId: raw.cuentaContableId ?? null,
       };
 
       if (this.proveedorId() == 'new-Item' || this.isModal()) {
@@ -307,8 +286,8 @@ export class ProveedoresFormsPageComponent implements OnInit {
         );
         await this.router.navigateByUrl('/panel/compras/proveedores');
       }
-    } catch (error: any) {
-      this.notificationService.error(error.message, 'Error');
+    } catch (error: unknown) {
+      this.notificationService.error(getUnknownErrorMessage(error), 'Error');
     } finally {
       this.loaderService.hide();
       this.loading.set(false);

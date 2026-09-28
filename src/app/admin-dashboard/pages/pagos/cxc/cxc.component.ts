@@ -65,7 +65,7 @@ export class CxcComponent implements OnInit {
 
   activeTab = signal<string>('cobros');
   tabItems: TabItem[] = [
-    { id: 'cobros', label: 'Pagos Realizados' },
+    { id: 'cobros', label: 'Pagos Recibidos' },
     { id: 'facturas', label: 'Facturas Pendientes' },
     { id: 'estado-cuenta', label: 'Estado de Cuenta' },
   ];
@@ -136,14 +136,17 @@ export class CxcComponent implements OnInit {
   constructor(private svc: PagosHttpService) {
     effect(() => {
       const tab = this.activeTab();
+      const page = this.paginationService.currentPage(); // Read to track page changes
+
       if (tab === 'cobros') {
         this.cargarCobros();
+      } else if (tab === 'facturas') {
+        this.cargar();
       }
-    });
+    }, { allowSignalWrites: true });
   }
 
   ngOnInit(): void {
-    this.cargar();
     this.cobrosFiltroTexto.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged())
       .subscribe(() => {

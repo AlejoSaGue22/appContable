@@ -5,6 +5,7 @@ import {
   ItemFactura,
   TipoFactura,
   InvoiceStatus,
+  FacturaNotasResumen,
 } from './../../../../interfaces/documento-venta-interface';
 import { PreviewAsientoComponent } from '@dashboard/components/preview-asiento/preview-asiento.component';
 import {
@@ -91,6 +92,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   catalogsStore = inject(CatalogsStore);
   cuentasBancariasService = inject(CuentasBancariasService);
   factura = signal<FacturaVenta | null>(null);
+  notasResumen = signal<FacturaNotasResumen | null>(null);
   productSeleccionados = signal<ItemFactura[]>([]);
   getAllProductos = signal<GetProductosDetalle[]>([]);
   getAllClientes = signal<ClientesInterfaceResponse[]>([]);
@@ -301,6 +303,13 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
         this.factura.set(invoice as any);
         this.productSeleccionados.set(invoice.items as ItemFactura[]);
         this.calcularTotal();
+
+        // Resumen de notas aplicadas (banner informativo, Fase 1: lectura)
+        this.notasResumen.set((invoice as any).notasResumen ?? null);
+        this.ventaServices.getNotasResumen(id).subscribe({
+          next: (r) => this.notasResumen.set(r.data ?? null),
+          error: () => this.notasResumen.set((invoice as any).notasResumen ?? null),
+        });
 
         // Cargar anticipos cruzados/aplicados a esta factura
         this.ventaServices.getAplicacionesAnticipo(id).subscribe({

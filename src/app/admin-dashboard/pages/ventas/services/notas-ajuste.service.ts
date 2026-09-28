@@ -15,19 +15,21 @@ export class NotasAjusteService {
     private http = inject(HttpClient);
 
     getNotasAjuste(options: Options & {
-        tipo?: string;
+        tipoFactura?: string;
         estado?: string;
         facturaNumero?: string;
         clienteNombre?: string;
     }): Observable<NotaAjusteResponse> {
-        const { limit = 10, page = 1, tipo, estado, facturaNumero, clienteNombre } = options;
+        const { limit = 10, page = 1, tipoFactura, estado, facturaNumero, clienteNombre } = options;
 
         const params: any = {
             limit,
-            page
+            page,
+            // Este módulo solo visualiza notas crédito
+            tipo: 'credito'
         };
 
-        if (tipo) params.tipo = tipo;
+        if (tipoFactura) params.tipoFactura = tipoFactura;
         if (estado) params.estado = estado;
         if (facturaNumero) params.facturaNumero = facturaNumero;
         if (clienteNombre) params.clienteNombre = clienteNombre;

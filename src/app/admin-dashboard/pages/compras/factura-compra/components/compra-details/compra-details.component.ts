@@ -3,6 +3,7 @@ import { Component, signal, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormaPago } from '@dashboard/interfaces/documento-venta-interface';
 import { FacturaCompraResponse } from '@dashboard/interfaces/factura-compra-interface';
+import { FacturaNotasResumen } from '@dashboard/interfaces/documento-venta-interface';
 import { PagoHistorial, PaymentStatus } from '@dashboard/interfaces/pagos-interface';
 import { FacturaCompraService } from '@dashboard/pages/compras/services/factura-compra.service';
 import { RegistrarPagoModalData } from '@dashboard/pages/pagos/components/modal-registrarpago/modal-registrarpago.component';
@@ -26,6 +27,7 @@ export class CompraDetailsComponent implements OnInit {
     asientos: any[] = [];
     pagos: PagoHistorial[] = [];
     loadingAsientos = false;
+    notasResumen = signal<FacturaNotasResumen | null>(null);
 
     // ── Modal de pago ─────────────────────────────────────────────────
     modalPagoVisible = false;
@@ -84,6 +86,12 @@ export class CompraDetailsComponent implements OnInit {
                 next: p => { this.pagos = p.data; },
             });
         }
+
+        // Resumen de notas crédito/débito aplicadas (Fase 1: lectura)
+        this.facturasService.getNotasResumen(c.id).subscribe({
+            next: r => { this.notasResumen.set(r.data ?? null); },
+            error: () => { this.notasResumen.set(null); },
+        });
     }
 
     reintentarAsiento(): void {

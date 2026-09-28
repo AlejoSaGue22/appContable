@@ -153,6 +153,18 @@
             </td>
             <td class="text-center">
               <span class="font-semibold text-slate-900">{{ invoice.comprobante_completo }}</span>
+              @if (invoice.notasResumen?.tieneNota) {
+              <span class="ml-1.5 inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold uppercase rounded-full border"
+                [class.bg-amber-50]="(invoice.notasResumen?.countNC ?? 0) > 0"
+                [class.text-amber-700]="(invoice.notasResumen?.countNC ?? 0) > 0"
+                [class.border-amber-200]="(invoice.notasResumen?.countNC ?? 0) > 0"
+                [class.bg-blue-50]="(invoice.notasResumen?.countNC ?? 0) === 0"
+                [class.text-blue-700]="(invoice.notasResumen?.countNC ?? 0) === 0"
+                [class.border-blue-200]="(invoice.notasResumen?.countNC ?? 0) === 0"
+                [title]="(invoice.notasResumen?.countNC ?? 0) > 0 ? 'Con nota crédito aplicada' : 'Con nota débito'">
+                {{ (invoice.notasResumen?.countNC ?? 0) > 0 ? 'Con NC' : 'Con ND' }}
+              </span>
+              }
             </td>
             <td class="text-center">
               <span class="px-2.5 py-1 text-[10px] font-semibold uppercase rounded-lg border"
@@ -199,6 +211,11 @@
               <div class="flex flex-col items-end">
                 <span class="text-xs text-gray-400">Pagado:
                   {{ invoice.totalPagado | currency: "" : "$" : "1.0-0" }}</span>
+                @if ((invoice.notasResumen?.totalNCAplicado ?? 0) > 0) {
+                <span class="text-[11px] text-amber-600" [title]="'Ajustado por nota crédito'">
+                  Incluye NC −{{ invoice.notasResumen?.totalNCAplicado | currency: "" : "$" : "1.0-0" }}
+                </span>
+                }
                 <span class="font-semibold text-xs mt-1" [class.text-red-500]="invoice.saldoPendiente > 0"
                   [class.text-emerald-500]="invoice.saldoPendiente === 0">
                   Saldo: {{ invoice.saldoPendiente | currency: "" : "$" : "1.0-0" }}
