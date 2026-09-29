@@ -32,7 +32,7 @@ export class FacturasCompraTableComponent implements OnDestroy {
  const fin = this.fechaFin();
  const page = this.paginationService.currentPage();
  if (inicio && fin) this.cargar(inicio, fin, page);
- });
+ }, { allowSignalWrites: true });
  }
 
  private cargar(inicio: string, fin: string, page: number): void {
@@ -41,7 +41,12 @@ export class FacturasCompraTableComponent implements OnDestroy {
  this.svc.getFacturasCompras({ limit: 10, page, startDate: inicio, endDate: fin })
  .pipe(takeUntil(this.destroy$))
  .subscribe({
- next: (res) => { this.data.set(res); this.loading.set(false); },
+ next: (res) => { 
+ this.data.set(res); 
+ this.loading.set(false);
+ this.paginationService.totalItems.set(res.meta?.total || 0);
+ this.paginationService.pageSize.set(res.meta?.totalPages || 1);
+ },
  error: () => { this.error.set('Error al cargar facturas'); this.loading.set(false); },
  });
  }

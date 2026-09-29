@@ -171,7 +171,6 @@ export interface FacturaNotasResumen {
     countNC: number;
     countND: number;
     countBorrador?: number;
-    notaDebitoPendienteFase2?: boolean;
     items?: NotaAjusteResumenItem[];
 }
 

@@ -161,6 +161,11 @@
                   Incluye NC −{{ compra.notasResumen?.totalNCAplicado | currency: "" : "$" : "1.0-0" }}
                 </span>
                 }
+                @if ((compra.notasResumen?.totalNDAplicado ?? 0) > 0) {
+                <span class="text-[11px] text-blue-600" [title]="'Ajustado por nota débito'">
+                  Incluye ND +{{ compra.notasResumen?.totalNDAplicado | currency: "" : "$" : "1.0-0" }}
+                </span>
+                }
                 <span [class.text-red-500]="compra.saldoPendiente > 0"
                   [class.text-emerald-500]="compra.saldoPendiente === 0">
                   {{ compra.saldoPendiente | currency: "" : "$" : "1.0-0" }}

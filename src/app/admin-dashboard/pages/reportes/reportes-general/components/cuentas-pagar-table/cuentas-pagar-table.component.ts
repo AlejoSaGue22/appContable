@@ -32,7 +32,7 @@ export class CuentasPagarTableComponent implements OnDestroy {
  const fin = this.fechaFin();
  const page = this.paginationService.currentPage();
  if (inicio && fin) this.cargar(inicio, fin, page);
- });
+ }, { allowSignalWrites: true });
  }
 
  private cargar(inicio: string, fin: string, page: number): void {
@@ -41,7 +41,12 @@ export class CuentasPagarTableComponent implements OnDestroy {
  this.svc.getReporteAgingPagar(inicio, fin, page, 10)
  .pipe(takeUntil(this.destroy$))
  .subscribe({
- next: (res) => { this.data.set(res); this.loading.set(false); },
+ next: (res) => { 
+ this.data.set(res); 
+ this.loading.set(false);
+ this.paginationService.totalItems.set(res.meta?.total || 0);
+ this.paginationService.pageSize.set(res.meta?.totalPages || 1);
+ },
  error: () => { this.error.set('Error al cargar cuentas por pagar'); this.loading.set(false); },
  });
  }

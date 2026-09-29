@@ -216,6 +216,11 @@
                   Incluye NC −{{ invoice.notasResumen?.totalNCAplicado | currency: "" : "$" : "1.0-0" }}
                 </span>
                 }
+                @if ((invoice.notasResumen?.totalNDAplicado ?? 0) > 0) {
+                <span class="text-[11px] text-blue-600" [title]="'Ajustado por nota débito'">
+                  Incluye ND +{{ invoice.notasResumen?.totalNDAplicado | currency: "" : "$" : "1.0-0" }}
+                </span>
+                }
                 <span class="font-semibold text-xs mt-1" [class.text-red-500]="invoice.saldoPendiente > 0"
                   [class.text-emerald-500]="invoice.saldoPendiente === 0">
                   Saldo: {{ invoice.saldoPendiente | currency: "" : "$" : "1.0-0" }}
