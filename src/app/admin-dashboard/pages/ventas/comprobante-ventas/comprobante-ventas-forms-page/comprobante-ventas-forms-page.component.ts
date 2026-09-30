@@ -41,6 +41,7 @@ import { ModalComponent } from '@shared/components/modal/modal.component';
 import { ClientsFormPageComponent } from '../../clientes/clients-form-page/clients-form-page.component';
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
 import { HelpersUtils } from '@utils/helpers.utils';
+import { avisarAdvertenciasInventario } from '@dashboard/services/inventario.service';
 import { CuentasBancariasService } from '@dashboard/pages/contabilidad/services/cuentas-bancarias.service';
 import { CuentaBancaria } from '@dashboard/pages/contabilidad/interfaces/cuenta-bancaria.interface';
 import { CurrencyFormatDirective } from '@shared/directives/currency-format.directive';
@@ -737,6 +738,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
           ? 'Factura guardada como borrador'
           : 'Factura creada con exito';
         this.notificacionService.success(msg, 'Accion Completada', 5000);
+        avisarAdvertenciasInventario(this.notificacionService, response.data);
 
         setTimeout(() => {
           this.loading.set(false);
@@ -830,6 +832,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
           'Accion Completada',
           5000,
         );
+        avisarAdvertenciasInventario(this.notificacionService, response.data);
         setTimeout(() => {
           this.router.navigateByUrl('/panel/ventas/comprobantes');
         }, 800);

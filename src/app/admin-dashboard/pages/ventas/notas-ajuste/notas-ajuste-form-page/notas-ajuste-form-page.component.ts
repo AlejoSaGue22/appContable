@@ -18,6 +18,7 @@ import { CatalogsStore } from '@dashboard/services/catalogs.store';
 import { ConceptosNotaCredito, ConceptosNotaDebito, CreateNotaCreditoV2, DisponibilidadFactura, NotaAjusteItem } from "../../../../interfaces/notas-ajuste-interface";
 import { GetFacturaRequest } from '@dashboard/interfaces/documento-venta-interface';
 import { PreviewAsientoComponent } from '@dashboard/components/preview-asiento/preview-asiento.component';
+import { avisarAdvertenciasInventario } from '@dashboard/services/inventario.service';
 
 /**
  * Formulario NC por concepto DIAN (guía 2026, estilo Alegra):
@@ -622,6 +623,7 @@ export class NotasAjusteFormPageComponent implements OnInit {
                 this.loaderService.hide();
                 if (res.success) {
                     this.notificationService.success('Nota guardada con éxito', 'Completado');
+                    avisarAdvertenciasInventario(this.notificationService, res.data);
                     if (isDraft) {
                         if (this.notaId() === 'new' || !this.notaId()) {
                             this.router.navigate(['/panel/ventas/notas-ajuste', (res.data as any).id]);

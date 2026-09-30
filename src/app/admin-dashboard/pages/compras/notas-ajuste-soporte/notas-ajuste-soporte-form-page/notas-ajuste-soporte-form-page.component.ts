@@ -11,15 +11,16 @@ import { NotificationService } from '@shared/services/notification.service';
 import { avisarAdvertenciasInventario } from '@dashboard/services/inventario.service';
 import { LoaderService } from '@utils/services/loader.service';
 import { ListGroupDropdownComponent } from "@shared/components/list-group-dropdown/list-group-dropdown.component";
-import { FacturaCompraService } from '../../services/factura-compra.service';
-import { ComprasNotasAjusteService } from '../../services/compras-notas-ajuste.service';
+import { DocumentosSoporteService } from '../../services/documentos-soporte.service';
+import { NotasAjusteSoporteService } from '../../services/notas-ajuste-soporte.service';
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
-import { NotaAjusteCompraItem } from '../../../../interfaces/notas-ajuste-compra-interface';
-import { FacturaCompra } from '../../../../interfaces/factura-compra-interface';
+import { NotaAjusteSoporteItem } from '../../../../interfaces/notas-ajuste-soporte-interface';
+import { DocumentoSoporte } from '../../../../interfaces/documento-soporte-interface';
+import { ConceptosNotaCredito, ConceptosNotaDebito } from '../../../../interfaces/notas-ajuste-interface';
 import { FormaPago } from '@dashboard/interfaces/documento-venta-interface'; // Assuming FormaPago is shared or similar
 
 @Component({
-    selector: 'app-notas-ajuste-compras-form-page',
+    selector: 'app-notas-ajuste-soporte-form-page',
     standalone: true,
     imports: [
         HeaderTitlePageComponent,
@@ -29,43 +30,50 @@ import { FormaPago } from '@dashboard/interfaces/documento-venta-interface'; // 
         CurrencyPipe,
         ListGroupDropdownComponent
     ],
-    templateUrl: './notas-ajuste-form-page.component.html',
+    templateUrl: './notas-ajuste-soporte-form-page.component.html',
 })
-export class NotasAjusteComprasFormPageComponent implements OnInit {
+export class NotasAjusteSoporteFormPageComponent implements OnInit {
 
     headTitle = computed(() => {
         const id = this.notaId() != 'new-Item';
+        const tipoLabel = this.tipoNota() === 'debito' ? 'Débito' : 'Crédito';
         return {
-            title: id ? 'Editar Nota de Crédito (Compras)' : 'Nueva Nota de Crédito (Compras)',
-            slog: id ? 'Edita una nota crédito vinculada a una factura de compra' : 'Registra una nota crédito vinculada a una factura de compra'
+            title: id ? `Editar Nota de ${tipoLabel} (Soporte)` : `Nueva Nota de ${tipoLabel} (Soporte)`,
+            slog: id ? 'Edita una nota vinculada a un documento soporte' : 'Registra una nota vinculada a un documento soporte'
         };
     });
 
     private fb = inject(FormBuilder);
     private route = inject(ActivatedRoute);
     private router = inject(Router);
-    private notasService = inject(ComprasNotasAjusteService);
-    private facturasService = inject(FacturaCompraService);
+    private notasService = inject(NotasAjusteSoporteService);
+    private facturasService = inject(DocumentosSoporteService);
     private notificationService = inject(NotificationService);
     private loaderService = inject(LoaderService);
     public catalogsStore = inject(CatalogsStore);
 
     notaId = toSignal(this.route.params.pipe(map(p => p['id'])));
-    facturaIdFromQuery = toSignal(this.route.queryParams.pipe(map(p => p['facturaId'])));
+    documentoIdFromQuery = toSignal(this.route.queryParams.pipe(map(p => p['documentoId'])));
 
-    tipoNota = signal<'credito'>('credito');
+    tipoNota = signal<'credito' | 'debito'>('credito');
     isDraft = signal<boolean>(false);
 
-    facturasDisponibles = signal<FacturaCompra[]>([]);
-    itemsSeleccionados = signal<NotaAjusteCompraItem[]>([]);
-    facturaSeleccionada = signal<FacturaCompra | null>(null);
+    /** El DSE origen es electrónico: la nota exige concepto de corrección DIAN. */
+    documentoEsElectronico = computed(() => this.documentoSeleccionado()?.tipo === 'electronico');
+
+    conceptosDisponibles = computed(() =>
+        this.tipoNota() === 'debito' ? ConceptosNotaDebito : ConceptosNotaCredito);
+
+    documentosDisponibles = signal<DocumentoSoporte[]>([]);
+    itemsSeleccionados = signal<NotaAjusteSoporteItem[]>([]);
+    documentoSeleccionado = signal<DocumentoSoporte | null>(null);
 
     // Computed signals for payment logic
-    facturaEsCredito = computed(() => this.facturaSeleccionada()?.formaPago === FormaPago.CREDITO);
-    facturaConAbonos = computed(() => (this.facturaSeleccionada()?.totalPagado ?? 0) > 0);
+    documentoEsCredito = computed(() => this.documentoSeleccionado()?.formaPago === FormaPago.CREDITO);
+    documentoConAbonos = computed(() => (this.documentoSeleccionado()?.totalPagado ?? 0) > 0);
 
     formaPagoBloqueada = computed(() => {
-        const factura = this.facturaSeleccionada();
+        const factura = this.documentoSeleccionado();
         if (!factura) return false;
 
         // Crédito sin abonos: bloqueada a CREDITO
@@ -78,9 +86,10 @@ export class NotasAjusteComprasFormPageComponent implements OnInit {
     });
 
     form = this.fb.group({
-        facturaOriginalId: ['', Validators.required],
-        facturaSearch: [''],
+        documentoOriginalId: ['', Validators.required],
+        documentoSearch: [''],
         tipo: ['credito', Validators.required],
+        conceptoCorreccion: [''],
         formaPago: ['', Validators.required],
         metodoPago: [''],
         esReembolsoAbono: [false],
@@ -132,24 +141,24 @@ export class NotasAjusteComprasFormPageComponent implements OnInit {
 
     ngOnInit(): void {
         this.loaderService.show();
-        this.loadFacturas();
+        this.loadDocumentos();
 
         const id = this.notaId();
         if (id && id !== 'new-Item') {
             this.loadNota(id);
         } else {
-            const fId = this.facturaIdFromQuery();
+            const fId = this.documentoIdFromQuery();
             if (fId) {
-                this.onFacturaSeleccionadaById(fId);
+                this.onDocumentoSeleccionadoById(fId);
             }
             this.loaderService.hide();
         }
     }
 
-    loadFacturas() {
-        this.facturasService.getFacturasCompras({ limit: 100, page: 1 }).subscribe(res => {
+    loadDocumentos() {
+        this.facturasService.getDocumentosSoporte({ limit: 100, page: 1 }).subscribe(res => {
             if (res && res.data) {
-                this.facturasDisponibles.set(res.data as any);
+                this.documentosDisponibles.set((res.data as any[]).filter((d: any) => d.estado === 'registrado'));
             }
         });
     }
@@ -160,9 +169,10 @@ export class NotasAjusteComprasFormPageComponent implements OnInit {
                 try {
                     const nota = res.data;
                     this.form.patchValue({
-                        facturaSearch: nota.facturaOriginalNumero,
-                        facturaOriginalId: nota.facturaOriginalId,
+                        documentoSearch: nota.documentoOriginalNumero,
+                        documentoOriginalId: nota.documentoOriginalId,
                         tipo: nota.tipo,
+                        conceptoCorreccion: (nota as any).conceptoCorreccion || '',
                         formaPago: nota.formaPago,
                         metodoPago: nota.metodoPago?.toString(),
                         esReembolsoAbono: nota.esReembolsoAbono,
@@ -197,38 +207,38 @@ export class NotasAjusteComprasFormPageComponent implements OnInit {
                         };
                     });
                     this.itemsSeleccionados.set(mappedItems);
-                    const factura = nota.facturaOriginal;
-                    this.facturaSeleccionada.set(factura as any);
+                    const documento = nota.documentoOriginal;
+                    this.documentoSeleccionado.set(documento as any);
                     this.loaderService.hide();
                 } catch (error) {
-                    console.log('Error al cargar la nota de ajuste de compra 2', error);
+                    console.log('Error al cargar la nota de ajuste a soporte 2', error);
                     this.loaderService.hide();
-                    this.notificationService.error('Error al cargar la nota de ajuste de compra', 'Error');
+                    this.notificationService.error('Error al cargar la nota de ajuste a soporte', 'Error');
                 }
             },
             error: (error) => {
-                console.log('Error al cargar la nota de ajuste de compra 1', error);
+                console.log('Error al cargar la nota de ajuste a soporte 1', error);
                 this.loaderService.hide();
                 this.notificationService.error(error.error?.message || 'Error al cargar la nota de ajuste', 'Error');
             }
         });
     }
 
-    onFacturaSeleccionada(factura: any) {
+    onDocumentoSeleccionado(factura: any) {
         const f = factura;
-        this.facturaSeleccionada.set(f);
+        this.documentoSeleccionado.set(f);
         this.isDraft.set(false);
 
         this.form.patchValue({
-            facturaOriginalId: f.id,
-            facturaSearch: f.numeroFacturaProveedor || f.numero,
+            documentoOriginalId: f.id,
+            documentoSearch: f.numeroFacturaProveedor || f.numero,
             formaPago: f.formaPago,
             metodoPago: f.formaPago === FormaPago.CONTADO ? f.metodoPago : '',
             esReembolsoAbono: false
         });
 
         // Auto-load items from invoice (soporta gasto directo a cuenta contable: articulo null)
-        const items: NotaAjusteCompraItem[] = (f.items ?? []).map((item: any) => {
+        const items: NotaAjusteSoporteItem[] = (f.items ?? []).map((item: any) => {
             const gross = item.quantity * item.unitPrice;
             const discountVal = gross * ((item.descuento || 0) / 100);
             const afterDiscount = gross - discountVal;
@@ -253,10 +263,11 @@ export class NotasAjusteComprasFormPageComponent implements OnInit {
         this.itemsSeleccionados.set(items);
     }
 
-    onFacturaSeleccionadaById(id: string) {
-        this.facturasService.getFacturaCompraById(id).subscribe(res => {
-            if (res.success && res.data) {
-                this.onFacturaSeleccionada(res.data);
+    onDocumentoSeleccionadoById(id: string) {
+        this.facturasService.getDocumentoSoporteById(id).subscribe(res => {
+            const doc = (res as any).data?.data?.[0] ?? (res as any).data;
+            if (res.success && doc) {
+                this.onDocumentoSeleccionado(doc);
             }
         });
     }
@@ -265,7 +276,7 @@ export class NotasAjusteComprasFormPageComponent implements OnInit {
         this.itemsSeleccionados.update(items => items.filter((_, i) => i !== index));
     }
 
-    updateItemField(index: number, field: keyof NotaAjusteCompraItem, value: any) {
+    updateItemField(index: number, field: keyof NotaAjusteSoporteItem, value: any) {
         this.itemsSeleccionados.update(items => {
             const newItems = [...items];
             newItems[index] = {
@@ -320,11 +331,19 @@ export class NotasAjusteComprasFormPageComponent implements OnInit {
             return;
         }
 
+        // La nota a un DSE electrónico exige concepto de corrección DIAN.
+        if (this.documentoEsElectronico() && !this.form.value.conceptoCorreccion) {
+            this.form.markAllAsTouched();
+            this.notificationService.error('Selecciona el concepto de corrección DIAN para el documento electrónico.', 'Formulario inválido');
+            return;
+        }
+
         this.loaderService.show();
         const data = {
             isDraft: isDraft,
             tipo: this.tipoNota(),
-            facturaOriginalId: this.form.value.facturaOriginalId,
+            documentoOriginalId: this.form.value.documentoOriginalId,
+            conceptoCorreccion: this.form.value.conceptoCorreccion || undefined,
             formaPago: this.form.value.formaPago,
             metodoPago: this.form.value.metodoPago,
             esReembolsoAbono: this.form.value.esReembolsoAbono,
@@ -340,8 +359,8 @@ export class NotasAjusteComprasFormPageComponent implements OnInit {
         };
 
         // Validación de Saldo (Impedir envío si excede el saldo pendiente)
-        const saldoPendiente = this.facturaSeleccionada()?.saldoPendiente ?? 0;
-        if (data.total > saldoPendiente && data.formaPago === FormaPago.CREDITO) {
+        const saldoPendiente = this.documentoSeleccionado()?.saldoPendiente ?? 0;
+        if (this.tipoNota() === 'credito' && data.total > saldoPendiente && data.formaPago === FormaPago.CREDITO) {
             this.notificationService.error(
                 `El valor de la nota (${this.totales().total}) no puede ser mayor al saldo pendiente (${saldoPendiente}) para ajustes de cartera.`,
                 'Error de Validación'
@@ -353,7 +372,9 @@ export class NotasAjusteComprasFormPageComponent implements OnInit {
         const id = this.notaId();
         const request = (id && id !== 'new-Item')
             ? this.notasService.updateNotaAjuste(id, data)
-            : this.notasService.createNotaCredito(data);
+            : (this.tipoNota() === 'debito'
+                ? this.notasService.createNotaDebito(data)
+                : this.notasService.createNotaCredito(data));
 
         request.subscribe({
             next: (res) => {
@@ -361,7 +382,7 @@ export class NotasAjusteComprasFormPageComponent implements OnInit {
                 if (res.success) {
                     this.notificationService.success('Nota guardada con éxito', 'Completado');
                     avisarAdvertenciasInventario(this.notificationService, res.data);
-                    this.router.navigate(['/panel/compras/notas-ajuste']);
+                    this.router.navigate(['/panel/compras/notas-ajuste-soporte']);
                 } else {
                     const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
                     this.notificationService.error(message || 'Error al guardar la nota', 'Error');
@@ -369,5 +390,10 @@ export class NotasAjusteComprasFormPageComponent implements OnInit {
             },
             error: () => this.loaderService.hide()
         });
+    }
+
+    onTipoChange(tipo: string): void {
+        this.tipoNota.set(tipo as 'credito' | 'debito');
+        this.form.patchValue({ tipo }, { emitEvent: false });
     }
 }

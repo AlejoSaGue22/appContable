@@ -11,6 +11,7 @@ import { ErrorPages } from '@shared/components/error-pages/error-pages.component
 import { ModalComponent } from '@shared/components/modal/modal.component';
 import { PaginationService } from '@shared/components/pagination/pagination.service';
 import { NotificationService } from '@shared/services/notification.service';
+import { avisarAdvertenciasInventario } from '@dashboard/services/inventario.service';
 import { LoaderService } from '@utils/services/loader.service';
 import { ResponseResult } from '@shared/interfaces/services.interfaces';
 import { NotasAjusteService } from '../services/notas-ajuste.service';
@@ -99,6 +100,7 @@ export class NotasAjusteComponent {
         this.loaderService.hide();
         if (res.success) {
           this.notificationService.success('Nota emitida con éxito', 'Éxito');
+          avisarAdvertenciasInventario(this.notificationService, res.data);
           this.notasResource.reload();
         } else {
           const message = Array.isArray(res.message)
@@ -229,6 +231,7 @@ export class NotasAjusteComponent {
             'Estado sincronizado con éxito',
             'Éxito',
           );
+          avisarAdvertenciasInventario(this.notificationService, res.data);
           this.notasResource.reload();
         } else {
           const message = Array.isArray(res.message)

@@ -11,35 +11,39 @@ import { NotificationService } from '@shared/services/notification.service';
 import { avisarAdvertenciasInventario } from '@dashboard/services/inventario.service';
 import { LoaderService } from '@utils/services/loader.service';
 import { ResponseResult } from '@shared/interfaces/services.interfaces';
-import { ComprasNotasAjusteService } from '../services/compras-notas-ajuste.service';
-import { NotaComprasFilters, TableNotasComprasComponent } from './components/table-notas/table-notas.component';
+import { NotasAjusteSoporteService } from '../services/notas-ajuste-soporte.service';
+import { NotaSoporteFilters, TableNotasSoporteComponent } from './components/table-notas-soporte/table-notas-soporte.component';
 
 @Component({
-    selector: 'app-notas-ajuste-compras',
+    selector: 'app-notas-ajuste-soporte',
     standalone: true,
-    imports: [LoaderComponent, ErrorPages, ModalComponent, TableNotasComprasComponent, RouterLink, HeaderTitlePageComponent],
-    templateUrl: './notas-ajuste.component.html',
+    imports: [LoaderComponent, ErrorPages, ModalComponent, TableNotasSoporteComponent, RouterLink, HeaderTitlePageComponent],
+    templateUrl: './notas-ajuste-soporte.component.html',
 })
-export class NotasAjusteComprasComponent {
+export class NotasAjusteSoporteComponent {
 
     headTitle: HeaderInput = {
-        title: 'Notas de Crédito de Compras',
-        slog: 'Administra las notas de crédito aplicadas a tus facturas de compras'
+        title: 'Notas de Ajuste a Documentos Soporte',
+        slog: 'Administra las notas de ajuste aplicadas a tus documentos soporte'
     };
 
     private route = inject(ActivatedRoute);
     private router = inject(Router);
-    notasService = inject(ComprasNotasAjusteService);
+    notasService = inject(NotasAjusteSoporteService);
     paginationService = inject(PaginationService);
     notificationService = inject(NotificationService);
     loaderService = inject(LoaderService);
 
-    filters = signal<NotaComprasFilters>({});
+    filters = signal<NotaSoporteFilters>({});
     totalItems = signal(0);
     totalPages = signal(1);
 
     isDeleteModalVisible = signal(false);
     idToDelete = signal<string>('');
+
+    isAnularModalVisible = signal(false);
+    idToAnular = signal<string>('');
+    motivoAnulacion = signal<string>('');
 
     notasResource = rxResource({
         request: () => ({
@@ -60,7 +64,7 @@ export class NotasAjusteComprasComponent {
         )
     });
 
-    onFilterChange(filters: NotaComprasFilters): void {
+    onFilterChange(filters: NotaSoporteFilters): void {
         this.filters.set(filters);
         this.router.navigate([], {
             relativeTo: this.route,
@@ -129,6 +133,35 @@ export class NotasAjusteComprasComponent {
                 } else {
                     const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
                     this.notificationService.error(message || 'Error desconocido', 'Error al generar asiento');
+                }
+            },
+            error: () => this.loaderService.hide()
+        });
+    }
+
+    confirmAnular(id: string): void {
+        this.idToAnular.set(id);
+        this.motivoAnulacion.set('');
+        this.isAnularModalVisible.set(true);
+    }
+
+    onAnular(): void {
+        const motivo = this.motivoAnulacion().trim();
+        if (!motivo) {
+            this.notificationService.error('Indica el motivo de la anulación', 'Error');
+            return;
+        }
+        this.loaderService.show('Anulando nota...');
+        this.notasService.anularNotaAjuste(this.idToAnular(), motivo).subscribe({
+            next: (res: ResponseResult) => {
+                this.loaderService.hide();
+                this.isAnularModalVisible.set(false);
+                if (res.success) {
+                    this.notificationService.success('Nota anulada con éxito', 'Éxito');
+                    this.notasResource.reload();
+                } else {
+                    const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
+                    this.notificationService.error(message || 'Error desconocido', 'Error al anular');
                 }
             },
             error: () => this.loaderService.hide()

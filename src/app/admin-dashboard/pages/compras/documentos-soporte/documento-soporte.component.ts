@@ -5,8 +5,8 @@ import { PaginationService } from '@shared/components/pagination/pagination.serv
 import { rxResource } from '@angular/core/rxjs-interop';
 import { tap } from 'rxjs';
 import { LoaderComponent } from "src/app/utils/components/loader/loader.component";
-import { TableComprasComponent, PurchaseInvoiceFilters } from "./components/table-compras/table-compras.component";
-import { FacturaCompraService } from '../services/factura-compra.service';
+import { TableDocumentosSoporteComponent, DocumentoSoporteFilters } from "./components/table-documentos-soporte/table-documentos-soporte.component";
+import { DocumentosSoporteService } from '../services/documentos-soporte.service';
 import { ModalComponent } from "@shared/components/modal/modal.component";
 import { ResponseResult } from '@shared/interfaces/services.interfaces';
 import { NotificationService } from '@shared/services/notification.service';
@@ -18,16 +18,16 @@ import { CurrencyPipe } from '@angular/common';
 import { avisarAdvertenciasInventario } from '@dashboard/services/inventario.service';
 
 @Component({
-    selector: 'app-factura-compra',
-    imports: [CommonModule, LoaderComponent, TableComprasComponent, ModalComponent, HeaderTitlePageComponent, ErrorPages, CurrencyPipe],
-    templateUrl: './factura-compra.component.html',
+    selector: 'app-documento-soporte',
+    imports: [CommonModule, LoaderComponent, TableDocumentosSoporteComponent, ModalComponent, HeaderTitlePageComponent, ErrorPages, CurrencyPipe],
+    templateUrl: './documento-soporte.component.html',
     standalone: true
 })
-export class FacturaCompraComponent {
+export class DocumentoSoporteComponent {
 
     headTitle: HeaderInput = {
-        title: 'Gestión de Facturas de Compra',
-        slog: 'Administra tus comprobantes de compra'
+        title: 'Gestión de Documentos Soporte',
+        slog: 'Administra tus documentos soporte'
     }
 
     private authService = inject(AuthService);
@@ -40,21 +40,21 @@ export class FacturaCompraComponent {
     isProcessing = signal<boolean>(false);
 
     // Filtros
-    filters = signal<PurchaseInvoiceFilters>({});
+    filters = signal<DocumentoSoporteFilters>({});
 
     paginationService = inject(PaginationService);
     notificacionService = inject(NotificationService);
-    facturaService = inject(FacturaCompraService);
+    documentoService = inject(DocumentosSoporteService);
     totalCompras = signal<number>(0);
     cardsTotales = signal<CardsTotales[]>([]);
 
-    facturasCompraResource = rxResource({
+    documentosSoporteResource = rxResource({
         request: () => ({
             page: this.paginationService.currentPage(),
             limit: 10,
             filters: this.filters()
         }),
-        loader: ({ request }) => this.facturaService.getFacturasCompras({
+        loader: ({ request }) => this.documentoService.getDocumentosSoporte({
             limit: request.limit,
             page: request.page,
             ...request.filters
@@ -64,14 +64,14 @@ export class FacturaCompraComponent {
                 this.paginationService.totalItems.set(el.meta?.total ?? 0);
                 this.paginationService.pageSize.set(el.meta?.totalPages ?? 1);
                 this.cardsTotales.set([
-                    { title: 'Total Facturas Compra', valor: this.totalCompras().toString(), percent: '0' },
+                    { title: 'Total Documentos', valor: this.totalCompras().toString(), percent: '0' },
                     { title: 'Total Gastos', valor: '0', percent: '0' },
                 ]);
             })
         )
     })
 
-    onFilterChange(filters: PurchaseInvoiceFilters): void {
+    onFilterChange(filters: DocumentoSoporteFilters): void {
         this.filters.set(filters);
     }
 
@@ -91,6 +91,9 @@ export class FacturaCompraComponent {
             case 'register':
                 this.onRegister();
                 break;
+            case 'emitir':
+                this.onEmitir();
+                break;
             default:
                 break;
         }
@@ -102,14 +105,31 @@ export class FacturaCompraComponent {
         this.isModalItem.set(true);
     }
 
+    onEmitir(): void {
+        if (this.isProcessing()) return;
+        this.isProcessing.set(true);
+        this.documentoService.emitirDocumentoSoporte(this.idItem()).subscribe((res: ResponseResult) => {
+            this.isProcessing.set(false);
+            this.isModalItem.set(false);
+            if (res.success) {
+                this.notificacionService.success('Documento emitido a la DIAN con éxito', 'Éxito');
+                avisarAdvertenciasInventario(this.notificacionService, res.data);
+                this.documentosSoporteResource.reload();
+            } else {
+                const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
+                this.notificacionService.error('Error al emitir documento', message || 'Error desconocido');
+            }
+        });
+    }
+
     onRetryAsiento(id: string): void {
         if (this.isProcessing()) return;
         this.isProcessing.set(true);
-        this.facturaService.retryAsiento(id).subscribe((res: ResponseResult) => {
+        this.documentoService.retryAsiento(id).subscribe((res: ResponseResult) => {
             this.isProcessing.set(false);
             if (res.success) {
                 this.notificacionService.success('Asiento reintentado con éxito', 'Éxito');
-                this.facturasCompraResource.reload();
+                this.documentosSoporteResource.reload();
             } else {
                 const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
                 this.notificacionService.error('Error al reintentar asiento', message || 'Error desconocido');
@@ -120,15 +140,15 @@ export class FacturaCompraComponent {
     onRegister(): void {
         if (this.isProcessing()) return;
         this.isProcessing.set(true);
-        this.facturaService.registrarFacturaCompra(this.idItem()).subscribe((res: ResponseResult) => {
+        this.documentoService.registrarDocumentoSoporte(this.idItem()).subscribe((res: ResponseResult) => {
             this.isProcessing.set(false);
             this.isModalItem.set(false);
             if (res.success) {
-                this.notificacionService.success('Factura registrada con éxito', 'Éxito');
-                this.facturasCompraResource.reload();
+                this.notificacionService.success('Documento registrado con éxito', 'Éxito');
+                this.documentosSoporteResource.reload();
             } else {
                 const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
-                this.notificacionService.error('Error al registrar factura', message || 'Error desconocido');
+                this.notificacionService.error('Error al registrar documento', message || 'Error desconocido');
             }
         });
     }
@@ -136,16 +156,16 @@ export class FacturaCompraComponent {
     onAnular(): void {
         if (this.isProcessing()) return;
         this.isProcessing.set(true);
-        this.facturaService.anularFacturaCompra(this.idItem()).subscribe((res: ResponseResult) => {
+        this.documentoService.anularDocumentoSoporte(this.idItem()).subscribe((res: ResponseResult) => {
             this.isProcessing.set(false);
             this.isModalItem.set(false);
             if (res.success) {
-                this.notificacionService.success('Factura anulada con éxito', 'Éxito');
+                this.notificacionService.success('Documento anulado con éxito', 'Éxito');
                 avisarAdvertenciasInventario(this.notificacionService, res.data);
-                this.facturasCompraResource.reload();
+                this.documentosSoporteResource.reload();
             } else {
                 const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
-                this.notificacionService.error('Error al anular factura', message || 'Error desconocido');
+                this.notificacionService.error('Error al anular documento', message || 'Error desconocido');
             }
         });
     }
@@ -153,15 +173,15 @@ export class FacturaCompraComponent {
     onDelete(): void {
         if (this.isProcessing()) return;
         this.isProcessing.set(true);
-        this.facturaService.deleteFacturaCompra(this.idItem()).subscribe((res: ResponseResult) => {
+        this.documentoService.deleteDocumentoSoporte(this.idItem()).subscribe((res: ResponseResult) => {
             this.isProcessing.set(false);
             this.isModalItem.set(false);
             if (res.success) {
-                this.notificacionService.success('Factura eliminada con éxito', 'Éxito');
-                this.facturasCompraResource.reload();
+                this.notificacionService.success('Documento eliminado con éxito', 'Éxito');
+                this.documentosSoporteResource.reload();
             } else {
                 const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
-                this.notificacionService.error('Error al eliminar factura', message || 'Error desconocido');
+                this.notificacionService.error('Error al eliminar documento', message || 'Error desconocido');
             }
         });
     }

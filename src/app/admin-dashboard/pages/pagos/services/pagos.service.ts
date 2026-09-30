@@ -72,6 +72,11 @@ export class PagosHttpService {
             .get<PagoHistorialResponse>(`${this.base}/pagos/cxp/${facturaCompraId}/historial`);
     }
 
+    getHistorialPagosDocumentoSoporte(documentoSoporteId: string): Observable<PagoHistorialResponse> {
+        return this.http
+            .get<PagoHistorialResponse>(`${this.base}/pagos/cxp-soporte/${documentoSoporteId}/historial`);
+    }
+
     registrarPago(facturaCompraId: string, dto: RegistrarPagoDto): Observable<PagoResponseDto<unknown>> {
         return this.http.post<PagoResponseDto<unknown>>(`${this.base}/pagos/cxp/${facturaCompraId}/pago`, dto);
     }

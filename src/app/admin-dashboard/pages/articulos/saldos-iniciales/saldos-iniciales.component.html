@@ -44,6 +44,22 @@
         <b>cantidad</b> (cantidad, stock o saldo), con encabezados en la primera fila.
     </p>
 
+    @if (conciliacion()) {
+    <div class="rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+        <div class="flex flex-wrap items-center gap-x-6 gap-y-1 text-xs">
+            <span class="font-black text-gray-900 uppercase tracking-wide">Conciliación vs 1435</span>
+            <span class="text-gray-500">Contable: <b class="tabular-nums text-gray-900">{{ conciliacion().saldoContable1435 | currency:'$':'symbol':'1.0-0' }}</b></span>
+            <span class="text-gray-500">Kardex: <b class="tabular-nums text-gray-900">{{ conciliacion().valorKardex | currency:'$':'symbol':'1.0-0' }}</b></span>
+            <span class="text-gray-500">Diferencia:
+                <b class="tabular-nums" [class.text-emerald-600]="conciliacion().diferencia == 0"
+                    [class.text-amber-600]="conciliacion().diferencia != 0">{{ conciliacion().diferencia | currency:'$':'symbol':'1.0-0' }}</b>
+            </span>
+            <span class="text-gray-400">{{ conciliacion().totalArticulos }} artículos · {{ conciliacion().articulosEnNegativo }} en negativo</span>
+        </div>
+        <p class="mt-1 text-[11px] text-gray-400">{{ conciliacion().nota }}</p>
+    </div>
+    }
+
     @if (noEncontrados().length) {
     <div class="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-xl px-4 py-2">
         <p class="font-bold mb-1">{{ noEncontrados().length }} filas del archivo no se aplicaron:</p>

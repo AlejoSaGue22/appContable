@@ -15,8 +15,8 @@ import { ProductosService } from '@dashboard/pages/ventas/services/productos.ser
 import { ProveedoresRequest } from '@dashboard/interfaces/proveedores-interface';
 import { GetProductosDetalle } from '@dashboard/interfaces/productos-interface';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { FacturaCompraService } from '../../services/factura-compra.service';
-import { FacturaCompra, ItemFacturaResponse } from '@dashboard/interfaces/factura-compra-interface';
+import { DocumentosSoporteService } from '../../services/documentos-soporte.service';
+import { DocumentoSoporte, ItemDocumentoSoporte } from '@dashboard/interfaces/documento-soporte-interface';
 import { FacturaNotasResumen } from '@dashboard/interfaces/documento-venta-interface';
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
 import { HelpersUtils } from '@utils/helpers.utils';
@@ -35,7 +35,7 @@ import { ActivoFijo } from '@dashboard/pages/contabilidad/interfaces/activos-fij
 import { CurrencyFormatDirective } from '@shared/directives/currency-format.directive';
 
 @Component({
-    selector: 'app-factura-compra-forms-page',
+    selector: 'app-documento-soporte-forms-page',
     standalone: true,
     imports: [
         CommonModule,
@@ -53,18 +53,18 @@ import { CurrencyFormatDirective } from '@shared/directives/currency-format.dire
     providers: [
         DecimalPipe
     ],
-    templateUrl: './factura-compra-forms-page.component.html',
+    templateUrl: './documento-soporte-forms-page.component.html',
 })
-export class FacturaCompraFormsPageComponent implements OnInit {
+export class DocumentoSoporteFormsPageComponent implements OnInit {
 
     headTitle: HeaderInput = {
-        title: 'Nueva Factura de Compra',
-        slog: 'Registra una nueva compra a proveedores'
+        title: 'Nuevo Documento Soporte',
+        slog: 'Registra un documento soporte a proveedores'
     };
 
     private fb = inject(FormBuilder);
     notificationService = inject(NotificationService);
-    facturaService = inject(FacturaCompraService);
+    documentoService = inject(DocumentosSoporteService);
     loaderService = inject(LoaderService);
     proveedoresServicios = inject(ProveedoresService);
     productoServicios = inject(ProductosService);
@@ -79,7 +79,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     isProviderModalVisible = signal<boolean>(false);
     isProductModalVisible = signal<boolean>(false);
 
-    facturaId = toSignal(
+    documentoId = toSignal(
         this.activatedRoute.params.pipe(
             map((params) => params['id'])
         )
@@ -100,7 +100,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     cuentasBancarias = signal<CuentaBancaria[]>([]);
     activosFijosList = signal<any[]>([]);
     refreshAsientoTrigger = signal<number>(0);
-    factura = signal<FacturaCompra | null>(null);
+    documento = signal<DocumentoSoporte | null>(null);
     notasResumen = signal<FacturaNotasResumen | null>(null);
     anticiposDisponibles = signal<any[]>([]);
     anticiposAsociados = signal<{ anticipoId: string; numero: string; montoOriginal: number; saldoDisponible: number; montoAplicado: number }[]>([]);
@@ -124,13 +124,16 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         tipoIdentificacion: [''],
         email: [''],
         telefono: [''],
+        tipo: ['estandar', Validators.required],
         fechaEmision: [new Date().toISOString().substring(0, 10), Validators.required],
         fechaVencimiento: [''],
         formaPago: ['', Validators.required],
         metodoPago: [''],
         cuentaBancariaId: [''],
         referencia: ['', Validators.required],
-        observaciones: [''],
+        observaciones: ['', Validators.maxLength(500)],
+        generationMode: ['1', Validators.required],
+        periodStartDate: [''],
         items: this.fb.array([])
     });
 
@@ -182,11 +185,11 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         this.activatedRoute.params.subscribe((params) => {
             const id = params['id'];
             if (id && id !== 'new') {
-                this.headTitle.title = 'Editar Factura de Compra';
-                this.headTitle.slog = 'Se edita factura de compra del sistema';
+                this.headTitle.title = 'Editar documento soporte';
+                this.headTitle.slog = 'Se edita documento soporte del sistema';
                 this.loadFactura(id);
             } else {
-                this.factura.set(null);
+                this.documento.set(null);
             }
         });
 
@@ -282,7 +285,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                 this.activosFijosList.set(activosFijos?.items || activosFijos?.data?.items || (Array.isArray(activosFijos) ? activosFijos : []));
             },
             error: (error) => {
-                this.notificationService.error('Error al cargar los datos de la factura de compra', error);
+                this.notificationService.error('Error al cargar los datos de el documento soporte', error);
             },
             complete: () => {
                 this.loaderService.hide();
@@ -292,14 +295,14 @@ export class FacturaCompraFormsPageComponent implements OnInit {
 
     loadFactura(id: string) {
         this.loaderService.show();
-        this.facturaService.getFacturaCompraById(id).subscribe({
-            next: (factura) => {
-                if (factura.success) {
-                    const invoice = factura.data.data[0]!;
-                    this.factura.set(invoice);
+        this.documentoService.getDocumentoSoporteById(id).subscribe({
+            next: (docRes) => {
+                if (docRes.success) {
+                    const invoice = docRes.data.data[0]!;
+                    this.documento.set(invoice);
                     this.notasResumen.set(invoice.notasResumen ?? null);
                     if (!invoice.notasResumen) {
-                        this.facturaService.getNotasResumen(id).subscribe({
+                        this.documentoService.getNotasResumen(id).subscribe({
                             next: r => this.notasResumen.set(r.data ?? null),
                             error: () => this.notasResumen.set(null),
                         });
@@ -309,7 +312,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                         this.items.removeAt(0);
                     }
 
-                    invoice.items.forEach((item: ItemFacturaResponse | any) => {
+                    invoice.items.forEach((item: ItemDocumentoSoporte | any) => {
                         let tipoConceptoVal = 'PRODUCTO';
                         let nombreDisplay = item.articulo?.nombre || '';
                         let prodId = item.articuloId || null;
@@ -362,6 +365,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                         numeroIdentificacion: ident,
                         email: prov?.email,
                         telefono: prov?.telefono,
+                        tipo: invoice.tipo || 'estandar',
                         fechaEmision: invoice.fecha,
                         fechaVencimiento: invoice.fechaVencimiento,
                         formaPago: invoice.formaPago,
@@ -369,14 +373,16 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                         cuentaBancariaId: invoice.cuentaBancariaId,
                         referencia: invoice.numeroFacturaProveedor,
                         observaciones: invoice.observaciones,
+                        generationMode: invoice.generationMode || '1',
+                        periodStartDate: invoice.periodStartDate || '',
                     });
                     this.totales.facturaTotal = invoice.total;
                     this.totales.subtotal = invoice.subtotal;
                     this.totales.totalIVA = invoice.iva;
                     this.totales.descuentoTotal = invoice.descuento;
 
-                    // Cargar anticipos cruzados/aplicados a esta factura
-                    this.facturaService.getAplicacionesAnticipo(id).subscribe({
+                    // Cargar anticipos cruzados/aplicados a este documento
+                    this.documentoService.getAplicacionesAnticipo(id).subscribe({
                         next: (appRes) => {
                             const apps = appRes.data || [];
                             this.anticiposAsociados.set(apps.map((app: any) => ({
@@ -403,7 +409,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                 }
             },
             error: (error) => {
-                this.notificationService.error('Error al cargar los datos de la factura de compra', error);
+                this.notificationService.error('Error al cargar los datos de el documento soporte', error);
                 this.loaderService.hide();
             }
 
@@ -572,13 +578,20 @@ export class FacturaCompraFormsPageComponent implements OnInit {
             return;
         }
 
+        if (!this.validarPeriodo()) return;
+
+        const esElectronico = this.formCompra.controls.tipo.value === 'electronico';
+        // El electrónico nunca se registra directo: se crea en borrador y se emite a la DIAN.
+        const crearComoBorrador = isDraft || esElectronico;
+
         this.loading.set(true);
-        this.loaderService.show('Guardando factura de compra...');
+        this.loaderService.show(esElectronico && !isDraft ? 'Emitiendo a la DIAN...' : 'Guardando documento soporte...');
         const factura = this.formCompra.value;
         const items = this.formCompra.controls.items.value;
 
         const invoiceData: any = {
-            isDraft,
+            isDraft: crearComoBorrador,
+            tipo: factura.tipo || 'estandar',
             proveedorId: factura.proveedor!,
             fecha: factura.fechaEmision!,
             numeroFacturaProveedor: factura.referencia || '',
@@ -587,6 +600,8 @@ export class FacturaCompraFormsPageComponent implements OnInit {
             formaPago: factura.formaPago!,
             metodoPago: factura.metodoPago || '',
             cuentaBancariaId: factura.cuentaBancariaId || '',
+            generationMode: factura.generationMode || '1',
+            periodStartDate: factura.periodStartDate || '',
             items: items.map((item: any) => ({
                 articuloId: item.productoId,
                 cuentaContableId: item.cuentaContableId,
@@ -607,20 +622,27 @@ export class FacturaCompraFormsPageComponent implements OnInit {
             }))
         };
 
-        if (this.facturaId() == 'new') {
-            this.facturaService.createFacturaCompra(invoiceData).subscribe((response) => {
-                this.loading.set(false);
+        if (this.documentoId() == 'new') {
+            this.documentoService.createDocumentoSoporte(invoiceData).subscribe((response) => {
                 if (response.success == false) {
+                    this.loading.set(false);
                     this.loaderService.hide();
                     this.notificationService.error(
-                        `Ocurrio un problema al crear la factura ${HelpersUtils.getMessageError(response.message)}`,
+                        `Ocurrio un problema al crear el documento ${HelpersUtils.getMessageError(response.message)}`,
                         'Error',
                         5000
                     );
                     return;
                 }
 
-                this.notificationService.success('Factura creada con exito', 'Accion Completada', 5000);
+                if (esElectronico && !isDraft) {
+                    const createdId = response.data?.id || (response as any).id;
+                    this.emitirDocumento(createdId);
+                    return;
+                }
+
+                this.loading.set(false);
+                this.notificationService.success('Documento creado con éxito', 'Accion Completada', 5000);
                 avisarAdvertenciasInventario(this.notificationService, response.data);
 
 
@@ -629,29 +651,75 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                     if (isDraft) {
                         const invoiceId = response.data?.id || (response as any).id;
                         if (invoiceId) {
-                            this.router.navigate(['/panel/compras/purchases', invoiceId]);
+                            this.router.navigate(['/panel/compras/documentos-soporte', invoiceId]);
                         } else {
-                            this.router.navigateByUrl('/panel/compras/purchases');
+                            this.router.navigateByUrl('/panel/compras/documentos-soporte');
                         }
                     } else {
-                        this.router.navigateByUrl('/panel/compras/purchases');
+                        this.router.navigateByUrl('/panel/compras/documentos-soporte');
                     }
                 }, 200);
             });
 
         } else {
-            this.updateFactura(this.facturaId()!, invoiceData, isDraft);
+            this.updateDocumento(this.documentoId()!, invoiceData, isDraft);
         }
 
     }
 
-    updateFactura(id: string, data: Partial<FacturaCompra>, isDraft: boolean) {
-        this.facturaService.updateFacturaCompra(id, data).subscribe((response) => {
+    /** Emite un documento electrónico en borrador a la DIAN. */
+    emitirDocumento(id: string): void {
+        if (!id) {
+            this.loading.set(false);
+            this.loaderService.hide();
+            return;
+        }
+        this.loaderService.show('Emitiendo a la DIAN...');
+        this.documentoService.emitirDocumentoSoporte(id).subscribe((res) => {
+            this.loading.set(false);
+            this.loaderService.hide();
+            if (res.success == false) {
+                this.notificationService.error(
+                    `El documento se guardó pero la DIAN lo rechazó: ${HelpersUtils.getMessageError(res.message)}`,
+                    'Advertencia',
+                    8000
+                );
+                this.router.navigate(['/panel/compras/documentos-soporte', id]);
+                return;
+            }
+            this.notificationService.success('Documento emitido a la DIAN con éxito', 'Acción Completada', 5000);
+            avisarAdvertenciasInventario(this.notificationService, res.data);
+            this.router.navigateByUrl('/panel/compras/documentos-soporte');
+        });
+    }
+
+    /** Valida el periodo DIAN (modo acumulado semanal exige fecha dentro de los últimos 6 días). */
+    validarPeriodo(): boolean {
+        const mode = this.formCompra.controls.generationMode.value || '1';
+        if (mode !== '2') return true;
+        const raw = this.formCompra.controls.periodStartDate.value;
+        if (!raw) {
+            this.notificationService.error('El modo acumulado semanal requiere la fecha de adquisición.', 'Campos no validos', 5000);
+            return false;
+        }
+        const start = new Date(raw + 'T00:00:00');
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        const diffDias = Math.floor((hoy.getTime() - start.getTime()) / 86400000);
+        if (Number.isNaN(start.getTime()) || diffDias < 0 || diffDias > 6) {
+            this.notificationService.error('La fecha de adquisición debe estar entre hoy y los 6 días anteriores.', 'Campos no validos', 5000);
+            return false;
+        }
+        return true;
+    }
+
+    updateDocumento(id: string, data: Partial<DocumentoSoporte>, isDraft: boolean) {
+        this.documentoService.updateDocumentoSoporte(id, data).subscribe((response) => {
             if (response.success == false) {
                 this.loading.set(false);
                 this.loaderService.hide();
                 this.notificationService.error(
-                    `Ocurrio un problema al actualizar la factura ${HelpersUtils.getMessageError(response.message)}`,
+                    `Ocurrio un problema al actualizar el documento ${HelpersUtils.getMessageError(response.message)}`,
                     'Error',
                     5000
                 );
@@ -669,26 +737,28 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                     this.loaderService.hide();
                     this.refreshAsientoTrigger.update(v => v + 1);
                 }, 200);
+            } else if (data.tipo === 'electronico') {
+                this.emitirDocumento(id);
             } else {
-                this.loaderService.show('Registrando factura de compra...');
-                this.facturaService.registrarFacturaCompra(id).subscribe((regRes) => {
+                this.loaderService.show('Registrando documento soporte...');
+                this.documentoService.registrarDocumentoSoporte(id).subscribe((regRes) => {
                     this.loading.set(false);
                     this.loaderService.hide();
                     if (regRes.success == false) {
                         this.notificationService.error(
-                            `La factura se guardó pero ocurrió un problema al registrarla: ${HelpersUtils.getMessageError(regRes.message)}`,
+                            `El documento se guardó pero ocurrió un problema al registrarlo: ${HelpersUtils.getMessageError(regRes.message)}`,
                             'Advertencia',
                             5000
                         );
                         return;
                     }
                     this.notificationService.success(
-                        'Factura registrada con éxito',
+                        'Documento registrado con éxito',
                         'Acción Completada',
                         5000
                     );
                     avisarAdvertenciasInventario(this.notificationService, regRes.data);
-                    this.router.navigateByUrl('/panel/compras/purchases');
+                    this.router.navigateByUrl('/panel/compras/documentos-soporte');
                 });
             }
         });
@@ -740,7 +810,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     }
 
     cargarAnticiposDisponibles(proveedorId: string) {
-        this.facturaService.getAnticiposDisponibles(proveedorId).subscribe({
+        this.documentoService.getAnticiposDisponibles(proveedorId).subscribe({
             next: (res) => {
                 const asociadosIds = this.anticiposAsociados().map(a => a.anticipoId);
                 const disponibles = (res.data || []).filter((a: any) => !asociadosIds.includes(a.id));

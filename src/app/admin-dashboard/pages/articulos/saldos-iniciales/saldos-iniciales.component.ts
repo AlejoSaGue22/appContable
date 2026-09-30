@@ -39,6 +39,7 @@ export class SaldosInicialesComponent {
     private notificationService = inject(NotificationService);
 
     filas = signal<FilaSaldo[]>([]);
+    conciliacion = signal<any | null>(null);
     cargando = signal(false);
     procesando = signal(false);
     importando = signal(false);
@@ -63,6 +64,16 @@ export class SaldosInicialesComponent {
 
     constructor() {
         this.cargar();
+        this.cargarConciliacion();
+    }
+
+    async cargarConciliacion() {
+        try {
+            const res = await firstValueFrom(this.inventarioService.conciliacion());
+            if (res.success) this.conciliacion.set((res.data as any)?.data ?? res.data);
+        } catch {
+            // Sin conciliación: el kardex sigue operando igual.
+        }
     }
 
     async cargar() {
@@ -253,6 +264,7 @@ export class SaldosInicialesComponent {
                 'Inventario',
                 5000
             );
+            this.cargarConciliacion();
         } finally {
             this.procesando.set(false);
         }

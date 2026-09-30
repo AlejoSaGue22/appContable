@@ -14,6 +14,7 @@ import { ResponseResult } from '@shared/interfaces/services.interfaces';
 import { ModalComponent } from "@shared/components/modal/modal.component";
 import { LoaderService } from '@utils/services/loader.service';
 import { InvoiceFilters } from '@dashboard/interfaces/documento-venta-interface';
+import { avisarAdvertenciasInventario } from '@dashboard/services/inventario.service';
 
 @Component({
     selector: 'app-comprobante-ventas',
@@ -129,6 +130,7 @@ export class ComprobanteVentasComponent {
             this.loaderService.hide();
             if (res.success) {
                 this.notificacionService.success('Factura estándar emitida con éxito', 'Éxito');
+                avisarAdvertenciasInventario(this.notificacionService, res.data);
                 this.comprobanteVentasResource.reload();
             } else {
                 const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
@@ -145,6 +147,7 @@ export class ComprobanteVentasComponent {
                 this.loaderService.hide();
                 this.isModalItem.set(false);
                 this.notificacionService.success('Factura anulada con éxito', 'Éxito');
+                avisarAdvertenciasInventario(this.notificacionService, res.data);
                 this.comprobanteVentasResource.reload();
             } else {
                 this.loaderService.hide();

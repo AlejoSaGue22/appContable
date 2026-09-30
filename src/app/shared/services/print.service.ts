@@ -91,8 +91,8 @@ export class PrintService {
   // ──────────────────────────────────────────────────────────────────────
   // IMPRIMIR FACTURA DE COMPRA
   // ──────────────────────────────────────────────────────────────────────
-  printPurchaseInvoice(compra: FacturaCompraResponse): void {
-    const html = this.buildPurchaseInvoiceHtml(compra);
+  printPurchaseInvoice(compra: FacturaCompraResponse, titulo?: string): void {
+    const html = this.buildPurchaseInvoiceHtml(compra, titulo);
     this.openPrintWindow(html, `Compra ${compra.numero}`);
   }
 
@@ -109,13 +109,13 @@ export class PrintService {
   // ──────────────────────────────────────────────────────────────────────
   // IMPRIMIR NOTA DE AJUSTE COMPRA (CRÉDITO/DÉBITO)
   // ──────────────────────────────────────────────────────────────────────
-  printAdjustmentNoteCompra(nota: NotaAjusteCompra): void {
-    const html = this.buildAdjustmentNoteCompraHtml(nota);
+  printAdjustmentNoteCompra(nota: NotaAjusteCompra, tituloTipo?: string): void {
+    const html = this.buildAdjustmentNoteCompraHtml(nota, tituloTipo);
     const title =
       nota.tipo === 'credito' ? 'Nota Crédito Compra' : 'Nota Débito Compra';
     this.openPrintWindow(
       html,
-      `${title} ${nota.prefijo || ''}${nota.numeroCompleto || nota.id}`,
+      `${tituloTipo || title} ${nota.prefijo || ''}${nota.numeroCompleto || nota.id}`,
     );
   }
 
@@ -561,7 +561,8 @@ export class PrintService {
   // ══════════════════════════════════════════════════════════════════════
   // PRIVATE — Construir HTML de Factura de Compra
   // ══════════════════════════════════════════════════════════════════════
-  private buildPurchaseInvoiceHtml(c: FacturaCompraResponse): string {
+  private buildPurchaseInvoiceHtml(c: FacturaCompraResponse, titulo?: string): string {
+    const tituloDoc = (titulo || 'Factura de compra').toUpperCase();
     const proveedorNombre = c.proveedor.razonSocial?.trim() || c.proveedor.nombre?.trim() || '—';
     const proveedorNit = c.proveedor.identificacion || '—';
     const fechaGen = this.formatDateTimePrint(c.createdAt);
@@ -585,7 +586,7 @@ export class PrintService {
 <html lang="es">
 <head>
  <meta charset="UTF-8"/>
- <title>Factura de Compra ${c.numero}</title>
+  <title>${tituloDoc} ${c.numero}</title>
  <style>
  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
  * { margin:0; padding:0; box-sizing:border-box; }
@@ -617,7 +618,7 @@ export class PrintService {
 
  <!-- Center: Document type + empresa info -->
  <td style="vertical-align:top;text-align:center;">
- <div style="font-size:13px;font-weight:800;color:#000000;text-transform:uppercase;letter-spacing:0.5px;">FACTURA DE COMPRA</div>
+  <div style="font-size:13px;font-weight:800;color:#000000;text-transform:uppercase;letter-spacing:0.5px;">${tituloDoc}</div>
  <div style="font-size:12px;font-weight:700;color:#000000;margin-top:2px;">NÚMERO ${c.numero}</div>
  ${c.numeroFacturaProveedor ? `<div style="font-size:10px;color:#64748b;margin-top:2px;">Ref. Proveedor: ${c.numeroFacturaProveedor}</div>` : ''}
  <div style="margin-top:6px;line-height:1.5;color:#475569;font-size:9.5px;">
@@ -1038,12 +1039,17 @@ export class PrintService {
   // ══════════════════════════════════════════════════════════════════════
   // PRIVATE — Construir HTML de Nota de Ajuste Compra
   // ══════════════════════════════════════════════════════════════════════
-  private buildAdjustmentNoteCompraHtml(n: NotaAjusteCompra): string {
-    const tipoLabel = n.tipo === 'credito' ? 'NOTA CRÉDITO COMPRA' : 'NOTA DÉBITO COMPRA';
+  private buildAdjustmentNoteCompraHtml(n: NotaAjusteCompra, tituloTipo?: string): string {
+    const tipoLabel = tituloTipo?.toUpperCase()
+      ?? (n.tipo === 'credito' ? 'NOTA CRÉDITO COMPRA' : 'NOTA DÉBITO COMPRA');
     const proveedorNombre = n.proveedor?.razonSocial?.trim() || n.proveedor?.nombre?.trim() || '—';
     const proveedorNit = n.proveedor?.identificacion || '—';
     const fechaGen = this.formatDateTimePrint(n.createdAt);
-    const facturaRef = n.facturaOriginal?.numeroFacturaProveedor || n.facturaOriginalNumero || '—';
+    const facturaRef = (n as any).facturaOriginal?.numeroFacturaProveedor
+      || (n as any).documentoOriginal?.numeroFacturaProveedor
+      || (n as any).facturaOriginalNumero
+      || (n as any).documentoOriginalNumero
+      || '—';
 
     const itemsRows = n.items.map((item, i) => `<tr>
               <td style="text-align:center;padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#64748b;">${i + 1}</td>
