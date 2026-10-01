@@ -1,0 +1,33 @@
+<form class="space-y-6" [formGroup]="formLogin">
+    <!-- Email Field -->
+    <div class="space-y-2">
+        <label for="email" class="block text-sm font-semibold text-slate-700">Correo Electrónico</label>
+        <div class="relative">
+            <input type="email" name="email" id="email" formControlName="email"
+                [class.border-red-500]="formLogin.get('email')?.touched && formLogin.get('email')?.errors"
+                class="w-full px-5 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 outline-none placeholder:text-slate-400"
+                placeholder="nombre@empresa.com">
+        </div>
+        <form-error-label [errorType]="formLogin.get('email')!" />
+    </div>
+
+    <!-- Password Field -->
+    <div class="space-y-2">
+        <div class="flex items-center justify-between">
+            <label for="password" class="block text-sm font-semibold text-slate-700">Contraseña</label>
+        </div>
+        <div class="relative">
+            <input type="password" name="password" id="password" placeholder="••••••••" formControlName="password"
+                [class.border-red-500]="formLogin.get('password')?.touched && formLogin.get('password')?.errors"
+                class="w-full px-5 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 outline-none placeholder:text-slate-400">
+        </div>
+        <form-error-label [errorType]="formLogin.get('password')!" />
+    </div>
+
+    <!-- Submit Button -->
+    <button type="submit" (click)="onSubmit()"
+        class="w-full py-3.5 px-5 cursor-pointer bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 transform transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:shadow-inner focus:ring-2 focus:ring-blue-500/40 outline-none">
+        Iniciar Sesión
+    </button>
+
+</form>

@@ -1,0 +1,278 @@
+<!-- Container for Filters and Table -->
+<div class="space-y-6 animate-fade-in">
+  <!-- Modernized Filters Panel -->
+  <div
+    class="bg-white/80 backdrop-blur-xl rounded-2xl shadow-sm border border-gray-100 p-6 overflow-hidden transition-all duration-300">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <!-- Buscador Principal -->
+      <div class="relative flex-1 max-w-md group">
+        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+          <svg class="h-4 w-4 text-gray-400 group-hover:text-blue-500 transition-colors" fill="none"
+            stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <input type="text" placeholder="Buscar período por nombre..." [ngModel]="search()"
+          (ngModelChange)="search.set($event)"
+          class="block w-full pl-11 pr-4 py-2 bg-gray-50/50 border border-gray-100 rounded-xl text-sm placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/20 transition-all" />
+      </div>
+
+      <!-- Botones Principales -->
+      <div class="flex items-center gap-3">
+        <button type="button" (click)="toggleFilters()"
+          class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm transition-all border cursor-pointer border-gray-200 hover:bg-gray-50 group"
+          [class.bg-blue-50]="showFilters()" [class.text-blue-600]="showFilters()">
+          <svg class="h-4 w-4 transition-transform group-hover:rotate-12" fill="none" stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+          </svg>
+          {{ showFilters() ? "Ocultar Filtros" : "Filtros Avanzados" }}
+          @if (activeFiltersCount() > 0) {
+          <span
+            class="flex items-center justify-center w-5 h-5 rounded-full bg-blue-600 text-[10px] text-white font-black animate-pulse">
+            {{ activeFiltersCount() }}
+          </span>
+          }
+        </button>
+
+        <button type="button" (click)="applyFilters()"
+          class="px-6 py-2 hover:bg-gray-100 border border-gray-200 text-sm cursor-pointer rounded-xl transition-all">
+          Consultar
+        </button>
+
+        @if (activeFiltersCount() > 0) {
+        <button type="button" (click)="clearFilters()" class="p-2 text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+          title="Limpiar filtros">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+        </button>
+        }
+      </div>
+    </div>
+
+    <!-- Advanced Filters Content -->
+    @if (showFilters()) {
+    <div class="mt-6 pt-6 border-t border-gray-50 grid grid-cols-1 sm:grid-cols-3 gap-6 animate-slide-down">
+      <!-- Filtro Estado -->
+      <div class="space-y-2">
+        <label class="text-[10px] text-gray-400 ml-1">Estado Período</label>
+        <select [ngModel]="estado()" (ngModelChange)="estado.set($event)"
+          class="block w-full px-4 py-2 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:border-blue-500/50 transition-all appearance-none cursor-pointer">
+          <option value="">Todos los estados</option>
+          <option value="BORRADOR">Borrador</option>
+          <option value="LIQUIDADA">Liquidada</option>
+          <option value="PAGADA">Pagada</option>
+          <option value="ANULADA">Anulada</option>
+        </select>
+      </div>
+
+      <!-- Filtro Tipo -->
+      <div class="space-y-2">
+        <label class="text-[10px] text-gray-400 ml-1">Tipo de Período</label>
+        <select [ngModel]="tipo()" (ngModelChange)="tipo.set($event)"
+          class="block w-full px-4 py-2 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:border-blue-500/50 transition-all appearance-none cursor-pointer">
+          <option value="">Todos los tipos</option>
+          <option value="MENSUAL">Mensual</option>
+          <option value="QUINCENAL">Quincenal</option>
+        </select>
+      </div>
+
+      <!-- Filtro Año -->
+      <div class="space-y-2">
+        <label class="text-[10px] text-gray-400 ml-1">Año</label>
+        <select [ngModel]="anio()" (ngModelChange)="anio.set($event)"
+          class="block w-full px-4 py-2 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:border-blue-500/50 transition-all appearance-none cursor-pointer">
+          <option value="">Todos los años</option>
+          <option value="2026">2026</option>
+          <option value="2025">2025</option>
+          <option value="2024">2024</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="mt-6 flex justify-end gap-3">
+      <button type="button" (click)="clearFilters()"
+        class="px-6 py-2 hover:bg-gray-100 border border-gray-200 text-sm cursor-pointer rounded-xl transition-all">
+        Limpiar Filtros
+      </button>
+      <button type="button" (click)="applyFilters()"
+        class="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm cursor-pointer rounded-xl transition-all active:scale-95">
+        Aplicar Filtros
+      </button>
+    </div>
+    }
+  </div>
+
+  <!-- Tabla de Períodos -->
+  <div
+    class="relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+    <div class="overflow-x-auto">
+      <table class="ledger-table">
+        <thead>
+          <tr>
+            <th class="text-center">Nombre</th>
+            <th class="text-center">Rango de Fechas</th>
+            <th class="text-center">Tipo</th>
+            <th class="text-right">Total a Pagar</th>
+            <th class="text-center">Estado</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of filteredPeriodos(); track p.id) {
+          <tr>
+            <td class="text-center font-semibold text-slate-900">
+              {{ p.nombre }}
+            </td>
+            <td class="text-center text-xs text-gray-500">
+              {{ p.fechaInicio }} - {{ p.fechaFin }}
+            </td>
+            <td class="text-center">
+              <span
+                class="px-2.5 py-1 text-[10px] font-semibold uppercase rounded-lg border bg-blue-50 text-blue-600 border-blue-100">
+                {{ p.tipo }}
+              </span>
+            </td>
+            <td class="text-right tabular-nums font-semibold text-emerald-600">
+              {{ p.totalNeto | currency: "" : "$" : "1.0-0" }}
+            </td>
+            <td class="text-center">
+              <span class="px-2.5 py-1 text-[10px] font-semibold uppercase rounded-lg border"
+                [class.bg-yellow-50]="p.estado === 'BORRADOR'" [class.text-yellow-600]="p.estado === 'BORRADOR'"
+                [class.border-yellow-100]="p.estado === 'BORRADOR'" [class.bg-emerald-50]="p.estado === 'LIQUIDADA'"
+                [class.text-emerald-600]="p.estado === 'LIQUIDADA'"
+                [class.border-emerald-100]="p.estado === 'LIQUIDADA'" [class.bg-blue-50]="p.estado === 'PAGADA'"
+                [class.text-blue-600]="p.estado === 'PAGADA'" [class.border-blue-100]="p.estado === 'PAGADA'"
+                [class.bg-red-50]="p.estado === 'ANULADA'" [class.text-red-500]="p.estado === 'ANULADA'"
+                [class.border-red-100]="p.estado === 'ANULADA'">
+                {{ p.estado }}
+              </span>
+            </td>
+            <td>
+              <div class="flex justify-center gap-2">
+                <!-- Gestionar Empleados (solo BORRADOR) -->
+                @if (p.estado === 'BORRADOR') {
+                <button type="button" (click)="gestionarEmpleados.emit(p)"
+                  class="inline-flex items-center rounded-lg text-sm text-blue-600 hover:text-blue-900 cursor-pointer"
+                  title="Gestionar Empleados">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                </button>
+
+                <!-- Eliminar (solo BORRADOR) -->
+                <button type="button" (click)="eliminar.emit(p)"
+                  class="inline-flex items-center rounded-lg text-sm text-red-600 hover:text-red-900 cursor-pointer"
+                  title="Eliminar Período">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+                }
+
+                <!-- Ver Detalle (LIQUIDADA o PAGADA) -->
+                @if (p.estado === 'LIQUIDADA' || p.estado === 'PAGADA') {
+                <button type="button" (click)="verDetalle.emit(p)"
+                  class="inline-flex items-center rounded-lg text-sm text-blue-600 hover:text-blue-900 cursor-pointer"
+                  title="Ver Detalle">
+                  <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                    <path fill-rule="evenodd"
+                      d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                      clip-rule="evenodd" />
+                  </svg>
+                </button>
+                }
+
+                <!-- Reversar Liquidación (solo LIQUIDADA) -->
+                @if (p.estado === 'LIQUIDADA') {
+                <button type="button" (click)="reversar.emit(p)"
+                  class="inline-flex items-center rounded-lg text-sm text-yellow-600 hover:text-yellow-900 cursor-pointer"
+                  title="Reversar Liquidación">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                  </svg>
+                </button>
+                }
+
+                <!-- Enviar DIAN / Descargar XML (LIQUIDADA o PAGADA) -->
+                @if (p.estado === 'PAGADA' || p.estado === 'LIQUIDADA') {
+                @if (p.dianEstado === 'NO_ENVIADA') {
+                <button type="button" (click)="enviarDian.emit(p)"
+                  class="inline-flex items-center rounded-lg text-sm text-purple-600 hover:text-purple-900 cursor-pointer"
+                  title="Enviar a DIAN">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                </button>
+                }
+                @if (p.dianEstado === 'ENVIADA' || p.dianEstado === 'ACEPTADA') {
+                <button type="button" (click)="descargarXml.emit(p)"
+                  class="inline-flex items-center rounded-lg text-sm text-orange-600 hover:text-orange-900 cursor-pointer"
+                  title="Descargar XML (DIAN: {{ p.dianEstado }})">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                  </svg>
+                </button>
+                }
+                }
+
+
+              </div>
+            </td>
+          </tr>
+          } @empty {
+          <tr>
+            <td colspan="8" class="text-center">
+              <div class="flex flex-col items-center justify-center py-14">
+                <div class="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
+                  <svg class="h-10 w-10 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <p class="text-sm font-bold text-gray-900">
+                  Sin períodos de nómina
+                </p>
+                <p class="mt-1 text-xs text-gray-400">
+                  Aún no se han registrado períodos con los filtros aplicados.
+                </p>
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginación -->
+    <app-pagination [length]="filteredPeriodos().length" />
+  </div>
+</div>
+
+<style>
+  .animate-slide-down {
+    animation: slideDown 0.3s ease-out;
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>

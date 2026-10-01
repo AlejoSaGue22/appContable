@@ -1,0 +1,152 @@
+import { Component, inject, signal, OnInit, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import {
+  HeaderInput,
+  HeaderTitlePageComponent,
+} from '@dashboard/components/header-title-page/header-title-page.component';
+import { BreadcrumbComponent } from '@shared/components/breadcrumb/breadcrumb.component';
+import { CuentasContablesService } from '@dashboard/pages/contabilidad/services/cuentas-contables.service';
+import { NotificationService } from '@shared/services/notification.service';
+import { firstValueFrom } from 'rxjs';
+// import { LoaderService } from '@utils/services/loader.service';
+import { ParametrizacionContableService } from './services/parametrizacion-contable.service';
+import { SearchableSelectComponent } from '@shared/components/searchable-select/searchable-select.component';
+
+@Component({
+  selector: 'app-parametrizacion-contable',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    HeaderTitlePageComponent,
+    BreadcrumbComponent,
+    SearchableSelectComponent,
+  ],
+  templateUrl: './parametrizacion-contable.html',
+})
+export class ParametrizacionContable implements OnInit {
+  titleHead: HeaderInput = {
+    title: 'Parametrización Contable',
+    slog: 'Configura las cuentas contables de la empresa',
+  };
+
+  breadcrumbItems = [
+    { label: 'Configuración', route: '/panel/admin/settings' },
+    { label: 'Parametrización Contable' },
+  ];
+
+  private fb = inject(FormBuilder);
+  private parametrizacionService = inject(ParametrizacionContableService);
+  private cuentasService = inject(CuentasContablesService);
+  private notificationService = inject(NotificationService);
+
+  cuentas = signal<any[]>([]);
+  isLoading = signal<boolean>(true);
+  cuentasFiltradasClientes = computed(() => {
+    return this.cuentas().filter(
+      (c) => c.aceptaMovimiento && c.codigo.startsWith('13'),
+    );
+  });
+
+  cuentasFiltradasIva = computed(() => {
+    return this.cuentas().filter(
+      (c) => c.aceptaMovimiento && c.codigo.startsWith('2408'),
+    );
+  });
+
+  cuentasFiltradasProveedores = computed(() => {
+    return this.cuentas().filter(
+      (c) => c.aceptaMovimiento && c.codigo.startsWith('22'),
+    );
+  });
+
+  cuentasFiltradasCaja = computed(() => {
+    return this.cuentas().filter(
+      (c) => c.aceptaMovimiento && c.codigo.startsWith('110'),
+    );
+  });
+
+  cuentasFiltradasBancos = computed(() => {
+    return this.cuentas().filter(
+      (c) => c.aceptaMovimiento && c.codigo.startsWith('11'),
+    );
+  });
+
+  cuentasFiltradasGastosCxP = computed(() => {
+    return this.cuentas().filter(
+      (c) => c.aceptaMovimiento && c.codigo.startsWith('23'),
+    );
+  });
+
+  isSaving = signal<boolean>(false);
+
+  paramForm: FormGroup = this.fb.group({
+    cuentaCobrarClientesId: [null],
+    cuentaDevolucionesClientesId: [null],
+    cuentaPagarProveedoresId: [null],
+    cuentaDevolucionesProveedoresId: [null],
+    cuentaDevolucionIvaComprasId: [null],
+    cuentaCajaDefectoId: [null],
+    cuentaBancosDefectoId: [null],
+    cuentaPagarGastosId: [null],
+  });
+
+  ngOnInit(): void {
+    this.loadData();
+  }
+
+  async loadData() {
+    this.isLoading.set(true);
+    try {
+      // Cargar cuentas contables
+      const cuentasData = await firstValueFrom(this.cuentasService.getCuentasContables());
+      this.cuentas.set(cuentasData);
+
+      // Cargar configuración actual
+      const config = await firstValueFrom(this.parametrizacionService.getConfiguracion());
+      if (config) {
+        this.paramForm.patchValue({
+          cuentaCobrarClientesId: config.cuentaCobrarClientesId || null,
+          cuentaDevolucionesClientesId:
+            config.cuentaDevolucionesClientesId || null,
+          cuentaPagarProveedoresId: config.cuentaPagarProveedoresId || null,
+          cuentaDevolucionesProveedoresId:
+            config.cuentaDevolucionesProveedoresId || null,
+          cuentaDevolucionIvaComprasId:
+            config.cuentaDevolucionIvaComprasId || null,
+          cuentaCajaDefectoId: config.cuentaCajaDefectoId || null,
+          cuentaBancosDefectoId: config.cuentaBancosDefectoId || null,
+          cuentaPagarGastosId: config.cuentaPagarGastosId || null,
+        });
+      }
+    } catch (error) {
+      this.notificationService.error('Error al cargar la información', 'Error');
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  async save() {
+    if (this.paramForm.invalid) return;
+
+    this.isSaving.set(true);
+    const data = this.paramForm.value;
+    try {
+      await firstValueFrom(
+        this.parametrizacionService.updateConfiguracion(data),
+      );
+      this.notificationService.success(
+        'Configuración contable actualizada exitosamente',
+        'Éxito',
+      );
+    } catch (error: any) {
+      this.notificationService.error(
+        error?.error?.message || 'Error al guardar la configuración',
+        'Error',
+      );
+    } finally {
+      this.isSaving.set(false);
+    }
+  }
+}

@@ -1,0 +1,92 @@
+import { Routes } from "@angular/router";
+import { ErrorPageComponent } from "@utils/components/error-page/error-page.component";
+import { ProveedoresComponent } from "./proveedores/proveedores.component";
+import { ProveedoresFormsPageComponent } from "./proveedores/proveedores-forms-page/proveedores-forms-page.component";
+import { ProveedorDetailsComponent } from "./proveedores/components/proveedor-details/proveedor-details.component";
+import { FacturaCompraComponent } from "./factura-compra/factura-compra.component";
+import { FacturaCompraFormsPageComponent } from "./factura-compra/factura-compra-forms-page/factura-compra-forms-page.component";
+import { CompraDetailsComponent } from "./factura-compra/components/compra-details/compra-details.component";
+import { NotasAjusteComprasComponent } from "./notas-ajuste/notas-ajuste.component";
+import { NotasAjusteComprasFormPageComponent } from "./notas-ajuste/notas-ajuste-form-page/notas-ajuste-form-page.component";
+import { NotasAjusteComprasDetailsComponent } from "./notas-ajuste/components/notas-ajuste-details/notas-ajuste-details.component";
+import { DocumentoSoporteComponent } from "./documentos-soporte/documento-soporte.component";
+import { DocumentoSoporteFormsPageComponent } from "./documentos-soporte/documento-soporte-forms-page/documento-soporte-forms-page.component";
+import { DocumentoSoporteDetailsComponent } from "./documentos-soporte/components/documento-soporte-details/documento-soporte-details.component";
+import { NotasAjusteSoporteComponent } from "./notas-ajuste-soporte/notas-ajuste-soporte.component";
+import { NotasAjusteSoporteFormPageComponent } from "./notas-ajuste-soporte/notas-ajuste-soporte-form-page/notas-ajuste-soporte-form-page.component";
+import { NotasAjusteSoporteDetailsComponent } from "./notas-ajuste-soporte/components/notas-ajuste-soporte-details/notas-ajuste-soporte-details.component";
+
+export const comprasRoutes: Routes = [
+    // Proveedores Routes
+    {
+        path: 'proveedores',
+        component: ProveedoresComponent
+    },
+    {
+        path: 'proveedores/:id',
+        component: ProveedoresFormsPageComponent
+    },
+    {
+        path: 'proveedores/:id/details',
+        component: ProveedorDetailsComponent
+    },
+    // Factura Compra Routes
+    {
+        path: 'purchases',
+        component: FacturaCompraComponent
+    },
+    {
+        path: 'purchases/:id',
+        component: FacturaCompraFormsPageComponent
+    },
+    {
+        path: 'purchases/:id/details',
+        component: CompraDetailsComponent
+    },
+    // Notas de Ajuste Compras Routes
+    {
+        path: 'notas-ajuste',
+        component: NotasAjusteComprasComponent
+    },
+    {
+        path: 'notas-ajuste/:id',
+        component: NotasAjusteComprasFormPageComponent
+    },
+    {
+        path: 'notas-ajuste/:id/details',
+        component: NotasAjusteComprasDetailsComponent
+    },
+    // Documentos Soporte Routes
+    {
+        path: 'documentos-soporte',
+        component: DocumentoSoporteComponent
+    },
+    {
+        path: 'documentos-soporte/:id',
+        component: DocumentoSoporteFormsPageComponent
+    },
+    {
+        path: 'documentos-soporte/:id/details',
+        component: DocumentoSoporteDetailsComponent
+    },
+    // Notas de Ajuste a Documentos Soporte Routes
+    {
+        path: 'notas-ajuste-soporte',
+        component: NotasAjusteSoporteComponent
+    },
+    {
+        path: 'notas-ajuste-soporte/:id',
+        component: NotasAjusteSoporteFormPageComponent
+    },
+    {
+        path: 'notas-ajuste-soporte/:id/details',
+        component: NotasAjusteSoporteDetailsComponent
+    },
+    {
+        path: '**',
+        component: ErrorPageComponent
+    }
+]
+
+export default comprasRoutes;
+

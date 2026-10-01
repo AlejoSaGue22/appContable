@@ -1,0 +1,55 @@
+import { Routes } from "@angular/router";
+import AdminLayoutsComponent from "@dashboard/layouts/admin-layouts/admin-layouts.component";
+import { DashboargPageComponent } from "./dashboard/dashboarg-page.component";
+
+export const routes: Routes = [
+    {
+        path: '',
+        component: AdminLayoutsComponent,
+        children: [
+            {
+                path: 'dashboard',
+                component: DashboargPageComponent
+            },
+            {
+                path: 'ventas',
+                loadChildren: () => import('./ventas/ventas.routes')
+            },
+            {
+                path: 'compras',
+                loadChildren: () => import('./compras/compras.routes')
+            },
+            {
+                path: 'articles',
+                loadChildren: () => import('./articulos/articulos.route')
+            },
+            {
+                path: 'reports',
+                loadChildren: () => import('./reportes/reportes.routes')
+            },
+            {
+                path: 'admin',
+                loadChildren: () => import('./administracion/administracion.routes')
+            },
+            {
+                path: 'pagos',
+                loadChildren: () => import('./pagos/pagos.routes')
+            },
+            {
+                path: 'contabilidad',
+                loadChildren: () => import('./contabilidad/contabilidad.routes')
+            },
+            {
+                path: 'nomina',
+                loadChildren: () => import('./nomina/nomina.routes')
+            },
+            {
+                path: '**',
+                redirectTo: 'dashboard'
+            }
+        ]
+    }
+]
+
+
+export default routes;

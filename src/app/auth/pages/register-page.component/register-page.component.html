@@ -1,0 +1,71 @@
+<form class="space-y-6" [formGroup]="registerForm">
+ <!-- Full Name Row -->
+ <div class="flex flex-col md:flex-row gap-4">
+ <div class="w-full space-y-2">
+ <label for="nombre" class="block text-sm font-semibold text-slate-700">Nombre</label>
+ <input
+ formControlName="fullname"
+ name="nombre"
+ id="nombre"
+ type="text"
+ placeholder="John"
+ [class.border-red-500]="registerForm.get('fullname')?.touched && registerForm.get('fullname')?.errors"
+ class="w-full px-5 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 outline-none placeholder:text-slate-400">
+ <form-error-label [errorType]="registerForm.get('fullname')!" />
+ </div>
+ <div class="w-full space-y-2">
+ <label for="lastname" class="block text-sm font-semibold text-slate-700">Apellido</label>
+ <input
+ formControlName="lastname"
+ name="lastname"
+ id="lastname"
+ type="text"
+ placeholder="Doe"
+ [class.border-red-500]="registerForm.get('lastname')?.touched && registerForm.get('lastname')?.errors"
+ class="w-full px-5 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 outline-none placeholder:text-slate-400">
+ <form-error-label [errorType]="registerForm.get('lastname')!" />
+ </div>
+ </div>
+
+ <!-- Email Field -->
+ <div class="space-y-2">
+ <label for="email" class="block text-sm font-semibold text-slate-700">Correo Electrónico</label>
+ <input
+ type="email"
+ formControlName="email"
+ name="email"
+ id="email"
+ placeholder="nombre@empresa.com"
+ [class.border-red-500]="registerForm.get('email')?.touched && registerForm.get('email')?.errors"
+ class="w-full px-5 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 outline-none placeholder:text-slate-400">
+ <form-error-label [errorType]="registerForm.get('email')!" />
+ </div>
+
+ <!-- Password Field -->
+ <div class="space-y-2">
+ <label for="password" class="block text-sm font-semibold text-slate-700">Contraseña</label>
+ <input
+ type="password"
+ formControlName="password"
+ name="password"
+ id="password"
+ placeholder="••••••••"
+ [class.border-red-500]="registerForm.get('password')?.touched && registerForm.get('password')?.errors"
+ class="w-full px-5 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200 outline-none placeholder:text-slate-400">
+ <form-error-label [errorType]="registerForm.get('password')!" />
+ </div>
+
+ <!-- Submit Button -->
+ <button
+ type="submit"
+ (click)="onSubmit()"
+ class="w-full py-3.5 px-5 cursor-pointer bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 transform transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:shadow-inner focus:ring-2 focus:ring-blue-500/40 outline-none">
+ Crear Cuenta
+ </button>
+
+ <!-- Footer -->
+ <p class="text-center text-sm font-medium text-slate-500">
+ ¿Ya tienes una cuenta?
+ <a routerLink="/auth/login" class="text-blue-600 cursor-pointer font-bold hover:underline decoration-2 underline-offset-4">Iniciar Sesión</a>
+ </p>
+</form>

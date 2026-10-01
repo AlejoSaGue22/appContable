@@ -1,0 +1,70 @@
+import { HttpClient } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { Observable, map } from 'rxjs';
+import { environment } from 'src/app/environments/environment';
+import { CategoryArticle, CategoryArticleResponse, ConceptNote, DocumentType, PaymentMethod, SalesChannel, UnitMeasure, Vendedor } from '../interfaces/catalogs-interface';
+import { Impuesto } from '../pages/administracion/configuraciones/pages/impuestos/interfaces/impuesto.interface';
+
+@Injectable({
+ providedIn: 'root'
+})
+export class CatalogsService {
+ private http = inject(HttpClient);
+ private baseUrl = environment.baseUrl;
+
+ findAllImpuestos(): Observable<Impuesto[]> {
+ return this.http.get<{ data: Impuesto[], meta: any }>(`${this.baseUrl}/settings/impuestos`, {
+ params: { limit: 1000 }
+ }).pipe(map(res => res.data));
+ }
+
+ findAllVendedores(): Observable<Vendedor[]> {
+ return this.http.get<{ data: Vendedor[], meta: any }>(`${this.baseUrl}/settings/vendedores`, {
+ params: { limit: 1000 }
+ }).pipe(map(res => res.data));
+ }
+
+ findAllDocumentTypes(): Observable<DocumentType[]> {
+ return this.http.get<DocumentType[]>(`${this.baseUrl}/catalogs/document-types`);
+ }
+
+ findAllTiposActivo(): Observable<any[]> {
+ return this.http.get<any[]>(`${this.baseUrl}/catalogs/tipos-activo`);
+ }
+
+ findAllPaymentMethods(): Observable<PaymentMethod[]> {
+ return this.http.get<PaymentMethod[]>(`${this.baseUrl}/catalogs/payment-methods`);
+ }
+
+ findAllSalesChannels(): Observable<SalesChannel[]> {
+ return this.http.get<SalesChannel[]>(`${this.baseUrl}/catalogs/sales-channels`);
+ }
+
+ findAllUnitsMeasure(): Observable<UnitMeasure[]> {
+ return this.http.get<UnitMeasure[]>(`${this.baseUrl}/catalogs/units-measure`);
+ }
+
+ findAllCategoriesArticles(limit: number = 10, offset: number = 0): Observable<CategoryArticleResponse> {
+ return this.http.get<CategoryArticleResponse>(`${this.baseUrl}/catalogs/categories-articles`, {
+ params: { limit, offset }
+ });
+ }
+
+ findAllConceptsNotes(tipo?: 'credito' | 'debito'): Observable<ConceptNote[]> {
+ return this.http.get<ConceptNote[]>(`${this.baseUrl}/catalogs/concepts-notes`, {
+ params: tipo ? { tipo } : {}
+ });
+ }
+
+ createCategoryArticle(category: any): Observable<any> {
+ return this.http.post(`${this.baseUrl}/catalogs/categories-articles`, category);
+ }
+
+ updateCategoryArticle(id: string, category: Partial<CategoryArticle>): Observable<any> {
+ return this.http.patch(`${this.baseUrl}/catalogs/categories-articles/${id}`, category);
+ }
+
+ removeCategoryArticle(id: string): Observable<any> {
+ return this.http.delete(`${this.baseUrl}/catalogs/categories-articles/${id}`);
+ }
+}

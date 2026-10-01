@@ -1,0 +1,103 @@
+<div class="relative">
+
+  <!-- ─── CLOSED STATE: show selected value ─── -->
+  @if (selectedItem() && !dropdownOpen()) {
+  <div class="flex items-center justify-between w-full border rounded-xl transition-all cursor-pointer"
+    [class.px-4]="size() === 'md'" [class.py-2.5]="size() === 'md'" [class.px-3]="size() === 'sm'"
+    [class.py-2]="size() === 'sm'" [class.text-sm]="size() === 'md'" [class.text-xs]="size() === 'sm'"
+    [class.bg-gray-50]="!isDisabled()" [class.border-gray-200]="!isDisabled()"
+    [class.hover:border-blue-300]="!isDisabled()" [class.hover:bg-white]="!isDisabled()"
+    [class.bg-gray-100]="isDisabled()" [class.border-gray-200]="isDisabled()" [class.cursor-not-allowed]="isDisabled()"
+    (click)="openDropdown()">
+    <span class="truncate text-gray-800 font-medium">
+      {{ selectedLabel() }}
+    </span>
+    <div class="flex items-center gap-1 ml-2 flex-shrink-0">
+      @if (!isDisabled()) {
+      <button type="button" (click)="clearSelection($event)"
+        class="p-0.5 text-gray-400 hover:text-red-500 transition-colors rounded cursor-pointer"
+        title="Limpiar selección">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+      }
+      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+      </svg>
+    </div>
+  </div>
+  }
+
+  <!-- ─── NO SELECTION / CLOSED STATE ─── -->
+  @else if (!dropdownOpen()) {
+  <div class="flex items-center justify-between w-full border rounded-xl transition-all cursor-pointer"
+    [class.px-4]="size() === 'md'" [class.py-2.5]="size() === 'md'" [class.px-3]="size() === 'sm'"
+    [class.py-2]="size() === 'sm'" [class.text-sm]="size() === 'md'" [class.text-xs]="size() === 'sm'"
+    [class.bg-gray-50]="!isDisabled()" [class.border-gray-200]="!isDisabled()"
+    [class.hover:border-blue-300]="!isDisabled()" [class.hover:bg-white]="!isDisabled()"
+    [class.bg-gray-100]="isDisabled()" [class.cursor-not-allowed]="isDisabled()" (click)="openDropdown()">
+    <span class="text-gray-400">{{ emptyLabel() }}</span>
+    <svg class="w-4 h-4 text-gray-400 ml-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+    </svg>
+  </div>
+  }
+
+  <!-- ─── OPEN STATE: search input + dropdown ─── -->
+  @else {
+  <div class="relative">
+    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+      </svg>
+    </div>
+    <input type="text" [value]="searchTerm()" (input)="onSearchInput($any($event.target).value)"
+      [placeholder]="placeholder()"
+      class="block w-full pl-10 pr-10 bg-white border border-blue-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all shadow-sm"
+      [class.py-2.5]="size() === 'md'" [class.text-sm]="size() === 'md'" [class.py-2]="size() === 'sm'"
+      [class.text-xs]="size() === 'sm'" autocomplete="off" />
+    @if (searchTerm()) {
+    <button type="button" (click)="searchTerm.set('')"
+      class="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+    } @else {
+    <span class="absolute inset-y-0 right-3 flex items-center text-gray-400 pointer-events-none">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+      </svg>
+    </span>
+    }
+  </div>
+
+  <!-- Dropdown -->
+  <div class="absolute z-50 mt-1 w-full bg-white rounded-xl border border-gray-200 shadow-xl overflow-hidden"
+    style="max-height: 220px; overflow-y: auto;">
+    @if (filteredItems().length === 0) {
+    <div class="px-4 py-3 text-sm text-gray-400 text-center">
+      Sin resultados para "{{ searchTerm() }}"
+    </div>
+    } @else {
+    @for (item of filteredItems(); track item[valueKey()]) {
+    <button type="button" (click)="selectItem(item)"
+      class="w-full text-left px-4 py-2.5 hover:bg-blue-50 hover:text-blue-700 transition-colors flex items-center justify-between group cursor-pointer"
+      [class.text-sm]="size() === 'md'" [class.text-xs]="size() === 'sm'"
+      [class.bg-blue-50]="selectedItem()?.[valueKey()] === item[valueKey()]"
+      [class.text-blue-700]="selectedItem()?.[valueKey()] === item[valueKey()]"
+      [class.font-medium]="selectedItem()?.[valueKey()] === item[valueKey()]">
+      <span>{{ buildLabel(item) }}</span>
+    </button>
+    }
+    @if (showTruncationNotice()) {
+    <div class="px-4 py-2 text-[11px] text-gray-400 text-center border-t border-gray-100 bg-gray-50">
+      Mostrando los primeros {{ maxResults() }} resultados. Refine la búsqueda.
+    </div>
+    }
+    }
+  </div>
+  }
+</div>

@@ -1,0 +1,112 @@
+export interface CatalogItem {
+    id: string;
+    nombre: string;
+    descripcion?: string;
+    codigo?: string;
+}
+
+export interface CategoryArticle {
+    id: number | string;
+    codigo: string;
+    nombre: string;
+    tipo: string;
+    descripcion?: string;
+    cuentaPrincipalId?: string;
+    cuentaPrincipal?: Partial<GetCuentasContables>;
+    cuentaCostoId?: string;
+    cuentaCosto?: Partial<GetCuentasContables>;
+    cuentaInventarioId?: string;
+    cuentaInventario?: Partial<GetCuentasContables>;
+    manejaInventario?: boolean;
+    state?: boolean;
+}
+
+export interface CategoryArticleResponse {
+    count: number;
+    pages: number;
+    categoriesArticles: CategoryArticle[];
+}
+
+export interface DocumentType {
+    id: string;
+    codigo: string;
+    nombre: string;
+    abreviatura: string;
+}
+export interface SalesChannel {
+    id: number;
+    nombre: string;
+    descripcion: string;
+    codigo: string;
+    state: boolean;
+}
+
+export interface ConceptNote {
+    id: string;
+    codigo: string;
+    nombre: string;
+    tipo?: string;
+    state: boolean;
+}
+
+export interface PaymentMethod extends CatalogItem { }
+export interface UnitMeasure extends CatalogItem { }
+export interface Municipality {
+    id: number;
+    name: string;
+    code: string;
+    department: string;
+}
+
+export interface Vendedor {
+    id: string;
+    nombre: string;
+    apellido: string;
+    identificacion: string;
+    telefono?: string;
+    activo: boolean;
+}
+
+import { Impuesto } from '../pages/administracion/configuraciones/pages/impuestos/interfaces/impuesto.interface';
+
+export interface TipoActivoCatalog {
+    id: number;
+    nombre: string;
+    state: boolean;
+}
+
+export interface CatalogsState {
+    documentTypes: DocumentType[];
+    paymentMethods: PaymentMethod[];
+    salesChannels: SalesChannel[];
+    unitsMeasure: UnitMeasure[];
+    municipalities: Municipality[];
+    categoriesArticles: CategoryArticle[];
+    conceptsNotes: ConceptNote[];
+    impuestos: Impuesto[];
+    vendedores: Vendedor[];
+    tiposActivo: TipoActivoCatalog[];
+    loading: boolean;
+    error: string | null;
+}
+
+
+export interface GetCuentasContables {
+    id: string;
+    codigo: string;
+    nombre: string;
+    descripcion: string | null;
+    tipo: string;
+    naturaleza: string;
+    nivel: number;
+    cuentaPadreId: string | null;
+    aceptaMovimiento: boolean;
+    requiereTercero: boolean;
+    requiereCentroCostos: boolean;
+    isActive: boolean;
+    isSystemAccount: boolean;
+    totalDebito: number;
+    totalCredito: number;
+    saldoPropio: number;
+    saldo: number;
+}

@@ -1,0 +1,57 @@
+<div class="modal-overlay" (click)="cerrar.emit()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    
+    <button type="button" class="close-btn" (click)="cerrar.emit()">✕</button>
+
+    <div class="modal-header">
+      <h2>Registrar Pago de Nómina</h2>
+      <p class="subtitle">Lote seleccionado: {{ lote.length }} empleados del período {{ periodoNombre }}</p>
+    </div>
+
+    <div class="modal-body">
+      <div *ngIf="error" class="error-alert">
+        {{ error }}
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Fecha de Pago <span class="required">*</span></label>
+          <input type="date" [(ngModel)]="fechaPago" class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label>Cuenta Bancaria de Origen <span class="required">*</span></label>
+          <select [(ngModel)]="cuentaBancariaId" class="form-control" [disabled]="loadingCuentas">
+            <option value="" disabled selected>Seleccione una cuenta bancaria</option>
+            <option *ngFor="let cb of cuentasBancarias" [value]="cb.id">
+              {{ cb.nombre }} {{ cb.numeroCuenta ? ' - ' + cb.numeroCuenta : '' }}
+            </option>
+          </select>
+          <span class="help-text">Cuenta bancaria desde la cual saldrá el dinero.</span>
+        </div>
+
+        <div class="form-group">
+          <label>N° Comprobante Bancario</label>
+          <input type="text" [(ngModel)]="numeroComprobante" class="form-control" placeholder="Opcional">
+        </div>
+
+        <div class="form-group full-width">
+          <label>Observaciones</label>
+          <textarea [(ngModel)]="observaciones" class="form-control" rows="2" placeholder="Opcional"></textarea>
+        </div>
+      </div>
+
+      <div class="summary-box">
+        <span class="summary-label">Total a debitar:</span>
+        <span class="summary-value">{{ totalAbono | currency:'COP':'symbol-narrow':'1.0-0' }}</span>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" (click)="cerrar.emit()" [disabled]="isSubmitting">Cancelar</button>
+      <button type="button" class="btn-primary" (click)="submit()" [disabled]="isSubmitting">
+        {{ isSubmitting ? 'Procesando...' : 'Confirmar Pago' }}
+      </button>
+    </div>
+  </div>
+</div>

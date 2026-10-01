@@ -1,0 +1,35 @@
+@if (loading()) {
+<app-loader />
+}
+
+@if (!loading()) {
+<header-title-page [titleHead]="headTitle()" />
+<app-breadcrumb [items]="breadcrumbItems" class="block px-4 sm:px-6 lg:px-8" />
+
+<div class="w-full px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+  <div class="max-w-7xl mx-auto">
+    <!-- Actions Bar -->
+    <div class="flex justify-end items-center mb-4">
+      <button type="button" (click)="openNew()"
+        class="inline-flex items-center px-4 py-2 bg-slate-900 cursor-pointer border border-transparent rounded-xl font-bold text-xs text-white hover:bg-slate-800 active:bg-slate-950 focus:outline-none focus:border-slate-950 focus:ring focus:ring-slate-300 disabled:opacity-25 transition-all shadow-lg shadow-slate-200">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+        </svg>
+        Nuevo Impuesto
+      </button>
+    </div>
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <app-impuestos-list [impuestos]="impuestos()" (edit)="onEdit($event)" (deleted)="loadData()" />
+      <app-pagination [length]="impuestos().length" />
+    </div>
+  </div>
+</div>
+}
+
+<!-- Tax Modal -->
+<app-modal [(visible)]="modalVisible" [title]="isEditing() ? 'Editar Impuesto' : 'Nuevo Impuesto'" width="max-w-2xl">
+  @if (modalVisible()) {
+  <app-impuestos-forms [impuestoId]="selectedId()" [isModal]="true" (saveSuccess)="onSaveSuccess()"
+    (cancel)="modalVisible.set(false)" />
+  }
+</app-modal>

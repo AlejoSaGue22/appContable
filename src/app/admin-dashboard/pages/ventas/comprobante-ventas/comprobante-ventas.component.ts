@@ -1,0 +1,262 @@
+import { Component, inject, signal } from '@angular/core';
+import { HeaderInput, HeaderTitlePageComponent } from "@dashboard/components/header-title-page/header-title-page.component";
+import { CardsTotales, NumCardsTotalesComponent } from "@shared/components/num-cards-totales/num-cards-totales.component";
+import { ComprobantesVentasService } from '../services/comprobantes-ventas.service';
+import { PaginationService } from '@shared/components/pagination/pagination.service';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { Observable, tap } from 'rxjs';
+import { LoaderComponent } from "src/app/utils/components/loader/loader.component";
+import { ErrorPages } from "@shared/components/error-pages/error-pages.component";
+import { HeaderTitleInvoices } from "./components/header-title-invoices/header-title-invoices.component";
+import { TableInvoices } from "./components/table-invoices/table-invoices.component";
+import { NotificationService } from '@shared/services/notification.service';
+import { ResponseResult } from '@shared/interfaces/services.interfaces';
+import { ModalComponent } from "@shared/components/modal/modal.component";
+import { LoaderService } from '@utils/services/loader.service';
+import { InvoiceFilters } from '@dashboard/interfaces/documento-venta-interface';
+import { avisarAdvertenciasInventario } from '@dashboard/services/inventario.service';
+
+@Component({
+    selector: 'app-comprobante-ventas',
+    imports: [LoaderComponent, ErrorPages, HeaderTitleInvoices, TableInvoices, ModalComponent],
+    templateUrl: './comprobante-ventas.component.html',
+})
+export class ComprobanteVentasComponent {
+
+    headTitle: HeaderInput = {
+        title: 'Gestión de Documentos de venta',
+        slog: 'Administra la información de tus facturas'
+    }
+    notificacionService = inject(NotificationService);
+    comprobantesVentasService = inject(ComprobantesVentasService);
+    paginationService = inject(PaginationService);
+    loaderService = inject(LoaderService);
+
+    isModalItem = signal<boolean>(false);
+    idItem = signal<string>('');
+    action = signal<string>('');
+    totalComprobantes = signal<number>(0);
+    cardsTotales = signal<CardsTotales[]>([]);
+    filters = signal<InvoiceFilters>({});
+
+
+    comprobanteVentasResource = rxResource({
+        request: () => ({
+            page: this.paginationService.currentPage(),
+            limit: 10,
+            filters: this.filters()
+        }),
+        loader: ({ request }) => this.comprobantesVentasService.getComprobanteVentas({
+            page: request.page,
+            limit: request.limit,
+            ...request.filters
+        })
+            .pipe(
+                tap((el) => {
+                    this.totalComprobantes.set(el.meta?.total ?? 0);
+                    this.paginationService.totalItems.set(el.meta?.total ?? 0);
+                    this.paginationService.pageSize.set(el.meta?.totalPages ?? 0);
+                    this.cardsTotales.set([
+                        { title: 'Total Facturas', valor: this.totalComprobantes().toString(), percent: '0' },
+                        { title: 'Balance General', valor: '0', percent: '0' },
+                    ]);
+                })
+            )
+    })
+
+    onFilterChange(filters: InvoiceFilters): void {
+        console.log(filters);
+        this.filters.set(filters);
+    }
+
+    // getStatusLabel(status: InvoiceStatus): string {
+    // const labels: Record<InvoiceStatus, string> = {
+    // [InvoiceStatus.DRAFT]: 'Borrador',
+    // [InvoiceStatus.ISSUED]: 'Emitida',
+    // [InvoiceStatus.PAID]: 'Pagada',
+    // [InvoiceStatus.CANCELLED]: 'Anulada'
+    // };
+    // return labels[status];
+    // }
+
+    get columnsTable() {
+        return [
+            { key: 'fecha', header: 'Fecha' },
+            { key: 'comprobante', header: 'Comprobante' },
+            { key: 'identificacion', header: 'Identificacion' },
+            { key: 'cliente', header: 'Cliente' },
+            { key: 'total', header: 'Total' },
+            { key: 'impuestos', header: 'Impuestos' },
+            { key: 'estado', header: 'Estado' },
+        ]
+    }
+
+    openModalItem(id: string, action: string): void {
+        this.isModalItem.set(true);
+        this.idItem.set(id);
+        this.action.set(action);
+    }
+
+    onAction(): void {
+        switch (this.action()) {
+            case 'anular':
+                this.onAnular();
+                break;
+            case 'delete':
+                this.onDelete();
+                break;
+            default:
+                break;
+        }
+    }
+
+    onEmitir(id: string): void {
+        this.loaderService.show('Emitiendo factura a la DIAN...');
+        this.comprobantesVentasService.emitirInvoice(id).subscribe((res: ResponseResult) => {
+            this.loaderService.hide();
+            if (res.success) {
+                this.notificacionService.success('Factura emitida con éxito', 'Éxito');
+                this.comprobanteVentasResource.reload();
+            } else {
+                const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
+                this.notificacionService.error(message || 'Error desconocido', 'Error al emitir factura');
+            }
+        }, () => this.loaderService.hide());
+    }
+
+    onEmitirEstandar(id: string): void {
+        this.loaderService.show('Emitiendo factura estándar...');
+        this.comprobantesVentasService.emitirEstandarInvoice(id).subscribe((res: ResponseResult) => {
+            this.loaderService.hide();
+            if (res.success) {
+                this.notificacionService.success('Factura estándar emitida con éxito', 'Éxito');
+                avisarAdvertenciasInventario(this.notificacionService, res.data);
+                this.comprobanteVentasResource.reload();
+            } else {
+                const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
+                this.notificacionService.error(message || 'Error desconocido', 'Error al emitir factura estándar');
+            }
+        }, () => this.loaderService.hide());
+    }
+
+    onAnular(): void {
+        const motivo = 'Anulación solicitada por el usuario';
+        this.loaderService.show('Anulando factura...');
+        this.comprobantesVentasService.anularInvoice(this.idItem(), motivo).subscribe((res: ResponseResult) => {
+            if (res.success) {
+                this.loaderService.hide();
+                this.isModalItem.set(false);
+                this.notificacionService.success('Factura anulada con éxito', 'Éxito');
+                avisarAdvertenciasInventario(this.notificacionService, res.data);
+                this.comprobanteVentasResource.reload();
+            } else {
+                this.loaderService.hide();
+                const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
+                this.notificacionService.error(message || 'Error desconocido', 'Error al anular factura');
+            }
+        });
+    }
+
+    onRetry(id: string): void {
+        this.comprobantesVentasService.retryInvoice(id).subscribe((res: ResponseResult) => {
+            if (res.success) {
+                this.notificacionService.success('Factura reintentada con éxito', 'Éxito');
+                this.comprobanteVentasResource.reload();
+            } else {
+                const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
+                this.notificacionService.error(message || 'Error desconocido', 'Error al reintentar factura');
+            }
+        });
+    }
+
+    onDelete(): void {
+        this.comprobantesVentasService.deleteInvoice(this.idItem()).subscribe((res: ResponseResult) => {
+            if (res.success) {
+                this.isModalItem.set(false);
+                this.notificacionService.success('Factura eliminada con éxito', 'Éxito');
+                this.comprobanteVentasResource.reload();
+            } else {
+                const message = Array.isArray(res.message) ? res.message.join(', ') : res.message;
+                this.notificacionService.error(message || 'Error desconocido', 'Error al eliminar factura');
+            }
+        });
+    }
+
+    onDownloadPDF(id: string): void {
+        this.handleDownloadBlob(
+            this.comprobantesVentasService.downloadPDF(id),
+            `factura-${id}.pdf`,
+            'Preparando descarga de PDF...',
+            'PDF descargado con éxito',
+            'Error al descargar PDF'
+        );
+    }
+
+    onDownloadXML(id: string): void {
+        this.handleDownloadBlob(
+            this.comprobantesVentasService.downloadXML(id),
+            `factura-${id}.xml`,
+            'Preparando descarga de XML...',
+            'XML descargado con éxito',
+            'Error al descargar XML'
+        );
+    }
+
+    private handleDownloadBlob(
+        observable: Observable<Blob>,
+        filename: string,
+        loadingMessage: string,
+        successMessage: string,
+        errorTitle: string
+    ): void {
+        this.loaderService.show(loadingMessage);
+        observable.subscribe({
+            next: async (blob) => {
+                if (blob.type === 'application/json') {
+                    try {
+                        const text = await blob.text();
+                        const json = JSON.parse(text);
+                        this.loaderService.hide();
+                        const message = Array.isArray(json.message)
+                            ? json.message.join(', ')
+                            : json.message;
+                        this.notificacionService.error(
+                            message || 'Error al descargar el archivo',
+                            errorTitle
+                        );
+                        return;
+                    } catch {
+                        // Continuar si falla el parseo
+                    }
+                }
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+                window.URL.revokeObjectURL(url);
+                this.loaderService.hide();
+                this.notificacionService.success(successMessage, 'Éxito');
+            },
+            error: async (err) => {
+                this.loaderService.hide();
+                let message = 'Error al descargar el archivo';
+                if (err?.error instanceof Blob) {
+                    try {
+                        const text = await err.error.text();
+                        const json = JSON.parse(text);
+                        message = Array.isArray(json.message)
+                            ? json.message.join(', ')
+                            : json.message || message;
+                    } catch {
+                        // fall through
+                    }
+                } else if (err?.message) {
+                    message = err.message;
+                }
+                this.notificacionService.error(message, errorTitle);
+            }
+        });
+    }
+
+}

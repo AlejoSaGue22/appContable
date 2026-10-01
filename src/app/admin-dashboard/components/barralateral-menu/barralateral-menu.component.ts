@@ -1,0 +1,37 @@
+import { NgClass } from '@angular/common';
+import { Component, computed, input, output } from '@angular/core';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { MenuItem } from '@utils/menu.config';
+import { AppIconComponent } from '@shared/components/app-icon/app-icon.component';
+
+@Component({
+  selector: 'app-barralateral-menu',
+  imports: [RouterLink, NgClass, RouterLinkActive, AppIconComponent],
+  templateUrl: './barralateral-menu.component.html',
+})
+export class BarralateralMenuComponent {
+
+ title = input.required<string>();
+ menuSection = input<MenuItem>();
+ subItems = input.required<MenuItem[]>();
+ defaultOpen = input<boolean>(false);
+ activeMenu = input<string | null>(null);
+ isActive = input<boolean>(false);
+ menuId = input<string>();
+ menuToggled = output<string>();
+
+ children = computed(() => {
+ return this.menuSection()?.children ?? [];
+ });
+
+ get isOpen(): boolean {
+ return this.activeMenu() === this.menuId();
+ }
+
+ toggleMenu() {
+ this.menuToggled.emit(this.menuId()!)
+ }
+
+
+
+}

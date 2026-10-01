@@ -1,0 +1,200 @@
+import { Component, inject, signal, effect } from '@angular/core';
+import { CommonModule, TitleCasePipe } from '@angular/common';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { firstValueFrom, tap } from 'rxjs';
+
+import { RolesService } from '../../../services/roles.service';
+import { Role, CreateRoleDto, UpdateRoleDto } from '../../../interfaces/roles.interface';
+import { NotificationService } from '@shared/services/notification.service';
+import { LoaderService } from '@utils/services/loader.service';
+import { ModalComponents } from '@shared/components/modal.components/modal.components';
+import { LoaderComponent } from "@utils/components/loader/loader.component";
+import { FormErrorLabelComponent } from "@utils/components/form-error-label/form-error-label.component";
+import { HelpersUtils } from '@utils/helpers.utils';
+import { HeaderInput, HeaderTitlePageComponent } from '@dashboard/components/header-title-page/header-title-page.component';
+import { TabsComponent, TabItem } from '@shared/components/tabs/tabs.component';
+
+@Component({
+ selector: 'app-roles',
+ standalone: true,
+ imports: [
+ CommonModule,
+ ReactiveFormsModule,
+ ModalComponents,
+ LoaderComponent,
+ FormErrorLabelComponent,
+ TitleCasePipe,
+ HeaderTitlePageComponent,
+ TabsComponent
+ ],
+ templateUrl: './roles.component.html',
+})
+export class RolesComponent {
+ private rolesService = inject(RolesService);
+ private notificationService = inject(NotificationService);
+ private loaderService = inject(LoaderService);
+ private fb = inject(FormBuilder);
+
+ headTitle: HeaderInput = {
+ title: 'Gestión de Roles y Permisos',
+ slog: 'Define las capacidades y accesos para los diferentes niveles de usuario'
+ };
+
+ // States
+ isModalOpen = signal(false);
+ isDeleteModalOpen = signal(false);
+ selectedRoleId = signal<string | null>(null);
+ isEditing = signal(false);
+ activeTab = signal<string>('roles');
+ tabItems: TabItem[] = [
+ { id: 'roles', label: 'Roles' },
+ { id: 'permissions', label: 'Permisos' }
+ ];
+
+ // Form
+ roleForm = this.fb.group({
+ name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+ description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(200)]],
+ permissions: [[] as string[], [Validators.required, Validators.minLength(1)]],
+ isActive: [true]
+ });
+
+ // Data Resources
+ rolesResource = rxResource({
+ loader: () => this.rolesService.getRoles()
+ });
+
+ permissionsResource = rxResource({
+ loader: () => this.rolesService.getAvailablePermissions()
+ });
+
+ openCreateModal() {
+ this.isEditing.set(false);
+ this.selectedRoleId.set(null);
+ this.roleForm.reset({ isActive: true, permissions: [] });
+ this.isModalOpen.set(true);
+ }
+
+ async openEditModal(role: Role) {
+ this.isEditing.set(true);
+ this.selectedRoleId.set(role.id);
+
+ const normalizedPermissions = (role.permissions || []).map((p: any) =>
+ typeof p === 'string' ? p : p.name || p.slug || p.id || p
+ );
+
+ this.roleForm.patchValue({
+ name: role.name,
+ description: role.description,
+ permissions: normalizedPermissions,
+ isActive: role.isActive
+ });
+ this.isModalOpen.set(true);
+ }
+
+ openDeleteModal(id: string, isSystem: boolean) {
+ if (isSystem) {
+ this.notificationService.warning('Los roles del sistema no pueden ser eliminados', 'Información');
+ return;
+ }
+ this.selectedRoleId.set(id);
+ this.isDeleteModalOpen.set(true);
+ }
+
+ togglePermission(perm: string) {
+ const currentPerms = this.roleForm.get('permissions')?.value || [];
+ 
+ // Buscar si el permiso ya existe (comparación robusta)
+ const index = currentPerms.findIndex((p: any) => {
+ const pValue = typeof p === 'string' ? p : p.name || p.slug || p.id;
+ return pValue === perm;
+ });
+
+ if (index !== -1) {
+ // Si existe, lo eliminamos
+ const newPerms = [...currentPerms];
+ newPerms.splice(index, 1);
+ this.roleForm.patchValue({ permissions: newPerms });
+ } else {
+ // Si no existe, lo agregamos como string
+ this.roleForm.patchValue({
+ permissions: [...currentPerms, perm]
+ });
+ }
+ }
+
+ isPermissionSelected(perm: string): boolean {
+ const perms = this.roleForm.get('permissions')?.value || [];
+ return perms.some((p: any) => {
+ const pValue = typeof p === 'string' ? p : p.name || p.slug || p.id;
+ return pValue === perm;
+ });
+ }
+
+ async onSubmit() {
+ if (this.roleForm.invalid) {
+ this.roleForm.markAllAsTouched();
+ return;
+ }
+
+ this.loaderService.show();
+ try {
+ const rawPermissions = this.roleForm.get('permissions')?.value || [];
+ const permissions = (rawPermissions as any[]).map((p: any) =>
+ typeof p === 'string' ? p : p.name || p
+ );
+ const dto = {
+ name: this.roleForm.get('name')?.value,
+ description: this.roleForm.get('description')?.value,
+ permissions,
+ isActive: this.roleForm.get('isActive')?.value,
+ };
+ let result;
+
+ if (this.isEditing() && this.selectedRoleId()) {
+ result = await firstValueFrom(this.rolesService.updateRole(this.selectedRoleId()!, dto as UpdateRoleDto));
+ } else {
+ result = await firstValueFrom(this.rolesService.createRole(dto as CreateRoleDto));
+ }
+
+ if (result.success) {
+ this.notificationService.success(
+ this.isEditing() ? 'Rol actualizado correctamente' : 'Rol creado correctamente',
+ 'Completado'
+ );
+ this.isModalOpen.set(false);
+ this.rolesResource.reload();
+ } else {
+ // this.notificationService.error(HelpersUtils.getMessageError(result.message), 'Error');
+ this.notificationService.error('Error al crear el rol', 'Error');
+ }
+ } catch (error: any) {
+ this.notificationService.error(error.message || 'Error en la operación', 'Error');
+ } finally {
+ this.loaderService.hide();
+ }
+ }
+
+ async onDeleteConfirm() {
+ const id = this.selectedRoleId();
+ if (!id) return;
+
+ this.loaderService.show();
+ try {
+ const result = await firstValueFrom(this.rolesService.deleteRole(id));
+ if (result.success) {
+ this.notificationService.success('Rol eliminado correctamente', 'Completado');
+ this.isDeleteModalOpen.set(false);
+ this.rolesResource.reload();
+ } else {
+ // this.notificationService.error(HelpersUtils.getMessageError(result.message), 'Error');
+ this.notificationService.error('Error al eliminar el rol', 'Error');
+ }
+ } catch (error: any) {
+ this.notificationService.error(error.message || 'Error al eliminar', 'Error');
+ } finally {
+ this.loaderService.hide();
+ }
+ }
+}

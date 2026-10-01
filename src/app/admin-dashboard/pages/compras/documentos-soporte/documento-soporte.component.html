@@ -1,0 +1,62 @@
+<div class="space-y-6 animate-fade-in">
+    @if ( documentosSoporteResource.isLoading() ) {
+    <div class="flex flex-col gap-3 justify-center items-center h-screen">
+        <app-loader />
+        <p class="text-sm text-gray-400 animate-pulse">Consultando documentos soporte...</p>
+    </div>
+    }
+
+    @if (documentosSoporteResource.hasValue() ) {
+    <header-title-page [titleHead]="headTitle" />
+
+    <!-- Table and Filters Modernized -->
+    <app-table-documentos-soporte [documentoData]="documentosSoporteResource.value().data" [busy]="isProcessing()" [activeFilters]="filters()" [userAuth]="user"
+        (filterChange)="onFilterChange($event)" (anular)="openModalItem($event, 'anular')"
+        (delete)="openModalItem($event, 'delete')" (register)="openModalItem($event, 'register')"
+        (emitir)="openModalItem($event, 'emitir')"
+        (retryAsiento)="onRetryAsiento($event)" (pageChange)="onPageChange($event)" />
+    }
+
+    @if (documentosSoporteResource.error()) {
+    <app-error-pages />
+    }
+</div>
+
+<!-- Modal Modernized -->
+<app-modal [(visible)]="isModalItem">
+    <div class="p-6 text-center">
+        <div [class]="action() === 'anular' ? 'bg-red-50 text-red-500' : action() === 'delete' ? 'bg-red-50 text-red-500' : 'bg-green-50 text-green-500'"
+            class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 mb-2">¿Confirmar acción?</h3>
+        <p class="text-sm text-gray-500 mb-8 max-w-xs mx-auto">Estas seguro de <strong>{{ action() === 'anular' ?
+                'anular' : action() === 'delete' ? 'eliminar' : action() === 'emitir' ? 'emitir a la DIAN' : 'registrar' }}</strong> este documento soporte?
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-3">
+            <button type="button" (click)="isProcessing() ? null : isModalItem.set(false)" [disabled]="isProcessing()"
+                class="flex-1 px-6 py-3 cursor-pointer border border-gray-100 text-sm font-semibold text-gray-500 rounded-xl hover:bg-gray-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                Cancelar
+            </button>
+            <button type="button" (click)="onAction()" [disabled]="isProcessing()"
+                [class]="action() === 'anular' ? 'bg-red-600' : action() === 'delete' ? 'bg-red-600' : 'bg-green-600'"
+                class="flex-1 px-6 py-3 cursor-pointer text-white text-sm font-semibold rounded-xl hover:bg-red-700 shadow-lg shadow-red-200 transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                @if (isProcessing()) {
+                <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                </svg>
+                Procesando...
+                } @else {
+                Confirmar
+                }
+            </button>
+        </div>
+    </div>
+</app-modal>

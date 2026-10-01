@@ -1,0 +1,301 @@
+import { CommonModule, CurrencyPipe } from '@angular/common';
+import { Component, inject, signal } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { DianStatus, FormaPago, GetFacturaRequest, InvoiceStatus, TipoFactura } from '@dashboard/interfaces/documento-venta-interface';
+import { FacturaNotasResumen } from '@dashboard/interfaces/documento-venta-interface';
+import { PagoHistorial, PaymentStatus } from '@dashboard/interfaces/pagos-interface';
+import { RegistrarPagoModalData } from '@dashboard/pages/pagos/components/modal-registrarpago/modal-registrarpago.component';
+import { PagosHttpService } from '@dashboard/pages/pagos/services/pagos.service';
+import { ComprobantesVentasService } from '@dashboard/pages/ventas/services/comprobantes-ventas.service';
+import { AsientosHttpService } from '@dashboard/services/asientos-http.service';
+import { NotificationService } from '@shared/services/notification.service';
+import { PrintService } from '@shared/services/print.service';
+import { ModalEmailComponent } from '@shared/components/modal-email/modal-email.component';
+import { HelpersUtils } from '@utils/helpers.utils';
+import { ResponseResult } from '@shared/interfaces/services.interfaces';
+
+@Component({
+    selector: 'app-invoice-details',
+    imports: [CommonModule, RouterLink, CurrencyPipe, ModalEmailComponent],
+    templateUrl: './invoice-details.component.html',
+})
+export class InvoiceDetailsComponent {
+    factura = signal<GetFacturaRequest | null>(null);
+    loading = signal(true);
+    error = signal<string | null>(null);
+    qrDataUrl = signal<string | null>(null);
+    qrRawUrl = signal<string | null>(null);
+    asientos: any[] = [];
+    cobros: PagoHistorial[] = [];
+    loadingAsientos = false;
+    notasResumen = signal<FacturaNotasResumen | null>(null);
+    modalCobroVisible = false;
+    modalCobroData: RegistrarPagoModalData | null = null;
+
+    // ── Email Modal ───────────────────────────────────────────────────────
+    modalEmailVisible = false;
+    sendingEmail = false;
+
+    private printService = inject(PrintService);
+    private router = inject(Router);
+
+    constructor(
+        private facturasService: ComprobantesVentasService,
+        private route: ActivatedRoute,
+        private pagosService: PagosHttpService,
+        private asientosService: AsientosHttpService,
+        private notificationService: NotificationService
+    ) { }
+
+    ngOnInit(): void {
+        const id = this.route.snapshot.params['id'];
+        this.loadInvoice(id);
+    }
+
+    cargarDatosContables(): void {
+        const id = this.factura()!.id;
+
+        // Cargar asientos de esta factura
+        this.loadingAsientos = true;
+        this.asientosService.getByReferencia(this.factura()!.comprobante_completo).subscribe({
+            next: a => { this.asientos = a; this.loadingAsientos = false; },
+            error: () => { this.loadingAsientos = false; },
+        });
+
+        // Cargar historial de cobros (solo si es crédito)
+        if (this.factura()!.formaPago === FormaPago.CREDITO) {
+            this.pagosService.getHistorialCobros(id).subscribe({
+                next: c => { this.cobros = c; },
+            });
+        }
+
+        // Resumen de notas crédito/débito aplicadas (Fase 1: lectura)
+        this.facturasService.getNotasResumen(id).subscribe({
+            next: r => { this.notasResumen.set(r.data ?? null); },
+            error: () => { this.notasResumen.set(null); },
+        });
+    }
+
+    // ── Modal de cobro ────────────────────────────────────────────────────
+    abrirCobro(): void {
+        const f = this.factura()!;
+        this.modalCobroData = {
+            tipo: 'cobro',
+            documentoId: f.id,
+            numeroDocumento: f.comprobante_completo,
+            contraparte: `${f.client.nombre} ${f.client.apellido}`,
+            total: f.total,
+            saldoPendiente: f.saldoPendiente ?? f.total,
+        };
+        this.modalCobroVisible = true;
+    }
+
+    // ── Reintentar asiento ────────────────────────────────────────────────
+    reintentarAsiento(): void {
+        this.loading.set(true);
+        this.facturasService.reintentarAsiento(this.factura()!.id).subscribe({
+            next: (response: ResponseResult) => {
+                if (response.success) {
+                    this.notificationService.success(response.message || 'Asiento reintentado correctamente', 'Exito');
+                    this.loadInvoice(this.factura()!.id);
+                } else {
+                    this.notificationService.error(`${response.message}`, 'Error');
+                }
+                this.loading.set(false);
+            },
+            error: (error) => {
+                this.notificationService.error(error.message || 'Ocurrio un error al reintentar asiento', 'Error');
+                this.loading.set(false);
+            }
+        });
+    }
+
+    // ── Helpers labels ────────────────────────────────────────────────────
+    getPaymentStatusLabel(status: PaymentStatus | null | undefined): string {
+        const map: Record<string, string> = {
+            pendiente: 'Pendiente de cobro',
+            parcial: 'Pago parcial',
+            pagado: 'Pagado',
+            vencida: 'Vencida',
+        };
+        return status ? (map[status] ?? status) : '—';
+    }
+
+    getTipoAsientoLabel(tipo: string): string {
+        const map: Record<string, string> = {
+            FACTURA_VENTA: 'Venta',
+            COBRO: 'Cobro CxC',
+            ANULACION_FACTURA_VENTA: 'Anulación',
+            PAGO_FACTURA_VENTA: 'Cobro',
+            CRUCE_ANTICIPO: 'Cruce de Anticipo',
+            ANULACION_COMPROBANTE: 'Anulación Cruce de Anticipo',
+            ANULACION_CRUCE_ANTICIPO: 'Anulación Cruce de Anticipo',
+        };
+        return map[tipo] ?? tipo;
+    }
+
+
+    loadInvoice(id: string): void {
+        this.loading.set(true);
+        this.error.set(null);
+
+        this.facturasService.getInvoiceById(id).subscribe({
+            next: (response) => {
+                const f = response.data[0];
+                this.factura.set(f);
+                this.resolveQr(f);
+                this.loading.set(false);
+                this.cargarDatosContables();
+            },
+            error: (err) => {
+                this.error.set('Error al cargar la factura');
+                this.loading.set(false);
+            }
+        });
+    }
+
+    getStatusClass(status: InvoiceStatus): string {
+        const classes: Record<InvoiceStatus, string> = {
+            [InvoiceStatus.DRAFT]: 'bg-gray-100 text-gray-800 border-gray-300',
+            [InvoiceStatus.PENDING_DIAN]: 'bg-yellow-100 text-yellow-800 border-yellow-300',
+            [InvoiceStatus.ACCEPTED]: 'bg-green-100 text-green-800 border-green-300',
+            [InvoiceStatus.REJECTED]: 'bg-red-100 text-red-800 border-red-300',
+            [InvoiceStatus.PAID]: 'bg-blue-100 text-blue-800 border-blue-300',
+            [InvoiceStatus.CANCELLED]: 'bg-red-50 text-red-500 border-red-100',
+            [InvoiceStatus.ISSUED]: 'bg-blue-100 text-blue-800 border-blue-300',
+            [InvoiceStatus.ERROR_ASIENTO]: 'bg-red-100 text-red-800 border-red-300'
+        };
+        return classes[status];
+    }
+
+    getStatusLabel(status: InvoiceStatus): string {
+        const labels: Record<InvoiceStatus, string> = {
+            [InvoiceStatus.DRAFT]: 'Borrador',
+            [InvoiceStatus.PENDING_DIAN]: 'Pendiente DIAN',
+            [InvoiceStatus.ACCEPTED]: 'Aceptada',
+            [InvoiceStatus.REJECTED]: 'Rechazada',
+            [InvoiceStatus.PAID]: 'Pagada',
+            [InvoiceStatus.CANCELLED]: 'Anulada',
+            [InvoiceStatus.ISSUED]: 'Emitida',
+            [InvoiceStatus.ERROR_ASIENTO]: 'Error Asiento'
+        };
+        return labels[status];
+    }
+
+    getDianStatusClass(status: DianStatus): string {
+        const classes: Record<DianStatus, string> = {
+            [DianStatus.PENDING]: 'bg-yellow-100 text-yellow-800 border-yellow-300',
+            [DianStatus.SENT]: 'bg-blue-50 text-blue-700 border-blue-200',
+            [DianStatus.PROCESSING]: 'bg-blue-100 text-blue-800 border-blue-300 animate-pulse',
+            [DianStatus.ACCEPTED]: 'bg-green-100 text-green-800 border-green-300',
+            [DianStatus.REJECTED]: 'bg-red-100 text-red-800 border-red-300',
+            [DianStatus.CANCELLED]: 'bg-gray-100 text-gray-800 border-gray-300'
+        };
+        return classes[status] || 'bg-gray-100 text-gray-800';
+    }
+
+    getDianStatusLabel(status: DianStatus): string {
+        const labels: Record<DianStatus, string> = {
+            [DianStatus.PENDING]: 'Pendiente envío',
+            [DianStatus.SENT]: 'Enviada',
+            [DianStatus.PROCESSING]: 'Procesando',
+            [DianStatus.ACCEPTED]: 'Aceptada por DIAN',
+            [DianStatus.REJECTED]: 'Rechazada por DIAN',
+            [DianStatus.CANCELLED]: 'Anulada'
+        };
+        return labels[status] || status;
+    }
+
+    getTipoFacturaLabel(tipo: TipoFactura): string {
+        const labels: Record<TipoFactura, string> = {
+            [TipoFactura.ELECTRONICA]: 'Factura Electrónica',
+            [TipoFactura.STANDARD]: 'Factura de Venta',
+        };
+        return labels[tipo] || tipo;
+    }
+
+    formatDate(date: string | Date): string {
+        if (!date) return '—';
+        // Evitar que JS reste un día al interpretar YYYY-MM-DD como UTC
+        const dateObj = typeof date === 'string' && date.includes('-') && !date.includes('T')
+            ? new Date(date.replace(/-/g, '\/'))
+            : new Date(date);
+
+        return dateObj.toLocaleDateString('es-CO', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    }
+
+    print(): void {
+        window.print();
+    }
+
+    printInvoice(): void {
+        const f = this.factura();
+        if (f) void this.printService.printInvoice(f);
+    }
+
+    printAsiento(): void {
+        const f = this.factura();
+        if (f && this.asientos.length > 0) {
+            const tercero = f.client ? `${f.client.razonSocial || f.client.nombre + ' ' + f.client.apellido} - ${f.client.numeroDocumento}` : '—';
+            this.printService.printAsientoContable(this.asientos, f.comprobante_completo, tercero);
+        }
+    }
+
+    exportPDF(): void {
+        // Implementar exportación a PDF
+    }
+
+    // ── Email Actions ─────────────────────────────────────────────────────
+    abrirModalEmail(): void {
+        this.modalEmailVisible = true;
+    }
+
+    enviarEmail(email: string): void {
+        const f = this.factura();
+        if (!f) return;
+
+        this.sendingEmail = true;
+        this.facturasService.sendEmail(f.id, email).subscribe({
+            next: (res) => {
+                if (res.success) {
+                    this.notificationService.success('Email enviado correctamente', 'Éxito');
+                    this.modalEmailVisible = false;
+                } else {
+                    this.notificationService.error(`Error al enviar email: ${HelpersUtils.getMessageError(res.message)}`, 'Error');
+                }
+                this.sendingEmail = false;
+            },
+            error: (err) => {
+                const message = Array.isArray(err.message) ? err.message.join(', ') : err.message;
+                this.notificationService.error(message || 'Ocurrió un error inesperado al enviar el email', 'Error');
+                this.sendingEmail = false;
+            }
+        });
+    }
+
+    clonarFactura(): void {
+        const f = this.factura();
+        if (!f) return;
+        this.router.navigate(['/panel/ventas/comprobantes/new-Item'], {
+            queryParams: { cloneFrom: f.id }
+        });
+    }
+
+    private resolveQr(f: GetFacturaRequest | null): void {
+        const raw = HelpersUtils.resolveQrText(f);
+        this.qrRawUrl.set(raw);
+        this.qrDataUrl.set(null);
+        if (raw) {
+            void HelpersUtils.toQrDataUrl(raw).then((dataUrl) => {
+                // Evita race si el usuario navegó a otra factura mientras se generaba
+                if (HelpersUtils.resolveQrText(this.factura()) === raw) {
+                    this.qrDataUrl.set(dataUrl);
+                }
+            });
+        }
+    }
+}

@@ -1,0 +1,233 @@
+<div class="p-6 space-y-6">
+  <header-title-page [titleHead]="headTitle()" />
+
+  <!-- Action Bar -->
+  <div class="flex items-center justify-between bg-white rounded-2xl p-4 border border-slate-100 shadow-sm">
+    <a routerLink="/panel/nomina/periodos"
+      class="inline-flex items-center gap-1.5 px-4 py-2 border-2 border-slate-200 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-all cursor-pointer">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      Volver a Períodos
+    </a>
+
+    @if (periodo()?.estado === 'BORRADOR') {
+    <div class="flex items-center gap-3">
+      <button type="button" (click)="guardarAsignacion()"
+        class="px-5 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-xl shadow-sm transition-all cursor-pointer active:scale-95">
+        Guardar Selección
+      </button>
+      <button type="button" (click)="liquidarPeriodo()" [disabled]="isLiquidando()"
+        class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-sm shadow-blue-200 transition-all cursor-pointer active:scale-95 flex items-center justify-center gap-2 disabled:opacity-75 disabled:cursor-wait">
+        @if (isLiquidando()) {
+        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+          </path>
+        </svg>
+        Liquidando...
+        } @else {
+        Liquidar Período
+        }
+      </button>
+    </div>
+    }
+    @if (periodo()?.estado !== 'BORRADOR') {
+    <div class="flex items-center gap-3">
+      <button type="button" (click)="descargarDesprendibles()"
+        class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl shadow-sm shadow-emerald-200 transition-all cursor-pointer active:scale-95 flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        Descargar Desprendibles ({{ selectedCount() }})
+      </button>
+    </div>
+    }
+  </div>
+
+  <!-- Resumen KPI del Período -->
+  @if (periodo()) {
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-1">
+      <span class="text-[11px] text-slate-400 font-semibold uppercase">Empleados Seleccionados</span>
+      <p class="text-2xl font-medium text-slate-800">{{ selectedCount() }}</p>
+    </div>
+
+    <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-1">
+      <span class="text-[11px] text-slate-400 font-semibold uppercase">Total Devengado Previo</span>
+      <p class="text-2xl font-medium text-slate-800">
+        ${{ (periodo()?.estado === 'BORRADOR' ? totalDevengadoEstimado() : periodo()?.totalDevengado) | number: '1.0-0'
+        }}
+      </p>
+    </div>
+
+    <div class="bg-white rounded-2xl p-5 border border-rose-100 shadow-sm space-y-1">
+      <span class="text-[11px] text-slate-400 font-semibold uppercase">Deducciones Previas</span>
+      <p class="text-2xl font-medium">
+        ${{ (periodo()?.estado === 'BORRADOR' ? totalDeduccionesEstimado() : periodo()?.totalDeducciones) | number:
+        '1.0-0' }}
+      </p>
+    </div>
+
+    <div class="bg-emerald-50/40 rounded-2xl p-5 border border-emerald-100 shadow-sm space-y-1">
+      <span class="text-[11px] text-emerald-600 font-semibold uppercase">Neto a Pagar Estimado</span>
+      <p class="text-2xl font-medium">
+        ${{ (periodo()?.estado === 'BORRADOR' ? totalNetoEstimado() : periodo()?.totalNeto) | number: '1.0-0' }}
+      </p>
+    </div>
+  </div>
+  }
+
+  <!-- Cuerpo Principal: Búsqueda y Tabla -->
+  <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col max-h-[600px]">
+    <!-- Barra de búsqueda -->
+    <div class="p-5 border-b border-slate-50 flex items-center justify-between gap-4 bg-slate-50/50 sticky top-0 z-20">
+      <div class="relative w-full max-w-md">
+        <svg class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor"
+          viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
+          placeholder="Buscar empleado por nombre, documento o cargo..."
+          class="w-full pl-10 pr-4 py-2.5 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/30 transition-all" />
+      </div>
+    </div>
+
+    <!-- Tabla de Empleados y Conceptos -->
+    <div class="overflow-y-auto flex-1 relative">
+      @if (loading()) {
+      <div class="py-16 text-center text-slate-400 text-xs">Cargando nómina del período...</div>
+      } @else {
+      <table class="w-full text-xs">
+        <thead
+          class="bg-slate-50 text-[11px] text-slate-500 uppercase border-b border-slate-100 sticky top-0 z-10 shadow-sm">
+          <tr>
+            <th class="px-5 py-3.5 text-center w-12 font-semibold">
+              <input type="checkbox" [checked]="isAllSelected()" (change)="toggleSelectAll()"
+                [disabled]="periodo()?.estado !== 'BORRADOR'"
+                class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer disabled:opacity-50" />
+            </th>
+            <th class="px-5 py-3.5 text-left font-semibold">Empleado</th>
+            <th class="px-5 py-3.5 text-left font-semibold">Identificación</th>
+            <th class="px-5 py-3.5 text-right font-semibold">Salario Base</th>
+            <th class="px-5 py-3.5 text-center font-semibold">Ingresos adicionales</th>
+            <th class="px-5 py-3.5 text-center font-semibold">Deducciones</th>
+            <th class="px-5 py-3.5 text-right font-semibold">Neto Estimado</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          @for (emp of filteredEmpleados(); track emp.id) {
+          <tr class="hover:bg-slate-50/80 transition-colors" [class.bg-blue-50]="selectedIds().has(emp.id)">
+            <td class="px-5 py-3.5 text-center">
+              <input type="checkbox" [checked]="selectedIds().has(emp.id)" (change)="toggleSelect(emp.id)"
+                [disabled]="periodo()?.estado !== 'BORRADOR'"
+                class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer disabled:opacity-50" />
+            </td>
+            <td class="px-5 py-3.5">
+              <div class="font-semibold text-slate-800 text-sm">
+                {{ emp.primerNombre }} {{ emp.segundoNombre || '' }} {{ emp.primerApellido }} {{ emp.segundoApellido ||
+                '' }}
+              </div>
+              <div class="text-[11px] text-slate-400 mt-0.5">{{ emp.cargo?.nombre || 'Sin cargo' }}</div>
+              @if (emp.liquidacionError) {
+              <div class="mt-1 text-[11px] font-medium text-rose-600" [title]="emp.liquidacionError">
+                Error de liquidación: {{ emp.liquidacionError }}
+              </div>
+              }
+            </td>
+            <td class="px-5 py-3.5 font-mono text-slate-500">{{ emp.tipoDocumento }} {{ emp.numeroDocumento }}</td>
+            <td class="px-5 py-3.5 text-right tabular-nums font-semibold text-slate-800">${{ emp.salarioBase | number:
+              '1.0-0' }}</td>
+
+            <!-- Columna Ingresos Adicionales -->
+            <td class="px-5 py-3.5 text-center">
+              <div class="flex items-center justify-center gap-2">
+                <button (click)="openPopover(emp, 'DEVENGADO')" type="button" [disabled]="!selectedIds().has(emp.id)"
+                  class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[11px] font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200/50 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                  Ingresos
+                </button>
+                @if (selectedIds().has(emp.id) && displayMap().has(emp.id)) {
+                <span class="text-[11px] font-semibold" [class.text-emerald-600]="!displayMap().get(emp.id)?.isEstimate"
+                  [class.text-emerald-400]="displayMap().get(emp.id)?.isEstimate"
+                  [title]="displayMap().get(emp.id)?.isEstimate ? 'Valor estimado (sin guardar)' : ''">
+                  +${{ (displayMap().get(emp.id)?.totalIngresosAdicionales || 0) | number: '1.0-0' }}
+                </span>
+                }
+              </div>
+            </td>
+
+            <!-- Columna Deducciones -->
+            <td class="px-5 py-3.5 text-center">
+              <div class="flex items-center justify-center gap-2">
+                <button (click)="openPopover(emp, 'DEDUCCION')" type="button" [disabled]="!selectedIds().has(emp.id)"
+                  class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[11px] font-semibold bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200/50 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+                  </svg>
+                  Deducciones
+                </button>
+                @if (selectedIds().has(emp.id) && displayMap().has(emp.id)) {
+                <span class="text-[11px] font-semibold" [class.text-rose-600]="!displayMap().get(emp.id)?.isEstimate"
+                  [class.text-rose-400]="displayMap().get(emp.id)?.isEstimate"
+                  [title]="displayMap().get(emp.id)?.isEstimate ? 'Valor estimado (sin guardar)' : ''">
+                  -${{ (displayMap().get(emp.id)?.totalDeducciones || 0) | number: '1.0-0' }}
+                </span>
+                }
+              </div>
+            </td>
+
+            <!-- Columna Neto Estimado -->
+            <td class="px-5 py-3.5 text-right font-semibold text-slate-700">
+              @if (selectedIds().has(emp.id) && displayMap().has(emp.id)) {
+              <div class="flex items-center justify-end gap-2">
+                @if (displayMap().get(emp.id)?.isEstimate) {
+                <span class="text-[10px] text-orange-500 font-medium px-1.5 py-0.5 bg-orange-50 rounded"
+                  title="Guarda la selección para calcular la nómina real">Estimado</span>
+                }
+                <span class="tabular-nums" [class.text-slate-900]="!displayMap().get(emp.id)?.isEstimate"
+                  [class.text-slate-500]="displayMap().get(emp.id)?.isEstimate">${{ (displayMap().get(emp.id)?.netoPagar
+                  || 0) | number:
+                  '1.0-0' }}</span>
+                @if (periodo()?.estado !== 'BORRADOR' && !displayMap().get(emp.id)?.isEstimate) {
+                <button type="button" (click)="verDetalleEmpleado(emp.id)"
+                  class="p-1 text-slate-400 hover:text-blue-600 transition-colors cursor-pointer" title="Ver detalle">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                </button>
+                }
+              </div>
+              } @else {
+              <span class="text-slate-300">—</span>
+              }
+            </td>
+          </tr>
+          } @empty {
+          <tr>
+            <td colspan="7" class="px-5 py-12 text-center text-slate-400">
+              No se encontraron empleados activos registrados en la plataforma
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+      }
+    </div>
+  </div>
+
+  <!-- Popover / Modal de Conceptos por Período -->
+  @if (showPopover() && popoverEmpleado() && periodo()) {
+  <app-concepto-periodo-popover [periodoId]="periodo()!.id" [empleado]="popoverEmpleado()!" [tipoView]="popoverTipo()"
+    [deduccionesLegales]="popoverDeduccionesLegales()" (close)="showPopover.set(false)"
+    (updated)="onPopoverUpdated()" />
+  }
+</div>
