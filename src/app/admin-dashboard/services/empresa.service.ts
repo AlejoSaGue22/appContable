@@ -32,10 +32,10 @@ export interface Empresa {
 
 @Injectable({ providedIn: 'root' })
 export class EmpresaService {
-  private readonly base = `${environment.baseUrl}/settings/empresa`;
+  private readonly base = `${environment.apiUrl}/settings/empresa`;
   private empresaCache$?: Observable<ApiResponse<Empresa>>;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getEmpresa(): Observable<ApiResponse<Empresa>> {
     if (!this.empresaCache$) {

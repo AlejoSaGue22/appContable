@@ -12,14 +12,14 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root',
 })
 export class CentrosCostosService {
-  private readonly baseUrl = environment.baseUrl;
+  private readonly baseUrl = environment.apiUrl;
   private readonly http = inject(HttpClient);
 
   // Señales para el estado
   public centrosCostos = signal<CentroCostoInterface[]>([]);
   public isLoading = signal<boolean>(false);
 
-  constructor() {}
+  constructor() { }
 
   /**
    * Carga todos los centros de costo y actualiza la señal

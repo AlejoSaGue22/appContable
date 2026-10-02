@@ -5,7 +5,7 @@ import { catchError, delay, map, Observable, of } from 'rxjs';
 import { environment } from 'src/app/environments/environment';
 import { NotaAjusteSoporteResponse, NotaAjusteSoporteResponseById } from '../../../interfaces/notas-ajuste-soporte-interface';
 
-const baseUrl = environment.baseUrl;
+const baseUrl = environment.apiUrl;
 
 @Injectable({
   providedIn: 'root'

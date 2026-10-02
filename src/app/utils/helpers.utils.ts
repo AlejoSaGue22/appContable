@@ -10,7 +10,7 @@ export class HelpersUtils {
     /** Origen del backend sin el prefijo /api/v1. Dev: http://localhost:3000, Prod (proxy): '' */
     static backendOrigin(): string {
         try {
-            return (environment.baseUrl || '').replace(/\/api\/v1\/?$/, '');
+            return (environment.apiUrl || '').replace(/\/api\/v1\/?$/, '');
         } catch {
             return '';
         }

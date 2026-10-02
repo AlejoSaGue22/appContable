@@ -20,7 +20,7 @@ import {
 
 @Injectable({ providedIn: 'root' })
 export class PagosHttpService {
-    private readonly base = `${environment.baseUrl}`;
+    private readonly base = `${environment.apiUrl}`;
 
     constructor(private http: HttpClient) { }
 

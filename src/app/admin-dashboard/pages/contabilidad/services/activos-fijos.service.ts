@@ -8,9 +8,9 @@ import { ActivoFijo, DepreciacionActivoFijo } from '../interfaces/activos-fijos.
   providedIn: 'root'
 })
 export class ActivosFijosService {
-  private readonly base = `${environment.baseUrl}/activos-fijos`;
+  private readonly base = `${environment.apiUrl}/activos-fijos`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getActivosFijos(params: any = {}): Observable<any> {
     return this.http.get<any>(this.base, { params });

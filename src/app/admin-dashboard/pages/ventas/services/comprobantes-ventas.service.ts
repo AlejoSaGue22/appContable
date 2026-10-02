@@ -5,7 +5,7 @@ import { Options, ResponseResult } from '@shared/interfaces/services.interfaces'
 import { catchError, delay, map, Observable, of } from 'rxjs';
 import { environment } from 'src/app/environments/environment';
 
-const baseUrl = environment.baseUrl;
+const baseUrl = environment.apiUrl;
 
 @Injectable({
   providedIn: 'root'
@@ -62,7 +62,7 @@ export class ComprobantesVentasService {
     return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/emitir`, {}).pipe(
       map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
       catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
-    ); 
+    );
   }
 
   emitirEstandarInvoice(id: string) {

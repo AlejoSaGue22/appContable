@@ -1,3 +1,4 @@
 export const environment = {
- baseUrl: '/api/v1'
+    production: true,
+    apiUrl: 'https://nest-contable-backend-production.up.railway.app/api/v1'
 };

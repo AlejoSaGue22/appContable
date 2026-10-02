@@ -6,7 +6,7 @@ import { catchError, delay, map, Observable, of, tap } from 'rxjs';
 import { environment } from 'src/app/environments/environment';
 import { Municipality } from '@dashboard/interfaces/catalogs-interface';
 
-const baseUrl = environment.baseUrl;
+const baseUrl = environment.apiUrl;
 
 const emptyCliente: ClientesFormInterface = {
     apellido: '',

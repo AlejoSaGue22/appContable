@@ -8,7 +8,7 @@ import { GetCuentasContables } from '../interfaces/cuentas-contables.interface';
     providedIn: 'root'
 })
 export class CuentasContablesService {
-    private readonly base = `${environment.baseUrl}/cuentas`;
+    private readonly base = `${environment.apiUrl}/cuentas`;
 
     constructor(private http: HttpClient) { }
 
