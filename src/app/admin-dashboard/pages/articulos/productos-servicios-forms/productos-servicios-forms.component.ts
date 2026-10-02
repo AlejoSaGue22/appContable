@@ -43,7 +43,7 @@ export class ProductosServiciosFormsComponent {
         codigo: [''],
         unidadmedida: ['', Validators.required],
         impuesto: ['', Validators.required],
-        isInventariable: [true],
+        isInventariable: [false],
         // retencion: ['', Validators.required],
 
         precioventa: this.fb.group({

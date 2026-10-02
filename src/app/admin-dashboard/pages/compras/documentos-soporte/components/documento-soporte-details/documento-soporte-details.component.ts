@@ -208,7 +208,7 @@ export class DocumentoSoporteDetailsComponent implements OnInit {
 
     printDocumentoSoporte(): void {
         const c = this.documento();
-        if (c) this.printService.printPurchaseInvoice(c as any, 'Documento Soporte');
+        if (c) this.printService.printPurchaseInvoice(c, 'Documento Soporte');
     }
 
     printAsiento(): void {
@@ -219,7 +219,7 @@ export class DocumentoSoporteDetailsComponent implements OnInit {
         }
     }
 
-    formatDate(date: string | Date): string {
+    formatDate(date: string | Date | undefined | null): string {
         if (!date) return '—';
         // Evitar que JS reste un día al interpretar YYYY-MM-DD como UTC
         const dateObj = typeof date === 'string' && date.includes('-') && !date.includes('T')

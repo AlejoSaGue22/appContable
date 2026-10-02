@@ -30,6 +30,7 @@ export enum DianStatusSoporte {
 export enum DocumentoSoporteEstado {
     BORRADOR = 'borrador',
     ERROR_ASIENTO = 'error_asiento',
+    PAGADO = 'pagado',
     REGISTRADO = 'registrado',
     ANULADO = 'anulado'
 }

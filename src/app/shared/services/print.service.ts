@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { GetFacturaRequest } from '@dashboard/interfaces/documento-venta-interface';
 import { FacturaCompraResponse } from '@dashboard/interfaces/factura-compra-interface';
+import { DocumentoSoporte } from '@dashboard/interfaces/documento-soporte-interface';
 import { NotaAjuste } from '@dashboard/interfaces/notas-ajuste-interface';
 import { NotaAjusteCompra } from '@dashboard/interfaces/notas-ajuste-compra-interface';
 import { HelpersUtils } from '@utils/helpers.utils';
@@ -91,9 +92,10 @@ export class PrintService {
   // ──────────────────────────────────────────────────────────────────────
   // IMPRIMIR FACTURA DE COMPRA
   // ──────────────────────────────────────────────────────────────────────
-  printPurchaseInvoice(compra: FacturaCompraResponse, titulo?: string): void {
-    const html = this.buildPurchaseInvoiceHtml(compra, titulo);
-    this.openPrintWindow(html, `Compra ${compra.numero}`);
+  printPurchaseInvoice(compra: FacturaCompraResponse | DocumentoSoporte, titulo?: string): Promise<void> {
+    return this.buildPurchaseInvoiceHtml(compra, titulo).then((html) => {
+      this.openPrintWindow(html, `Compra ${compra.numero}`);
+    });
   }
 
   // ──────────────────────────────────────────────────────────────────────
@@ -561,12 +563,21 @@ export class PrintService {
   // ══════════════════════════════════════════════════════════════════════
   // PRIVATE — Construir HTML de Factura de Compra
   // ══════════════════════════════════════════════════════════════════════
-  private buildPurchaseInvoiceHtml(c: FacturaCompraResponse, titulo?: string): string {
+  private async buildPurchaseInvoiceHtml(c: FacturaCompraResponse | DocumentoSoporte, titulo?: string): Promise<string> {
     const tituloDoc = (titulo || 'Factura de compra').toUpperCase();
     const proveedorNombre = c.proveedor.razonSocial?.trim() || c.proveedor.nombre?.trim() || '—';
     const proveedorNit = c.proveedor.identificacion || '—';
     const fechaGen = this.formatDateTimePrint(c.createdAt);
     const fechaVenc = c.fechaVencimiento || c.fecha;
+
+    const isElectronico = 'tipo' in c && c.tipo === 'electronico';
+    const qrRaw = isElectronico ? HelpersUtils.resolveQrText(c) : null;
+    const qrDataUrl = qrRaw ? await HelpersUtils.toQrDataUrl(qrRaw) : null;
+    const qrBlock = qrDataUrl ? `<td style="width:100px;text-align:center;vertical-align:top;padding:6px;">
+  <img src="${qrDataUrl}" alt="QR DIAN" style="width:88px;height:88px;"/>
+  </td>` : (qrRaw ? `<td style="width:100px;text-align:center;vertical-align:top;padding:6px;">
+  <div style="font-size:7px;color:#64748b;word-break:break-all;max-width:100px;">${this.escapeHtml(qrRaw)}</div>
+  </td>` : '');
 
     const itemsRows = c.items.map((item, i) => `<tr>
  <td style="text-align:center;padding:7px 5px;border-bottom:1px solid #e2e8f0;font-size:10px;color:#64748b;">${i + 1}</td>
@@ -631,6 +642,9 @@ export class PrintService {
  ${this.empresa.textoAdicional ? '<br/>' + this.empresa.textoAdicional : ''}
  </div>
  </td>
+
+ <!-- Right: QR Code -->
+ ${qrBlock}
  </tr>
  </table>
 

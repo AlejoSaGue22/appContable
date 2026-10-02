@@ -151,12 +151,13 @@
                 compra.numero || compra.numeroDian || 'Borrador'
                 }}</span>
               @if (compra.numeroDian) {
-              <span class="block text-[10px] font-mono text-violet-600" [title]="compra.referenceCode || ''">
+              <span class="block text-[10px] font-mono text-green-600" [title]="compra.referenceCode || ''">
                 DIAN: {{ compra.numeroDian }}
               </span>
               }
               @if (compra.notasResumen?.tieneNota) {
-              <span class="ml-1.5 inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold uppercase rounded-full border"
+              <span
+                class="ml-1.5 inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold uppercase rounded-full border"
                 [class.bg-amber-50]="(compra.notasResumen?.countNC ?? 0) > 0"
                 [class.text-amber-700]="(compra.notasResumen?.countNC ?? 0) > 0"
                 [class.border-amber-200]="(compra.notasResumen?.countNC ?? 0) > 0"
@@ -169,7 +170,7 @@
               }
             </td>
             <td class="text-center">
-              <span class="px-2 py-0.5 text-[10px] font-bold uppercase rounded-full border"
+              <span class="px-2 py-0.5 text-[10px] font-semibold rounded-full border"
                 [class]="getTipoClass(compra.tipo)">
                 {{ compra.tipo === 'electronico' ? 'Electrónico' : 'Estándar' }}
               </span>
