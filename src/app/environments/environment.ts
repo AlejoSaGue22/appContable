@@ -1,5 +1,3 @@
 export const environment = {
-  baseUrl: 'http://localhost:3000/api/v1',
-  // baseUrl: 'http://192.168.1.10:3000/api/v1',
-  // baseUrl: 'http://192.168.1.3:3000/api/v1',
+  baseUrl: 'https://nest-contable-backend-production.up.railway.app/api/v1',
 };  
