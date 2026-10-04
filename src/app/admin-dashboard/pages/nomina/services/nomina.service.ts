@@ -16,7 +16,7 @@ import { Banco } from '@dashboard/pages/contabilidad/interfaces/cuenta-bancaria.
 @Injectable({ providedIn: 'root' })
 export class NominaService {
   private readonly http = inject(HttpClient);
-  private readonly base = `${environment.baseUrl}/nomina`;
+  private readonly base = `${environment.apiUrl}/nomina`;
 
   private handleError = (error: HttpErrorResponse) => {
     let errorMessage = 'Ocurrió un error inesperado';
@@ -156,7 +156,7 @@ export class NominaService {
   }
 
   getBancos(): Observable<{ data: Banco[], message: string }> {
-    return this.http.get<{ data: Banco[], message: string }>(`${environment.baseUrl}/bancos`).pipe(catchError(this.handleError));
+    return this.http.get<{ data: Banco[], message: string }>(`${environment.apiUrl}/bancos`).pipe(catchError(this.handleError));
   }
 
   // ── Conceptos y Recurrentes ───────────────────────────────────────

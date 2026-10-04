@@ -20,7 +20,7 @@ export interface ParametrizacionContable {
 })
 export class ParametrizacionContableService {
     private http = inject(HttpClient);
-    private apiUrl = `${environment.baseUrl}/settings/parametrizacion-contable`;
+    private apiUrl = `${environment.apiUrl}/settings/parametrizacion-contable`;
 
     getConfiguracion(): Observable<ParametrizacionContable> {
         return this.http.get<ParametrizacionContable>(this.apiUrl);

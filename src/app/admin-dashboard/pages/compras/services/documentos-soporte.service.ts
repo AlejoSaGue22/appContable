@@ -6,7 +6,7 @@ import { Options, ResponseResult } from '@shared/interfaces/services.interfaces'
 import { environment } from 'src/app/environments/environment';
 import { catchError, delay, map, Observable, of } from 'rxjs';
 
-const baseUrl = environment.baseUrl;
+const baseUrl = environment.apiUrl;
 
 @Injectable({ providedIn: 'root' })
 export class DocumentosSoporteService {

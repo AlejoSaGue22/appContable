@@ -12,14 +12,14 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root',
 })
 export class CargosService {
-  private readonly baseUrl = environment.baseUrl;
+  private readonly baseUrl = environment.apiUrl;
   private readonly http = inject(HttpClient);
 
   // Señales para el estado
   public cargos = signal<CargoInterface[]>([]);
   public isLoading = signal<boolean>(false);
 
-  constructor() {}
+  constructor() { }
 
   /**
    * Carga todos los cargos y actualiza la señal

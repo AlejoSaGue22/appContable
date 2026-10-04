@@ -5,19 +5,19 @@ import { DashboardHistory, DashboardResponse, RecentTransaction } from '@dashboa
 import { environment } from 'src/app/environments/environment';
 import { DashboardAvanzadoKPIs } from '../../../interfaces/reportes-avanzados.interface';
 
-const baseUrl = environment.baseUrl;
+const baseUrl = environment.apiUrl;
 
 @Injectable({
- providedIn: 'root'
+    providedIn: 'root'
 })
 export class DashboardService {
- private http = inject(HttpClient);
+    private http = inject(HttpClient);
 
- getSummary(period: string = 'current_month'): Observable<DashboardResponse> {
- return this.http.get<DashboardResponse>(`${baseUrl}/dashboard/summary`, { params: { period } });
- }
+    getSummary(period: string = 'current_month'): Observable<DashboardResponse> {
+        return this.http.get<DashboardResponse>(`${baseUrl}/dashboard/summary`, { params: { period } });
+    }
 
- getDashboardAvanzado(): Observable<DashboardAvanzadoKPIs> {
- return this.http.get<DashboardAvanzadoKPIs>(`${baseUrl}/reportes/dashboard-avanzado`);
- }
+    getDashboardAvanzado(): Observable<DashboardAvanzadoKPIs> {
+        return this.http.get<DashboardAvanzadoKPIs>(`${baseUrl}/reportes/dashboard-avanzado`);
+    }
 }

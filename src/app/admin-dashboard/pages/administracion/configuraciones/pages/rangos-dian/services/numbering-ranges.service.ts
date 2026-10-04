@@ -14,7 +14,7 @@ import {
 })
 export class NumberingRangesService {
   private http = inject(HttpClient);
-  private apiUrl = `${environment.baseUrl}/numbering-ranges`;
+  private apiUrl = `${environment.apiUrl}/numbering-ranges`;
 
   list(filters?: {
     domain?: NumberingRangeDomain;

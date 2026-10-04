@@ -12,7 +12,7 @@ import {
   providedIn: 'root',
 })
 export class ComprobantesService {
-  private readonly baseUrl = environment.baseUrl;
+  private readonly baseUrl = environment.apiUrl;
   private readonly http = inject(HttpClient);
 
   public comprobantes = signal<ComprobanteContableInterface[]>([]);

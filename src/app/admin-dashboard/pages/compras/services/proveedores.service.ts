@@ -5,7 +5,7 @@ import { Options, ResponseResult } from '@shared/interfaces/services.interfaces'
 import { catchError, map, Observable, of } from 'rxjs';
 import { ProveedoresInterface, ProveedoresResponse } from '@dashboard/interfaces/proveedores-interface';
 
-const baseUrl = environment.baseUrl;
+const baseUrl = environment.apiUrl;
 
 const emptyProveedor: ProveedoresInterface = {
   id: '',

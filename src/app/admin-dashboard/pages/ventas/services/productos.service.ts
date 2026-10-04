@@ -6,7 +6,7 @@ import { catchError, delay, map, Observable, of } from 'rxjs';
 import { environment } from 'src/app/environments/environment';
 import { CatalogsStore } from '@dashboard/services/catalogs.store';
 
-const baseUrl = environment.baseUrl;
+const baseUrl = environment.apiUrl;
 
 const emptyProducto: ArticulosInterface = {
     id: '',

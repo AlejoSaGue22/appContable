@@ -5,7 +5,7 @@ import type { NotificationService } from '@shared/services/notification.service'
 import { catchError, map, Observable, of } from 'rxjs';
 import { environment } from 'src/app/environments/environment';
 
-const baseUrl = environment.baseUrl;
+const baseUrl = environment.apiUrl;
 
 export interface AdvertenciaInventarioUI {
     codigo: string;

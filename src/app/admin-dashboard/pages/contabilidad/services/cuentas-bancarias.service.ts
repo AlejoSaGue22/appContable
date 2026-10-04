@@ -19,8 +19,8 @@ import { Options } from '@shared/interfaces/services.interfaces';
 })
 export class CuentasBancariasService {
   private readonly http = inject(HttpClient);
-  private readonly base = `${environment.baseUrl}/cuentas-bancarias`;
-  private readonly banksUrl = `${environment.baseUrl}/bancos`;
+  private readonly base = `${environment.apiUrl}/cuentas-bancarias`;
+  private readonly banksUrl = `${environment.apiUrl}/bancos`;
 
   getCuentasBancos(options: Options & { estado?: 'activo' | 'inactivo' | 'todos' }): Observable<ResponseCuentasBancarias> {
     const { offset = 0, limit = 10, search = '', estado } = options;
