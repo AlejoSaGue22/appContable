@@ -280,7 +280,7 @@
                   <td class="text-gray-400">{{ i + 1 }}</td>
                   <td>
                     <p class="font-medium text-gray-900">
-                      {{ item.description || item.articulo.nombre }}
+                      {{ item.articulo.nombre + " " + item.description }}
                     </p>
                     @if (item.articulo) {
                     <p class="text-xs text-gray-400 font-mono mt-0.5">
@@ -611,12 +611,9 @@
                 <tr>
                   <td>
                     <span class="px-2 py-0.5 text-[10px] font-bold uppercase rounded-full border"
-                      [class.bg-amber-50]="n.tipo === 'credito'"
-                      [class.text-amber-700]="n.tipo === 'credito'"
-                      [class.border-amber-200]="n.tipo === 'credito'"
-                      [class.bg-blue-50]="n.tipo === 'debito'"
-                      [class.text-blue-700]="n.tipo === 'debito'"
-                      [class.border-blue-200]="n.tipo === 'debito'">
+                      [class.bg-amber-50]="n.tipo === 'credito'" [class.text-amber-700]="n.tipo === 'credito'"
+                      [class.border-amber-200]="n.tipo === 'credito'" [class.bg-blue-50]="n.tipo === 'debito'"
+                      [class.text-blue-700]="n.tipo === 'debito'" [class.border-blue-200]="n.tipo === 'debito'">
                       {{ n.tipo === 'credito' ? 'NC' : 'ND' }}
                     </span>
                   </td>

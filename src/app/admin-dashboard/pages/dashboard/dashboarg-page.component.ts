@@ -69,8 +69,9 @@ export class DashboargPageComponent implements OnInit {
     },
   ];
 
-  roles = signal(['Super Admin', 'Admin', 'Gerente', 'Contador']);
-  role = inject(AuthService).user()?.role;
+  private authService = inject(AuthService);
+  isPermitted = this.authService.canViewFinancials;
+  
   logoApp = HelpersUtils.logoApp;
   nameApp = HelpersUtils.nameApp;
   cardsValor = signal<CardsTotales[]>([]);

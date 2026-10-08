@@ -12,6 +12,7 @@ import { ModalComponent } from '@shared/components/modal/modal.component';
 import { ModalAsientoContableComponent } from '../components/modal-asiento-contable/modal-asiento-contable.component';
 import { VolantePagoComponent } from '../components/volante-pago/volante-pago.component';
 import { NotificationService } from '@shared/services/notification.service';
+import { AuthService } from 'src/app/auth/services/auth.service';
 
 @Component({
     selector: 'app-movimientos',
@@ -31,6 +32,9 @@ export class MovimientosComponent {
     private svc = inject(PagosHttpService);
     private paginationService = inject(PaginationService);
     private notificationService = inject(NotificationService);
+    private authService = inject(AuthService);
+
+    isPermitted = this.authService.canViewFinancials;
 
     headTitle = signal<HeaderInput>({
         title: 'Movimientos Financieros',

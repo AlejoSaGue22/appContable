@@ -21,6 +21,12 @@ export class LoginPageComponent {
   private _isLoading = signal<boolean>(false);
   isLoading = computed(() => this._isLoading());
 
+  showPassword = signal<boolean>(false);
+
+  togglePasswordVisibility() {
+    this.showPassword.set(!this.showPassword());
+  }
+
   formLogin = this.fb.group({
     email: ['', [Validators.required]],
     password: ['', [Validators.required, Validators.minLength(4)]],

@@ -27,6 +27,13 @@ export class AuthService {
     user = computed(() => this._user());
     authStatus = computed(() => this._authStatus());
 
+    private readonly FINANCIAL_ROLES = ['Super Admin', 'Administrador', 'Gerente', 'Contador'];
+
+    canViewFinancials = computed(() => {
+        const role = this.user()?.role;
+        return role ? this.FINANCIAL_ROLES.includes(role) : false;
+    });
+
     private authEvents = new Subject<'login' | 'logout' | 'status-changed'>();
     authEvents$ = this.authEvents.asObservable();
 

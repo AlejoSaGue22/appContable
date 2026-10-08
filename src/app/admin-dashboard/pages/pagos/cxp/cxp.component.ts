@@ -17,6 +17,7 @@ import { ModalAsientoContableComponent } from '../components/modal-asiento-conta
 import { VolantePagoComponent } from '../components/volante-pago/volante-pago.component';
 import { EstadoCuentaComponent } from '../components/estado-cuenta/estado-cuenta.component';
 import { TabsComponent, TabItem } from '@shared/components/tabs/tabs.component';
+import { AuthService } from 'src/app/auth/services/auth.service';
 
 @Component({
   selector: 'app-cxp',
@@ -28,6 +29,8 @@ import { TabsComponent, TabItem } from '@shared/components/tabs/tabs.component';
 export class CxpComponent {
   private svc = inject(PagosHttpService);
   private paginationService = inject(PaginationService);
+  private authService = inject(AuthService);
+  isPermitted = this.authService.canViewFinancials;
 
   headTitle = signal<HeaderInput>({
     title: 'Cuentas por Pagar',

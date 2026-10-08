@@ -67,7 +67,8 @@
 
     <!-- Table Section -->
     <div class="space-y-4 transition-opacity duration-300" [class.opacity-50]="productorxResource.isLoading()">
-        <app-table-productos [productosData]="productorxResource.value().articulos" (delete)="openModal($event)" (kardex)="openKardex($event)" />
+        <app-table-productos [productosData]="productorxResource.value().articulos" (delete)="openModal($event)"
+            (kardex)="openKardex($event)" />
 
         @if (productorxResource.value().articulos.length > 0) {
         <app-pagination [length]="productorxResource.value().articulos.length" />
@@ -103,7 +104,21 @@
 
     <!-- Kardex Modal -->
     <app-modal [(visible)]="isKardexOpen">
-        <app-kardex-modal [articuloId]="kardexArticuloId()" [articuloNombre]="kardexArticuloNombre()"
-            (ajustado)="onKardexAjustado()" />
+        <div class="relative">
+            <!-- Botón de cerrar -->
+            <button (click)="isKardexOpen = false"
+                class="absolute -top-2 -right-2 p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors z-10 cursor-pointer"
+                title="Cerrar">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <!-- Contenido del Kardex -->
+            <div class="pt-4">
+                <app-kardex-modal [articuloId]="kardexArticuloId()" [articuloNombre]="kardexArticuloNombre()"
+                    (ajustado)="onKardexAjustado()" />
+            </div>
+        </div>
     </app-modal>
 </div>

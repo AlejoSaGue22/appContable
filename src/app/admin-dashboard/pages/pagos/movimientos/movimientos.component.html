@@ -3,6 +3,7 @@
 <div class="w-full space-y-6 animate-fade-in">
 
     <!-- Tarjetas resumen -->
+    @if(isPermitted()) {
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-5">
             <div class="flex items-center gap-3">
@@ -55,6 +56,7 @@
             </div>
         </div>
     </div>
+    }
 
     <!-- Tabla principal -->
     <div class="bg-white rounded-xl shadow-lg overflow-hidden">

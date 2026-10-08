@@ -1,5 +1,5 @@
 <div class="space-y-5 bg-gray-50/50 min-h-screen">
-    @if (roles().includes(role ?? '')) {
+    @if (isPermitted()) {
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <header-title-page [titleHead]="headTitle()" class="flex-1" />
 

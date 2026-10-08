@@ -35,6 +35,7 @@ import { ModalAsientoContableComponent } from '../components/modal-asiento-conta
 import { VolantePagoComponent } from '../components/volante-pago/volante-pago.component';
 import { EstadoCuentaComponent } from '../components/estado-cuenta/estado-cuenta.component';
 import { TabsComponent, TabItem } from '@shared/components/tabs/tabs.component';
+import { AuthService } from 'src/app/auth/services/auth.service';
 
 @Component({
   selector: 'app-cxc',
@@ -58,6 +59,9 @@ import { TabsComponent, TabItem } from '@shared/components/tabs/tabs.component';
 })
 export class CxcComponent implements OnInit {
   private paginationService = inject(PaginationService);
+  private authService = inject(AuthService);
+  isPermitted = this.authService.canViewFinancials;
+
   headTitle = signal<HeaderInput>({
     title: 'Cuentas por Cobrar',
     slog: 'Facturas de venta a crédito pendientes de pago',
