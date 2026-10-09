@@ -29,16 +29,18 @@
             <tbody>
                 @for (vendedor of filteredVendedores(); track vendedor.id) {
                 <tr>
-                    <td>
-                        <span class="text-gray-900">{{ vendedor.nombre + ' ' + vendedor.apellido }}</span>
+                    <td class="text-center">
+                        <span class="text-gray-900">
+                            {{ vendedor.nombre | titlecase }} {{ vendedor.apellido|titlecase}}
+                        </span>
                     </td>
-                    <td>
+                    <td class="text-center">
                         <span class="text-slate-600">{{ vendedor.identificacion }}</span>
                     </td>
-                    <td>
+                    <td class="text-center">
                         <span class="text-slate-500">{{ vendedor.telefono || '-' }}</span>
                     </td>
-                    <td class="px-4 py-2">
+                    <td class="px-4 py-2 text-center">
                         @if (vendedor.activo) {
                         <div class="flex items-center gap-1.5">
                             <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
@@ -52,8 +54,8 @@
                         }
                     </td>
 
-                    <td class="text-right">
-                        <div class="flex items-center justify-end gap-2">
+                    <td class="text-center">
+                        <div class="flex items-center justify-center gap-2">
                             <button (click)="onEdit(vendedor)"
                                 class="flex items-center justify-center w-9 h-9 rounded-xl cursor-pointer text-slate-600 hover:bg-slate-900 hover:text-white transition-all duration-300"
                                 title="Editar Vendedor">

@@ -1,5 +1,5 @@
 import { Component, input, output, computed, signal, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Vendedor } from '../../interfaces/vendedor.interface';
 import { ModalComponent } from '@shared/components/modal/modal.component';
@@ -10,7 +10,7 @@ import { LoaderService } from '@utils/services/loader.service';
 @Component({
     selector: 'app-vendedores-list',
     standalone: true,
-    imports: [CommonModule, FormsModule, ModalComponent],
+    imports: [CommonModule, FormsModule, ModalComponent, TitleCasePipe],
     templateUrl: './vendedores-list.component.html',
 })
 export class VendedoresListComponent {

@@ -13,9 +13,7 @@ export class PaginationComponent implements OnDestroy {
     length = input.required<number>();
 
     pages = computed(() => {
-        const total = this.paginationService.totalItems();
-        const size = this.paginationService.pageSize() || 10;
-        return Math.ceil(total / size) || 1;
+        return this.paginationService.pageSize() || 1;
     });
 
     selectPage = linkedSignal(this.paginationService.currentPage);

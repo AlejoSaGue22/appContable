@@ -58,7 +58,7 @@ export class VendedoresComponent implements OnInit {
       const response = await firstValueFrom(this.vendedoresService.getAll(page, limit));
       this.vendedores.set(response.data);
       this.paginationService.totalItems.set(response.meta.total);
-      this.paginationService.pageSize.set(response.meta.limit);
+      this.paginationService.pageSize.set(response.meta.totalPages || 1);
     } catch (error) {
       this.notificationService.error('Error al cargar los vendedores', 'Error');
     } finally {
