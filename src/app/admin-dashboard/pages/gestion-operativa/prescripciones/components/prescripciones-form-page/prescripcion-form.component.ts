@@ -7,8 +7,7 @@ import { FormErrorLabelComponent } from '@utils/components/form-error-label/form
 import { NotificationService } from '@shared/services/notification.service';
 import { PrescripcionesService } from '@dashboard/pages/ventas/services/prescripciones.service';
 import { ClientesService } from '@dashboard/pages/ventas/services/clientes.service';
-import { UsersService } from '@dashboard/pages/administracion/users/services/users.service';
-import { Prescripcion, TipoLentePrescripcion } from '@dashboard/pages/ventas/interfaces/prescripcion.interface';
+import { Prescripcion, ProfesionalResponsable, TipoExamenPrescripcion, TipoLentePrescripcion } from '@dashboard/pages/ventas/interfaces/prescripcion.interface';
 import { ClientesInterfaceResponse, ClientesResponse } from '@dashboard/interfaces/clientes-interface';
 
 
@@ -24,12 +23,12 @@ export class PrescripcionFormComponent implements OnInit {
   private readonly location = inject(Location);
   private readonly service = inject(PrescripcionesService);
   private readonly clientesService = inject(ClientesService);
-  private readonly usersService = inject(UsersService);
   private readonly notify = inject(NotificationService);
 
   readonly loading = signal(false);
   readonly patients = signal<ClientesInterfaceResponse[]>([]);
-  readonly professionals = signal<any[]>([]);
+  readonly professionals = signal<ProfesionalResponsable[]>([]);
+  readonly tiposExamen = signal<TipoExamenPrescripcion[]>([]);
   readonly id = this.route.snapshot.paramMap.get('id');
   readonly showLensometria = signal(false);
 
@@ -40,7 +39,7 @@ export class PrescripcionFormComponent implements OnInit {
     fechaExamen: [new Date().toISOString().substring(0, 10), Validators.required],
     clienteId: ['', Validators.required],
     profesionalId: [''],
-    tipoExamen: ['VALORACION_VISUAL', Validators.required],
+    tipoExamenId: ['', Validators.required],
     tipoLente: ['OFTALMICO' as TipoLentePrescripcion, Validators.required],
     derecho: this.eyeGroup(),
     izquierdo: this.eyeGroup(),
@@ -91,6 +90,27 @@ export class PrescripcionFormComponent implements OnInit {
     return this.patients().find((p) => p.id === this.form.get('clienteId')?.value);
   }
 
+  get tipoDocumentoAbrev(): string {
+    const c = this.client;
+    if (!c) return '';
+    return c.tipoDocumentoRel?.abreviatura || c.tipoDocumento || '';
+  }
+
+  get tipoDocumentoDisplay(): string {
+    const c = this.client;
+    if (!c) return 'Seleccione paciente';
+    if (c.tipoDocumentoRel?.abreviatura && c.tipoDocumentoRel?.nombre) {
+      return `${c.tipoDocumentoRel.abreviatura} - ${c.tipoDocumentoRel.nombre}`;
+    }
+    return c.tipoDocumentoRel?.abreviatura || c.tipoDocumentoRel?.nombre || c.tipoDocumento || '---';
+  }
+
+  get numeroDocumentoDisplay(): string {
+    const c = this.client;
+    if (!c) return 'Seleccione paciente';
+    return c.numeroDocumento ? `${c.numeroDocumento}${c.dv ? '-' + c.dv : ''}` : '---';
+  }
+
   get lensType(): TipoLentePrescripcion {
     return (this.form.get('tipoLente')?.value as TipoLentePrescripcion) || 'OFTALMICO';
   }
@@ -109,14 +129,29 @@ export class PrescripcionFormComponent implements OnInit {
 
   async ngOnInit() {
     try {
-      const response: ClientesResponse = await firstValueFrom(this.clientesService.getClientes({ limit: 100, offset: 0 }));
-      this.patients.set((response.clientes || []));
+      const [response, types, professionals] = await Promise.all([
+        firstValueFrom(this.clientesService.getClientes({ limit: 100, offset: 0 })) as Promise<ClientesResponse>,
+        firstValueFrom(this.service.listTiposExamen()),
+        firstValueFrom(this.service.listProfesionales()),
+      ]);
+      this.patients.set(response.clientes || []);
+      this.tiposExamen.set(types.data || []);
+      this.professionals.set(professionals.data || []);
 
-      const users: any = await firstValueFrom(this.usersService.getUsers({ limit: 100, offset: 1 }));
-      this.professionals.set(users.data || users.users || []);
+      const defaultType = this.tiposExamen().find((type) => type.codigo === 'VALORACION_VISUAL');
+      if (defaultType) this.form.patchValue({ tipoExamenId: defaultType.id });
 
       if (this.id && this.id !== 'new-prescription') {
         const result = await firstValueFrom(this.service.get(this.id));
+        if (result.data?.cliente && !this.patients().some((p) => p.id === result.data.clienteId)) {
+          this.patients.update((list) => [result.data.cliente, ...list]);
+        }
+        if (result.data?.profesional && !this.professionals().some((p) => p.id === result.data.profesionalId)) {
+          this.professionals.update((list) => [result.data.profesional!, ...list]);
+        }
+        if (result.data?.tipoExamenRel && !this.tiposExamen().some((t) => t.id === result.data.tipoExamenId)) {
+          this.tiposExamen.update((list) => [result.data.tipoExamenRel!, ...list]);
+        }
         this.fill(result.data);
       }
     } catch {
@@ -129,7 +164,7 @@ export class PrescripcionFormComponent implements OnInit {
       fechaExamen: item.fechaExamen,
       clienteId: item.clienteId,
       profesionalId: item.profesionalId || '',
-      tipoExamen: item.tipoExamen,
+      tipoExamenId: item.tipoExamenId || item.tipoExamenRel?.id || '',
       tipoLente: item.tipoLente,
       usoIndicado: item.usoIndicado || '',
       material: item.material || '',
@@ -178,7 +213,7 @@ export class PrescripcionFormComponent implements OnInit {
     delete payload.lensometriaIzquierdo;
     delete payload.contacto;
 
-    if (!payload.profesionalId) payload.profesionalId = undefined;
+    if (!payload.profesionalId) payload.profesionalId = null;
 
     try {
       if (this.id && this.id !== 'new-prescription') {

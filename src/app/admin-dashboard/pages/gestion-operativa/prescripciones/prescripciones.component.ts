@@ -10,10 +10,10 @@ import { PrescripcionesService } from '@dashboard/pages/ventas/services/prescrip
 import { Prescripcion } from '@dashboard/pages/ventas/interfaces/prescripcion.interface';
 import { PrintService } from '@shared/services/print.service';
 
-
 @Component({
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, DatePipe, PaginationComponent, HeaderTitlePageComponent],
+  providers: [PaginationService],
   templateUrl: './prescripciones.component.html'
 })
 export class PrescripcionesComponent {
@@ -23,11 +23,17 @@ export class PrescripcionesComponent {
   readonly pagination = inject(PaginationService);
 
   constructor() {
+    this.pagination.pageSize.set(1);
+    this.pagination.totalItems.set(0);
+
     effect(() => {
       const response = this.resource.value();
       if (response?.meta) {
         this.pagination.totalItems.set(response.meta.total);
-        this.pagination.pageSize.set(response.meta.totalPages);
+        this.pagination.pageSize.set(Math.max(1, response.meta.totalPages));
+      } else {
+        this.pagination.totalItems.set(0);
+        this.pagination.pageSize.set(1);
       }
     });
   }
@@ -43,7 +49,8 @@ export class PrescripcionesComponent {
       page: this.pagination.currentPage(),
       search: this.appliedSearch(),
       desde: this.desde(),
-      hasta: this.hasta()
+      hasta: this.hasta(),
+      tipoLente: this.typeFilter(),
     }),
     loader: ({ request }) => {
       const params: Record<string, string | number> = {
@@ -58,6 +65,9 @@ export class PrescripcionesComponent {
       }
       if (request.hasta && request.hasta.trim()) {
         params['hasta'] = request.hasta.trim();
+      }
+      if (request.tipoLente && request.tipoLente !== 'ALL') {
+        params['tipoLente'] = request.tipoLente;
       }
       return this.service.list(params);
     },
@@ -77,21 +87,29 @@ export class PrescripcionesComponent {
     this.router.navigate([], { queryParams: { page: 1 }, queryParamsHandling: 'merge' });
   }
 
+  setTypeFilter(type: 'ALL' | 'OFTALMICO' | 'CONTACTO'): void {
+    if (this.typeFilter() === type) return;
+    this.typeFilter.set(type);
+    this.router.navigate([], { queryParams: { page: 1 }, queryParamsHandling: 'merge' });
+  }
+
   items(): Prescripcion[] {
-    const all = this.resource.value()?.data ?? [];
-    if (this.typeFilter() === 'ALL') {
-      return all;
-    }
-    return all.filter(p => p.tipoLente === this.typeFilter());
+    return this.resource.value()?.data ?? [];
   }
 
   totalItems(): number {
     return this.resource.value()?.meta?.total ?? 0;
   }
 
+  totalGeneral(): number {
+    return this.resource.value()?.meta?.totalGeneral ?? this.totalItems();
+  }
+
   countByType(type: 'OFTALMICO' | 'CONTACTO'): number {
-    const all = this.resource.value()?.data ?? [];
-    return all.filter(p => p.tipoLente === type).length;
+    const meta = this.resource.value()?.meta;
+    if (type === 'OFTALMICO') return meta?.totalOftalmico ?? 0;
+    if (type === 'CONTACTO') return meta?.totalContacto ?? 0;
+    return 0;
   }
 
   patientName(item: Prescripcion): string {
@@ -110,7 +128,10 @@ export class PrescripcionesComponent {
   }
 
   patientDoc(item: Prescripcion): string {
-    return item.cliente?.numeroDocumento || 'Sin doc.';
+    const c = item.cliente;
+    if (!c?.numeroDocumento) return 'Sin doc.';
+    const prefix = c.tipoDocumentoRel?.abreviatura ? `${c.tipoDocumentoRel.abreviatura} ` : '';
+    return `${prefix}${c.numeroDocumento}`;
   }
 
   typeLabel(value: string): string {

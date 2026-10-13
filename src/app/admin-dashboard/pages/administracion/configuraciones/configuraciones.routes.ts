@@ -19,6 +19,10 @@ const configuracionesRoutes: Routes = [
         component: EmpresaComponent
     },
     {
+        path: 'profesionales',
+        loadComponent: () => import('./pages/profesionales/profesionales.component').then(m => m.ProfesionalesComponent)
+    },
+    {
         path: 'impuestos',
         component: ImpuestosComponent
     },

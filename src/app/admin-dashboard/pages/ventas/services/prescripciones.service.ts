@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/app/environments/environment';
-import { Prescripcion, PrescripcionesResponse } from '../interfaces/prescripcion.interface';
+import { ProfesionalResponsable, Prescripcion, PrescripcionesResponse, TipoExamenPrescripcion } from '../interfaces/prescripcion.interface';
 
 @Injectable({ providedIn: 'root' })
 export class PrescripcionesService {
@@ -25,4 +25,36 @@ export class PrescripcionesService {
   create(payload: Partial<Prescripcion>): Observable<any> { return this.http.post(this.base, payload); }
   update(id: string, payload: Partial<Prescripcion>): Observable<any> { return this.http.patch(`${this.base}/${id}`, payload); }
   cancel(id: string): Observable<any> { return this.http.delete(`${this.base}/${id}`); }
+
+  listTiposExamen(): Observable<{ success: boolean; data: TipoExamenPrescripcion[] }> {
+    return this.http.get<any>(`${this.base}/catalogos/tipos-examen`);
+  }
+
+  listProfesionales(includeInactive = false): Observable<{ success: boolean; data: ProfesionalResponsable[] }> {
+    return this.http.get<any>(`${this.base}/catalogos/profesionales`, {
+      params: includeInactive ? { includeInactive: 'true' } : {},
+    });
+  }
+
+  createTipoExamen(payload: Pick<TipoExamenPrescripcion, 'codigo' | 'nombre'>): Observable<any> {
+    return this.http.post(`${this.base}/catalogos/tipos-examen`, payload);
+  }
+
+  updateTipoExamen(id: string, payload: Partial<TipoExamenPrescripcion>): Observable<any> {
+    return this.http.patch(`${this.base}/catalogos/tipos-examen/${id}`, payload);
+  }
+
+  createProfesional(payload: Pick<ProfesionalResponsable, 'nombre'> & Partial<ProfesionalResponsable>): Observable<any> {
+    return this.http.post(`${this.base}/catalogos/profesionales`, payload);
+  }
+
+  updateProfesional(id: string, payload: Partial<ProfesionalResponsable>): Observable<any> {
+    return this.http.patch(`${this.base}/catalogos/profesionales/${id}`, payload);
+  }
+
+  uploadFirma(id: string, file: File): Observable<any> {
+    const body = new FormData();
+    body.append('file', file);
+    return this.http.post(`${this.base}/catalogos/profesionales/${id}/firma`, body);
+  }
 }

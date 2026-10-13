@@ -1282,7 +1282,11 @@ export class PrintService {
 
     const fechaExamen = this.formatDatePrint(p.fechaExamen);
     const fechaControl = p.fechaControl ? this.formatDatePrint(p.fechaControl) : 'No programada';
-    const profesionalNombre = p.profesional?.fullName || p.profesional?.nombre || 'Especialista en Optometría';
+    const profesionalNombre = p.profesional?.nombre || 'Especialista en Optometría';
+    const firmaProfesional = p.profesional?.firmaUrl
+      ? HelpersUtils.resolveLogoUrl(p.profesional.firmaUrl)
+      : '';
+    const tipoExamenNombre = p.tipoExamenRel?.nombre || p.tipoExamen || 'Valoración Visual';
 
     const tipoLenteLabel = p.tipoLente === 'OFTALMICO'
       ? 'Lente Oftálmico'
@@ -1361,7 +1365,7 @@ export class PrintService {
         <td style="width:130px;vertical-align:top;text-align:right;">
           <div style="border:1.5px solid #cbd5e1;border-radius:4px;padding:8px 10px;background:#f8fafc;text-align:center;">
             <div style="font-size:8.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">FOLIO CLÍNICO</div>
-            <div style="font-size:14px;font-weight:800;color:#0284c7;margin:3px 0;letter-spacing:0.5px;">${p.numero}</div>
+            <div style="font-size:10px;font-weight:800;color:#0284c7;margin:3px 0;letter-spacing:0.5px;">${p.numero}</div>
             <div style="font-size:8.5px;color:#475569;margin-bottom:3px;">Fecha: <strong>${fechaExamen}</strong></div>
             <div style="display:inline-block;padding:2px 8px;border-radius:3px;font-size:8.5px;font-weight:700;text-transform:uppercase;background:${p.estado === 'ACTIVA' ? '#dcfce7;color:#166534;' : '#ffe4e6;color:#9f1239;'}">${p.estado}</div>
           </div>
@@ -1411,7 +1415,7 @@ export class PrintService {
             </tr>
             <tr>
               <td style="padding:3px 0;font-size:10px;font-weight:600;color:#64748b;">Tipo de examen:</td>
-              <td style="padding:3px 0;font-size:10px;font-weight:500;color:#334155;text-align:right;">${p.tipoExamen || 'Valoración Visual'}</td>
+              <td style="padding:3px 0;font-size:10px;font-weight:500;color:#334155;text-align:right;">${this.escapeHtml(tipoExamenNombre)}</td>
             </tr>
             <tr>
               <td style="padding:3px 0;font-size:10px;font-weight:600;color:#64748b;">Próximo control:</td>
@@ -1424,7 +1428,7 @@ export class PrintService {
 
     <!-- ═══════ TABLA CLÍNICA DE REFRACCIÓN FINAL ═══════ -->
     <div style="margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;">
-      <span style="font-size:11px;font-weight:800;color:#0f172a;text-transform:uppercase;letter-spacing:0.5px;">FÓRMULA ÓPTICA FINAL (Rx)</span>
+      <span style="font-size:11px;font-weight:800;color:#0f172a;text-transform:uppercase;letter-spacing:0.5px;">FÓRMULA ÓPTICA FINAL</span>
       <span style="font-size:9.5px;font-weight:700;color:#0369a1;background:#e0f2fe;padding:2px 8px;border-radius:4px;border:1px solid #bae6fd;">${tipoLenteLabel}</span>
     </div>
 
@@ -1506,37 +1510,37 @@ export class PrintService {
         </td>
         <td style="padding:8px 12px;font-size:9.5px;color:#475569;border-right:1px solid #e2e8f0;width:25%;">
           <strong style="color:#0f172a;display:block;margin-bottom:2px;text-transform:uppercase;font-size:8.5px;">Uso Indicado</strong>
-          ${p.usoIndicado || 'Permanente'}
+          ${p.usoIndicado}
         </td>
         <td style="padding:8px 12px;font-size:9.5px;color:#475569;border-right:1px solid #e2e8f0;width:25%;">
           <strong style="color:#0f172a;display:block;margin-bottom:2px;text-transform:uppercase;font-size:8.5px;">Material</strong>
-          ${p.material || 'Estándar'}
+          ${p.material}
         </td>
         <td style="padding:8px 12px;font-size:9.5px;color:#475569;width:25%;">
           <strong style="color:#0f172a;display:block;margin-bottom:2px;text-transform:uppercase;font-size:8.5px;">Filtros / Tratamiento</strong>
-          ${p.filtroTratamiento || 'Antirreflejo básico'}
+          ${p.filtroTratamiento}
         </td>
       </tr>
     </table>
 
     ${hasContactData ? `
     <!-- ═══════ PARÁMETROS CONTACTO ═══════ -->
-    <div style="font-size:10px;font-weight:700;color:#0f766e;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Parámetros de Adaptación Corneal (Lentes de Contacto)</div>
-    <table cellpadding="0" cellspacing="0" style="width:100%;border:1px solid #99f6e4;border-radius:4px;margin-bottom:16px;border-collapse:separate;overflow:hidden;background:#f0fdfa;">
+    <div style="font-size:10px;font-weight:700;color:#f8fafc;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Parámetros de Adaptación Corneal</div>
+    <table cellpadding="0" cellspacing="0" style="width:100%;border:1px solid #cbd5e1;border-radius:4px;margin-bottom:16px;border-collapse:separate;overflow:hidden;background:#f8fafc;">
       <tr>
-        <td style="padding:7px 10px;font-size:9.5px;color:#115e59;border-right:1px solid #ccfbf1;width:20%;">
+        <td style="padding:7px 10px;font-size:9.5px;color:#475569;border-right:1px solid #cbd5e1;width:20%;">
           <strong>Marca:</strong> ${cd.marca || '—'}
         </td>
-        <td style="padding:7px 10px;font-size:9.5px;color:#115e59;border-right:1px solid #ccfbf1;width:20%;">
+        <td style="padding:7px 10px;font-size:9.5px;color:#475569;border-right:1px solid #cbd5e1;width:20%;">
           <strong>Curva Base:</strong> ${cd.curvaBase || '—'}
         </td>
-        <td style="padding:7px 10px;font-size:9.5px;color:#115e59;border-right:1px solid #ccfbf1;width:20%;">
+        <td style="padding:7px 10px;font-size:9.5px;color:#475569;border-right:1px solid #cbd5e1;width:20%;">
           <strong>Diámetro:</strong> ${cd.diametro || '—'}
         </td>
-        <td style="padding:7px 10px;font-size:9.5px;color:#115e59;border-right:1px solid #ccfbf1;width:20%;">
+        <td style="padding:7px 10px;font-size:9.5px;color:#475569;border-right:1px solid #cbd5e1;width:20%;">
           <strong>Reemplazo:</strong> ${cd.frecuenciaReemplazo || '—'}
         </td>
-        <td style="padding:7px 10px;font-size:9.5px;color:#115e59;width:20%;">
+        <td style="padding:7px 10px;font-size:9.5px;color:#475569;width:20%;">
           <strong>Cuidados:</strong> ${cd.cuidados || cd.materialContacto || '—'}
         </td>
       </tr>
@@ -1545,13 +1549,13 @@ export class PrintService {
 
     ${hasLensometry ? `
     <!-- ═══════ LENSOMETRÍA PREVIA ═══════ -->
-    <div style="font-size:10px;font-weight:700;color:#b45309;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Lensometría (Fórmula Anterior Medida)</div>
-    <table cellpadding="0" cellspacing="0" style="width:100%;border:1px solid #fde68a;border-radius:4px;margin-bottom:16px;border-collapse:separate;overflow:hidden;background:#fffbeb;">
+    <div style="font-size:10px;font-weight:700;color:#f8fafc;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Lensometría</div>
+    <table cellpadding="0" cellspacing="0" style="width:100%;border:1px solid #cbd5e1;border-radius:4px;margin-bottom:16px;border-collapse:separate;overflow:hidden;background:#f8fafc;">
       <tr>
-        <td style="padding:7px 12px;font-size:9.5px;color:#92400e;border-right:1px solid #fef3c7;width:50%;font-family:'Courier New',monospace;">
+        <td style="padding:7px 12px;font-size:9.5px;color:#475569;border-right:1px solid #ccfbf1;width:50%;font-family:'Courier New',monospace;">
           <strong>OD Previo:</strong> Sph: ${fmtDiopter(l?.derecho?.esfera)} | Cyl: ${fmtDiopter(l?.derecho?.cilindro)} | Eje: ${fmtAxis(l?.derecho?.eje)}
         </td>
-        <td style="padding:7px 12px;font-size:9.5px;color:#92400e;width:50%;font-family:'Courier New',monospace;">
+        <td style="padding:7px 12px;font-size:9.5px;color:#475569;width:50%;font-family:'Courier New',monospace;">
           <strong>OI Previo:</strong> Sph: ${fmtDiopter(l?.izquierdo?.esfera)} | Cyl: ${fmtDiopter(l?.izquierdo?.cilindro)} | Eje: ${fmtAxis(l?.izquierdo?.eje)}
         </td>
       </tr>
@@ -1595,9 +1599,10 @@ export class PrintService {
           Control sugerido: <strong>${fechaControl}</strong>
         </td>
         <td style="text-align:center;width:45%;vertical-align:bottom;">
+          ${firmaProfesional ? `<img src="${this.escapeHtml(firmaProfesional)}" alt="Firma de ${this.escapeHtml(profesionalNombre)}" style="display:block;max-width:180px;max-height:65px;object-fit:contain;margin:0 auto 3px;"/>` : ''}
           <div style="border-bottom:1.5px solid #0f172a;margin:0 auto 4px auto;width:220px;"></div>
-          <div style="font-size:10.5px;font-weight:700;color:#0f172a;">${profesionalNombre}</div>
-          <div style="font-size:8.5px;color:#64748b;">Firma y Registro Profesional</div>
+          <div style="font-size:10.5px;font-weight:700;color:#0f172a;">${this.escapeHtml(profesionalNombre)}</div>
+          <div style="font-size:8.5px;color:#64748b;">${this.escapeHtml(p.profesional?.especialidad || 'Profesional responsable')}${p.profesional?.registroProfesional ? ` · Registro ${this.escapeHtml(p.profesional.registroProfesional)}` : ''}</div>
         </td>
       </tr>
     </table>

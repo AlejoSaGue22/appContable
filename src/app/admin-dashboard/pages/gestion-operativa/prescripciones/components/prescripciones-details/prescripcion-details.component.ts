@@ -8,6 +8,7 @@ import { Prescripcion } from '@dashboard/pages/ventas/interfaces/prescripcion.in
 import { PrintService } from '@shared/services/print.service';
 
 import { NotificationService } from '@shared/services/notification.service';
+import { HelpersUtils } from '@utils/helpers.utils';
 
 @Component({
   standalone: true,
@@ -50,6 +51,7 @@ export class PrescripcionDetailsComponent implements OnInit {
   company = signal<any>(null);
   history = signal<Prescripcion[]>([]);
   copied = signal(false);
+  firmaProfesional = signal<string>('');
 
   async ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id')!;
@@ -62,8 +64,11 @@ export class PrescripcionDetailsComponent implements OnInit {
         const history = await firstValueFrom(this.service.history(c.id));
         this.history.set(history.data.filter((h: any) => h.id !== id));
       }
+      this.firmaProfesional.set(HelpersUtils.resolveLogoUrl(this.item()?.profesional?.firmaUrl));
 
-      this.empresaService.getEmpresa().subscribe((r: any) => this.company.set(r.data || r));
+      this.empresaService.getEmpresa().subscribe((r: any) => {
+        this.company.set({ ...r.data, logoUrlFormated: HelpersUtils.resolveLogoUrl(r.data.logoUrl) });
+      });
     } catch (error) {
       console.error('Error al cargar la prescripción:', error);
       this.notify.error('No se pudo cargar la información de la prescripción', 'Error');
@@ -76,7 +81,10 @@ export class PrescripcionDetailsComponent implements OnInit {
   }
 
   patientDoc(): string {
-    return this.item()?.cliente?.numeroDocumento || '—';
+    const c = this.item()?.cliente;
+    if (!c?.numeroDocumento) return '—';
+    const abrev = c.tipoDocumentoRel?.abreviatura;
+    return abrev ? `${abrev} ${c.numeroDocumento}` : c.numeroDocumento;
   }
 
   patientPhone(): string {

@@ -14,7 +14,7 @@
         </div>
         <div>
           <h1 class="text-2xl font-bold text-slate-900">
-            {{ id && id !== 'new-prescription' ? 'Editar Prescripción Visual' : 'Nueva Prescripción Visual' }}
+            {{ id && id !== 'new-prescription' ? 'Editar Prescripción Medica' : 'Nueva Prescripción Medica' }}
           </h1>
           <p class="text-xs text-slate-500">
             Registro de refracción óptica, agudeza visual y especificaciones técnicas para laboratorio
@@ -43,7 +43,7 @@
             class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-bold">1</span>
           <h2 class="text-base font-semibold text-slate-900">Información del Paciente & Consulta</h2>
         </div>
-        <span class="text-xs text-slate-400 font-medium">* Campos obligatorios</span>
+        <span class="text-xs text-slate-400">* Campos obligatorios</span>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
@@ -54,23 +54,35 @@
           </label>
           <div class="relative">
             <input type="date" formControlName="fechaExamen"
-              class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium" />
+              class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all " />
           </div>
         </div>
 
         <!-- Paciente -->
-        <div class="md:col-span-6">
+        <div class="md:col-span-4">
           <label class="block text-xs font-bold uppercase  text-slate-600 mb-1.5">
             Paciente <span class="text-rose-500">*</span>
           </label>
           <div class="relative">
             <select formControlName="clienteId"
-              class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium">
+              class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all ">
               <option value="">Selecciona un paciente del directorio...</option>
               @for (p of patients(); track p.id) {
-              <option [value]="p.id">{{ p.fullName }} · {{ p.numeroDocumento }}</option>
+              <option [value]="p.id">{{ p.fullName }} · {{ p.tipoDocumentoRel?.abreviatura || 'Doc' }}: {{
+                p.numeroDocumento }}</option>
               }
             </select>
+          </div>
+        </div>
+
+        <!-- Tipo de Documento (Auto-rellenada) -->
+        <div class="md:col-span-2">
+          <label class="block text-xs font-bold uppercase  text-slate-600 mb-1.5">
+            Tipo Documento
+          </label>
+          <div class="relative">
+            <input [value]="tipoDocumentoDisplay" readonly [title]="tipoDocumentoDisplay"
+              class="w-full px-3.5 py-2.5 text-sm bg-slate-100/80 border border-slate-200 rounded-xl text-slate-600 font-medium cursor-not-allowed uppercase truncate" />
           </div>
         </div>
 
@@ -80,8 +92,8 @@
             Identificación
           </label>
           <div class="relative">
-            <input [value]="client?.numeroDocumento || 'Seleccione paciente'" readonly
-              class="w-full px-3.5 py-2.5 text-sm bg-slate-100/80 border border-slate-200 rounded-xl text-slate-600 font-mono font-medium cursor-not-allowed" />
+            <input [value]="numeroDocumentoDisplay" readonly
+              class="w-full px-3.5 py-2.5 text-sm bg-slate-100/80 border border-slate-200 rounded-xl text-slate-600 font-mono  cursor-not-allowed" />
           </div>
         </div>
 
@@ -92,10 +104,10 @@
           </label>
           <div class="relative">
             <select formControlName="profesionalId"
-              class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium">
+              class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all ">
               <option value="">Selecciona el profesional tratante...</option>
               @for (p of professionals(); track p.id) {
-              <option [value]="p.id">{{ p.fullName }}</option>
+              <option [value]="p.id">{{ p.nombre }}{{ p.especialidad ? ' · ' + p.especialidad : '' }}</option>
               }
             </select>
           </div>
@@ -107,11 +119,12 @@
             Tipo de Consulta / Examen <span class="text-rose-500">*</span>
           </label>
           <div class="relative">
-            <select formControlName="tipoExamen"
-              class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium">
-              <option value="VALORACION_VISUAL">Valoración Visual / Refracción Integral</option>
-              <option value="CONTROL">Control Periódico / Seguimiento</option>
-              <option value="ADAPTACION">Adaptación de Lentes de Contacto</option>
+            <select formControlName="tipoExamenId"
+              class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all ">
+              <option value="">Selecciona el tipo de consulta / examen...</option>
+              @for (tipo of tiposExamen(); track tipo.id) {
+              <option [value]="tipo.id">{{ tipo.nombre }}</option>
+              }
             </select>
           </div>
         </div>
@@ -198,8 +211,8 @@
             </div>
           </div>
           <div class="mt-4">
-            <h3 class="font-bold text-sm text-slate-900">Especializado / Terapéutico</h3>
-            <p class="text-xs text-slate-500 mt-1">Filtros terapéuticos, prismas especiales o prótesis oculares.</p>
+            <h3 class="font-bold text-sm text-slate-900">Especializado / Otro</h3>
+            <p class="text-xs text-slate-500 mt-1">Filtros especiales u otro tipo.</p>
           </div>
         </div>
       </div>
@@ -212,7 +225,7 @@
           </label>
           <input type="text" formControlName="tipoLenteDescripcion"
             placeholder="Ej: Monofocal Digital, Progresivo HD, Bifocal Invisible..."
-            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium" />
+            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all " />
         </div>
 
         <div class="md:col-span-4">
@@ -221,7 +234,7 @@
           </label>
           <input type="text" formControlName="usoIndicado"
             placeholder="Ej: Permanente, Lectura, Pantallas / Computador, Conducción..."
-            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium" />
+            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all " />
         </div>
 
         <div class="md:col-span-4">
@@ -230,7 +243,7 @@
           </label>
           <input type="text" formControlName="material"
             placeholder="Ej: Policarbonato 1.59, CR-39, Alto Índice 1.67, Trivex..."
-            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium" />
+            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all " />
         </div>
 
         <div class="md:col-span-8">
@@ -239,7 +252,7 @@
           </label>
           <input type="text" formControlName="filtroTratamiento"
             placeholder="Ej: Antirreflejo Crizal, Filtro Azul (Blue Light Cut), Fotocromático Transitions, UV 400..."
-            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium" />
+            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all " />
         </div>
 
         <div class="md:col-span-4">
@@ -247,7 +260,7 @@
             Fecha de Próximo Control
           </label>
           <input type="date" formControlName="fechaControl"
-            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium" />
+            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all " />
         </div>
       </div>
 
@@ -265,37 +278,37 @@
             <label class="block text-xs font-bold uppercase  text-teal-900 mb-1">Marca /
               Laboratorio</label>
             <input type="text" formControlName="marca" placeholder="Ej: Acuvue Oasys, Biofinity..."
-              class="w-full px-3 py-2 text-sm bg-white border border-teal-200 rounded-xl text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:outline-none font-medium" />
+              class="w-full px-3 py-2 text-sm bg-white border border-teal-200 rounded-xl text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:outline-none " />
           </div>
           <div>
             <label class="block text-xs font-bold uppercase  text-teal-900 mb-1">Curva Base (BC en
               mm)</label>
             <input type="text" formControlName="curvaBase" placeholder="Ej: 8.4, 8.6..."
-              class="w-full px-3 py-2 text-sm bg-white border border-teal-200 rounded-xl text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:outline-none font-medium" />
+              class="w-full px-3 py-2 text-sm bg-white border border-teal-200 rounded-xl text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:outline-none " />
           </div>
           <div>
             <label class="block text-xs font-bold uppercase  text-teal-900 mb-1">Diámetro (DIA en
               mm)</label>
             <input type="text" formControlName="diametro" placeholder="Ej: 14.0, 14.2..."
-              class="w-full px-3 py-2 text-sm bg-white border border-teal-200 rounded-xl text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:outline-none font-medium" />
+              class="w-full px-3 py-2 text-sm bg-white border border-teal-200 rounded-xl text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:outline-none " />
           </div>
           <div>
             <label class="block text-xs font-bold uppercase  text-teal-900 mb-1">Frecuencia de
               Reemplazo</label>
             <input type="text" formControlName="frecuenciaReemplazo" placeholder="Diario, Quincenal, Mensual, Anual..."
-              class="w-full px-3 py-2 text-sm bg-white border border-teal-200 rounded-xl text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:outline-none font-medium" />
+              class="w-full px-3 py-2 text-sm bg-white border border-teal-200 rounded-xl text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:outline-none " />
           </div>
           <div>
             <label class="block text-xs font-bold uppercase  text-teal-900 mb-1">Material de
               Contacto</label>
             <input type="text" formControlName="materialContacto" placeholder="Ej: Senofilcon A, Comfilcon A..."
-              class="w-full px-3 py-2 text-sm bg-white border border-teal-200 rounded-xl text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:outline-none font-medium" />
+              class="w-full px-3 py-2 text-sm bg-white border border-teal-200 rounded-xl text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:outline-none " />
           </div>
           <div>
             <label class="block text-xs font-bold uppercase  text-teal-900 mb-1">Solución &
               Cuidados</label>
             <input type="text" formControlName="cuidados" placeholder="Ej: Solución multipropósito Opti-Free..."
-              class="w-full px-3 py-2 text-sm bg-white border border-teal-200 rounded-xl text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:outline-none font-medium" />
+              class="w-full px-3 py-2 text-sm bg-white border border-teal-200 rounded-xl text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:outline-none " />
           </div>
         </div>
       </div>
@@ -390,7 +403,7 @@
                 AV Lejana
               </label>
               <input type="text" formControlName="agudezaLejana" placeholder="Ej. 20/20"
-                class="w-full px-3 py-2 text-xs font-medium bg-white border border-sky-200 rounded-xl text-slate-800 focus:outline-none focus:border-sky-500" />
+                class="w-full px-3 py-2 text-xs  bg-white border border-sky-200 rounded-xl text-slate-800 focus:outline-none focus:border-sky-500" />
               <div class="flex flex-wrap gap-1 mt-1.5">
                 @for (opt of ['20/20', '20/25', '20/30', '20/40']; track opt) {
                 <button type="button" (click)="setAgudeza('derecho', 'agudezaLejana', opt)"
@@ -407,7 +420,7 @@
                 AV Próxima
               </label>
               <input type="text" formControlName="agudezaProxima" placeholder="Ej. J1"
-                class="w-full px-3 py-2 text-xs font-medium bg-white border border-sky-200 rounded-xl text-slate-800 focus:outline-none focus:border-sky-500" />
+                class="w-full px-3 py-2 text-xs  bg-white border border-sky-200 rounded-xl text-slate-800 focus:outline-none focus:border-sky-500" />
               <div class="flex flex-wrap gap-1 mt-1.5">
                 @for (opt of ['J1', 'J2', 'J3']; track opt) {
                 <button type="button" (click)="setAgudeza('derecho', 'agudezaProxima', opt)"
@@ -424,7 +437,7 @@
                 Prisma (Δ / Base)
               </label>
               <input type="text" formControlName="prisma" placeholder="Ej: 1.5 BI, 2.0 BD"
-                class="w-full px-3 py-2 text-xs font-medium bg-white border border-sky-200 rounded-xl text-slate-800 focus:outline-none focus:border-sky-500" />
+                class="w-full px-3 py-2 text-xs  bg-white border border-sky-200 rounded-xl text-slate-800 focus:outline-none focus:border-sky-500" />
             </div>
           </div>
 
@@ -504,7 +517,7 @@
                 AV Lejana
               </label>
               <input type="text" formControlName="agudezaLejana" placeholder="Ej. 20/20"
-                class="w-full px-3 py-2 text-xs font-medium bg-white border border-indigo-200 rounded-xl text-slate-800 focus:outline-none focus:border-indigo-500" />
+                class="w-full px-3 py-2 text-xs  bg-white border border-indigo-200 rounded-xl text-slate-800 focus:outline-none focus:border-indigo-500" />
               <div class="flex flex-wrap gap-1 mt-1.5">
                 @for (opt of ['20/20', '20/25', '20/30', '20/40']; track opt) {
                 <button type="button" (click)="setAgudeza('izquierdo', 'agudezaLejana', opt)"
@@ -521,7 +534,7 @@
                 AV Próxima
               </label>
               <input type="text" formControlName="agudezaProxima" placeholder="Ej. J1"
-                class="w-full px-3 py-2 text-xs font-medium bg-white border border-indigo-200 rounded-xl text-slate-800 focus:outline-none focus:border-indigo-500" />
+                class="w-full px-3 py-2 text-xs  bg-white border border-indigo-200 rounded-xl text-slate-800 focus:outline-none focus:border-indigo-500" />
               <div class="flex flex-wrap gap-1 mt-1.5">
                 @for (opt of ['J1', 'J2', 'J3']; track opt) {
                 <button type="button" (click)="setAgudeza('izquierdo', 'agudezaProxima', opt)"
@@ -538,7 +551,7 @@
                 Prisma (Δ / Base)
               </label>
               <input type="text" formControlName="prisma" placeholder="Ej: 1.5 BI, 2.0 BD"
-                class="w-full px-3 py-2 text-xs font-medium bg-white border border-indigo-200 rounded-xl text-slate-800 focus:outline-none focus:border-indigo-500" />
+                class="w-full px-3 py-2 text-xs  bg-white border border-indigo-200 rounded-xl text-slate-800 focus:outline-none focus:border-indigo-500" />
             </div>
           </div>
 
@@ -563,8 +576,7 @@
           <div>
             <div class="flex items-center gap-2">
               <h2 class="text-base font-bold text-slate-900">Lensometría (Fórmula Anterior en Uso)</h2>
-              <span
-                class="text-[11px] font-medium text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full">
+              <span class="text-[11px]  text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full">
                 Opcional
               </span>
             </div>
@@ -591,22 +603,22 @@
             <div>
               <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Esfera</label>
               <input type="number" step="0.25" formControlName="esfera" placeholder="0.00"
-                class="w-full px-2.5 py-1.5 text-xs font-mono font-medium bg-white border border-slate-200 rounded-lg text-center" />
+                class="w-full px-2.5 py-1.5 text-xs font-mono  bg-white border border-slate-200 rounded-lg text-center" />
             </div>
             <div>
               <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Cilindro</label>
               <input type="number" step="0.25" formControlName="cilindro" placeholder="0.00"
-                class="w-full px-2.5 py-1.5 text-xs font-mono font-medium bg-white border border-slate-200 rounded-lg text-center" />
+                class="w-full px-2.5 py-1.5 text-xs font-mono  bg-white border border-slate-200 rounded-lg text-center" />
             </div>
             <div>
               <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Eje</label>
               <input type="number" formControlName="eje" placeholder="0°"
-                class="w-full px-2.5 py-1.5 text-xs font-mono font-medium bg-white border border-slate-200 rounded-lg text-center" />
+                class="w-full px-2.5 py-1.5 text-xs font-mono  bg-white border border-slate-200 rounded-lg text-center" />
             </div>
             <div>
               <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Adición</label>
               <input type="number" step="0.25" formControlName="adicion" placeholder="0.00"
-                class="w-full px-2.5 py-1.5 text-xs font-mono font-medium bg-white border border-slate-200 rounded-lg text-center" />
+                class="w-full px-2.5 py-1.5 text-xs font-mono  bg-white border border-slate-200 rounded-lg text-center" />
             </div>
           </div>
         </div>
@@ -622,22 +634,22 @@
             <div>
               <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Esfera</label>
               <input type="number" step="0.25" formControlName="esfera" placeholder="0.00"
-                class="w-full px-2.5 py-1.5 text-xs font-mono font-medium bg-white border border-slate-200 rounded-lg text-center" />
+                class="w-full px-2.5 py-1.5 text-xs font-mono  bg-white border border-slate-200 rounded-lg text-center" />
             </div>
             <div>
               <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Cilindro</label>
               <input type="number" step="0.25" formControlName="cilindro" placeholder="0.00"
-                class="w-full px-2.5 py-1.5 text-xs font-mono font-medium bg-white border border-slate-200 rounded-lg text-center" />
+                class="w-full px-2.5 py-1.5 text-xs font-mono  bg-white border border-slate-200 rounded-lg text-center" />
             </div>
             <div>
               <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Eje</label>
               <input type="number" formControlName="eje" placeholder="0°"
-                class="w-full px-2.5 py-1.5 text-xs font-mono font-medium bg-white border border-slate-200 rounded-lg text-center" />
+                class="w-full px-2.5 py-1.5 text-xs font-mono  bg-white border border-slate-200 rounded-lg text-center" />
             </div>
             <div>
               <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Adición</label>
               <input type="number" step="0.25" formControlName="adicion" placeholder="0.00"
-                class="w-full px-2.5 py-1.5 text-xs font-mono font-medium bg-white border border-slate-200 rounded-lg text-center" />
+                class="w-full px-2.5 py-1.5 text-xs font-mono  bg-white border border-slate-200 rounded-lg text-center" />
             </div>
           </div>
         </div>
@@ -663,7 +675,7 @@
           </label>
           <textarea formControlName="indicaciones" rows="3"
             placeholder="Ej: Uso permanente. Adaptación gradual a lentes progresivos durante los primeros 4 días..."
-            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium resize-none">
+            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all  resize-none">
           </textarea>
         </div>
 
@@ -673,7 +685,7 @@
           </label>
           <textarea formControlName="recomendaciones" rows="3"
             placeholder="Ej: Regla 20-20-20 en pantallas, uso de lágrimas artificiales lubricantes cada 6 horas..."
-            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium resize-none">
+            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all  resize-none">
           </textarea>
         </div>
 
@@ -683,7 +695,7 @@
           </label>
           <textarea formControlName="observaciones" rows="2"
             placeholder="Ej: Montura al aire biselada, diámetro especial de lente, descentración pupilar..."
-            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium resize-none">
+            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all  resize-none">
           </textarea>
         </div>
       </div>
@@ -699,9 +711,13 @@
         <div class="text-xs">
           <div class="font-bold text-slate-800">
             {{ client ? client.fullName : 'Sin paciente seleccionado' }}
+            @if (client) {
+            <span class="text-slate-400 font-normal"> · {{ tipoDocumentoAbrev || 'Doc' }}: {{ numeroDocumentoDisplay
+              }}</span>
+            }
           </div>
           <div class="text-slate-500">
-            Modalidad: <span class="font-medium text-slate-700">{{ lensType === 'OFTALMICO' ? 'Lente Oftálmico' :
+            Modalidad: <span class=" text-slate-700">{{ lensType === 'OFTALMICO' ? 'Lente Oftálmico' :
               lensType === 'CONTACTO' ? 'Lente de Contacto' : 'Especial' }}</span>
           </div>
         </div>

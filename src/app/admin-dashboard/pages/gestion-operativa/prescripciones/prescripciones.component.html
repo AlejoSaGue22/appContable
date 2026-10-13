@@ -17,42 +17,42 @@
     <div
       class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all flex items-center justify-between group">
       <div>
-        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Fórmulas</p>
-        <h3 class="text-2xl font-extrabold text-slate-900 mt-1">{{ totalItems() }}</h3>
+        <p class="text-xs font-bold uppercase text-slate-400">Total Fórmulas</p>
+        <h3 class="text-2xl font-extrabold text-slate-900 mt-1">{{ totalGeneral() }}</h3>
         <p class="text-xs text-slate-500 mt-1">Registradas en el sistema</p>
       </div>
       <div
-        class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+        class="w-12 h-12 rounded-xl bg-blue-50 text-slate-900 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
         <i class="fa-solid fa-file-prescription"></i>
       </div>
     </div>
 
     <!-- Card 2: Oftálmicos -->
-    <div (click)="typeFilter.set('OFTALMICO')"
+    <div (click)="setTypeFilter('OFTALMICO')"
       class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all flex items-center justify-between group cursor-pointer"
       [class.ring-2]="typeFilter() === 'OFTALMICO'" [class.ring-blue-500]="typeFilter() === 'OFTALMICO'">
       <div>
-        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Lentes Oftálmicos</p>
-        <h3 class="text-2xl font-extrabold text-blue-600 mt-1">{{ countByType('OFTALMICO') }}</h3>
+        <p class="text-xs font-bold uppercase text-slate-400">Lentes Oftálmicos</p>
+        <h3 class="text-2xl font-extrabold text-slate-900 mt-1">{{ countByType('OFTALMICO') }}</h3>
         <p class="text-xs text-slate-500 mt-1">Monturas y gafas</p>
       </div>
       <div
-        class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+        class="w-12 h-12 rounded-xl bg-blue-50 text-slate-900 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
         <i class="fa-solid fa-glasses"></i>
       </div>
     </div>
 
     <!-- Card 3: Contacto -->
-    <div (click)="typeFilter.set('CONTACTO')"
+    <div (click)="setTypeFilter('CONTACTO')"
       class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-all flex items-center justify-between group cursor-pointer"
       [class.ring-2]="typeFilter() === 'CONTACTO'" [class.ring-blue-500]="typeFilter() === 'CONTACTO'">
       <div>
-        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Lentes de Contacto</p>
-        <h3 class="text-2xl font-extrabold text-blue-600 mt-1">{{ countByType('CONTACTO') }}</h3>
+        <p class="text-xs font-bold uppercase text-slate-400">Lentes de Contacto</p>
+        <h3 class="text-2xl font-extrabold text-slate-900 mt-1">{{ countByType('CONTACTO') }}</h3>
         <p class="text-xs text-slate-500 mt-1">Adaptación corneal</p>
       </div>
       <div
-        class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+        class="w-12 h-12 rounded-xl bg-blue-50 text-slate-900 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
         <i class="fa-solid fa-eye"></i>
       </div>
     </div>
@@ -61,22 +61,22 @@
     <div
       class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-5 text-white shadow-sm flex items-center justify-between">
       <div>
-        <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Filtro Rápido</p>
+        <p class="text-xs font-bold uppercase text-slate-400">Filtro Rápido</p>
         <div class="flex items-center gap-2 mt-2">
-          <button (click)="typeFilter.set('ALL')" class="px-2.5 py-1 text-xs rounded-lg transition-all"
+          <button (click)="setTypeFilter('ALL')" class="px-2.5 py-1 text-xs rounded-lg transition-all"
             [ngClass]="typeFilter() === 'ALL' ? 'bg-white text-slate-900 font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10'">
             Todos
           </button>
-          <button (click)="typeFilter.set('OFTALMICO')" class="px-2.5 py-1 text-xs rounded-lg transition-all"
+          <button (click)="setTypeFilter('OFTALMICO')" class="px-2.5 py-1 text-xs rounded-lg transition-all"
             [ngClass]="typeFilter() === 'OFTALMICO' ? 'bg-indigo-400 text-slate-900 font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10'">
             Oftálmico
           </button>
-          <button (click)="typeFilter.set('CONTACTO')" class="px-2.5 py-1 text-xs rounded-lg transition-all"
+          <button (click)="setTypeFilter('CONTACTO')" class="px-2.5 py-1 text-xs rounded-lg transition-all"
             [ngClass]="typeFilter() === 'CONTACTO' ? 'bg-teal-400 text-slate-900 font-bold' : 'text-slate-300 hover:text-white hover:bg-white/10'">
             Contacto
           </button>
         </div>
-        <p class="text-[11px] text-slate-400 mt-2">Mostrando: {{ items().length }} resultados</p>
+        <p class="text-[11px] text-slate-400 mt-2">Mostrando: {{ totalItems() }} resultados</p>
       </div>
       <div class="w-10 h-10 rounded-xl bg-white/10 text-white flex items-center justify-center text-base">
         <i class="fa-solid fa-filter"></i>
@@ -89,7 +89,7 @@
     <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
       <!-- Input de búsqueda -->
       <div class="md:col-span-5 relative group">
-        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+        <label class="block text-xs font-bold uppercase text-slate-500 mb-1.5">
           Buscar paciente o documento
         </label>
         <div class="relative">
@@ -105,7 +105,7 @@
 
       <!-- Fecha Desde -->
       <div class="md:col-span-2">
-        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+        <label class="block text-xs font-bold uppercase text-slate-500 mb-1.5">
           Desde
         </label>
         <div class="relative">
@@ -116,7 +116,7 @@
 
       <!-- Fecha Hasta -->
       <div class="md:col-span-2">
-        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+        <label class="block text-xs font-bold uppercase text-slate-500 mb-1.5">
           Hasta
         </label>
         <div class="relative">
@@ -161,7 +161,7 @@
   <!-- Estado Vacío -->
   @else if (items().length === 0) {
   <div
-    class="bg-white rounded-2xl p-16 text-center border border-dashed border-slate-200 shadow-sm max-w-2xl mx-auto flex flex-col items-center justify-center">
+    class="bg-white rounded-2xl p-16 text-center border border-dashed border-slate-200 shadow-sm mx-auto flex flex-col items-center justify-center">
     <div class="w-16 h-16 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center text-3xl mb-4">
       <i class="fa-solid fa-file-circle-question"></i>
     </div>
@@ -194,17 +194,16 @@
   <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
     <div class="overflow-x-auto">
       <table class="w-full text-sm text-left">
-        <thead
-          class="bg-slate-50/80 border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+        <thead class="bg-slate-50/80 border-b border-slate-100 text-[11px] font-bold uppercase text-slate-500">
           <tr>
-            <th scope="col" class="py-4 px-5">Folio / Rx</th>
-            <th scope="col" class="py-4 px-5">Fecha Examen</th>
-            <th scope="col" class="py-4 px-5">Paciente</th>
-            <th scope="col" class="py-4 px-5">Identificación</th>
-            <th scope="col" class="py-4 px-5">Profesional</th>
-            <th scope="col" class="py-4 px-5">Modalidad</th>
-            <th scope="col" class="py-4 px-5">Estado</th>
-            <th scope="col" class="py-4 px-5 text-right">Acciones</th>
+            <th scope="col" class="py-4 px-5 text-center">HC N°/Folio</th>
+            <th scope="col" class="py-4 px-5 text-center">Fecha Examen</th>
+            <th scope="col" class="py-4 px-5 text-center">Paciente</th>
+            <th scope="col" class="py-4 px-5 text-center">Identificación</th>
+            <th scope="col" class="py-4 px-5 text-center">Profesional</th>
+            <th scope="col" class="py-4 px-5 text-center">Modalidad</th>
+            <th scope="col" class="py-4 px-5 text-center">Estado</th>
+            <th scope="col" class="py-4 px-5 text-center">Acciones</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">
@@ -213,11 +212,7 @@
             <!-- Folio / Número -->
             <td class="py-4 px-5 whitespace-nowrap">
               <div class="inline-flex items-center gap-2">
-                <span
-                  class="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 font-mono text-xs font-bold flex items-center justify-center">
-                  <i class="fa-solid fa-receipt text-[11px] text-slate-500"></i>
-                </span>
-                <span class="font-mono font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                <span class="font-mono font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">
                   {{ item.numero }}
                 </span>
               </div>
@@ -226,7 +221,6 @@
             <!-- Fecha -->
             <td class="py-4 px-5 whitespace-nowrap text-slate-600">
               <div class="inline-flex items-center gap-1.5">
-                <i class="fa-regular fa-calendar text-xs text-slate-400"></i>
                 <span>{{ item.fechaExamen | date:'dd/MM/yyyy' }}</span>
               </div>
             </td>
@@ -240,7 +234,7 @@
                 </div>
                 <div>
                   <div class="font-semibold text-slate-900">{{ patientName(item) }}</div>
-                  <div class="text-xs text-slate-400">{{ item.tipoExamen || 'Valoración' }}</div>
+                  <div class="text-xs text-slate-400">{{ item.tipoExamenRel?.nombre || 'Valoración' }}</div>
                 </div>
               </div>
             </td>
@@ -257,7 +251,7 @@
             <td class="py-4 px-5 whitespace-nowrap text-slate-700">
               <div class="inline-flex items-center gap-2">
                 <i class="fa-solid fa-user-doctor text-xs text-slate-400"></i>
-                <span class="text-xs font-medium">{{ item.profesional?.fullName || 'No asignado' }}</span>
+                <span class="text-xs font-medium">{{ item.profesional?.nombre || 'No asignado' }}</span>
               </div>
             </td>
 
@@ -265,7 +259,7 @@
             <td class="py-4 px-5 whitespace-nowrap">
               @if (item.tipoLente === 'OFTALMICO') {
               <span
-                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 ring-1 ring-indigo-600/10">
+                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 ring-1 ring-blue-600/10">
                 <i class="fa-solid fa-glasses text-[10px]"></i>
                 <span>Oftálmico</span>
               </span>
@@ -334,7 +328,7 @@
   <!-- Paginación -->
   @if(items().length > 0){
   <div class="pt-2">
-    <app-pagination [length]="resource.value()?.meta?.total || 0" />
+    <app-pagination [length]="items().length" />
   </div>
   }
 </div>

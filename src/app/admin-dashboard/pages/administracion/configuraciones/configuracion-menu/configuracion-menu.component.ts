@@ -33,10 +33,9 @@ export class ConfiguracionMenuComponent {
         'Configura la información de tu empresa y adapta el sistema a tu negocio.',
       options: [
         { label: 'Datos de Empresa', route: 'empresa' },
+        { label: 'Profesionales', route: 'profesionales' },
         // { label: 'Usuarios y Permisos', route: 'usuarios' },
         // { label: 'Mi perfil', route: 'perfil' },
-        // { label: 'Centros de costos', route: 'centros-costos' },
-        // { label: 'Cargos', route: 'cargos' },
       ],
     },
     {
