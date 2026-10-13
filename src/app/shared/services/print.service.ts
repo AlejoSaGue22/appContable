@@ -4,6 +4,7 @@ import { FacturaCompraResponse } from '@dashboard/interfaces/factura-compra-inte
 import { DocumentoSoporte } from '@dashboard/interfaces/documento-soporte-interface';
 import { NotaAjuste } from '@dashboard/interfaces/notas-ajuste-interface';
 import { NotaAjusteCompra } from '@dashboard/interfaces/notas-ajuste-compra-interface';
+import { Prescripcion } from '@dashboard/pages/ventas/interfaces/prescripcion.interface';
 import { HelpersUtils } from '@utils/helpers.utils';
 import { EmpresaService } from '@dashboard/services/empresa.service';
 
@@ -119,6 +120,14 @@ export class PrintService {
       html,
       `${tituloTipo || title} ${nota.prefijo || ''}${nota.numeroCompleto || nota.id}`,
     );
+  }
+
+  // ──────────────────────────────────────────────────────────────────────
+  // IMPRIMIR PRESCRIPCIÓN ÓPTICA
+  // ──────────────────────────────────────────────────────────────────────
+  printPrescripcion(prescripcion: Prescripcion, empresaCustom?: any): void {
+    const html = this.buildPrescripcionHtml(prescripcion, empresaCustom);
+    this.openPrintWindow(html, `Prescripción ${prescripcion.numero}`);
   }
 
   // ══════════════════════════════════════════════════════════════════════
@@ -1243,6 +1252,369 @@ export class PrintService {
 
 </body>
     </html>`;
+  }
+
+  // ══════════════════════════════════════════════════════════════════════
+  // PRIVATE — Construir HTML de Prescripción Óptica
+  // ══════════════════════════════════════════════════════════════════════
+  private buildPrescripcionHtml(p: Prescripcion, empresaCustom?: any): string {
+    const emp: EmpresaInfo = {
+      nombre: empresaCustom?.razonSocial || empresaCustom?.nombre || this.empresa.nombre,
+      nit: empresaCustom?.numeroDocumento || empresaCustom?.nit || this.empresa.nit,
+      telefono: empresaCustom?.telefono || this.empresa.telefono,
+      email: empresaCustom?.email || this.empresa.email,
+      direccion: empresaCustom?.direccion || this.empresa.direccion,
+      ciudad: empresaCustom?.ciudad || this.empresa.ciudad || 'Colombia',
+      sucursal: empresaCustom?.sucursal || this.empresa.sucursal || 'Principal',
+      logoUrl: empresaCustom?.logoUrl ? HelpersUtils.resolveLogoUrl(empresaCustom.logoUrl) : this.empresa.logoUrl,
+      textoAdicional: empresaCustom?.textoAdicional || this.empresa.textoAdicional,
+    };
+    const logo = emp.logoUrl || this.logoApp;
+
+    const c = p.cliente;
+    const clienteNombre = c?.razonSocial || `${c?.nombre || ''} ${c?.apellido || ''}`.trim() || 'Sin paciente';
+    const tipoDocLabel = c?.tipoDocumentoRel?.abreviatura || c?.tipoDocumento || 'CC/NIT';
+    const clienteDoc = c?.numeroDocumento || '—';
+    const clienteTel = c?.telefono || '—';
+    const clienteDir = c?.direccion || '—';
+    const clienteEmail = c?.email || '—';
+    const clienteCiudad = c?.ciudadRel?.name || c?.ciudad || '—';
+
+    const fechaExamen = this.formatDatePrint(p.fechaExamen);
+    const fechaControl = p.fechaControl ? this.formatDatePrint(p.fechaControl) : 'No programada';
+    const profesionalNombre = p.profesional?.fullName || p.profesional?.nombre || 'Especialista en Optometría';
+
+    const tipoLenteLabel = p.tipoLente === 'OFTALMICO'
+      ? 'Lente Oftálmico'
+      : p.tipoLente === 'CONTACTO'
+        ? 'Lente de Contacto'
+        : (p.tipoLenteDescripcion || p.tipoLente || 'Especializado');
+
+    const fmtDiopter = (val: any): string => {
+      if (val === null || val === undefined || val === '') return '—';
+      const num = Number(val);
+      if (isNaN(num)) return String(val);
+      if (num > 0) return `+${num.toFixed(2)}`;
+      if (num === 0) return '0.00';
+      return num.toFixed(2);
+    };
+
+    const fmtAxis = (val: any): string => {
+      if (val === null || val === undefined || val === '') return '—';
+      return `${val}°`;
+    };
+
+    const cd: any = p.datosContacto || {};
+    const hasContactData = p.tipoLente === 'CONTACTO' && !!(cd.marca || cd.curvaBase || cd.diametro || cd.frecuenciaReemplazo || cd.materialContacto || cd.cuidados);
+
+    const l = p.lensometria;
+    const hasLensometry = !!(l?.derecho?.esfera || l?.derecho?.cilindro || l?.izquierdo?.esfera || l?.izquierdo?.cilindro);
+
+    return `<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Prescripción ${p.numero}</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',sans-serif; font-size:11px; color:#1e293b; background:#fff; }
+
+    @media print {
+      @page { margin:0; size:A4; }
+      body { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    }
+  </style>
+</head>
+<body>
+
+<table cellpadding="0" cellspacing="0" style="width:210mm;min-height:297mm;margin:0 auto;border-collapse:collapse;">
+<tr>
+  <td style="vertical-align:top;padding:28px 36px 20px 20px;">
+
+    <!-- ═══════ HEADER ═══════ -->
+    <table cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:16px;">
+      <tr>
+        <!-- Left: Logo -->
+        <td style="width:140px;vertical-align:top;padding-right:16px;">
+          <div style="font-size:28px;font-weight:800;color:#000000;line-height:1;margin-bottom:4px;letter-spacing:-0.5px;">
+            <img src="${logo}" alt="Logo" style="width:100px;height:100px;object-fit:contain;"/>
+          </div>
+        </td>
+
+        <!-- Center: Empresa info + Título -->
+        <td style="vertical-align:top;text-align:center;">
+          <div style="font-size:13px;font-weight:800;color:#000000;text-transform:uppercase;letter-spacing:0.5px;">PRESCRIPCIÓN ÓPTICA / FÓRMULA MÉDICA</div>
+          <div style="font-size:12px;font-weight:700;color:#000000;margin-top:2px;">NÚMERO ${p.numero}</div>
+          <div style="margin-top:6px;line-height:1.5;color:#475569;font-size:9.5px;">
+            <strong style="color:#334155;">${emp.nombre}</strong><br/>
+            NIT: ${emp.nit}<br/>
+            ${emp.telefono}<br/>
+            ${emp.email}<br/>
+            ${emp.direccion}<br/>
+            ${emp.ciudad}
+            ${emp.textoAdicional ? '<br/>' + emp.textoAdicional : ''}
+          </div>
+        </td>
+
+        <!-- Right: Folio badge -->
+        <td style="width:130px;vertical-align:top;text-align:right;">
+          <div style="border:1.5px solid #cbd5e1;border-radius:4px;padding:8px 10px;background:#f8fafc;text-align:center;">
+            <div style="font-size:8.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">FOLIO CLÍNICO</div>
+            <div style="font-size:14px;font-weight:800;color:#0284c7;margin:3px 0;letter-spacing:0.5px;">${p.numero}</div>
+            <div style="font-size:8.5px;color:#475569;margin-bottom:3px;">Fecha: <strong>${fechaExamen}</strong></div>
+            <div style="display:inline-block;padding:2px 8px;border-radius:3px;font-size:8.5px;font-weight:700;text-transform:uppercase;background:${p.estado === 'ACTIVA' ? '#dcfce7;color:#166534;' : '#ffe4e6;color:#9f1239;'}">${p.estado}</div>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    <!-- ═══════ CLIENT & CONSULTATION INFO ═══════ -->
+    <table cellpadding="0" cellspacing="0" style="width:100%;border:1.5px solid #cbd5e1;border-radius:4px;margin-bottom:16px;border-collapse:separate;overflow:hidden;">
+      <tr>
+        <!-- Paciente -->
+        <td style="vertical-align:top;padding:10px 14px;width:55%;">
+          <table cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;">
+            <tr>
+              <td style="padding:3px 0;font-size:10px;font-weight:700;color:#000000;width:95px;">${tipoDocLabel}:</td>
+              <td style="padding:3px 0;font-size:10px;color:#334155;">${clienteDoc}</td>
+            </tr>
+            <tr>
+              <td style="padding:3px 0;font-size:10px;font-weight:700;color:#000000;">Paciente:</td>
+              <td style="padding:3px 0;font-size:10px;color:#334155;font-weight:600;">${clienteNombre}</td>
+            </tr>
+            <tr>
+              <td style="padding:3px 0;font-size:10px;font-weight:700;color:#000000;">Teléfono:</td>
+              <td style="padding:3px 0;font-size:10px;color:#334155;">${clienteTel}</td>
+            </tr>
+            <tr>
+              <td style="padding:3px 0;font-size:10px;font-weight:700;color:#000000;">Dirección:</td>
+              <td style="padding:3px 0;font-size:10px;color:#334155;">${clienteDir}</td>
+            </tr>
+            <tr>
+              <td style="padding:3px 0;font-size:10px;font-weight:700;color:#000000;">Ciudad / Email:</td>
+              <td style="padding:3px 0;font-size:10px;color:#334155;">${clienteCiudad !== '—' ? clienteCiudad + ' / ' : ''}${clienteEmail}</td>
+            </tr>
+          </table>
+        </td>
+
+        <!-- Profesional y Consulta -->
+        <td style="vertical-align:top;padding:10px 14px;width:45%;border-left:1.5px solid #cbd5e1;background:#f8fafc;">
+          <table cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;">
+            <tr>
+              <td style="padding:3px 0;font-size:10px;font-weight:600;color:#64748b;">Fecha examen:</td>
+              <td style="padding:3px 0;font-size:10px;font-weight:600;color:#334155;text-align:right;">${fechaExamen}</td>
+            </tr>
+            <tr>
+              <td style="padding:3px 0;font-size:10px;font-weight:600;color:#64748b;">Profesional tratante:</td>
+              <td style="padding:3px 0;font-size:10px;font-weight:600;color:#334155;text-align:right;">${profesionalNombre}</td>
+            </tr>
+            <tr>
+              <td style="padding:3px 0;font-size:10px;font-weight:600;color:#64748b;">Tipo de examen:</td>
+              <td style="padding:3px 0;font-size:10px;font-weight:500;color:#334155;text-align:right;">${p.tipoExamen || 'Valoración Visual'}</td>
+            </tr>
+            <tr>
+              <td style="padding:3px 0;font-size:10px;font-weight:600;color:#64748b;">Próximo control:</td>
+              <td style="padding:3px 0;font-size:10px;font-weight:600;color:#0284c7;text-align:right;">${fechaControl}</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    <!-- ═══════ TABLA CLÍNICA DE REFRACCIÓN FINAL ═══════ -->
+    <div style="margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:11px;font-weight:800;color:#0f172a;text-transform:uppercase;letter-spacing:0.5px;">FÓRMULA ÓPTICA FINAL (Rx)</span>
+      <span style="font-size:9.5px;font-weight:700;color:#0369a1;background:#e0f2fe;padding:2px 8px;border-radius:4px;border:1px solid #bae6fd;">${tipoLenteLabel}</span>
+    </div>
+
+    <table cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;margin-bottom:16px;border:1.5px solid #cbd5e1;border-radius:4px;overflow:hidden;">
+      <thead>
+        <tr style="background:#efefef;">
+          <th style="padding:8px 8px;font-size:9px;font-weight:700;color:#000000;text-transform:uppercase;letter-spacing:0.5px;text-align:left;width:120px;border-bottom:1.5px solid #cbd5e1;">Ojo</th>
+          <th style="padding:8px 6px;font-size:9px;font-weight:700;color:#000000;text-transform:uppercase;letter-spacing:0.5px;text-align:center;border-bottom:1.5px solid #cbd5e1;">Esfera (SPH)</th>
+          <th style="padding:8px 6px;font-size:9px;font-weight:700;color:#000000;text-transform:uppercase;letter-spacing:0.5px;text-align:center;border-bottom:1.5px solid #cbd5e1;">Cilindro (CYL)</th>
+          <th style="padding:8px 6px;font-size:9px;font-weight:700;color:#000000;text-transform:uppercase;letter-spacing:0.5px;text-align:center;border-bottom:1.5px solid #cbd5e1;">Eje (AXIS)</th>
+          <th style="padding:8px 6px;font-size:9px;font-weight:700;color:#000000;text-transform:uppercase;letter-spacing:0.5px;text-align:center;border-bottom:1.5px solid #cbd5e1;">Adición (ADD)</th>
+          <th style="padding:8px 6px;font-size:9px;font-weight:700;color:#000000;text-transform:uppercase;letter-spacing:0.5px;text-align:center;border-bottom:1.5px solid #cbd5e1;">AV Lejana</th>
+          <th style="padding:8px 6px;font-size:9px;font-weight:700;color:#000000;text-transform:uppercase;letter-spacing:0.5px;text-align:center;border-bottom:1.5px solid #cbd5e1;">AV Próxima</th>
+          <th style="padding:8px 6px;font-size:9px;font-weight:700;color:#000000;text-transform:uppercase;letter-spacing:0.5px;text-align:center;border-bottom:1.5px solid #cbd5e1;">Prisma (Δ)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="background:#f0f9ff;">
+          <td style="padding:8px 8px;border-bottom:1px solid #cbd5e1;font-size:10.5px;font-weight:700;color:#0284c7;">
+            OD (Ojo Derecho)
+          </td>
+          <td style="padding:8px 6px;border-bottom:1px solid #cbd5e1;font-size:11.5px;font-weight:700;color:#0f172a;text-align:center;font-family:'Courier New',monospace;">
+            ${fmtDiopter(p.ojoDerecho?.esfera)}
+          </td>
+          <td style="padding:8px 6px;border-bottom:1px solid #cbd5e1;font-size:11.5px;font-weight:700;color:#0f172a;text-align:center;font-family:'Courier New',monospace;">
+            ${fmtDiopter(p.ojoDerecho?.cilindro)}
+          </td>
+          <td style="padding:8px 6px;border-bottom:1px solid #cbd5e1;font-size:11.5px;font-weight:700;color:#0f172a;text-align:center;font-family:'Courier New',monospace;">
+            ${fmtAxis(p.ojoDerecho?.eje)}
+          </td>
+          <td style="padding:8px 6px;border-bottom:1px solid #cbd5e1;font-size:10.5px;font-weight:600;color:#334155;text-align:center;font-family:'Courier New',monospace;">
+            ${fmtDiopter(p.ojoDerecho?.adicion)}
+          </td>
+          <td style="padding:8px 6px;border-bottom:1px solid #cbd5e1;font-size:10.5px;font-weight:600;color:#334155;text-align:center;">
+            ${p.ojoDerecho?.agudezaLejana || '—'}
+          </td>
+          <td style="padding:8px 6px;border-bottom:1px solid #cbd5e1;font-size:10.5px;font-weight:600;color:#334155;text-align:center;">
+            ${p.ojoDerecho?.agudezaProxima || '—'}
+          </td>
+          <td style="padding:8px 6px;border-bottom:1px solid #cbd5e1;font-size:10px;color:#64748b;text-align:center;">
+            ${p.ojoDerecho?.prisma || '—'}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:8px 8px;font-size:10.5px;font-weight:700;color:#4f46e5;">
+            OI (Ojo Izquierdo)
+          </td>
+          <td style="padding:8px 6px;font-size:11.5px;font-weight:700;color:#0f172a;text-align:center;font-family:'Courier New',monospace;">
+            ${fmtDiopter(p.ojoIzquierdo?.esfera)}
+          </td>
+          <td style="padding:8px 6px;font-size:11.5px;font-weight:700;color:#0f172a;text-align:center;font-family:'Courier New',monospace;">
+            ${fmtDiopter(p.ojoIzquierdo?.cilindro)}
+          </td>
+          <td style="padding:8px 6px;font-size:11.5px;font-weight:700;color:#0f172a;text-align:center;font-family:'Courier New',monospace;">
+            ${fmtAxis(p.ojoIzquierdo?.eje)}
+          </td>
+          <td style="padding:8px 6px;font-size:10.5px;font-weight:600;color:#334155;text-align:center;font-family:'Courier New',monospace;">
+            ${fmtDiopter(p.ojoIzquierdo?.adicion)}
+          </td>
+          <td style="padding:8px 6px;font-size:10.5px;font-weight:600;color:#334155;text-align:center;">
+            ${p.ojoIzquierdo?.agudezaLejana || '—'}
+          </td>
+          <td style="padding:8px 6px;font-size:10.5px;font-weight:600;color:#334155;text-align:center;">
+            ${p.ojoIzquierdo?.agudezaProxima || '—'}
+          </td>
+          <td style="padding:8px 6px;font-size:10px;color:#64748b;text-align:center;">
+            ${p.ojoIzquierdo?.prisma || '—'}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ═══════ ESPECIFICACIONES TÉCNICAS & MATERIAL ═══════ -->
+    <table cellpadding="0" cellspacing="0" style="width:100%;border:1px solid #cbd5e1;border-radius:4px;margin-bottom:16px;border-collapse:separate;overflow:hidden;background:#f8fafc;">
+      <tr>
+        <td style="padding:8px 12px;font-size:9.5px;color:#475569;border-right:1px solid #e2e8f0;width:25%;">
+          <strong style="color:#0f172a;display:block;margin-bottom:2px;text-transform:uppercase;font-size:8.5px;">Diseño / Tipo</strong>
+          ${p.tipoLenteDescripcion || p.tipoLente || '—'}
+        </td>
+        <td style="padding:8px 12px;font-size:9.5px;color:#475569;border-right:1px solid #e2e8f0;width:25%;">
+          <strong style="color:#0f172a;display:block;margin-bottom:2px;text-transform:uppercase;font-size:8.5px;">Uso Indicado</strong>
+          ${p.usoIndicado || 'Permanente'}
+        </td>
+        <td style="padding:8px 12px;font-size:9.5px;color:#475569;border-right:1px solid #e2e8f0;width:25%;">
+          <strong style="color:#0f172a;display:block;margin-bottom:2px;text-transform:uppercase;font-size:8.5px;">Material</strong>
+          ${p.material || 'Estándar'}
+        </td>
+        <td style="padding:8px 12px;font-size:9.5px;color:#475569;width:25%;">
+          <strong style="color:#0f172a;display:block;margin-bottom:2px;text-transform:uppercase;font-size:8.5px;">Filtros / Tratamiento</strong>
+          ${p.filtroTratamiento || 'Antirreflejo básico'}
+        </td>
+      </tr>
+    </table>
+
+    ${hasContactData ? `
+    <!-- ═══════ PARÁMETROS CONTACTO ═══════ -->
+    <div style="font-size:10px;font-weight:700;color:#0f766e;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Parámetros de Adaptación Corneal (Lentes de Contacto)</div>
+    <table cellpadding="0" cellspacing="0" style="width:100%;border:1px solid #99f6e4;border-radius:4px;margin-bottom:16px;border-collapse:separate;overflow:hidden;background:#f0fdfa;">
+      <tr>
+        <td style="padding:7px 10px;font-size:9.5px;color:#115e59;border-right:1px solid #ccfbf1;width:20%;">
+          <strong>Marca:</strong> ${cd.marca || '—'}
+        </td>
+        <td style="padding:7px 10px;font-size:9.5px;color:#115e59;border-right:1px solid #ccfbf1;width:20%;">
+          <strong>Curva Base:</strong> ${cd.curvaBase || '—'}
+        </td>
+        <td style="padding:7px 10px;font-size:9.5px;color:#115e59;border-right:1px solid #ccfbf1;width:20%;">
+          <strong>Diámetro:</strong> ${cd.diametro || '—'}
+        </td>
+        <td style="padding:7px 10px;font-size:9.5px;color:#115e59;border-right:1px solid #ccfbf1;width:20%;">
+          <strong>Reemplazo:</strong> ${cd.frecuenciaReemplazo || '—'}
+        </td>
+        <td style="padding:7px 10px;font-size:9.5px;color:#115e59;width:20%;">
+          <strong>Cuidados:</strong> ${cd.cuidados || cd.materialContacto || '—'}
+        </td>
+      </tr>
+    </table>
+    ` : ''}
+
+    ${hasLensometry ? `
+    <!-- ═══════ LENSOMETRÍA PREVIA ═══════ -->
+    <div style="font-size:10px;font-weight:700;color:#b45309;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Lensometría (Fórmula Anterior Medida)</div>
+    <table cellpadding="0" cellspacing="0" style="width:100%;border:1px solid #fde68a;border-radius:4px;margin-bottom:16px;border-collapse:separate;overflow:hidden;background:#fffbeb;">
+      <tr>
+        <td style="padding:7px 12px;font-size:9.5px;color:#92400e;border-right:1px solid #fef3c7;width:50%;font-family:'Courier New',monospace;">
+          <strong>OD Previo:</strong> Sph: ${fmtDiopter(l?.derecho?.esfera)} | Cyl: ${fmtDiopter(l?.derecho?.cilindro)} | Eje: ${fmtAxis(l?.derecho?.eje)}
+        </td>
+        <td style="padding:7px 12px;font-size:9.5px;color:#92400e;width:50%;font-family:'Courier New',monospace;">
+          <strong>OI Previo:</strong> Sph: ${fmtDiopter(l?.izquierdo?.esfera)} | Cyl: ${fmtDiopter(l?.izquierdo?.cilindro)} | Eje: ${fmtAxis(l?.izquierdo?.eje)}
+        </td>
+      </tr>
+    </table>
+    ` : ''}
+
+    <!-- ═══════ INDICACIONES & OBSERVACIONES ═══════ -->
+    <table cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:20px;">
+      <tr>
+        <td style="vertical-align:top;padding-right:8px;width:50%;">
+          <div style="border:1px solid #cbd5e1;border-radius:4px;padding:8px 10px;min-height:65px;">
+            <div style="font-size:9.5px;font-weight:700;color:#334155;margin-bottom:3px;text-transform:uppercase;">Indicaciones de Adaptación</div>
+            <div style="font-size:9px;color:#475569;line-height:1.45;white-space:pre-line;">${p.indicaciones || 'Ninguna especificada.'}</div>
+          </div>
+        </td>
+        <td style="vertical-align:top;padding-left:8px;width:50%;">
+          <div style="border:1px solid #cbd5e1;border-radius:4px;padding:8px 10px;min-height:65px;">
+            <div style="font-size:9.5px;font-weight:700;color:#334155;margin-bottom:3px;text-transform:uppercase;">Recomendaciones Visuales</div>
+            <div style="font-size:9px;color:#475569;line-height:1.45;white-space:pre-line;">${p.recomendaciones || 'Ninguna especificada.'}</div>
+          </div>
+        </td>
+      </tr>
+      ${p.observaciones ? `
+      <tr>
+        <td colspan="2" style="padding-top:10px;">
+          <div style="border:1px solid #cbd5e1;border-radius:4px;padding:8px 10px;">
+            <div style="font-size:9.5px;font-weight:700;color:#334155;margin-bottom:3px;text-transform:uppercase;">Observaciones Clínicas / Montaje</div>
+            <div style="font-size:9px;color:#475569;line-height:1.45;white-space:pre-line;">${p.observaciones}</div>
+          </div>
+        </td>
+      </tr>
+      ` : ''}
+    </table>
+
+    <!-- ═══════ FIRMA DEL PROFESIONAL & PIE DE PÁGINA ═══════ -->
+    <table cellpadding="0" cellspacing="0" style="width:100%;margin-top:25px;margin-bottom:10px;">
+      <tr>
+        <td style="vertical-align:bottom;font-size:8.5px;color:#94a3b8;width:55%;line-height:1.4;">
+          Documento clínico generado electrónicamente.<br/>
+          Válido para formulación y elaboración en laboratorio óptico autorizado.<br/>
+          Control sugerido: <strong>${fechaControl}</strong>
+        </td>
+        <td style="text-align:center;width:45%;vertical-align:bottom;">
+          <div style="border-bottom:1.5px solid #0f172a;margin:0 auto 4px auto;width:220px;"></div>
+          <div style="font-size:10.5px;font-weight:700;color:#0f172a;">${profesionalNombre}</div>
+          <div style="font-size:8.5px;color:#64748b;">Firma y Registro Profesional</div>
+        </td>
+      </tr>
+    </table>
+
+  </td>
+
+  <!-- Barra vertical derecha con marca de texto -->
+  <td style="width:22px;position:relative;">
+    <div style="position:absolute;top:50%;left:99%;transform:translate(-50%,-50%) rotate(90deg);color:#000000;font-size:10px;letter-spacing:1px;font-weight:600;white-space:nowrap;opacity:0.3;">
+      Documento generado con software contable propio
+    </div>
+  </td>
+</tr>
+</table>
+
+</body>
+</html>`;
   }
 
   // ══════════════════════════════════════════════════════════════════════

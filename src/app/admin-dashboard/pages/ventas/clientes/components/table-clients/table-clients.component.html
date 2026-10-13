@@ -16,21 +16,24 @@
                 @for (cliente of clientesData(); track cliente.id) {
                 <tr>
                     <td class="font-mono text-center">
-                        <span class="font-medium">{{ cliente.tipoDocumentoRel.abreviatura }}</span> - {{
-                        cliente.numeroDocumento }}
+                        {{ cliente.tipoDocumentoRel.abreviatura }} - {{ cliente.numeroDocumento }}
                     </td>
                     <td class="text-center">
-                        <span>{{ cliente.razonSocial || (cliente.nombre + ' ' + cliente.apellido) | titlecase}}</span>
+                        <span>{{ cliente.razonSocial || (cliente.nombre + ' ' + cliente.apellido) }}</span>
                     </td>
                     <td class="text-slate-500 text-center">{{ cliente.telefono }}</td>
-                    <td class="text-slate-500 text-center">{{ cliente.email | titlecase }}</td>
+                    <td class="text-slate-500 text-center">{{ cliente.email }}</td>
                     <td class="text-center">
                         @if (cliente.isActive) {
-                        <span class="px-2.5 py-1 text-[10px] font-semibold uppercase er bg-emerald-50 text-emerald-600 rounded-lg border 
- border-emerald-100">Activo</span>
+                        <span
+                            class="px-2.5 py-1 text-[10px] font-semibold uppercase er bg-emerald-50 text-emerald-600 rounded-lg border border-emerald-100">
+                            Activo
+                        </span>
                         } @else {
-                        <span class="px-2.5 py-1 text-[10px] font-semibold uppercase er bg-gray-50 text-gray-400 rounded-lg border 
- border-gray-100">Inactivo</span>
+                        <span
+                            class="px-2.5 py-1 text-[10px] font-semibold uppercase er bg-gray-50 text-gray-400 rounded-lg border border-gray-100">
+                            Inactivo
+                        </span>
                         }
                     </td>
                     <td class="text-center">

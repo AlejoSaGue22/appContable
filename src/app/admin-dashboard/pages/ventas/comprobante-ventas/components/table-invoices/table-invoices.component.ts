@@ -24,17 +24,13 @@ import { CurrencyPipe, TitleCasePipe } from '@angular/common';
         FormsModule,
         PaginationComponent,
         CurrencyPipe,
-        TitleCasePipe,
     ],
     templateUrl: './table-invoices.component.html',
 })
 export class TableInvoices {
     invoiceData = input.required<GetFacturaRequest[]>();
-
-    // Input for active filters to restore state if component is recreated
     activeFilters = input<InvoiceFilters>({});
 
-    // Output events
     filterChange = output<InvoiceFilters>();
     emitir = output<string>();
     emitirEstandar = output<string>();

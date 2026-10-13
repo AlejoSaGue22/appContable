@@ -49,10 +49,37 @@
                 }
               ]
             },
+            "staging": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "with": "src/app/environments/environment.staging.ts",
+                  "replace": "src/app/environments/environment.ts"
+                }
+              ]
+            },
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "with": "src/app/environments/environment.development.ts",
+                  "replace": "src/app/environments/environment.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -62,6 +89,9 @@
           "configurations": {
             "production": {
               "buildTarget": "contableSoft:build:production"
+            },
+            "staging": {
+              "buildTarget": "contableSoft:build:staging"
             },
             "development": {
               "buildTarget": "contableSoft:build:development"

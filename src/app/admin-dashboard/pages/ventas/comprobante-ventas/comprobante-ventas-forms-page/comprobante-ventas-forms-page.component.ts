@@ -17,7 +17,7 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
   HeaderInput,
   HeaderTitlePageComponent,
@@ -46,6 +46,7 @@ import { CuentasBancariasService } from '@dashboard/pages/contabilidad/services/
 import { CuentaBancaria } from '@dashboard/pages/contabilidad/interfaces/cuenta-bancaria.interface';
 import { CurrencyFormatDirective } from '@shared/directives/currency-format.directive';
 import { ProductosServiciosFormsComponent } from '@dashboard/pages/articulos/productos-servicios-forms/productos-servicios-forms.component';
+import { MedioPago } from '@dashboard/interfaces/pagos-interface';
 
 @Component({
   selector: 'app-comprobante-ventas-forms-page',
@@ -103,6 +104,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   refreshAsientoTrigger = signal<number>(0);
   anticiposDisponibles = signal<any[]>([]);
   anticiposAsociados = signal<{ anticipoId: string; numero: string; montoOriginal: number; saldoDisponible: number; montoAplicado: number }[]>([]);
+  abonosInicialesVisibles = signal(false);
   isCloningLoading = false;
 
   InvoiceStatus = InvoiceStatus;
@@ -303,6 +305,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
 
         this.factura.set(invoice as any);
         this.productSeleccionados.set(invoice.items as ItemFactura[]);
+        this.cargarAbonosIniciales((invoice as any).abonosInicialesPendientes || []);
         this.calcularTotal();
 
         // Resumen de notas aplicadas (banner informativo, Fase 1: lectura)
@@ -360,7 +363,12 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     canal: ['', Validators.required],
     tipoFactura: [TipoFactura.STANDARD, Validators.required],
     productos: [[]],
+    abonosIniciales: this.fb.array([]),
   });
+
+  get abonosInicialesArray(): FormArray {
+    return this.formVentas.get('abonosIniciales') as FormArray;
+  }
 
   tipoFacturaSignal = toSignal(
     this.formVentas.get('tipoFactura')!.valueChanges,
@@ -381,6 +389,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       metodoPagoControl?.setValidators([Validators.required]);
       cuentaBancariaControl?.setValidators([Validators.required]);
       fechaVencimientoControl?.clearValidators();
+      this.limpiarAbonosIniciales();
     } else {
       metodoPagoControl?.clearValidators();
       metodoPagoControl?.setValue('');
@@ -392,6 +401,75 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     cuentaBancariaControl?.updateValueAndValidity();
     fechaVencimientoControl?.updateValueAndValidity();
   });
+
+  agregarAbonoInicial(): void {
+    const abono = this.fb.group({
+      monto: [0, [Validators.required, Validators.min(0.01)]],
+      metodoPagoId: ['', Validators.required],
+      cuentaBancariaId: [''],
+      referencia: [''],
+      notas: [''],
+    });
+
+    abono.get('metodoPagoId')?.valueChanges.subscribe((metodoId) => {
+      const cuenta = abono.get('cuentaBancariaId');
+      const metodo = this.catalogsStore.paymentMethods().find(m => m.id == metodoId);
+      if (metodo && metodo.codigo === '10') {
+        cuenta?.clearValidators();
+        cuenta?.setValue('');
+      } else {
+        cuenta?.setValidators([Validators.required]);
+      }
+      cuenta?.updateValueAndValidity({ emitEvent: false });
+    });
+
+    this.abonosInicialesArray.push(abono);
+    this.abonosInicialesVisibles.set(true);
+  }
+
+  cargarAbonosIniciales(abonos: any[]): void {
+    this.limpiarAbonosIniciales();
+    if (this.formVentas.get('formaPago')?.value !== FormaPago.CREDITO || !abonos.length) return;
+    for (const abono of abonos) {
+      this.agregarAbonoInicial();
+      this.abonosInicialesArray.at(this.abonosInicialesArray.length - 1).patchValue({
+        monto: Number(abono.monto),
+        metodoPagoId: abono.metodoPagoId ?? '',
+        cuentaBancariaId: abono.cuentaBancariaId ?? '',
+        referencia: abono.referencia ?? '',
+        notas: abono.notas ?? '',
+      });
+    }
+  }
+
+  quitarAbonoInicial(index: number): void {
+    this.abonosInicialesArray.removeAt(index);
+    if (this.abonosInicialesArray.length === 0) {
+      this.abonosInicialesVisibles.set(false);
+    }
+  }
+
+  limpiarAbonosIniciales(): void {
+    while (this.abonosInicialesArray.length) this.abonosInicialesArray.removeAt(0);
+    this.abonosInicialesVisibles.set(false);
+  }
+
+  totalAbonosIniciales(): number {
+    return this.abonosInicialesArray.controls.reduce(
+      (total, control) => total + Number(control.get('monto')?.value || 0), 0,
+    );
+  }
+
+  saldoConAbonosIniciales(): number {
+    return Math.max(0, this.totales.facturaTotal - this.totalAbonosIniciales());
+  }
+
+  private obtenerMedioPago(metodoPagoId: unknown): MedioPago {
+    const metodo = this.catalogsStore.paymentMethods().find(m => m.id == metodoPagoId);
+    if (metodo?.codigo === '20') return 'cheque';
+    if (['47', '42', '30', '48', '49'].includes(String(metodo?.codigo))) return 'banco';
+    return 'caja';
+  }
 
   ivaLogic = effect(() => {
     const tipoFactura = this.tipoFacturaSignal();
@@ -685,6 +763,15 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       return;
     }
 
+    if (this.formaPagoSignal() === FormaPago.CREDITO && this.totalAbonosIniciales() > this.totales.facturaTotal + 0.01) {
+      this.notificacionService.error(
+        'La suma de los abonos no puede superar el total de la factura',
+        'Abono inválido',
+        5000,
+      );
+      return;
+    }
+
     this.loaderservice.show('Guardando factura de venta...');
     this.loading.set(true);
     const valueFormFactura = this.formVentas.value;
@@ -718,7 +805,15 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       anticiposAsociados: this.anticiposAsociados().map(a => ({
         anticipoId: a.anticipoId,
         montoAplicado: a.montoAplicado
-      }))
+      })),
+      abonosIniciales: this.formaPagoSignal() === FormaPago.CREDITO
+        ? this.abonosInicialesArray.getRawValue().map((abono: any) => ({
+          ...abono,
+          monto: Number(abono.monto),
+          metodoPagoId: abono.metodoPagoId ? Number(abono.metodoPagoId) : undefined,
+          medioPago: this.obtenerMedioPago(abono.metodoPagoId),
+          fecha: valueFormFactura.fecha,
+        })) : [],
     };
 
     if (this.invoiceID() == 'new-Item') {

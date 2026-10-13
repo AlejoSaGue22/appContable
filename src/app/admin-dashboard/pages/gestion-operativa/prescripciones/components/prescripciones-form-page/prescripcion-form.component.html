@@ -1,0 +1,736 @@
+<div class="p-4 md:p-8 max-w-7xl mx-auto space-y-6 animate-fade-in pb-24">
+  <!-- Top Navigation & Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200/80">
+    <div>
+      <button type="button" (click)="cancel()"
+        class="inline-flex items-center gap-2 text-xs font-bold uppercase  text-slate-500 hover:text-slate-800 transition-colors mb-2 cursor-pointer">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Volver al listado</span>
+      </button>
+      <div class="flex items-center gap-3 mt-4">
+        <div
+          class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center text-lg shadow-md shadow-blue-500/20">
+          <i class="fa-solid fa-file-prescription"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold text-slate-900">
+            {{ id && id !== 'new-prescription' ? 'Editar Prescripción Visual' : 'Nueva Prescripción Visual' }}
+          </h1>
+          <p class="text-xs text-slate-500">
+            Registro de refracción óptica, agudeza visual y especificaciones técnicas para laboratorio
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Status Badge -->
+    <div class="flex items-center gap-3 self-start sm:self-auto">
+      <span
+        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span>Consulta Activa</span>
+      </span>
+    </div>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="save()" class="space-y-6">
+
+    <!-- SECCIÓN 1: DATOS GENERALES Y PACIENTE -->
+    <section class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-5">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2.5">
+          <span
+            class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-bold">1</span>
+          <h2 class="text-base font-semibold text-slate-900">Información del Paciente & Consulta</h2>
+        </div>
+        <span class="text-xs text-slate-400 font-medium">* Campos obligatorios</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
+        <!-- Fecha del examen -->
+        <div class="md:col-span-3">
+          <label class="block text-xs font-bold uppercase text-slate-600 mb-1.5">
+            Fecha del Examen <span class="text-rose-500">*</span>
+          </label>
+          <div class="relative">
+            <input type="date" formControlName="fechaExamen"
+              class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium" />
+          </div>
+        </div>
+
+        <!-- Paciente -->
+        <div class="md:col-span-6">
+          <label class="block text-xs font-bold uppercase  text-slate-600 mb-1.5">
+            Paciente <span class="text-rose-500">*</span>
+          </label>
+          <div class="relative">
+            <select formControlName="clienteId"
+              class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium">
+              <option value="">Selecciona un paciente del directorio...</option>
+              @for (p of patients(); track p.id) {
+              <option [value]="p.id">{{ p.fullName }} · {{ p.numeroDocumento }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <!-- Identificación (Auto-rellenada) -->
+        <div class="md:col-span-3">
+          <label class="block text-xs font-bold uppercase  text-slate-600 mb-1.5">
+            Identificación
+          </label>
+          <div class="relative">
+            <input [value]="client?.numeroDocumento || 'Seleccione paciente'" readonly
+              class="w-full px-3.5 py-2.5 text-sm bg-slate-100/80 border border-slate-200 rounded-xl text-slate-600 font-mono font-medium cursor-not-allowed" />
+          </div>
+        </div>
+
+        <!-- Profesional Responsable -->
+        <div class="md:col-span-6">
+          <label class="block text-xs font-bold uppercase  text-slate-600 mb-1.5">
+            Profesional Responsable
+          </label>
+          <div class="relative">
+            <select formControlName="profesionalId"
+              class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium">
+              <option value="">Selecciona el profesional tratante...</option>
+              @for (p of professionals(); track p.id) {
+              <option [value]="p.id">{{ p.fullName }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <!-- Tipo de Examen -->
+        <div class="md:col-span-6">
+          <label class="block text-xs font-bold uppercase  text-slate-600 mb-1.5">
+            Tipo de Consulta / Examen <span class="text-rose-500">*</span>
+          </label>
+          <div class="relative">
+            <select formControlName="tipoExamen"
+              class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium">
+              <option value="VALORACION_VISUAL">Valoración Visual / Refracción Integral</option>
+              <option value="CONTROL">Control Periódico / Seguimiento</option>
+              <option value="ADAPTACION">Adaptación de Lentes de Contacto</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 2: MODALIDAD DE LENTE Y ESPECIFICACIONES -->
+    <section class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-6">
+      <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
+        <span
+          class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-bold">2</span>
+        <div>
+          <h2 class="text-base font-bold text-slate-900">Modalidad de Lente & Especificaciones Técnicas</h2>
+          <p class="text-xs text-slate-500">Selecciona el tipo de lente a prescribir y sus características de diseño</p>
+        </div>
+      </div>
+
+      <!-- Selector Visual de Tipo de Lente (Tarjetas Interactivas) -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Tarjeta 1: Oftálmico -->
+        <div (click)="setTipoLente('OFTALMICO')"
+          class="relative p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between group"
+          [ngClass]="lensType === 'OFTALMICO'
+            ? 'border-blue-600 bg-blue-50/40 shadow-sm ring-4 ring-blue-500/10'
+            : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50'">
+          <div class="flex items-start justify-between">
+            <div class="w-11 h-11 rounded-xl flex items-center justify-center text-xl"
+              [ngClass]="lensType === 'OFTALMICO' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600 group-hover:scale-105 transition-transform'">
+              <i class="fa-solid fa-glasses"></i>
+            </div>
+            <div class="w-5 h-5 rounded-full border flex items-center justify-center"
+              [ngClass]="lensType === 'OFTALMICO' ? 'border-blue-600 bg-blue-600' : 'border-slate-300'">
+              @if (lensType === 'OFTALMICO') {
+              <div class="w-2 h-2 rounded-full bg-white"></div>
+              }
+            </div>
+          </div>
+          <div class="mt-4">
+            <h3 class="font-bold text-sm text-slate-900">Lente Oftálmico</h3>
+            <p class="text-xs text-slate-500 mt-1">Gafas de montura, lentes monofocales, progresivos o bifocales.</p>
+          </div>
+        </div>
+
+        <!-- Tarjeta 2: Contacto -->
+        <div (click)="setTipoLente('CONTACTO')"
+          class="relative p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between group"
+          [ngClass]="lensType === 'CONTACTO'
+            ? 'border-teal-600 bg-teal-50/40 shadow-sm ring-4 ring-teal-500/10'
+            : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50'">
+          <div class="flex items-start justify-between">
+            <div class="w-11 h-11 rounded-xl flex items-center justify-center text-xl"
+              [ngClass]="lensType === 'CONTACTO' ? 'bg-teal-600 text-white' : 'bg-slate-100 text-slate-600 group-hover:scale-105 transition-transform'">
+              <i class="fa-solid fa-eye"></i>
+            </div>
+            <div class="w-5 h-5 rounded-full border flex items-center justify-center"
+              [ngClass]="lensType === 'CONTACTO' ? 'border-teal-600 bg-teal-600' : 'border-slate-300'">
+              @if (lensType === 'CONTACTO') {
+              <div class="w-2 h-2 rounded-full bg-white"></div>
+              }
+            </div>
+          </div>
+          <div class="mt-4">
+            <h3 class="font-bold text-sm text-slate-900">Lente de Contacto</h3>
+            <p class="text-xs text-slate-500 mt-1">Adaptación corneal: esféricos, tóricos, blandos o RGP.</p>
+          </div>
+        </div>
+
+        <!-- Tarjeta 3: Otro -->
+        <div (click)="setTipoLente('OTRO')"
+          class="relative p-5 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between group"
+          [ngClass]="lensType === 'OTRO'
+            ? 'border-slate-800 bg-slate-50 shadow-sm ring-4 ring-slate-800/10'
+            : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/50'">
+          <div class="flex items-start justify-between">
+            <div class="w-11 h-11 rounded-xl flex items-center justify-center text-xl"
+              [ngClass]="lensType === 'OTRO' ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-600 group-hover:scale-105 transition-transform'">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            <div class="w-5 h-5 rounded-full border flex items-center justify-center"
+              [ngClass]="lensType === 'OTRO' ? 'border-slate-800 bg-slate-800' : 'border-slate-300'">
+              @if (lensType === 'OTRO') {
+              <div class="w-2 h-2 rounded-full bg-white"></div>
+              }
+            </div>
+          </div>
+          <div class="mt-4">
+            <h3 class="font-bold text-sm text-slate-900">Especializado / Terapéutico</h3>
+            <p class="text-xs text-slate-500 mt-1">Filtros terapéuticos, prismas especiales o prótesis oculares.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Parámetros Comunes de Lentes -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 pt-2">
+        <div class="md:col-span-4">
+          <label class="block text-xs font-bold uppercase  text-slate-600 mb-1.5">
+            Diseño / Tipo de Lente
+          </label>
+          <input type="text" formControlName="tipoLenteDescripcion"
+            placeholder="Ej: Monofocal Digital, Progresivo HD, Bifocal Invisible..."
+            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium" />
+        </div>
+
+        <div class="md:col-span-4">
+          <label class="block text-xs font-bold uppercase  text-slate-600 mb-1.5">
+            Uso Indicado
+          </label>
+          <input type="text" formControlName="usoIndicado"
+            placeholder="Ej: Permanente, Lectura, Pantallas / Computador, Conducción..."
+            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium" />
+        </div>
+
+        <div class="md:col-span-4">
+          <label class="block text-xs font-bold uppercase  text-slate-600 mb-1.5">
+            Material
+          </label>
+          <input type="text" formControlName="material"
+            placeholder="Ej: Policarbonato 1.59, CR-39, Alto Índice 1.67, Trivex..."
+            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium" />
+        </div>
+
+        <div class="md:col-span-8">
+          <label class="block text-xs font-bold uppercase  text-slate-600 mb-1.5">
+            Tratamiento / Filtros de Protección
+          </label>
+          <input type="text" formControlName="filtroTratamiento"
+            placeholder="Ej: Antirreflejo Crizal, Filtro Azul (Blue Light Cut), Fotocromático Transitions, UV 400..."
+            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium" />
+        </div>
+
+        <div class="md:col-span-4">
+          <label class="block text-xs font-bold uppercase  text-slate-600 mb-1.5">
+            Fecha de Próximo Control
+          </label>
+          <input type="date" formControlName="fechaControl"
+            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium" />
+        </div>
+      </div>
+
+      <!-- Panel Especializado: Datos de Adaptación de Contacto -->
+      @if (lensType === 'CONTACTO') {
+      <div class="mt-4 rounded-2xl border-2 border-teal-200 bg-teal-50/30 p-5 space-y-4 animate-fade-in"
+        formGroupName="contacto">
+        <div class="flex items-center gap-2 text-teal-800">
+          <i class="fa-solid fa-circle-info text-teal-600"></i>
+          <h3 class="font-bold text-sm">Parámetros de Adaptación Corneal (Lentes de Contacto)</h3>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-bold uppercase  text-teal-900 mb-1">Marca /
+              Laboratorio</label>
+            <input type="text" formControlName="marca" placeholder="Ej: Acuvue Oasys, Biofinity..."
+              class="w-full px-3 py-2 text-sm bg-white border border-teal-200 rounded-xl text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:outline-none font-medium" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase  text-teal-900 mb-1">Curva Base (BC en
+              mm)</label>
+            <input type="text" formControlName="curvaBase" placeholder="Ej: 8.4, 8.6..."
+              class="w-full px-3 py-2 text-sm bg-white border border-teal-200 rounded-xl text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:outline-none font-medium" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase  text-teal-900 mb-1">Diámetro (DIA en
+              mm)</label>
+            <input type="text" formControlName="diametro" placeholder="Ej: 14.0, 14.2..."
+              class="w-full px-3 py-2 text-sm bg-white border border-teal-200 rounded-xl text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:outline-none font-medium" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase  text-teal-900 mb-1">Frecuencia de
+              Reemplazo</label>
+            <input type="text" formControlName="frecuenciaReemplazo" placeholder="Diario, Quincenal, Mensual, Anual..."
+              class="w-full px-3 py-2 text-sm bg-white border border-teal-200 rounded-xl text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:outline-none font-medium" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase  text-teal-900 mb-1">Material de
+              Contacto</label>
+            <input type="text" formControlName="materialContacto" placeholder="Ej: Senofilcon A, Comfilcon A..."
+              class="w-full px-3 py-2 text-sm bg-white border border-teal-200 rounded-xl text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:outline-none font-medium" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase  text-teal-900 mb-1">Solución &
+              Cuidados</label>
+            <input type="text" formControlName="cuidados" placeholder="Ej: Solución multipropósito Opti-Free..."
+              class="w-full px-3 py-2 text-sm bg-white border border-teal-200 rounded-xl text-slate-800 focus:ring-2 focus:ring-teal-500/20 focus:outline-none font-medium" />
+          </div>
+        </div>
+      </div>
+      }
+    </section>
+
+    <!-- SECCIÓN 3: CONSOLA CLÍNICA DE REFRACCIÓN FINAL (HERO / FIRMA VISUAL) -->
+    <section class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2.5">
+          <span
+            class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-bold">3</span>
+          <div>
+            <h2 class="text-base font-bold text-slate-900">Refracción Final & Agudeza Visual</h2>
+            <p class="text-xs text-slate-500">Graduación óptica para Ojo Derecho (OD) y Ojo Izquierdo (OI)</p>
+          </div>
+        </div>
+        <div class="hidden sm:flex items-center gap-2 text-xs font-mono text-slate-400">
+          <span>Pasos: 0.25 Dpt</span>
+          <span>·</span>
+          <span>Eje: 0° - 180°</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- OJO DERECHO (OD) - Sky / Blue Palette -->
+        <div
+          class="rounded-2xl border-2 border-sky-200 bg-gradient-to-b from-sky-50/50 to-white p-5 space-y-4 shadow-sm"
+          formGroupName="derecho">
+          <div class="flex items-center justify-between border-b border-sky-100 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="px-2.5 py-1 rounded-lg bg-sky-600 text-white font-mono font-bold text-xs shadow-sm">
+                OD
+              </span>
+              <h3 class="font-bold text-sm text-sky-950">Ojo Derecho (Oculus Dexter)</h3>
+            </div>
+            <span class="text-[11px] font-semibold text-sky-700 bg-sky-100/60 px-2 py-0.5 rounded-md">Refracción
+              Primaria</span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <!-- Esfera -->
+            <div>
+              <label class="block text-[11px] font-bold uppercase  text-slate-600 mb-1">
+                Esfera (SPH)
+              </label>
+              <div class="relative">
+                <input type="number" step="0.25" formControlName="esfera" placeholder="+0.00"
+                  class="w-full px-3 py-2 text-sm font-mono font-bold bg-white border border-sky-200 rounded-xl text-slate-800 focus:outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 transition-all text-center" />
+              </div>
+            </div>
+
+            <!-- Cilindro -->
+            <div>
+              <label class="block text-[11px] font-bold uppercase  text-slate-600 mb-1">
+                Cilindro (CYL)
+              </label>
+              <div class="relative">
+                <input type="number" step="0.25" formControlName="cilindro" placeholder="-0.00"
+                  class="w-full px-3 py-2 text-sm font-mono font-bold bg-white border border-sky-200 rounded-xl text-slate-800 focus:outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 transition-all text-center" />
+              </div>
+            </div>
+
+            <!-- Eje -->
+            <div>
+              <label class="block text-[11px] font-bold uppercase  text-slate-600 mb-1">
+                Eje (AXIS)
+              </label>
+              <div class="relative">
+                <input type="number" step="1" min="0" max="180" formControlName="eje" placeholder="0° - 180°"
+                  class="w-full px-3 py-2 text-sm font-mono font-bold bg-white border border-sky-200 rounded-xl text-slate-800 focus:outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 transition-all text-center" />
+              </div>
+            </div>
+
+            <!-- Adición -->
+            <div>
+              <label class="block text-[11px] font-bold uppercase  text-slate-600 mb-1">
+                Adición (ADD)
+              </label>
+              <div class="relative">
+                <input type="number" step="0.25" formControlName="adicion" placeholder="+0.00"
+                  class="w-full px-3 py-2 text-sm font-mono font-bold bg-white border border-sky-200 rounded-xl text-slate-800 focus:outline-none focus:ring-4 focus:ring-sky-500/10 focus:border-sky-500 transition-all text-center" />
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+            <!-- Agudeza Lejana -->
+            <div>
+              <label class="block text-[11px] font-bold uppercase  text-slate-600 mb-1">
+                AV Lejana
+              </label>
+              <input type="text" formControlName="agudezaLejana" placeholder="Ej. 20/20"
+                class="w-full px-3 py-2 text-xs font-medium bg-white border border-sky-200 rounded-xl text-slate-800 focus:outline-none focus:border-sky-500" />
+              <div class="flex flex-wrap gap-1 mt-1.5">
+                @for (opt of ['20/20', '20/25', '20/30', '20/40']; track opt) {
+                <button type="button" (click)="setAgudeza('derecho', 'agudezaLejana', opt)"
+                  class="px-1.5 py-0.5 text-[10px] font-mono rounded bg-white hover:bg-sky-100 text-sky-800 border border-sky-200 transition-colors">
+                  {{ opt }}
+                </button>
+                }
+              </div>
+            </div>
+
+            <!-- Agudeza Próxima -->
+            <div>
+              <label class="block text-[11px] font-bold uppercase  text-slate-600 mb-1">
+                AV Próxima
+              </label>
+              <input type="text" formControlName="agudezaProxima" placeholder="Ej. J1"
+                class="w-full px-3 py-2 text-xs font-medium bg-white border border-sky-200 rounded-xl text-slate-800 focus:outline-none focus:border-sky-500" />
+              <div class="flex flex-wrap gap-1 mt-1.5">
+                @for (opt of ['J1', 'J2', 'J3']; track opt) {
+                <button type="button" (click)="setAgudeza('derecho', 'agudezaProxima', opt)"
+                  class="px-1.5 py-0.5 text-[10px] font-mono rounded bg-white hover:bg-sky-100 text-sky-800 border border-sky-200 transition-colors">
+                  {{ opt }}
+                </button>
+                }
+              </div>
+            </div>
+
+            <!-- Prisma -->
+            <div>
+              <label class="block text-[11px] font-bold uppercase  text-slate-600 mb-1">
+                Prisma (Δ / Base)
+              </label>
+              <input type="text" formControlName="prisma" placeholder="Ej: 1.5 BI, 2.0 BD"
+                class="w-full px-3 py-2 text-xs font-medium bg-white border border-sky-200 rounded-xl text-slate-800 focus:outline-none focus:border-sky-500" />
+            </div>
+          </div>
+
+          <!-- Observaciones OD -->
+          <div class="pt-1">
+            <input type="text" formControlName="observaciones"
+              placeholder="Notas clínicas específicas de Ojo Derecho..."
+              class="w-full px-3 py-2 text-xs bg-white border border-sky-200 rounded-xl text-slate-700 placeholder-slate-400 focus:outline-none focus:border-sky-500" />
+          </div>
+        </div>
+
+        <!-- OJO IZQUIERDO (OI) - Purple / Indigo Palette -->
+        <div
+          class="rounded-2xl border-2 border-indigo-200 bg-gradient-to-b from-indigo-50/50 to-white p-5 space-y-4 shadow-sm"
+          formGroupName="izquierdo">
+          <div class="flex items-center justify-between border-b border-indigo-100 pb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-mono font-bold text-xs shadow-sm">
+                OI
+              </span>
+              <h3 class="font-bold text-sm text-indigo-950">Ojo Izquierdo (Oculus Sinister)</h3>
+            </div>
+            <span class="text-[11px] font-semibold text-indigo-700 bg-indigo-100/60 px-2 py-0.5 rounded-md">Refracción
+              Primaria</span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <!-- Esfera -->
+            <div>
+              <label class="block text-[11px] font-bold uppercase  text-slate-600 mb-1">
+                Esfera (SPH)
+              </label>
+              <div class="relative">
+                <input type="number" step="0.25" formControlName="esfera" placeholder="+0.00"
+                  class="w-full px-3 py-2 text-sm font-mono font-bold bg-white border border-indigo-200 rounded-xl text-slate-800 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all text-center" />
+              </div>
+            </div>
+
+            <!-- Cilindro -->
+            <div>
+              <label class="block text-[11px] font-bold uppercase  text-slate-600 mb-1">
+                Cilindro (CYL)
+              </label>
+              <div class="relative">
+                <input type="number" step="0.25" formControlName="cilindro" placeholder="-0.00"
+                  class="w-full px-3 py-2 text-sm font-mono font-bold bg-white border border-indigo-200 rounded-xl text-slate-800 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all text-center" />
+              </div>
+            </div>
+
+            <!-- Eje -->
+            <div>
+              <label class="block text-[11px] font-bold uppercase  text-slate-600 mb-1">
+                Eje (AXIS)
+              </label>
+              <div class="relative">
+                <input type="number" step="1" min="0" max="180" formControlName="eje" placeholder="0° - 180°"
+                  class="w-full px-3 py-2 text-sm font-mono font-bold bg-white border border-indigo-200 rounded-xl text-slate-800 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all text-center" />
+              </div>
+            </div>
+
+            <!-- Adición -->
+            <div>
+              <label class="block text-[11px] font-bold uppercase  text-slate-600 mb-1">
+                Adición (ADD)
+              </label>
+              <div class="relative">
+                <input type="number" step="0.25" formControlName="adicion" placeholder="+0.00"
+                  class="w-full px-3 py-2 text-sm font-mono font-bold bg-white border border-indigo-200 rounded-xl text-slate-800 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all text-center" />
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+            <!-- Agudeza Lejana -->
+            <div>
+              <label class="block text-[11px] font-bold uppercase  text-slate-600 mb-1">
+                AV Lejana
+              </label>
+              <input type="text" formControlName="agudezaLejana" placeholder="Ej. 20/20"
+                class="w-full px-3 py-2 text-xs font-medium bg-white border border-indigo-200 rounded-xl text-slate-800 focus:outline-none focus:border-indigo-500" />
+              <div class="flex flex-wrap gap-1 mt-1.5">
+                @for (opt of ['20/20', '20/25', '20/30', '20/40']; track opt) {
+                <button type="button" (click)="setAgudeza('izquierdo', 'agudezaLejana', opt)"
+                  class="px-1.5 py-0.5 text-[10px] font-mono rounded bg-white hover:bg-indigo-100 text-indigo-800 border border-indigo-200 transition-colors">
+                  {{ opt }}
+                </button>
+                }
+              </div>
+            </div>
+
+            <!-- Agudeza Próxima -->
+            <div>
+              <label class="block text-[11px] font-bold uppercase  text-slate-600 mb-1">
+                AV Próxima
+              </label>
+              <input type="text" formControlName="agudezaProxima" placeholder="Ej. J1"
+                class="w-full px-3 py-2 text-xs font-medium bg-white border border-indigo-200 rounded-xl text-slate-800 focus:outline-none focus:border-indigo-500" />
+              <div class="flex flex-wrap gap-1 mt-1.5">
+                @for (opt of ['J1', 'J2', 'J3']; track opt) {
+                <button type="button" (click)="setAgudeza('izquierdo', 'agudezaProxima', opt)"
+                  class="px-1.5 py-0.5 text-[10px] font-mono rounded bg-white hover:bg-indigo-100 text-indigo-800 border border-indigo-200 transition-colors">
+                  {{ opt }}
+                </button>
+                }
+              </div>
+            </div>
+
+            <!-- Prisma -->
+            <div>
+              <label class="block text-[11px] font-bold uppercase  text-slate-600 mb-1">
+                Prisma (Δ / Base)
+              </label>
+              <input type="text" formControlName="prisma" placeholder="Ej: 1.5 BI, 2.0 BD"
+                class="w-full px-3 py-2 text-xs font-medium bg-white border border-indigo-200 rounded-xl text-slate-800 focus:outline-none focus:border-indigo-500" />
+            </div>
+          </div>
+
+          <!-- Observaciones OI -->
+          <div class="pt-1">
+            <input type="text" formControlName="observaciones"
+              placeholder="Notas clínicas específicas de Ojo Izquierdo..."
+              class="w-full px-3 py-2 text-xs bg-white border border-indigo-200 rounded-xl text-slate-700 placeholder-slate-400 focus:outline-none focus:border-indigo-500" />
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SECCIÓN 4: LENSOMETRÍA (DESPLEGABLE / OPCIONAL) -->
+    <section class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden transition-all">
+      <button type="button" (click)="toggleLensometria()"
+        class="w-full p-5 flex items-center justify-between text-left hover:bg-slate-50/80 transition-colors cursor-pointer">
+        <div class="flex items-center gap-3">
+          <span
+            class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-bold">4</span>
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-base font-bold text-slate-900">Lensometría (Fórmula Anterior en Uso)</h2>
+              <span
+                class="text-[11px] font-medium text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full">
+                Opcional
+              </span>
+            </div>
+            <p class="text-xs text-slate-500">Valores medidos en las gafas actuales para comparación de evolución
+              clínica</p>
+          </div>
+        </div>
+        <div
+          class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center transition-transform"
+          [class.rotate-180]="showLensometria()">
+          <i class="fa-solid fa-chevron-down text-xs"></i>
+        </div>
+      </button>
+
+      @if (showLensometria()) {
+      <div class="p-6 pt-0 border-t border-slate-100 grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4 animate-fade-in">
+        <!-- Lensometría OD -->
+        <div class="rounded-xl border border-slate-200 bg-slate-50/50 p-4 space-y-3" formGroupName="lensometriaDerecho">
+          <div class="flex items-center gap-2 font-bold text-xs text-slate-700">
+            <span class="w-2 h-2 rounded-full bg-sky-500"></span>
+            <span>OD · Lensometría Previa</span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Esfera</label>
+              <input type="number" step="0.25" formControlName="esfera" placeholder="0.00"
+                class="w-full px-2.5 py-1.5 text-xs font-mono font-medium bg-white border border-slate-200 rounded-lg text-center" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Cilindro</label>
+              <input type="number" step="0.25" formControlName="cilindro" placeholder="0.00"
+                class="w-full px-2.5 py-1.5 text-xs font-mono font-medium bg-white border border-slate-200 rounded-lg text-center" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Eje</label>
+              <input type="number" formControlName="eje" placeholder="0°"
+                class="w-full px-2.5 py-1.5 text-xs font-mono font-medium bg-white border border-slate-200 rounded-lg text-center" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Adición</label>
+              <input type="number" step="0.25" formControlName="adicion" placeholder="0.00"
+                class="w-full px-2.5 py-1.5 text-xs font-mono font-medium bg-white border border-slate-200 rounded-lg text-center" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Lensometría OI -->
+        <div class="rounded-xl border border-slate-200 bg-slate-50/50 p-4 space-y-3"
+          formGroupName="lensometriaIzquierdo">
+          <div class="flex items-center gap-2 font-bold text-xs text-slate-700">
+            <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+            <span>OI · Lensometría Previa</span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Esfera</label>
+              <input type="number" step="0.25" formControlName="esfera" placeholder="0.00"
+                class="w-full px-2.5 py-1.5 text-xs font-mono font-medium bg-white border border-slate-200 rounded-lg text-center" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Cilindro</label>
+              <input type="number" step="0.25" formControlName="cilindro" placeholder="0.00"
+                class="w-full px-2.5 py-1.5 text-xs font-mono font-medium bg-white border border-slate-200 rounded-lg text-center" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Eje</label>
+              <input type="number" formControlName="eje" placeholder="0°"
+                class="w-full px-2.5 py-1.5 text-xs font-mono font-medium bg-white border border-slate-200 rounded-lg text-center" />
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Adición</label>
+              <input type="number" step="0.25" formControlName="adicion" placeholder="0.00"
+                class="w-full px-2.5 py-1.5 text-xs font-mono font-medium bg-white border border-slate-200 rounded-lg text-center" />
+            </div>
+          </div>
+        </div>
+      </div>
+      }
+    </section>
+
+    <!-- SECCIÓN 5: INDICACIONES MÉDICAS Y RECOMENDACIONES -->
+    <section class="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-5">
+      <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
+        <span
+          class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-bold">5</span>
+        <div>
+          <h2 class="text-base font-bold text-slate-900">Indicaciones Médicas & Recomendaciones</h2>
+          <p class="text-xs text-slate-500">Pautas de adaptación, higiene visual e instrucciones para el paciente</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div>
+          <label class="block text-xs font-bold uppercase  text-slate-600 mb-1.5">
+            Indicaciones al Paciente
+          </label>
+          <textarea formControlName="indicaciones" rows="3"
+            placeholder="Ej: Uso permanente. Adaptación gradual a lentes progresivos durante los primeros 4 días..."
+            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium resize-none">
+          </textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase  text-slate-600 mb-1.5">
+            Recomendaciones Visuales & Ergonómicas
+          </label>
+          <textarea formControlName="recomendaciones" rows="3"
+            placeholder="Ej: Regla 20-20-20 en pantallas, uso de lágrimas artificiales lubricantes cada 6 horas..."
+            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium resize-none">
+          </textarea>
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-xs font-bold uppercase  text-slate-600 mb-1.5">
+            Observaciones Adicionales / Notas de Laboratorio
+          </label>
+          <textarea formControlName="observaciones" rows="2"
+            placeholder="Ej: Montura al aire biselada, diámetro especial de lente, descentración pupilar..."
+            class="w-full px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium resize-none">
+          </textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- BARRA FLOTANTE DE GUARDADO Y ACCIÓN -->
+    <div
+      class="sticky bottom-4 z-30 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200 shadow-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-xs">
+          <i class="fa-solid fa-clipboard-check"></i>
+        </div>
+        <div class="text-xs">
+          <div class="font-bold text-slate-800">
+            {{ client ? client.fullName : 'Sin paciente seleccionado' }}
+          </div>
+          <div class="text-slate-500">
+            Modalidad: <span class="font-medium text-slate-700">{{ lensType === 'OFTALMICO' ? 'Lente Oftálmico' :
+              lensType === 'CONTACTO' ? 'Lente de Contacto' : 'Especial' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 w-full sm:w-auto">
+        <button type="button" (click)="cancel()"
+          class="flex-1 sm:flex-none px-5 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-sm font-semibold transition-all cursor-pointer">
+          Cancelar
+        </button>
+
+        <button type="submit" [disabled]="loading()"
+          class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-7 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold shadow-lg shadow-blue-500/25 hover:shadow-blue-500/35 transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+          @if (loading()) {
+          <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+            viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+            </path>
+          </svg>
+          <span>Guardando...</span>
+          } @else {
+          <i class="fa-solid fa-floppy-disk text-xs"></i>
+          <span>Guardar Prescripción</span>
+          }
+        </button>
+      </div>
+    </div>
+
+  </form>
+</div>

@@ -6,7 +6,7 @@ import { modalOpen } from '@shared/interfaces/services.interfaces';
 
 @Component({
     selector: 'app-table-clients',
-    imports: [CommonModule, RouterLink, TitleCasePipe],
+    imports: [CommonModule, RouterLink],
     templateUrl: './table-clients.component.html',
     standalone: true
 })

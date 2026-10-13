@@ -24,6 +24,10 @@ export const routes: Routes = [
                 loadChildren: () => import('./articulos/articulos.route')
             },
             {
+                path: 'gestion-operativa',
+                loadChildren: () => import('./gestion-operativa/gestion-operativa.routes')
+            },
+            {
                 path: 'reports',
                 loadChildren: () => import('./reportes/reportes.routes')
             },
