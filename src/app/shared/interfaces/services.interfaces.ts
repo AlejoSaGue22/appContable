@@ -6,6 +6,7 @@ export interface Options {
   page?: number;
   venta_compra?: 'venta' | 'costo';
   search?: string;
+  estadoCliente?: 'ACTIVO' | 'INACTIVO';
 }
 
 export type ResponseResult = { success: true, data?: any, message?: string } | { success: false, error: ErrorAuthResponse, message: string[] };

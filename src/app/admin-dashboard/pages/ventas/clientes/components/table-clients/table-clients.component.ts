@@ -13,6 +13,8 @@ import { modalOpen } from '@shared/interfaces/services.interfaces';
 export class TableClientsComponent {
 
     clientesData = input<ClientesInterfaceResponse[]>([]);
+    emptyTitle = input('No hay clientes registrados');
+    emptyHint = input('Comienza agregando tu primer cliente');
     @Output() delete = new EventEmitter<modalOpen>();
     @Output() view = new EventEmitter<ClientesInterfaceResponse>();
 

@@ -44,13 +44,13 @@ export class ProductosServiciosComponent {
 
     productorxResource = rxResource({
         request: () => ({
-            page: this.paginationService.currentPage() - 1,
+            page: this.paginationService.currentPage(),
             limit: 10,
             search: this.appliedSearchTerm()
         }),
         loader: ({ request }) => {
             return this.productoServicio.getProductos({
-                offset: request.page * request.limit,
+                offset: (request.page - 1) * request.limit,
                 limit: request.limit,
                 search: request.search
             }).pipe(
@@ -76,7 +76,7 @@ export class ProductosServiciosComponent {
     executeSearch() {
         const term = this.searchTerm();
         this.appliedSearchTerm.set(term);
-        this.router.navigate([], { queryParams: { search: term }, queryParamsHandling: 'merge' });
+        this.router.navigate([], { queryParams: { search: term, page: 1 }, queryParamsHandling: 'merge' });
     }
 
     openModal(event: modalOpen) {

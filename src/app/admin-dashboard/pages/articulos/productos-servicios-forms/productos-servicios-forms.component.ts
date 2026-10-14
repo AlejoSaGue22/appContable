@@ -45,7 +45,6 @@ export class ProductosServiciosFormsComponent {
         impuesto: ['', Validators.required],
         isInventariable: [false],
         // retencion: ['', Validators.required],
-
         precioventa: this.fb.group({
             precio1: ['', [Validators.pattern(/^\d+(\.\d{1,2})?$/)]],
             precio2: ['', [Validators.pattern(/^\d+(\.\d{1,2})?$/)]]

@@ -16,6 +16,8 @@ import { HelpersUtils } from '@utils/helpers.utils';
 import { ClientDetailComponent } from './components/client-detail/client-detail.component';
 import { ClientesInterfaceResponse } from '@dashboard/interfaces/clientes-interface';
 
+type EstadoClienteFilter = 'TODOS' | 'ACTIVO' | 'INACTIVO';
+
 @Component({
     selector: 'app-clients-page',
     imports: [HeaderTitlePageComponent, TableClientsComponent, ModalComponents, LoaderComponent, PaginationComponent, RouterLink, ClientDetailComponent],
@@ -42,17 +44,24 @@ export class ClientsPageComponent {
     isModalDetail = false;
     searchTerm = signal<string>(this.route.snapshot.queryParams['search'] || '');
     appliedSearchTerm = signal<string>(this.route.snapshot.queryParams['search'] || '');
+    estadoFilter = signal<EstadoClienteFilter>(
+        ['ACTIVO', 'INACTIVO'].includes(this.route.snapshot.queryParams['estado'])
+            ? this.route.snapshot.queryParams['estado'] as EstadoClienteFilter
+            : 'TODOS'
+    );
 
     clientesResource = rxResource({
         request: () => ({
             page: this.paginationService.currentPage(),
             limit: 10,
-            search: this.appliedSearchTerm()
+            search: this.appliedSearchTerm(),
+            estado: this.estadoFilter()
         }),
         loader: ({ request }) => this.clienteServices.getClientes({
-            offset: this.paginationService.currentPage(),
+            offset: (request.page - 1) * request.limit,
             limit: request.limit,
-            search: request.search
+            search: request.search,
+            estadoCliente: request.estado === 'TODOS' ? undefined : request.estado,
         }).pipe(
             tap((el) => {
                 this.totalCliente.set(el.count);
@@ -72,9 +81,37 @@ export class ClientsPageComponent {
     }
 
     executeSearch() {
-        const term = this.searchTerm();
+        const term = this.searchTerm().trim();
+        this.searchTerm.set(term);
         this.appliedSearchTerm.set(term);
-        this.router.navigate([], { queryParams: { search: term }, queryParamsHandling: 'merge' });
+        this.navigateWithFilters();
+    }
+
+    setEstadoFilter(value: string) {
+        this.estadoFilter.set(value === 'ACTIVO' || value === 'INACTIVO' ? value : 'TODOS');
+        this.navigateWithFilters();
+    }
+
+    clearFilters() {
+        this.searchTerm.set('');
+        this.appliedSearchTerm.set('');
+        this.estadoFilter.set('TODOS');
+        this.navigateWithFilters();
+    }
+
+    hasActiveFilters(): boolean {
+        return !!this.appliedSearchTerm() || this.estadoFilter() !== 'TODOS';
+    }
+
+    private navigateWithFilters() {
+        this.router.navigate([], {
+            queryParams: {
+                search: this.appliedSearchTerm() || null,
+                estado: this.estadoFilter() === 'TODOS' ? null : this.estadoFilter(),
+                page: 1,
+            },
+            queryParamsHandling: 'merge',
+        });
     }
 
     openModal(event: modalOpen) {
