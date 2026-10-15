@@ -140,6 +140,7 @@
             <th class="text-center">Cliente</th>
             <th class="text-center">Estado</th>
             <th class="text-center">Forma Pago</th>
+            <th class="text-center">Financiación</th>
             <th class="text-right">Total</th>
             <th class="text-right">Saldo</th>
             <th class="text-center">Acciones</th>
@@ -202,6 +203,22 @@
             </td>
             <td class="text-center">
               <span class="font-mono">{{ invoice.formaPago }}</span>
+            </td>
+            <td class="text-center">
+              @if (invoice.formaPago === 'CREDITO') {
+              <span class="inline-flex max-w-48 items-center truncate rounded-full border px-2.5 py-1 text-[10px] font-semibold"
+                [class.bg-amber-50]="invoice.esFinanciacionExterna"
+                [class.text-amber-700]="invoice.esFinanciacionExterna"
+                [class.border-amber-200]="invoice.esFinanciacionExterna"
+                [class.bg-slate-50]="!invoice.esFinanciacionExterna"
+                [class.text-slate-600]="!invoice.esFinanciacionExterna"
+                [class.border-slate-200]="!invoice.esFinanciacionExterna"
+                [title]="invoice.esFinanciacionExterna ? (invoice.financiadora?.nombre || 'Financiación externa') : 'Financiación propia'">
+                {{ invoice.esFinanciacionExterna ? (invoice.financiadora?.nombre || 'Externa') : 'Propia' }}
+              </span>
+              } @else {
+              <span class="text-gray-400">—</span>
+              }
             </td>
             <td class="text-right tabular-nums">
               <span class="font-semibold text-slate-900">{{ invoice.total | currency: "" : "$" : "1.0-0" }}</span>

@@ -6,6 +6,7 @@ import {
   TipoFactura,
   InvoiceStatus,
   FacturaNotasResumen,
+  FinanciadoraVenta,
 } from './../../../../interfaces/documento-venta-interface';
 import { PreviewAsientoComponent } from '@dashboard/components/preview-asiento/preview-asiento.component';
 import {
@@ -47,6 +48,7 @@ import { CuentaBancaria } from '@dashboard/pages/contabilidad/interfaces/cuenta-
 import { CurrencyFormatDirective } from '@shared/directives/currency-format.directive';
 import { ProductosServiciosFormsComponent } from '@dashboard/pages/articulos/productos-servicios-forms/productos-servicios-forms.component';
 import { MedioPago } from '@dashboard/interfaces/pagos-interface';
+import { EmpresaService } from '@dashboard/services/empresa.service';
 
 @Component({
   selector: 'app-comprobante-ventas-forms-page',
@@ -93,12 +95,15 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   router = inject(Router);
   catalogsStore = inject(CatalogsStore);
   cuentasBancariasService = inject(CuentasBancariasService);
+  empresaService = inject(EmpresaService);
   factura = signal<FacturaVenta | null>(null);
   notasResumen = signal<FacturaNotasResumen | null>(null);
   productSeleccionados = signal<ItemFactura[]>([]);
   getAllProductos = signal<GetProductosDetalle[]>([]);
   getAllClientes = signal<ClientesInterfaceResponse[]>([]);
   cuentasBancarias = signal<CuentaBancaria[]>([]);
+  financiadoras = signal<FinanciadoraVenta[]>([]);
+  empresaNombre = signal('Empresa actual');
   loading = signal<boolean>(false);
   minDate = signal<string>(new Date().toISOString().substring(0, 10));
   refreshAsientoTrigger = signal<number>(0);
@@ -161,6 +166,15 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
 
     this.getClientesAndProductos();
     this.loadCuentasBancarias();
+    this.ventaServices.getFinanciadoras().subscribe({
+      next: (response) => this.financiadoras.set(response.data ?? []),
+      error: () => this.notificacionService.error('No fue posible cargar las entidades financiadoras.'),
+    });
+    this.empresaService.getEmpresa().subscribe({
+      next: (response) => {
+        if (response.success && response.data?.razonSocial) this.empresaNombre.set(response.data.razonSocial);
+      },
+    });
 
     this.activateRoute.params.subscribe((params) => {
       const id = params['id'];
@@ -204,10 +218,12 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
             : cliente.numeroDocumento,
           clienteSearch: nombreDisplay,
           contacto: cliente.email,
-          vendedor: invoice.vendedor,
+          vendedor: (invoice as any).vendedorRel?.id || invoice.vendedor,
           canal: invoice.canalVenta,
           fecha: new Date().toISOString().substring(0, 10),
           formaPago: invoice.formaPago,
+          esFinanciacionExterna: invoice.esFinanciacionExterna ?? false,
+          financiadoraId: invoice.financiadoraId || '',
           metodoPago: invoice.metodoPago,
           cuentaBancariaId: (invoice as any).cuentaBancariaId || '',
           fechaVencimiento: invoice.fechaVencimiento,
@@ -294,10 +310,12 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
             : cliente.numeroDocumento,
           clienteSearch: nombreDisplay,
           contacto: cliente.email,
-          vendedor: invoice.vendedor,
+          vendedor: (invoice as any).vendedorRel?.id || invoice.vendedor,
           canal: invoice.canalVenta,
           fecha: invoice.fecha,
           formaPago: invoice.formaPago,
+          esFinanciacionExterna: invoice.esFinanciacionExterna ?? false,
+          financiadoraId: invoice.financiadoraId || '',
           metodoPago: invoice.metodoPago,
           cuentaBancariaId: (invoice as any).cuentaBancariaId || '',
           fechaVencimiento: invoice.fechaVencimiento,
@@ -356,6 +374,8 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     contacto: [''],
     vendedor: [''],
     formaPago: [FormaPago.CONTADO, Validators.required],
+    esFinanciacionExterna: [false],
+    financiadoraId: [''],
     metodoPago: [''],
     cuentaBancariaId: [''],
     fechaVencimiento: [''],
@@ -379,11 +399,18 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     initialValue: this.formVentas.get('formaPago')?.value as FormaPago,
   });
 
+  financiacionExternaSignal = toSignal(this.formVentas.get('esFinanciacionExterna')!.valueChanges, {
+    initialValue: this.formVentas.get('esFinanciacionExterna')?.value as boolean,
+  });
+
   paymentLogic = effect(() => {
     const formaPago = this.formaPagoSignal();
+    const financiacionExterna = this.financiacionExternaSignal();
     const metodoPagoControl = this.formVentas.get('metodoPago');
     const cuentaBancariaControl = this.formVentas.get('cuentaBancariaId');
     const fechaVencimientoControl = this.formVentas.get('fechaVencimiento');
+    const financiacionExternaControl = this.formVentas.get('esFinanciacionExterna');
+    const financiadoraControl = this.formVentas.get('financiadoraId');
 
     if (formaPago === FormaPago.CONTADO) {
       metodoPagoControl?.setValidators([Validators.required]);
@@ -397,6 +424,18 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       cuentaBancariaControl?.setValue('');
       fechaVencimientoControl?.setValidators([Validators.required]);
     }
+
+    const esCredito = formaPago === FormaPago.CREDITO;
+    const esExterna = esCredito && financiacionExterna === true;
+    if (!esCredito && financiacionExternaControl?.value) {
+      financiacionExternaControl.setValue(false);
+    }
+    if (!esExterna && financiadoraControl?.value) {
+      financiadoraControl.setValue('');
+    }
+    if (esExterna) financiadoraControl?.setValidators([Validators.required]);
+    else financiadoraControl?.clearValidators();
+    financiadoraControl?.updateValueAndValidity({ emitEvent: false });
     metodoPagoControl?.updateValueAndValidity();
     cuentaBancariaControl?.updateValueAndValidity();
     fechaVencimientoControl?.updateValueAndValidity();
@@ -783,6 +822,10 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       canalVenta: valueFormFactura.canal!,
       fecha: valueFormFactura.fecha!,
       formaPago: valueFormFactura.formaPago!,
+      esFinanciacionExterna: valueFormFactura.formaPago === FormaPago.CREDITO && valueFormFactura.esFinanciacionExterna === true,
+      financiadoraId: valueFormFactura.formaPago === FormaPago.CREDITO && valueFormFactura.esFinanciacionExterna === true
+        ? (valueFormFactura.financiadoraId || null)
+        : null,
       metodoPago: valueFormFactura.metodoPago!,
       cuentaBancariaId: valueFormFactura.cuentaBancariaId || undefined,
       fechaVencimiento: valueFormFactura.fechaVencimiento!,

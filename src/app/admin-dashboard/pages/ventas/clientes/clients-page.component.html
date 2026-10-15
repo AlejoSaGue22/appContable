@@ -1,136 +1,123 @@
 <div class="space-y-6 animate-fade-in">
   @if (clientesResource.isLoading() && !clientesResource.hasValue()) {
-    <div class="flex flex-col gap-3 justify-center items-center h-screen">
-      <app-loader />
-      <p class="text-sm text-gray-400 animate-pulse">
-        Cargando base de clientes...
-      </p>
-    </div>
+  <div class="flex flex-col gap-3 justify-center items-center h-screen">
+    <app-loader />
+    <p class="text-sm text-gray-400 animate-pulse">
+      Cargando base de clientes...
+    </p>
+  </div>
   }
 
   @if (clientesResource.hasValue()) {
-    <!-- Header -->
-    <header-title-page [titleHead]="headTitle" />
+  <!-- Header -->
+  <header-title-page [titleHead]="headTitle" />
 
-    <section class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5" aria-label="Buscar y filtrar clientes">
-      <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-        <div class="min-w-0 flex-1 space-y-3">
-          <div>
-            <h2 class="text-sm font-bold text-slate-800">Encuentra un cliente</h2>
-            <p class="mt-1 text-xs text-slate-500">Busca por nombre, razón social o datos del documento.</p>
-          </div>
-          <div class="flex flex-col gap-2 sm:flex-row">
-            <label class="relative block min-w-0 flex-1">
-              <span class="sr-only">Buscar clientes</span>
-              @if (clientesResource.isLoading() && clientesResource.hasValue()) {
-                <span class="absolute inset-y-0 left-3.5 flex items-center">
-                  <span class="h-4 w-4 animate-spin rounded-full border-2 border-slate-200 border-t-blue-600"></span>
-                </span>
-              } @else {
-                <svg class="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <circle cx="11" cy="11" r="7" stroke-width="1.8" />
-                  <path d="m16 16 4 4" stroke-width="1.8" stroke-linecap="round" />
-                </svg>
-              }
-              <input #txtSearch (input)="onSearch(txtSearch.value)" (keyup.enter)="executeSearch()" [value]="searchTerm()"
-                type="search" placeholder="Ej. María Pérez, 900123456 o CC"
-                class="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10" />
-            </label>
-            <button type="button" (click)="executeSearch()"
-              class="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 text-xs font-bold text-white transition hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-400/20">
-              Buscar
-            </button>
-          </div>
+  <section class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5"
+    aria-label="Buscar y filtrar clientes">
+    <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+      <div class="min-w-0 flex-1 space-y-3">
+        <div>
+          <h2 class="text-sm font-bold text-slate-800">Encuentra un cliente</h2>
+          <p class="mt-1 text-xs text-slate-500">Busca por nombre, razón social o datos del documento.</p>
         </div>
-
-        <div class="sm:w-48 xl:shrink-0">
-          <label class="block">
-            <span class="mb-1.5 block text-[10px] font-bold uppercase tracking-wide text-slate-500">Estado</span>
-            <select [value]="estadoFilter()" (change)="setEstadoFilter($any($event.target).value)"
-              class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-xs font-medium text-slate-700 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10">
-              <option value="TODOS">Activos e inactivos</option>
-              <option value="ACTIVO">Solo activos</option>
-              <option value="INACTIVO">Solo inactivos</option>
-            </select>
-          </label>
-        </div>
-
-        <div class="flex items-center gap-3 xl:pb-0.5">
-          @if (hasActiveFilters()) {
-            <button type="button" (click)="clearFilters()"
-              class="h-10 rounded-lg px-3 text-xs font-semibold text-slate-500 transition hover:bg-slate-100 hover:text-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-300/30">
-              Limpiar filtros
-            </button>
-          }
-          <a routerLink="/panel/ventas/clients/new-Item"
-            class="inline-flex h-11 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-blue-600 px-4 text-xs font-bold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-500/20 sm:flex-none">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 5v14M5 12h14" />
+        <div class="flex flex-col gap-2 sm:flex-row">
+          <label class="relative block min-w-0 flex-1">
+            <span class="sr-only">Buscar clientes</span>
+            @if (clientesResource.isLoading() && clientesResource.hasValue()) {
+            <span class="absolute inset-y-0 left-3.5 flex items-center">
+              <span class="h-4 w-4 animate-spin rounded-full border-2 border-slate-200 border-t-blue-600"></span>
+            </span>
+            } @else {
+            <svg class="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+              fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="11" cy="11" r="7" stroke-width="1.8" />
+              <path d="m16 16 4 4" stroke-width="1.8" stroke-linecap="round" />
             </svg>
-            Nuevo cliente
-          </a>
+            }
+            <input #txtSearch (input)="onSearch(txtSearch.value)" (keyup.enter)="executeSearch()" [value]="searchTerm()"
+              type="search" placeholder="Ej. María Pérez, 900123456 o CC"
+              class="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10" />
+          </label>
+          <button type="button" (click)="executeSearch()"
+            class="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 text-xs font-bold text-white transition hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-400/20">
+            Buscar
+          </button>
         </div>
       </div>
 
-      <div class="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3">
-        <p class="text-xs text-slate-500">
-          @if (clientesResource.isLoading() && clientesResource.hasValue()) {
-            Actualizando resultados…
-          } @else {
-            <span class="font-bold text-slate-800">{{ totalCliente() }}</span>
-            {{ totalCliente() === 1 ? 'cliente encontrado' : 'clientes encontrados' }}
-          }
-        </p>
+      <div class="sm:w-48 xl:shrink-0">
+        <label class="block">
+          <span class="mb-1.5 block text-[10px] font-bold uppercase tracking-wide text-slate-500">Estado</span>
+          <select [value]="estadoFilter()" (change)="setEstadoFilter($any($event.target).value)"
+            class="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-xs font-medium text-slate-700 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10">
+            <option value="TODOS">Todos</option>
+            <option value="ACTIVO">Solo activos</option>
+            <option value="INACTIVO">Solo inactivos</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="flex items-center gap-3 xl:pb-0.5">
         @if (hasActiveFilters()) {
-          <div class="flex flex-wrap items-center gap-1.5">
-            @if (appliedSearchTerm()) {
-              <span class="rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-medium text-blue-700">“{{ appliedSearchTerm() }}”</span>
-            }
-            @if (estadoFilter() !== 'TODOS') {
-              <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-medium text-emerald-700">{{ estadoFilter() === 'ACTIVO' ? 'Activos' : 'Inactivos' }}</span>
-            }
-          </div>
+        <button type="button" (click)="clearFilters()"
+          class="h-10 rounded-lg px-3 text-xs font-semibold text-slate-500 transition hover:bg-slate-100 hover:text-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-300/30">
+          Limpiar filtros
+        </button>
+        }
+        <a routerLink="/panel/ventas/clients/new-Item"
+          class="inline-flex h-11 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-blue-600 px-4 text-xs font-bold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-500/20 sm:flex-none">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 5v14M5 12h14" />
+          </svg>
+          Nuevo cliente
+        </a>
+      </div>
+    </div>
+
+    <div class="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3">
+      <p class="text-xs text-slate-500">
+        @if (clientesResource.isLoading() && clientesResource.hasValue()) {
+        Actualizando resultados…
+        } @else {
+        <span class="font-bold text-slate-800">{{ totalCliente() }}</span>
+        {{ totalCliente() === 1 ? 'cliente encontrado' : 'clientes encontrados' }}
+        }
+      </p>
+      @if (hasActiveFilters()) {
+      <div class="flex flex-wrap items-center gap-1.5">
+        @if (appliedSearchTerm()) {
+        <span class="rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-medium text-blue-700">“{{ appliedSearchTerm()
+          }}”</span>
+        }
+        @if (estadoFilter() !== 'TODOS') {
+        <span class="rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-medium text-emerald-700">{{ estadoFilter()
+          === 'ACTIVO' ? 'Activos' : 'Inactivos' }}</span>
         }
       </div>
-    </section>
-
-    <!-- Table Section -->
-    <div
-      class="space-y-4 transition-opacity duration-300"
-      [class.opacity-50]="clientesResource.isLoading()"
-    >
-      <app-table-clients
-        [clientesData]="clientesResource.value().clientes"
-        [emptyTitle]="hasActiveFilters() ? 'No encontramos clientes con esos filtros' : 'No hay clientes registrados'"
-        [emptyHint]="hasActiveFilters() ? 'Prueba con otros datos o limpia los filtros para ver todos los clientes.' : 'Comienza agregando tu primer cliente.'"
-        (delete)="openModal($event)"
-        (view)="onViewDetail($event)"
-      />
-
-      @if (clientesResource.value().clientes.length > 0) {
-        <app-pagination [length]="clientesResource.value().clientes.length" />
       }
     </div>
+  </section>
+
+  <!-- Table Section -->
+  <div class="space-y-4 transition-opacity duration-300" [class.opacity-50]="clientesResource.isLoading()">
+    <app-table-clients [clientesData]="clientesResource.value().clientes"
+      [emptyTitle]="hasActiveFilters() ? 'No encontramos clientes con esos filtros' : 'No hay clientes registrados'"
+      [emptyHint]="hasActiveFilters() ? 'Prueba con otros datos o limpia los filtros para ver todos los clientes.' : 'Comienza agregando tu primer cliente.'"
+      (delete)="openModal($event)" (view)="onViewDetail($event)" />
+
+    @if (clientesResource.value().clientes.length > 0) {
+    <app-pagination [length]="clientesResource.value().clientes.length" />
+    }
+  </div>
   }
 
   <!-- Delete Modal Modernized -->
   <app-modal [(visible)]="isModalEdit">
     <div class="p-6 text-center">
-      <div
-        class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6"
-      >
-        <svg
-          class="w-8 h-8"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-          />
+      <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
         </svg>
       </div>
       <h3 class="text-xl font-black text-gray-900 mb-2">
@@ -142,16 +129,12 @@
       </p>
 
       <div class="flex flex-col sm:flex-row gap-3">
-        <button
-          (click)="isModalEdit = false"
-          class="flex-1 px-6 py-3 border border-gray-100 text-sm font-bold text-gray-500 rounded-xl hover:bg-gray-50 transition-all"
-        >
+        <button (click)="isModalEdit = false"
+          class="flex-1 px-6 py-3 border border-gray-100 text-sm font-bold text-gray-500 rounded-xl hover:bg-gray-50 transition-all">
           No, mantener
         </button>
-        <button
-          (click)="deleteCliente()"
-          class="flex-1 px-6 py-3 bg-red-500 text-white text-sm font-bold rounded-xl hover:bg-red-600 shadow-lg shadow-red-200 transition-all active:scale-95"
-        >
+        <button (click)="deleteCliente()"
+          class="flex-1 px-6 py-3 bg-red-500 text-white text-sm font-bold rounded-xl hover:bg-red-600 shadow-lg shadow-red-200 transition-all active:scale-95">
           Sí, eliminar
         </button>
       </div>
@@ -166,14 +149,12 @@
       </div>
 
       @if (selectedCliente(); as cliente) {
-        <app-client-detail [cliente]="cliente" />
+      <app-client-detail [cliente]="cliente" />
       }
 
       <div class="mt-10 px-4">
-        <button
-          (click)="isModalDetail = false"
-          class="w-full cursor-pointer py-4 bg-gray-900 text-white text-sm font-bold rounded-2xl hover:bg-gray-800 transition-all shadow-xl active:scale-[0.98]"
-        >
+        <button (click)="isModalDetail = false"
+          class="w-full cursor-pointer py-4 bg-gray-900 text-white text-sm font-bold rounded-2xl hover:bg-gray-800 transition-all shadow-xl active:scale-[0.98]">
           Cerrar Vista
         </button>
       </div>

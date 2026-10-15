@@ -8,6 +8,7 @@ import {
   signal,
   computed,
   effect,
+  output,
 } from '@angular/core';
 import {
   ControlValueAccessor,
@@ -67,6 +68,9 @@ export class SearchableSelectComponent implements ControlValueAccessor {
 
   /** Max items visibles en el dropdown */
   maxResults = input<number>(80);
+
+  /** Emite el término de búsqueda cuando el usuario escribe (para búsquedas remotas) */
+  searchChange = output<string>();
 
   /** Tamaño del componente: 'sm' para tablas, 'md' normal */
   size = input<'sm' | 'md'>('md');
@@ -155,6 +159,10 @@ export class SearchableSelectComponent implements ControlValueAccessor {
     if (this.isDisabled()) return;
     this.searchTerm.set('');
     this.dropdownOpen.set(true);
+    setTimeout(() => {
+      const input = this.elRef.nativeElement.querySelector('input') as HTMLInputElement | null;
+      input?.focus();
+    }, 50);
   }
 
   selectItem(item: any): void {
@@ -177,6 +185,7 @@ export class SearchableSelectComponent implements ControlValueAccessor {
 
   onSearchInput(value: string): void {
     this.searchTerm.set(value);
+    this.searchChange.emit(value);
     if (!this.dropdownOpen()) this.dropdownOpen.set(true);
   }
 

@@ -216,6 +216,17 @@
                 factura()!.formaPago
                 }}</span>
 
+              @if (factura()!.formaPago === 'CREDITO') {
+              <span class="text-gray-500">Financiación:</span>
+              <span class="font-medium text-gray-800">
+                @if (factura()!.esFinanciacionExterna) {
+                {{ factura()!.financiadora?.nombre || 'Entidad externa' }}
+                } @else {
+                Propia
+                }
+              </span>
+              }
+
               @if (factura()!.metodoPago) {
               <span class="text-gray-500">Método:</span>
               <span class="font-medium text-gray-800">{{
@@ -231,10 +242,10 @@
               </span>
               }
 
-              @if (factura()!.vendedor) {
+              @if (factura()!.vendedorRel || factura()!.vendedor) {
               <span class="text-gray-500">Vendedor:</span>
               <span class="font-medium text-gray-800">{{
-                factura()!.vendedor
+                factura()!.vendedorRel ? (factura()!.vendedorRel!.nombre + ' ' + (factura()!.vendedorRel!.apellido || '')).trim() : factura()!.vendedor
                 }}</span>
               }
 

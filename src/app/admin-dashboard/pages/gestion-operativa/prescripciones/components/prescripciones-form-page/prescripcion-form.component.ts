@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -9,11 +9,11 @@ import { PrescripcionesService } from '@dashboard/pages/ventas/services/prescrip
 import { ClientesService } from '@dashboard/pages/ventas/services/clientes.service';
 import { Prescripcion, ProfesionalResponsable, TipoExamenPrescripcion, TipoLentePrescripcion } from '@dashboard/pages/ventas/interfaces/prescripcion.interface';
 import { ClientesInterfaceResponse, ClientesResponse } from '@dashboard/interfaces/clientes-interface';
-
+import { SearchableSelectComponent } from '@shared/components/searchable-select/searchable-select.component';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, SearchableSelectComponent],
   templateUrl: './prescripcion-form.component.html'
 })
 export class PrescripcionFormComponent implements OnInit {
@@ -31,6 +31,20 @@ export class PrescripcionFormComponent implements OnInit {
   readonly tiposExamen = signal<TipoExamenPrescripcion[]>([]);
   readonly id = this.route.snapshot.paramMap.get('id');
   readonly showLensometria = signal(false);
+
+  private searchTimeout: any;
+
+  readonly patientsList = computed(() => {
+    return this.patients().map((p) => {
+      const docAbrev = p.tipoDocumentoRel?.abreviatura || (p.tipoDocumento ? String(p.tipoDocumento) : 'Doc');
+      const docNum = p.numeroDocumento ? `${p.numeroDocumento}${p.dv ? '-' + p.dv : ''}` : '';
+      const docLabel = docNum ? `${docAbrev}: ${docNum}` : '';
+      return {
+        ...p,
+        documentoLabel: docLabel,
+      };
+    });
+  });
 
   readonly agudezaLejanaOptions = ['20/15', '20/20', '20/25', '20/30', '20/40', '20/50', '20/70', '20/100', '20/200', 'Cuenta dedos'];
   readonly agudezaProximaOptions = ['J1', 'J2', 'J3', 'J4', '0.50M', '0.75M', '1.0M'];
@@ -123,6 +137,27 @@ export class PrescripcionFormComponent implements OnInit {
     this.form.get(eye)?.get(field)?.setValue(val);
   }
 
+  onSearchPatient(term: string) {
+    const q = term?.trim();
+    if (!q || q.length < 2) return;
+
+    clearTimeout(this.searchTimeout);
+    this.searchTimeout = setTimeout(async () => {
+      try {
+        const res = await firstValueFrom(this.clientesService.getClientes({ search: q, limit: 50 }));
+        if (res?.clientes?.length) {
+          this.patients.update((current) => {
+            const existingIds = new Set(current.map((c) => c.id));
+            const fresh = res.clientes.filter((c) => !existingIds.has(c.id));
+            return fresh.length ? [...current, ...fresh] : current;
+          });
+        }
+      } catch {
+        // Fallback silencioso a la lista local
+      }
+    }, 300);
+  }
+
   toggleLensometria() {
     this.showLensometria.update(v => !v);
   }
@@ -130,7 +165,7 @@ export class PrescripcionFormComponent implements OnInit {
   async ngOnInit() {
     try {
       const [response, types, professionals] = await Promise.all([
-        firstValueFrom(this.clientesService.getClientes({ limit: 100, offset: 0 })) as Promise<ClientesResponse>,
+        firstValueFrom(this.clientesService.getClientes({ limit: 1000, offset: 0 })) as Promise<ClientesResponse>,
         firstValueFrom(this.service.listTiposExamen()),
         firstValueFrom(this.service.listProfesionales()),
       ]);

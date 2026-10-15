@@ -55,6 +55,7 @@
     </div>
     <input type="text" [value]="searchTerm()" (input)="onSearchInput($any($event.target).value)"
       [placeholder]="placeholder()"
+      (keydown.escape)="dropdownOpen.set(false)"
       class="block w-full pl-10 pr-10 bg-white border border-blue-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-400 transition-all shadow-sm"
       [class.py-2.5]="size() === 'md'" [class.text-sm]="size() === 'md'" [class.py-2]="size() === 'sm'"
       [class.text-xs]="size() === 'sm'" autocomplete="off" />

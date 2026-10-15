@@ -1,4 +1,5 @@
 import { ClientesInterfaceResponse } from "./clientes-interface";
+import { Vendedor } from "./catalogs-interface";
 import { CreatedBy } from "./factura-compra-interface";
 import { CuentaBancaria, PaymentStatus } from "./pagos-interface";
 import { ArticulosInterface } from "./productos-interface";
@@ -45,10 +46,14 @@ export interface FacturaVenta {
     comprobante_completo: string;
     status: InvoiceStatus;
     vendedor: string;
+    vendedorRel?: Vendedor | null;
     canalVenta: string;
     fecha: string;
     tipoFactura: TipoFactura;
     formaPago: FormaPago;
+    esFinanciacionExterna?: boolean;
+    financiadoraId?: string | null;
+    financiadora?: FinanciadoraVenta | null;
     metodoPago?: string;
     cuentaBancariaId?: string;
     fechaVencimiento?: string;
@@ -86,9 +91,13 @@ export interface GetFacturaRequest {
     status: InvoiceStatus;
     dianStatus: DianStatus;
     vendedor: string | null;
+    vendedorRel?: Vendedor | null;
     canalVenta: string;
     canalVentaRel: CatalogsItems;
     formaPago: FormaPago;
+    esFinanciacionExterna: boolean;
+    financiadoraId: string | null;
+    financiadora?: FinanciadoraVenta | null;
     metodoPago: string | null;
     metodoPagoRel: CatalogsItems;
     cuentaBancariaId: string | null;
@@ -220,4 +229,11 @@ export enum DianStatus {
     ACCEPTED = 'accepted', // DIAN aprobó (tiene CUFE)
     REJECTED = 'rejected', // DIAN rechazó
     CANCELLED = 'cancelled' // Anulada (nota crédito enviada)
+}
+
+export interface FinanciadoraVenta {
+    id: string;
+    nombre: string;
+    nit?: string | null;
+    activo?: boolean;
 }
