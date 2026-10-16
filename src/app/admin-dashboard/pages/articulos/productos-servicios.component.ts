@@ -115,9 +115,7 @@ export class ProductosServiciosComponent {
         }
 
         this.notificacionService.success('Se ha eliminado el producto correctamente', 'Eliminado!', 3000);
-        setTimeout(() => {
-            window.location.reload();
-        }, 600);
+        this.productorxResource.reload();
     }
 
 }

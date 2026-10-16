@@ -15,7 +15,7 @@ import {
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { PaginationComponent } from '@shared/components/pagination/pagination';
-import { CurrencyPipe, TitleCasePipe } from '@angular/common';
+import { CurrencyPipe } from '@angular/common';
 
 @Component({
     selector: 'app-table-invoices',
@@ -23,7 +23,7 @@ import { CurrencyPipe, TitleCasePipe } from '@angular/common';
         RouterLink,
         FormsModule,
         PaginationComponent,
-        CurrencyPipe,
+        CurrencyPipe
     ],
     templateUrl: './table-invoices.component.html',
 })

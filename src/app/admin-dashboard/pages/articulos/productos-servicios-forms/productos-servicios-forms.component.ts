@@ -142,7 +142,7 @@ export class ProductosServiciosFormsComponent {
                 if (this.isModal()) {
                     this.saveSuccess.emit(product.data);
                 } else {
-                    await this.router.navigateByUrl('/panel/products_services');
+                    await this.router.navigateByUrl('/panel/articles');
                 }
 
             } else {

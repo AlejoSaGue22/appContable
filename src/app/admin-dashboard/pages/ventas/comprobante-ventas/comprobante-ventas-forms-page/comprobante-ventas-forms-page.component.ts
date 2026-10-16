@@ -1,4 +1,4 @@
-import { CurrencyPipe, DatePipe } from '@angular/common';
+import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import {
   FacturaVenta,
   FormaPago,
@@ -54,6 +54,7 @@ import { EmpresaService } from '@dashboard/services/empresa.service';
   selector: 'app-comprobante-ventas-forms-page',
   standalone: true,
   imports: [
+    CommonModule,
     HeaderTitlePageComponent,
     ReactiveFormsModule,
     ListGroupDropdownComponent,

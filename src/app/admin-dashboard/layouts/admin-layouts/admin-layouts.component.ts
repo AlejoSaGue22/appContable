@@ -41,7 +41,7 @@ export default class AdminLayoutsComponent implements OnInit, OnDestroy {
     private router = inject(Router);
     loaderService = inject(LoaderService);
 
-    activeMenu: string | null = 'Dashboard';
+    activeMenu: string | null = '';
     private routeSubscription: Subscription | null = null;
     menuItems = computed(() => this.menuService.menuItems());
     menuItemsOther = computed(() => this.menuService.menuItems().filter(item => item.other === 'SI').sort((a, b) => a.order! - b.order!));

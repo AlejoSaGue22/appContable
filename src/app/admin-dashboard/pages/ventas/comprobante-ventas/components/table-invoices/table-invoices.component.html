@@ -206,7 +206,8 @@
             </td>
             <td class="text-center">
               @if (invoice.formaPago === 'CREDITO') {
-              <span class="inline-flex max-w-48 items-center truncate rounded-full border px-2.5 py-1 text-[10px] font-semibold"
+              <span
+                class="inline-flex max-w-48 items-center truncate rounded-full border px-2.5 py-1 text-[10px] font-semibold"
                 [class.bg-amber-50]="invoice.esFinanciacionExterna"
                 [class.text-amber-700]="invoice.esFinanciacionExterna"
                 [class.border-amber-200]="invoice.esFinanciacionExterna"
@@ -214,7 +215,7 @@
                 [class.text-slate-600]="!invoice.esFinanciacionExterna"
                 [class.border-slate-200]="!invoice.esFinanciacionExterna"
                 [title]="invoice.esFinanciacionExterna ? (invoice.financiadora?.nombre || 'Financiación externa') : 'Financiación propia'">
-                {{ invoice.esFinanciacionExterna ? (invoice.financiadora?.nombre || 'Externa') : 'Propia' }}
+                {{ invoice.esFinanciacionExterna ? invoice.financiadora?.nombre : 'PROPIA' }}
               </span>
               } @else {
               <span class="text-gray-400">—</span>

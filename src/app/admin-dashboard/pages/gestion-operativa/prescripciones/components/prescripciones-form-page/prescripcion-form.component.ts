@@ -107,16 +107,21 @@ export class PrescripcionFormComponent implements OnInit {
   get tipoDocumentoAbrev(): string {
     const c = this.client;
     if (!c) return '';
-    return c.tipoDocumentoRel?.abreviatura || c.tipoDocumento || '';
+    return c.tipoDocumentoRel?.abreviatura || (c.tipoDocumento ? String(c.tipoDocumento) : '');
   }
 
   get tipoDocumentoDisplay(): string {
     const c = this.client;
     if (!c) return 'Seleccione paciente';
-    if (c.tipoDocumentoRel?.abreviatura && c.tipoDocumentoRel?.nombre) {
-      return `${c.tipoDocumentoRel.abreviatura} - ${c.tipoDocumentoRel.nombre}`;
+    const abrev = c.tipoDocumentoRel?.abreviatura;
+    const nombre = c.tipoDocumentoRel?.nombre;
+    if (abrev && nombre) {
+      if (abrev.trim().toUpperCase() === nombre.trim().toUpperCase()) {
+        return abrev;
+      }
+      return `${abrev} - ${nombre}`;
     }
-    return c.tipoDocumentoRel?.abreviatura || c.tipoDocumentoRel?.nombre || c.tipoDocumento || '---';
+    return abrev || nombre || (c.tipoDocumento ? String(c.tipoDocumento) : '---');
   }
 
   get numeroDocumentoDisplay(): string {
@@ -124,6 +129,34 @@ export class PrescripcionFormComponent implements OnInit {
     if (!c) return 'Seleccione paciente';
     return c.numeroDocumento ? `${c.numeroDocumento}${c.dv ? '-' + c.dv : ''}` : '---';
   }
+
+  /** Muestra documento formateado completo y limpio: ej. 'NIT · 901422556-2' o 'C.C. · 10203040' sin duplicar */
+  get documentoCompletoDisplay(): string {
+    const c = this.client;
+    if (!c) return 'Seleccione un paciente...';
+    const abrev = c.tipoDocumentoRel?.abreviatura || (c.tipoDocumento ? String(c.tipoDocumento) : 'DOC');
+    const num = c.numeroDocumento ? `${c.numeroDocumento}${c.dv ? '-' + c.dv : ''}` : '';
+    if (abrev && num) return `${abrev} · ${num}`;
+    return num || abrev || '---';
+  }
+
+  // ── Presets clínicos para agilizar el llenado ──
+  readonly presetsDiseno = ['Monofocal', 'Progresivo HD', 'Bifocal Invisible', 'Ocupacional / Office'];
+  readonly presetsUso = ['Permanente', 'Lectura / Visión Próxima', 'Pantallas / PC', 'Visión Lejana', 'Conducción'];
+  readonly presetsMaterial = ['Policarbonato 1.59', 'CR-39 (Orgánico)', 'Alto Índice 1.67', 'Trivex', 'Mineral'];
+  readonly presetsTratamiento = ['Antirreflejo', 'Filtro Azul (Blue UV)', 'Fotocromático Transitions', 'UV 400', 'Capa Hidrofóbica'];
+  readonly presetsIndicaciones = [
+    'Uso permanente en visión lejana y próxima',
+    'Adaptación gradual durante los primeros 4 días',
+    'Uso exclusivo para trabajo en computador y lectura',
+    'No frotarse los ojos'
+  ];
+  readonly presetsRecomendaciones = [
+    'Pausa activa: regla 20-20-20 en pantallas',
+    'Uso de lágrimas artificiales lubricantes cada 6 a 8 horas',
+    'Limpiar siempre los lentes con paño de microfibra y solución óptica',
+    'Evitar el uso de papel o alcohol en los cristales'
+  ];
 
   get lensType(): TipoLentePrescripcion {
     return (this.form.get('tipoLente')?.value as TipoLentePrescripcion) || 'OFTALMICO';
@@ -134,7 +167,115 @@ export class PrescripcionFormComponent implements OnInit {
   }
 
   setAgudeza(eye: 'derecho' | 'izquierdo', field: 'agudezaLejana' | 'agudezaProxima', val: string) {
-    this.form.get(eye)?.get(field)?.setValue(val);
+    const current = this.form.get(eye)?.get(field)?.value;
+    this.form.get(eye)?.get(field)?.setValue(current === val ? '' : val);
+    this.form.get(eye)?.get(field)?.markAsDirty();
+  }
+
+  togglePreset(controlName: string, value: string, append = false) {
+    const control = this.form.get(controlName);
+    if (!control) return;
+    const current = (control.value || '').trim();
+
+    if (!append) {
+      control.setValue(current.toLowerCase() === value.toLowerCase() ? '' : value);
+      control.markAsDirty();
+      return;
+    }
+
+    const parts = current ? current.split(/,\s*|\s*\+\s*/).map((s: string) => s.trim()).filter(Boolean) : [];
+    const index = parts.findIndex((p: string) => p.toLowerCase() === value.toLowerCase());
+    if (index >= 0) {
+      parts.splice(index, 1);
+    } else {
+      parts.push(value);
+    }
+    control.setValue(parts.join(' + '));
+    control.markAsDirty();
+  }
+
+  isPresetActive(controlName: string, value: string, append = false): boolean {
+    const val = (this.form.get(controlName)?.value || '').trim();
+    if (!append) return val.toLowerCase() === value.toLowerCase();
+    const parts = val ? val.split(/,\s*|\s*\+\s*/).map((s: string) => s.trim().toLowerCase()) : [];
+    return parts.includes(value.toLowerCase());
+  }
+
+  setControlMonths(months: number) {
+    const d = new Date();
+    d.setMonth(d.getMonth() + months);
+    this.form.patchValue({ fechaControl: d.toISOString().substring(0, 10) });
+    this.form.get('fechaControl')?.markAsDirty();
+  }
+
+  copyOdToOi() {
+    const od = this.form.get('derecho')?.value;
+    if (!od) return;
+    this.form.patchValue({
+      izquierdo: {
+        esfera: od.esfera,
+        cilindro: od.cilindro,
+        eje: od.eje,
+        adicion: od.adicion,
+        agudezaLejana: od.agudezaLejana,
+        agudezaProxima: od.agudezaProxima,
+        prisma: od.prisma,
+        observaciones: od.observaciones
+      }
+    });
+    this.notify.info('Graduación de Ojo Derecho (OD) copiada a Ojo Izquierdo (OI)', 'Copia Clínica');
+  }
+
+  copyLensometriaToActual() {
+    const ld = this.form.get('lensometriaDerecho')?.value;
+    const li = this.form.get('lensometriaIzquierdo')?.value;
+    if (ld) {
+      this.form.patchValue({
+        derecho: {
+          esfera: ld.esfera,
+          cilindro: ld.cilindro,
+          eje: ld.eje,
+          adicion: ld.adicion
+        }
+      });
+    }
+    if (li) {
+      this.form.patchValue({
+        izquierdo: {
+          esfera: li.esfera,
+          cilindro: li.cilindro,
+          eje: li.eje,
+          adicion: li.adicion
+        }
+      });
+    }
+    this.notify.info('Fórmula de lensometría cargada en refracción actual', 'Valores Copiados');
+  }
+
+  adjustDiopter(eye: 'derecho' | 'izquierdo', field: 'esfera' | 'cilindro' | 'adicion', delta: number) {
+    const control = this.form.get(eye)?.get(field);
+    if (!control) return;
+    const currentVal = parseFloat(String(control.value || '0')) || 0;
+    const newVal = Math.round((currentVal + delta) * 100) / 100;
+    const formatted = newVal > 0 ? `+${newVal.toFixed(2)}` : newVal.toFixed(2);
+    control.setValue(formatted);
+    control.markAsDirty();
+  }
+
+  toggleSign(eye: 'derecho' | 'izquierdo', field: 'esfera' | 'cilindro') {
+    const control = this.form.get(eye)?.get(field);
+    if (!control || control.value == null || control.value === '') return;
+    const currentVal = parseFloat(String(control.value)) || 0;
+    const newVal = -currentVal;
+    const formatted = newVal > 0 ? `+${newVal.toFixed(2)}` : newVal.toFixed(2);
+    control.setValue(formatted);
+    control.markAsDirty();
+  }
+
+  get hasLensometriaData(): boolean {
+    const ld = this.form.get('lensometriaDerecho')?.value;
+    const li = this.form.get('lensometriaIzquierdo')?.value;
+    return !!(ld?.esfera || ld?.cilindro || ld?.eje || ld?.adicion || li?.esfera || li?.cilindro || li?.eje || li?.adicion);
   }
 
   onSearchPatient(term: string) {

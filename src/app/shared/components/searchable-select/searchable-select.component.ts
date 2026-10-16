@@ -54,6 +54,9 @@ export class SearchableSelectComponent implements ControlValueAccessor {
   /** Claves del objeto a usar como etiqueta visible (se unen con " - ") */
   labelKeys = input<string[]>(['nombre']);
 
+  /** Clave opcional para mostrar cuando un item está seleccionado en el input cerrado (e.g. 'fullName') */
+  selectedLabelKey = input<string | null>(null);
+
   /** Clave del objeto que se usa como valor del control (e.g. 'id') */
   valueKey = input<string>('id');
 
@@ -100,7 +103,12 @@ export class SearchableSelectComponent implements ControlValueAccessor {
   /** Label of the selected item */
   selectedLabel = computed(() => {
     const item = this.selectedItem();
-    return item ? this.buildLabel(item) : '';
+    if (!item) return '';
+    const key = this.selectedLabelKey();
+    if (key && item[key]) {
+      return String(item[key]);
+    }
+    return this.buildLabel(item);
   });
 
   /** Filtered results based on search */
