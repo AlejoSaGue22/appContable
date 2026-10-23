@@ -64,7 +64,10 @@ export class PrescripcionDetailsComponent implements OnInit {
         const history = await firstValueFrom(this.service.history(c.id));
         this.history.set(history.data.filter((h: any) => h.id !== id));
       }
-      this.firmaProfesional.set(HelpersUtils.resolveLogoUrl(this.item()?.profesional?.firmaUrl));
+      const rawFirma = this.item()?.profesional?.firmaUrl?.trim();
+      this.firmaProfesional.set(
+        rawFirma && !rawFirma.includes('logo_app') ? HelpersUtils.resolveLogoUrl(rawFirma) : ''
+      );
 
       this.empresaService.getEmpresa().subscribe((r: any) => {
         this.company.set({ ...r.data, logoUrlFormated: HelpersUtils.resolveLogoUrl(r.data.logoUrl) });

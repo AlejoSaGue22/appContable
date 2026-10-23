@@ -166,7 +166,8 @@
           class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs font-bold">2</span>
         <div>
           <h2 class="text-base font-bold text-slate-900">Modalidad de Lente & Especificaciones Técnicas</h2>
-          <p class="text-xs text-slate-500">Selecciona el tipo de lente a prescribir y sus características de laboratorio</p>
+          <p class="text-xs text-slate-500">Selecciona el tipo de lente a prescribir y sus características de
+            laboratorio</p>
         </div>
       </div>
 
@@ -258,8 +259,7 @@
           <div class="flex flex-wrap gap-1.5 mt-2">
             @for (opt of presetsDiseno; track opt) {
             <button type="button" (click)="togglePreset('tipoLenteDescripcion', opt)"
-              class="px-2 py-0.5 text-[11px] rounded-lg transition-all font-medium cursor-pointer"
-              [ngClass]="isPresetActive('tipoLenteDescripcion', opt)
+              class="px-2 py-0.5 text-[11px] rounded-lg transition-all font-medium cursor-pointer" [ngClass]="isPresetActive('tipoLenteDescripcion', opt)
                 ? 'bg-blue-600 text-white shadow-xs'
                 : 'bg-slate-100 hover:bg-slate-200 text-slate-700'">
               {{ opt }}
@@ -273,14 +273,12 @@
           <label class="block text-xs font-bold uppercase text-slate-600 mb-1.5">
             Uso Indicado
           </label>
-          <input type="text" formControlName="usoIndicado"
-            placeholder="Ej: Permanente, Lectura, Pantallas..."
+          <input type="text" formControlName="usoIndicado" placeholder="Ej: Permanente, Lectura, Pantallas..."
             class="w-full h-[42px] px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all" />
           <div class="flex flex-wrap gap-1.5 mt-2">
             @for (opt of presetsUso; track opt) {
             <button type="button" (click)="togglePreset('usoIndicado', opt)"
-              class="px-2 py-0.5 text-[11px] rounded-lg transition-all font-medium cursor-pointer"
-              [ngClass]="isPresetActive('usoIndicado', opt)
+              class="px-2 py-0.5 text-[11px] rounded-lg transition-all font-medium cursor-pointer" [ngClass]="isPresetActive('usoIndicado', opt)
                 ? 'bg-blue-600 text-white shadow-xs'
                 : 'bg-slate-100 hover:bg-slate-200 text-slate-700'">
               {{ opt }}
@@ -294,14 +292,12 @@
           <label class="block text-xs font-bold uppercase text-slate-600 mb-1.5">
             Material del Lente
           </label>
-          <input type="text" formControlName="material"
-            placeholder="Ej: Policarbonato 1.59, CR-39..."
+          <input type="text" formControlName="material" placeholder="Ej: Policarbonato 1.59, CR-39..."
             class="w-full h-[42px] px-3.5 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all" />
           <div class="flex flex-wrap gap-1.5 mt-2">
             @for (opt of presetsMaterial; track opt) {
             <button type="button" (click)="togglePreset('material', opt)"
-              class="px-2 py-0.5 text-[11px] rounded-lg transition-all font-medium cursor-pointer"
-              [ngClass]="isPresetActive('material', opt)
+              class="px-2 py-0.5 text-[11px] rounded-lg transition-all font-medium cursor-pointer" [ngClass]="isPresetActive('material', opt)
                 ? 'bg-blue-600 text-white shadow-xs'
                 : 'bg-slate-100 hover:bg-slate-200 text-slate-700'">
               {{ opt }}
@@ -321,11 +317,11 @@
           <div class="flex flex-wrap gap-1.5 mt-2">
             @for (opt of presetsTratamiento; track opt) {
             <button type="button" (click)="togglePreset('filtroTratamiento', opt, true)"
-              class="px-2 py-0.5 text-[11px] rounded-lg transition-all font-medium cursor-pointer"
-              [ngClass]="isPresetActive('filtroTratamiento', opt, true)
+              class="px-2 py-0.5 text-[11px] rounded-lg transition-all font-medium cursor-pointer" [ngClass]="isPresetActive('filtroTratamiento', opt, true)
                 ? 'bg-blue-600 text-white shadow-xs'
                 : 'bg-slate-100 hover:bg-slate-200 text-slate-700'">
-              <i class="fa-solid fa-plus text-[9px] mr-1" [class.fa-check]="isPresetActive('filtroTratamiento', opt, true)"></i>
+              <i class="fa-solid fa-plus text-[9px] mr-1"
+                [class.fa-check]="isPresetActive('filtroTratamiento', opt, true)"></i>
               {{ opt }}
             </button>
             }
@@ -439,7 +435,8 @@
               </span>
               <h3 class="font-bold text-sm text-sky-950">Ojo Derecho (Oculus Dexter)</h3>
             </div>
-            <span class="text-[11px] font-semibold text-sky-700 bg-sky-100/70 px-2 py-0.5 rounded-md">Refracción Principal</span>
+            <span class="text-[11px] font-semibold text-sky-700 bg-sky-100/70 px-2 py-0.5 rounded-md">Refracción
+              Principal</span>
           </div>
 
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -524,8 +521,7 @@
               <div class="flex flex-wrap gap-1 mt-1.5">
                 @for (opt of ['20/20', '20/25', '20/30', '20/40']; track opt) {
                 <button type="button" (click)="setAgudeza('derecho', 'agudezaLejana', opt)"
-                  class="px-1.5 py-0.5 text-[10px] font-mono rounded transition-colors cursor-pointer"
-                  [ngClass]="form.get('derecho.agudezaLejana')?.value === opt
+                  class="px-1.5 py-0.5 text-[10px] font-mono rounded transition-colors cursor-pointer" [ngClass]="form.get('derecho.agudezaLejana')?.value === opt
                     ? 'bg-sky-600 text-white font-bold'
                     : 'bg-white hover:bg-sky-100 text-sky-800 border border-sky-200'">
                   {{ opt }}
@@ -544,8 +540,7 @@
               <div class="flex flex-wrap gap-1 mt-1.5">
                 @for (opt of ['J1', 'J2', 'J3']; track opt) {
                 <button type="button" (click)="setAgudeza('derecho', 'agudezaProxima', opt)"
-                  class="px-1.5 py-0.5 text-[10px] font-mono rounded transition-colors cursor-pointer"
-                  [ngClass]="form.get('derecho.agudezaProxima')?.value === opt
+                  class="px-1.5 py-0.5 text-[10px] font-mono rounded transition-colors cursor-pointer" [ngClass]="form.get('derecho.agudezaProxima')?.value === opt
                     ? 'bg-sky-600 text-white font-bold'
                     : 'bg-white hover:bg-sky-100 text-sky-800 border border-sky-200'">
                   {{ opt }}
@@ -583,7 +578,8 @@
               </span>
               <h3 class="font-bold text-sm text-indigo-950">Ojo Izquierdo (Oculus Sinister)</h3>
             </div>
-            <span class="text-[11px] font-semibold text-indigo-700 bg-indigo-100/70 px-2 py-0.5 rounded-md">Refracción Principal</span>
+            <span class="text-[11px] font-semibold text-indigo-700 bg-indigo-100/70 px-2 py-0.5 rounded-md">Refracción
+              Principal</span>
           </div>
 
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -668,8 +664,7 @@
               <div class="flex flex-wrap gap-1 mt-1.5">
                 @for (opt of ['20/20', '20/25', '20/30', '20/40']; track opt) {
                 <button type="button" (click)="setAgudeza('izquierdo', 'agudezaLejana', opt)"
-                  class="px-1.5 py-0.5 text-[10px] font-mono rounded transition-colors cursor-pointer"
-                  [ngClass]="form.get('izquierdo.agudezaLejana')?.value === opt
+                  class="px-1.5 py-0.5 text-[10px] font-mono rounded transition-colors cursor-pointer" [ngClass]="form.get('izquierdo.agudezaLejana')?.value === opt
                     ? 'bg-indigo-600 text-white font-bold'
                     : 'bg-white hover:bg-indigo-100 text-indigo-800 border border-indigo-200'">
                   {{ opt }}
@@ -688,8 +683,7 @@
               <div class="flex flex-wrap gap-1 mt-1.5">
                 @for (opt of ['J1', 'J2', 'J3']; track opt) {
                 <button type="button" (click)="setAgudeza('izquierdo', 'agudezaProxima', opt)"
-                  class="px-1.5 py-0.5 text-[10px] font-mono rounded transition-colors cursor-pointer"
-                  [ngClass]="form.get('izquierdo.agudezaProxima')?.value === opt
+                  class="px-1.5 py-0.5 text-[10px] font-mono rounded transition-colors cursor-pointer" [ngClass]="form.get('izquierdo.agudezaProxima')?.value === opt
                     ? 'bg-indigo-600 text-white font-bold'
                     : 'bg-white hover:bg-indigo-100 text-indigo-800 border border-indigo-200'">
                   {{ opt }}
@@ -730,7 +724,8 @@
             <div class="flex items-center gap-2">
               <h2 class="text-base font-bold text-slate-900">Lensometría (Fórmula Anterior en Uso)</h2>
               @if (hasLensometriaData) {
-              <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+              <span
+                class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
                 Registrada
               </span>
               } @else {
@@ -739,7 +734,8 @@
               </span>
               }
             </div>
-            <p class="text-xs text-slate-500">Valores medidos en las gafas actuales para comparación de evolución clínica</p>
+            <p class="text-xs text-slate-500">Valores medidos en las gafas actuales para comparación de evolución
+              clínica</p>
           </div>
         </div>
         <div class="flex items-center gap-3">
@@ -885,7 +881,8 @@
     <div
       class="sticky bottom-4 z-30 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200 shadow-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm shadow-xs">
+        <div
+          class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm shadow-xs">
           <i class="fa-solid fa-clipboard-check"></i>
         </div>
         <div class="text-xs">
@@ -900,9 +897,11 @@
                 lensType === 'CONTACTO' ? 'Lente de Contacto' : 'Especial' }}</strong></span>
             <span>·</span>
             <span class="font-mono text-slate-600">
-              OD: {{ form.get('derecho.esfera')?.value || '+0.00' }} / {{ form.get('derecho.cilindro')?.value || '0.00' }}
+              OD: {{ form.get('derecho.esfera')?.value || '+0.00' }} / {{ form.get('derecho.cilindro')?.value || '0.00'
+              }}
               ·
-              OI: {{ form.get('izquierdo.esfera')?.value || '+0.00' }} / {{ form.get('izquierdo.cilindro')?.value || '0.00' }}
+              OI: {{ form.get('izquierdo.esfera')?.value || '+0.00' }} / {{ form.get('izquierdo.cilindro')?.value ||
+              '0.00' }}
             </span>
           </div>
         </div>

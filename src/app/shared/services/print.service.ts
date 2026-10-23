@@ -1283,8 +1283,9 @@ export class PrintService {
     const fechaExamen = this.formatDatePrint(p.fechaExamen);
     const fechaControl = p.fechaControl ? this.formatDatePrint(p.fechaControl) : 'No programada';
     const profesionalNombre = p.profesional?.nombre || 'Especialista en Optometría';
-    const firmaProfesional = p.profesional?.firmaUrl
-      ? HelpersUtils.resolveLogoUrl(p.profesional.firmaUrl)
+    const rawFirma = p.profesional?.firmaUrl?.trim();
+    const firmaProfesional = (rawFirma && !rawFirma.includes('logo_app'))
+      ? HelpersUtils.resolveLogoUrl(rawFirma)
       : '';
     const tipoExamenNombre = p.tipoExamenRel?.nombre || p.tipoExamen || 'Valoración Visual';
 
@@ -1365,7 +1366,7 @@ export class PrintService {
         <td style="width:130px;vertical-align:top;text-align:right;">
           <div style="border:1.5px solid #cbd5e1;border-radius:4px;padding:8px 10px;background:#f8fafc;text-align:center;">
             <div style="font-size:8.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">FOLIO CLÍNICO</div>
-            <div style="font-size:10px;font-weight:800;color:#0284c7;margin:3px 0;letter-spacing:0.5px;">${p.numero}</div>
+            <div style="font-size:10px;font-weight:800;color:#000000;margin:3px 0;letter-spacing:0.5px;">${p.numero}</div>
             <div style="font-size:8.5px;color:#475569;margin-bottom:3px;">Fecha: <strong>${fechaExamen}</strong></div>
             <div style="display:inline-block;padding:2px 8px;border-radius:3px;font-size:8.5px;font-weight:700;text-transform:uppercase;background:${p.estado === 'ACTIVA' ? '#dcfce7;color:#166534;' : '#ffe4e6;color:#9f1239;'}">${p.estado}</div>
           </div>
@@ -1419,7 +1420,7 @@ export class PrintService {
             </tr>
             <tr>
               <td style="padding:3px 0;font-size:10px;font-weight:600;color:#64748b;">Próximo control:</td>
-              <td style="padding:3px 0;font-size:10px;font-weight:600;color:#0284c7;text-align:right;">${fechaControl}</td>
+              <td style="padding:3px 0;font-size:10px;font-weight:600;color:#967425;text-align:right;">${fechaControl}</td>
             </tr>
           </table>
         </td>
@@ -1429,7 +1430,7 @@ export class PrintService {
     <!-- ═══════ TABLA CLÍNICA DE REFRACCIÓN FINAL ═══════ -->
     <div style="margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;">
       <span style="font-size:11px;font-weight:800;color:#0f172a;text-transform:uppercase;letter-spacing:0.5px;">FÓRMULA ÓPTICA FINAL</span>
-      <span style="font-size:9.5px;font-weight:700;color:#0369a1;background:#e0f2fe;padding:2px 8px;border-radius:4px;border:1px solid #bae6fd;">${tipoLenteLabel}</span>
+      <span style="font-size:9.5px;font-weight:700;color:#967425;background:#faf7f0;padding:2px 8px;border-radius:4px;border:1px solid #e5d7b5;">${tipoLenteLabel}</span>
     </div>
 
     <table cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;margin-bottom:16px;border:1.5px solid #cbd5e1;border-radius:4px;overflow:hidden;">
@@ -1446,8 +1447,8 @@ export class PrintService {
         </tr>
       </thead>
       <tbody>
-        <tr style="background:#f0f9ff;">
-          <td style="padding:8px 8px;border-bottom:1px solid #cbd5e1;font-size:10.5px;font-weight:700;color:#0284c7;">
+        <tr style="background:#faf7f0;">
+          <td style="padding:8px 8px;border-bottom:1px solid #cbd5e1;font-size:10.5px;font-weight:700;color:#967425;">
             OD (Ojo Derecho)
           </td>
           <td style="padding:8px 6px;border-bottom:1px solid #cbd5e1;font-size:11.5px;font-weight:700;color:#0f172a;text-align:center;font-family:'Courier New',monospace;">
@@ -1473,7 +1474,7 @@ export class PrintService {
           </td>
         </tr>
         <tr>
-          <td style="padding:8px 8px;font-size:10.5px;font-weight:700;color:#4f46e5;">
+          <td style="padding:8px 8px;font-size:10.5px;font-weight:700;color:#967425;">
             OI (Ojo Izquierdo)
           </td>
           <td style="padding:8px 6px;font-size:11.5px;font-weight:700;color:#0f172a;text-align:center;font-family:'Courier New',monospace;">
@@ -1525,7 +1526,7 @@ export class PrintService {
 
     ${hasContactData ? `
     <!-- ═══════ PARÁMETROS CONTACTO ═══════ -->
-    <div style="font-size:10px;font-weight:700;color:#f8fafc;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Parámetros de Adaptación Corneal</div>
+    <div style="font-size:10px;font-weight:700;color:#0f172a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Parámetros de Adaptación Corneal</div>
     <table cellpadding="0" cellspacing="0" style="width:100%;border:1px solid #cbd5e1;border-radius:4px;margin-bottom:16px;border-collapse:separate;overflow:hidden;background:#f8fafc;">
       <tr>
         <td style="padding:7px 10px;font-size:9.5px;color:#475569;border-right:1px solid #cbd5e1;width:20%;">
@@ -1549,10 +1550,10 @@ export class PrintService {
 
     ${hasLensometry ? `
     <!-- ═══════ LENSOMETRÍA PREVIA ═══════ -->
-    <div style="font-size:10px;font-weight:700;color:#f8fafc;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Lensometría</div>
+    <div style="font-size:10px;font-weight:700;color:#0f172a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Lensometría</div>
     <table cellpadding="0" cellspacing="0" style="width:100%;border:1px solid #cbd5e1;border-radius:4px;margin-bottom:16px;border-collapse:separate;overflow:hidden;background:#f8fafc;">
       <tr>
-        <td style="padding:7px 12px;font-size:9.5px;color:#475569;border-right:1px solid #ccfbf1;width:50%;font-family:'Courier New',monospace;">
+        <td style="padding:7px 12px;font-size:9.5px;color:#475569;border-right:1px solid #cbd5e1;width:50%;font-family:'Courier New',monospace;">
           <strong>OD Previo:</strong> Sph: ${fmtDiopter(l?.derecho?.esfera)} | Cyl: ${fmtDiopter(l?.derecho?.cilindro)} | Eje: ${fmtAxis(l?.derecho?.eje)}
         </td>
         <td style="padding:7px 12px;font-size:9.5px;color:#475569;width:50%;font-family:'Courier New',monospace;">
