@@ -14,12 +14,23 @@ export class FacturaCompraService {
 
     getFacturasCompras(options: Options & {
         estado?: string;
-        type?: string;
         providerName?: string;
+        numeroFactura?: string;
+        numeroFacturaProveedor?: string;
         startDate?: string;
         endDate?: string;
     }): Observable<ComprobanteCompraResponse> {
-        const { limit = 10, page = 1, estado, type, providerName, startDate, endDate } = options;
+        const {
+            limit = 10,
+            page = 1,
+            estado,
+            providerName,
+            search,
+            numeroFactura,
+            numeroFacturaProveedor,
+            startDate,
+            endDate,
+        } = options;
 
         const params: any = {
             limit,
@@ -27,8 +38,10 @@ export class FacturaCompraService {
         };
 
         if (estado) params.estado = estado;
-        if (type) params.type = type;
-        if (providerName) params.providerName = providerName;
+        if (providerName?.trim()) params.providerName = providerName.trim();
+        if (search?.trim()) params.search = search.trim();
+        if (numeroFactura?.trim()) params.numeroFactura = numeroFactura.trim();
+        if (numeroFacturaProveedor?.trim()) params.numeroFacturaProveedor = numeroFacturaProveedor.trim();
         if (startDate) params.startDate = startDate;
         if (endDate) params.endDate = endDate;
 

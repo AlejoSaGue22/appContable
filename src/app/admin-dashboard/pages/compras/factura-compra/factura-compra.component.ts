@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CardsTotales } from "@shared/components/num-cards-totales/num-cards-totales.component";
 import { PaginationService } from '@shared/components/pagination/pagination.service';
 import { rxResource } from '@angular/core/rxjs-interop';
@@ -31,6 +32,8 @@ export class FacturaCompraComponent {
     }
 
     private authService = inject(AuthService);
+    private router = inject(Router);
+    private route = inject(ActivatedRoute);
     user: UserAuth | null = this.authService.user();
 
     isModalItem = signal<boolean>(false);
@@ -73,6 +76,11 @@ export class FacturaCompraComponent {
 
     onFilterChange(filters: PurchaseInvoiceFilters): void {
         this.filters.set(filters);
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { page: 1 },
+            queryParamsHandling: 'merge',
+        });
     }
 
     onPageChange(page: number): void {

@@ -65,17 +65,26 @@ export class HelpersUtils {
         }
     }
 
-    static getMessageError(error: string[]): string {
+    static getMessageError(error: any): string {
+        if (!error) {
+            return 'Error desconocido';
+        }
 
         if (typeof error === 'string') {
             return error;
         }
 
-        if (error.length > 0) {
-            return error.join(', ');
+        if (Array.isArray(error)) {
+            return error.length > 0 ? error.join(', ') : 'Error desconocido';
         }
-        return 'Error desconocido';
+
+        if (typeof error === 'object' && error.message) {
+            return HelpersUtils.getMessageError(error.message);
+        }
+
+        return String(error);
     }
+
 
     private static qrCache = new Map<string, string>();
 

@@ -61,7 +61,9 @@
           <div class="relative">
             <app-list-group-dropdown title="Cliente" [dataList]="getAllClientes()"
               [labelKey]="['fullName', 'numeroDocumento']" (objectSelect)="onClienteSeleccionado($event)"
-              [valueInput]="formVentas.controls.clienteSearch.value ?? ''" (createOption)="openClientModal()" />
+              [valueInput]="formVentas.controls.clienteSearch.value ?? ''" [remoteSearch]="true"
+              [loading]="searchingClientes()" (searchTermChange)="onClienteSearchChange($event)"
+              (createOption)="openClientModal()" />
           </div>
 
           <div>
@@ -432,7 +434,9 @@
             <app-list-group-dropdown title="Item" [dataList]="getAllProductos()" [labelKey]="['nombre', 'codigo']"
               formControlName="articulo" (objectSelect)="onProductoSeleccionado($event)"
               (createOption)="openProductModal()"
-              [valueInput]="productosItemsForm.get('articulo')?.value || ''"></app-list-group-dropdown>
+              [valueInput]="productosItemsForm.get('articulo')?.value || ''" [remoteSearch]="true"
+              [loading]="searchingProductos()" (searchTermChange)="onProductoSearchChange($event)">
+            </app-list-group-dropdown>
           </div>
 
           <div [class]="tipoFacturaSignal() === 'ESTANDAR' ? 'md:col-span-3' : 'md:col-span-2'">
@@ -483,7 +487,8 @@
           </div>
 
           <div class="md:col-span-1 flex justify-end">
-            <button type="button" (click)="setProductos()" [disabled]="productosItemsForm.invalid"
+            <button type="button" (click)="setProductos()"
+              [disabled]="productosItemsForm.invalid || productSearchRequiresSelection()"
               class="h-[42px] w-[42px] flex items-center justify-center cursor-pointer bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md shadow-blue-100"
               title="Agregar Item">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"

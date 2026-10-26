@@ -1,23 +1,27 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
+import { catchError, firstValueFrom, map, of, Subject, switchMap, timer } from 'rxjs';
 import { FormErrorLabelComponent } from '@utils/components/form-error-label/form-error-label.component';
 import { NotificationService } from '@shared/services/notification.service';
 import { PrescripcionesService } from '@dashboard/pages/ventas/services/prescripciones.service';
 import { ClientesService } from '@dashboard/pages/ventas/services/clientes.service';
 import { Prescripcion, ProfesionalResponsable, TipoExamenPrescripcion, TipoLentePrescripcion } from '@dashboard/pages/ventas/interfaces/prescripcion.interface';
-import { ClientesInterfaceResponse, ClientesResponse } from '@dashboard/interfaces/clientes-interface';
+import { ClientesFormInterface, ClientesInterfaceResponse, ClientesResponse } from '@dashboard/interfaces/clientes-interface';
 import { SearchableSelectComponent } from '@shared/components/searchable-select/searchable-select.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ModalComponent } from '@shared/components/modal/modal.component';
+import { ClientsFormPageComponent } from '@dashboard/pages/ventas/clientes/clients-form-page/clients-form-page.component';
 
 @Component({
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, SearchableSelectComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, SearchableSelectComponent, ModalComponent, ClientsFormPageComponent],
   templateUrl: './prescripcion-form.component.html'
 })
 export class PrescripcionFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly location = inject(Location);
@@ -31,8 +35,11 @@ export class PrescripcionFormComponent implements OnInit {
   readonly tiposExamen = signal<TipoExamenPrescripcion[]>([]);
   readonly id = this.route.snapshot.paramMap.get('id');
   readonly showLensometria = signal(false);
+  readonly searchingPatients = signal(false);
+  readonly showCreateClientModal = signal(false);
 
-  private searchTimeout: any;
+  private readonly patientSearchTerms = new Subject<string>();
+  private hasPatientSearchStarted = false;
 
   readonly patientsList = computed(() => {
     return this.patients().map((p) => {
@@ -279,24 +286,33 @@ export class PrescripcionFormComponent implements OnInit {
   }
 
   onSearchPatient(term: string) {
-    const q = term?.trim();
-    if (!q || q.length < 2) return;
+    this.hasPatientSearchStarted = true;
+    this.form.get('clienteId')?.setValue('');
+    this.patients.set([]);
+    this.searchingPatients.set(true);
+    this.patientSearchTerms.next(term.trim());
+  }
 
-    clearTimeout(this.searchTimeout);
-    this.searchTimeout = setTimeout(async () => {
-      try {
-        const res = await firstValueFrom(this.clientesService.getClientes({ search: q, limit: 50 }));
-        if (res?.clientes?.length) {
-          this.patients.update((current) => {
-            const existingIds = new Set(current.map((c) => c.id));
-            const fresh = res.clientes.filter((c) => !existingIds.has(c.id));
-            return fresh.length ? [...current, ...fresh] : current;
-          });
-        }
-      } catch {
-        // Fallback silencioso a la lista local
-      }
-    }, 300);
+  openCreateClientModal(): void {
+    this.showCreateClientModal.set(true);
+  }
+
+  closeCreateClientModal(): void {
+    this.showCreateClientModal.set(false);
+  }
+
+  onPatientCreated(client: ClientesFormInterface): void {
+    const patient = this.normalizePatient(client);
+    this.patients.update((list) => [patient, ...list.filter((item) => item.id !== patient.id)]);
+    this.form.patchValue({ clienteId: patient.id });
+    this.showCreateClientModal.set(false);
+  }
+
+  private normalizePatient(patient: Partial<ClientesInterfaceResponse> | Partial<ClientesFormInterface>): ClientesInterfaceResponse {
+    const fullName = ('fullName' in patient ? patient.fullName?.trim() : undefined)
+      || patient.razonSocial?.trim()
+      || `${patient.nombre || ''} ${patient.apellido || ''}`.trim();
+    return { ...patient, fullName } as ClientesInterfaceResponse;
   }
 
   toggleLensometria() {
@@ -304,13 +320,37 @@ export class PrescripcionFormComponent implements OnInit {
   }
 
   async ngOnInit() {
+    this.patientSearchTerms
+      .pipe(
+        switchMap((search) =>
+          timer(300).pipe(
+            switchMap(() =>
+              this.clientesService.getClientes({ limit: 10, offset: 0, search: search || undefined }).pipe(
+                map((response) => (response.clientes || []).map((patient) => this.normalizePatient(patient))),
+                catchError((error) => {
+                  this.notify.error(error?.error?.message || 'No fue posible buscar clientes', 'Error');
+                  return of([] as ClientesInterfaceResponse[]);
+                }),
+              ),
+            ),
+          ),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((patients) => {
+        this.patients.set(patients);
+        this.searchingPatients.set(false);
+      });
+
     try {
       const [response, types, professionals] = await Promise.all([
-        firstValueFrom(this.clientesService.getClientes({ limit: 1000, offset: 0 })) as Promise<ClientesResponse>,
+        firstValueFrom(this.clientesService.getClientes({ limit: 10, offset: 0 })) as Promise<ClientesResponse>,
         firstValueFrom(this.service.listTiposExamen()),
         firstValueFrom(this.service.listProfesionales()),
       ]);
-      this.patients.set(response.clientes || []);
+      if (!this.hasPatientSearchStarted) {
+        this.patients.set((response.clientes || []).map((patient) => this.normalizePatient(patient)));
+      }
       this.tiposExamen.set(types.data || []);
       this.professionals.set(professionals.data || []);
 
@@ -320,7 +360,7 @@ export class PrescripcionFormComponent implements OnInit {
       if (this.id && this.id !== 'new-prescription') {
         const result = await firstValueFrom(this.service.get(this.id));
         if (result.data?.cliente && !this.patients().some((p) => p.id === result.data.clienteId)) {
-          this.patients.update((list) => [result.data.cliente, ...list]);
+          this.patients.update((list) => [this.normalizePatient(result.data.cliente), ...list]);
         }
         if (result.data?.profesional && !this.professionals().some((p) => p.id === result.data.profesionalId)) {
           this.professionals.update((list) => [result.data.profesional!, ...list]);

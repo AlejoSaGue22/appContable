@@ -75,6 +75,16 @@ export class SearchableSelectComponent implements ControlValueAccessor {
   /** Emite el término de búsqueda cuando el usuario escribe (para búsquedas remotas) */
   searchChange = output<string>();
 
+  /** Cuando está activo, los resultados ya vienen filtrados desde el servidor */
+  remoteSearch = input<boolean>(false);
+
+  /** Indica que hay una búsqueda remota en curso */
+  loading = input<boolean>(false);
+
+  /** Texto de la acción opcional para crear un registro desde el selector */
+  createOptionLabel = input<string | null>(null);
+  createOption = output<void>();
+
   /** Tamaño del componente: 'sm' para tablas, 'md' normal */
   size = input<'sm' | 'md'>('md');
 
@@ -120,6 +130,7 @@ export class SearchableSelectComponent implements ControlValueAccessor {
     const list = this.items();
     const max = this.maxResults();
 
+    if (this.remoteSearch()) return list.slice(0, max);
     if (!q.trim()) return list.slice(0, max);
 
     return list
@@ -195,6 +206,17 @@ export class SearchableSelectComponent implements ControlValueAccessor {
     this.searchTerm.set(value);
     this.searchChange.emit(value);
     if (!this.dropdownOpen()) this.dropdownOpen.set(true);
+  }
+
+  clearSearchTerm(): void {
+    this.searchTerm.set('');
+    this.searchChange.emit('');
+  }
+
+  onCreateOption(): void {
+    this.dropdownOpen.set(false);
+    this.searchTerm.set('');
+    this.createOption.emit();
   }
 
   @HostListener('document:click', ['$event'])

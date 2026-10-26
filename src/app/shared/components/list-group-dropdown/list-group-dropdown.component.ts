@@ -39,9 +39,12 @@ export class ListGroupDropdownComponent<
   labelKey = input<string[]>([]);
   objectSelect = output<T>();
   createOption = output<void>(); // Evento para crear nuevo
+  searchTermChange = output<string>();
   searchOption = signal<string>('');
   showDropdown = signal<boolean>(false);
   searchable = input<boolean>(true);
+  remoteSearch = input<boolean>(false);
+  loading = input<boolean>(false);
 
   constructor(private elementRef: ElementRef) {
     effect(() => {
@@ -63,7 +66,7 @@ export class ListGroupDropdownComponent<
       const firstKey = keys[0];
       const match = list.find(
         (item) =>
-          String(item[firstKey] ?? '') === strVal ||
+          String(this.getNestedValue(item, firstKey) ?? '') === strVal ||
           String(item['id'] ?? '') === strVal ||
           String(item['codigo'] ?? '') === strVal,
       );
@@ -76,6 +79,7 @@ export class ListGroupDropdownComponent<
 
   filteredOptions = computed(() => {
     const list = this.dataList();
+    if (this.remoteSearch()) return list;
     const term = this.searchOption().toLowerCase();
 
     if (!term.trim()) return list;
@@ -88,9 +92,13 @@ export class ListGroupDropdownComponent<
   buildLabel(item: T): string {
     const keys = this.labelKey();
     return keys
-      .map((key) => String(item[key] ?? '').trim())
+      .map((key) => String(this.getNestedValue(item, key) ?? '').trim())
       .filter(Boolean)
       .join(' - ');
+  }
+
+  private getNestedValue(item: any, key: string): any {
+    return key.split('.').reduce((value, part) => value?.[part], item);
   }
 
   // ------- CONTROL VALUE ACCESSOR ------- //
@@ -124,12 +132,14 @@ export class ListGroupDropdownComponent<
   // ------- FUNCIONES DEL COMPONENTE ------- //
 
   onSearchChange(event: any) {
-    this.searchOption.set(event.target.value);
+    const value = event.target.value;
+    this.searchOption.set(value);
     this.showDropdown.set(true);
+    this.searchTermChange.emit(value);
   }
 
   selectedItem(item: T) {
-    this.value = item[this.labelKey()[0]];
+    this.value = this.getNestedValue(item, this.labelKey()[0]);
     this.objectSelect.emit(item);
     this.searchOption.set(this.buildLabel(item));
     this.showDropdown.set(false);

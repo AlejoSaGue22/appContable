@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HeaderInput, HeaderTitlePageComponent } from "@dashboard/components/header-title-page/header-title-page.component";
@@ -9,12 +9,12 @@ import { NotificationService } from '@shared/services/notification.service';
 import { LoaderService } from '@utils/services/loader.service';
 import { ModalComponent } from '@shared/components/modal/modal.component';
 import { ProveedoresFormsPageComponent } from '../../proveedores/proveedores-forms-page/proveedores-forms-page.component';
-import { forkJoin, map } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, forkJoin, map, of, Subject, switchMap, timer } from 'rxjs';
 import { ProveedoresService } from '../../services/proveedores.service';
 import { ProductosService } from '@dashboard/pages/ventas/services/productos.service';
 import { ProveedoresRequest } from '@dashboard/interfaces/proveedores-interface';
 import { GetProductosDetalle } from '@dashboard/interfaces/productos-interface';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { DocumentosSoporteService } from '../../services/documentos-soporte.service';
 import { DocumentoSoporte, ItemDocumentoSoporte } from '@dashboard/interfaces/documento-soporte-interface';
 import { FacturaNotasResumen } from '@dashboard/interfaces/documento-venta-interface';
@@ -63,6 +63,10 @@ export class DocumentoSoporteFormsPageComponent implements OnInit {
     };
 
     private fb = inject(FormBuilder);
+    private destroyRef = inject(DestroyRef);
+    private proveedorSearchTerms = new Subject<string>();
+    private productoSearchTerms = new Subject<string>();
+    private activoFijoSearchTerms = new Subject<string>();
     notificationService = inject(NotificationService);
     documentoService = inject(DocumentosSoporteService);
     loaderService = inject(LoaderService);
@@ -99,6 +103,13 @@ export class DocumentoSoporteFormsPageComponent implements OnInit {
     cuentasContables = signal<GetCuentasContables[]>([]);
     cuentasBancarias = signal<CuentaBancaria[]>([]);
     activosFijosList = signal<any[]>([]);
+    searchingProveedores = signal(false);
+    searchingProductos = signal(false);
+    searchingActivosFijos = signal(false);
+    itemSearchRequiresSelection = signal(false);
+    private hasProveedorSearchStarted = false;
+    private hasProductoSearchStarted = false;
+    private hasActivoFijoSearchStarted = false;
     refreshAsientoTrigger = signal<number>(0);
     documento = signal<DocumentoSoporte | null>(null);
     notasResumen = signal<FacturaNotasResumen | null>(null);
@@ -182,6 +193,86 @@ export class DocumentoSoporteFormsPageComponent implements OnInit {
 
     ngOnInit(): void {
         this.setupPaymentLogic();
+        this.proveedorSearchTerms
+            .pipe(
+                debounceTime(300),
+                distinctUntilChanged(),
+                switchMap((search) =>
+                    this.proveedoresServicios.getProveedores({
+                        limit: 10,
+                        offset: 0,
+                        search: search || undefined,
+                    }).pipe(
+                        map((response) => (response.proveedores || []).map((provider: any) => ({
+                            ...provider,
+                            fullName: provider.razonSocial?.trim() || `${provider.nombre || ''} ${provider.apellido || ''}`.trim(),
+                        }))),
+                        catchError((error) => {
+                            this.notificationService.error('Error al buscar proveedores', error);
+                            return of([] as ProveedoresRequest[]);
+                        }),
+                    ),
+                ),
+                takeUntilDestroyed(this.destroyRef),
+            )
+            .subscribe((providers) => {
+                this.proveedoresList.set(providers);
+                this.searchingProveedores.set(false);
+            });
+
+        this.productoSearchTerms
+            .pipe(
+                switchMap((search) =>
+                    timer(300).pipe(
+                        switchMap(() =>
+                            this.productoServicios.getProductos({
+                                limit: 10,
+                                offset: 0,
+                                venta_compra: 'compra',
+                                search: search || undefined,
+                            }).pipe(
+                                map((response) => response.articulos || []),
+                                catchError((error) => {
+                                    this.notificationService.error('Error al buscar productos', error);
+                                    return of([] as GetProductosDetalle[]);
+                                }),
+                            ),
+                        ),
+                    ),
+                ),
+                takeUntilDestroyed(this.destroyRef),
+            )
+            .subscribe((products) => {
+                this.productosList.set(products);
+                this.searchingProductos.set(false);
+            });
+
+        this.activoFijoSearchTerms
+            .pipe(
+                switchMap((search) =>
+                    timer(300).pipe(
+                        switchMap(() =>
+                            this.activosFijosService.getActivosFijos({
+                                page: 1,
+                                limit: 10,
+                                busqueda: search || undefined,
+                            }).pipe(
+                                map((response) => response.items || []),
+                                catchError((error) => {
+                                    this.notificationService.error('Error al buscar activos fijos', error);
+                                    return of([] as ActivoFijo[]);
+                                }),
+                            ),
+                        ),
+                    ),
+                ),
+                takeUntilDestroyed(this.destroyRef),
+            )
+            .subscribe((assets) => {
+                this.activosFijosList.set(assets);
+                this.searchingActivosFijos.set(false);
+            });
+
         this.activatedRoute.params.subscribe((params) => {
             const id = params['id'];
             if (id && id !== 'new') {
@@ -210,6 +301,7 @@ export class DocumentoSoporteFormsPageComponent implements OnInit {
             }
             prodCtrl?.setValue(null);
             cuentaCtrl?.setValue(null);
+            this.itemSearchRequiresSelection.set(false);
             prodCtrl?.updateValueAndValidity();
             cuentaCtrl?.updateValueAndValidity();
 
@@ -269,20 +361,26 @@ export class DocumentoSoporteFormsPageComponent implements OnInit {
     getProveedoresAndProductos() {
         this.loaderService.show();
         forkJoin({
-            proveedores: this.proveedoresServicios.getProveedores({ limit: 1000, offset: 0 }),
-            productos: this.productoServicios.getProductos({ limit: 1000, offset: 0 }),
+            proveedores: this.proveedoresServicios.getProveedores({ limit: 10, offset: 0 }),
+            productos: this.productoServicios.getProductos({ limit: 10, offset: 0, venta_compra: 'compra' }),
             cuentas: this.cuentasService.getCuentasContables(),
-            activosFijos: this.activosFijosService.getActivosFijos()
+            activosFijos: this.activosFijosService.getActivosFijos({ page: 1, limit: 10 })
         }).subscribe({
             next: ({ proveedores, productos, cuentas, activosFijos }) => {
                 const mappedProveedores = (proveedores.proveedores || []).map((p: any) => ({
                     ...p,
                     fullName: p.razonSocial?.trim() || `${p.nombre || ''} ${p.apellido || ''}`.trim()
                 }));
-                this.proveedoresList.set(mappedProveedores);
-                this.productosList.set(productos.articulos);
+                if (!this.hasProveedorSearchStarted) {
+                    this.proveedoresList.set(mappedProveedores);
+                }
+                if (!this.hasProductoSearchStarted) {
+                    this.productosList.set(productos.articulos);
+                }
                 this.cuentasContables.set(cuentas.filter(c => c.aceptaMovimiento && c.isActive));
-                this.activosFijosList.set(activosFijos?.items || activosFijos?.data?.items || (Array.isArray(activosFijos) ? activosFijos : []));
+                if (!this.hasActivoFijoSearchStarted) {
+                    this.activosFijosList.set(activosFijos?.items || activosFijos?.data?.items || (Array.isArray(activosFijos) ? activosFijos : []));
+                }
             },
             error: (error) => {
                 this.notificationService.error('Error al cargar los datos de el documento soporte', error);
@@ -291,6 +389,43 @@ export class DocumentoSoporteFormsPageComponent implements OnInit {
                 this.loaderService.hide();
             }
         });
+    }
+
+    onProveedorSearchChange(search: string): void {
+        this.hasProveedorSearchStarted = true;
+        this.formCompra.patchValue({
+            proveedor: '',
+            numeroIdentificacion: '',
+            tipoIdentificacion: '',
+            email: '',
+            telefono: '',
+        }, { emitEvent: false });
+        this.anticiposDisponibles.set([]);
+        this.anticiposAsociados.set([]);
+        this.searchingProveedores.set(true);
+        this.proveedoresList.set([]);
+        this.proveedorSearchTerms.next(search.trim());
+    }
+
+    onProductoSearchChange(search: string): void {
+        this.hasProductoSearchStarted = true;
+        this.itemSearchRequiresSelection.set(true);
+        this.searchingProductos.set(true);
+        this.productosList.set([]);
+        this.productoSearchTerms.next(search.trim());
+    }
+
+    onActivoFijoSearchChange(search: string): void {
+        this.hasActivoFijoSearchStarted = true;
+        this.itemSearchRequiresSelection.set(true);
+        this.searchingActivosFijos.set(true);
+        this.activosFijosList.set([]);
+        this.activoFijoSearchTerms.next(search.trim());
+    }
+
+    onProductoSeleccionado(producto: GetProductosDetalle | ActivoFijo): void {
+        this.itemSearchRequiresSelection.set(false);
+        this.productosItemsForm.patchValue({ producto });
     }
 
     loadFactura(id: string) {
@@ -441,7 +576,7 @@ export class DocumentoSoporteFormsPageComponent implements OnInit {
     }
 
     addItem() {
-        if (this.productosItemsForm.invalid) return;
+        if (this.productosItemsForm.invalid || this.itemSearchRequiresSelection()) return;
 
         const itemVal = this.productosItemsForm.value;
         const qty = itemVal.quantity || 0;
@@ -486,6 +621,7 @@ export class DocumentoSoporteFormsPageComponent implements OnInit {
         });
 
         this.items.push(newItem);
+        this.itemSearchRequiresSelection.set(false);
 
         const currentTipo = itemVal.tipoConcepto;
         this.productosItemsForm.reset({
@@ -892,6 +1028,7 @@ export class DocumentoSoporteFormsPageComponent implements OnInit {
 
         // Select the new product in the item form
         this.productosItemsForm.patchValue({ producto: newProduct });
+        this.itemSearchRequiresSelection.set(false);
 
         this.closeProductModal();
         this.notificationService.success('Producto creado y seleccionado', 'Listo');

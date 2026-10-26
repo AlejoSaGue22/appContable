@@ -57,7 +57,7 @@
       class="block w-full pl-10 pr-9 bg-white border border-blue-500 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all text-slate-800"
       [ngClass]="size() === 'md' ? 'h-[42px] text-sm' : 'h-8 text-xs'" autocomplete="off" />
     @if (searchTerm()) {
-    <button type="button" (click)="searchTerm.set('')"
+    <button type="button" (click)="clearSearchTerm()"
       class="absolute inset-y-0 right-3 flex items-center text-slate-400 hover:text-slate-600 cursor-pointer">
       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
@@ -75,7 +75,11 @@
   <!-- Dropdown -->
   <div class="absolute z-50 mt-1 w-full bg-white rounded-xl border border-slate-200 shadow-xl overflow-hidden animate-scale-in"
     style="max-height: 240px; overflow-y: auto;">
-    @if (filteredItems().length === 0) {
+    @if (loading()) {
+    <div class="px-4 py-3 text-sm text-slate-400 text-center">
+      Buscando...
+    </div>
+    } @else if (filteredItems().length === 0) {
     <div class="px-4 py-3 text-sm text-slate-400 text-center">
       Sin resultados para "{{ searchTerm() }}"
     </div>
@@ -100,6 +104,12 @@
       Mostrando los primeros {{ maxResults() }} resultados. Refine la búsqueda.
     </div>
     }
+    }
+    @if (createOptionLabel()) {
+    <button type="button" (click)="onCreateOption()"
+      class="w-full text-left px-3.5 py-2.5 border-t border-slate-100 text-sm font-semibold text-blue-700 hover:bg-blue-50 transition-colors cursor-pointer">
+      <i class="fa-solid fa-plus mr-2"></i>{{ createOptionLabel() }}
+    </button>
     }
   </div>
   }

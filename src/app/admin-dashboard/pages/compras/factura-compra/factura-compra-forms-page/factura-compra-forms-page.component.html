@@ -34,7 +34,9 @@
             <div class="relative">
               <app-list-group-dropdown title="Proveedor" [dataList]="proveedoresList()"
                 [labelKey]="['fullName', 'identificacion']" (objectSelect)="onProviderSaved($event)"
-                [valueInput]="formCompra.controls.proveedorSearch.value ?? ''" (createOption)="openProviderModal()" />
+                [valueInput]="formCompra.controls.proveedorSearch.value ?? ''" [remoteSearch]="true"
+                [loading]="searchingProveedores()" (searchTermChange)="onProveedorSearchChange($event)"
+                (createOption)="openProviderModal()" />
             </div>
 
             <div class="relative">
@@ -281,8 +283,9 @@
                 @if (productosItemsForm.get('tipoConcepto')?.value === 'PRODUCTO') {
                 <div class="md:col-span-2">
                   <app-list-group-dropdown title="Productos creados" [dataList]="productosCreados()"
-                    [labelKey]="['nombre', 'codigo']" formControlName="producto"
-                    (objectSelect)="productosItemsForm.patchValue({ producto: $event })"
+                    [labelKey]="['nombre', 'codigo']" formControlName="producto" [remoteSearch]="true"
+                    [loading]="searchingProductos()" (searchTermChange)="onProductoSearchChange($event)"
+                    (objectSelect)="onProductoSeleccionado($event)"
                     (createOption)="openProductModal()">
                   </app-list-group-dropdown>
                 </div>
@@ -350,7 +353,8 @@
                 </div>
 
                 <div class="md:col-span-1 flex justify-end">
-                  <button type="button" (click)="addItem()" [disabled]="productosItemsForm.invalid"
+                  <button type="button" (click)="addItem()"
+                    [disabled]="productosItemsForm.invalid || productSearchRequiresSelection()"
                     class="h-10 w-10 flex items-center justify-center cursor-pointer bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
                     title="Agregar Item">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"

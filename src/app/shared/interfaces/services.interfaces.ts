@@ -4,7 +4,7 @@ export interface Options {
   limit?: number;
   offset?: number;
   page?: number;
-  venta_compra?: 'venta' | 'costo';
+  venta_compra?: 'venta' | 'costo' | 'compra';
   search?: string;
   estadoCliente?: 'ACTIVO' | 'INACTIVO';
 }

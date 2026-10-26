@@ -10,8 +10,8 @@ import {
 } from './../../../../interfaces/documento-venta-interface';
 import { PreviewAsientoComponent } from '@dashboard/components/preview-asiento/preview-asiento.component';
 import {
-  AfterContentInit,
   Component,
+  DestroyRef,
   effect,
   computed,
   inject,
@@ -19,12 +19,9 @@ import {
   signal,
 } from '@angular/core';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import {
-  HeaderInput,
-  HeaderTitlePageComponent,
-} from '@dashboard/components/header-title-page/header-title-page.component';
+import { HeaderInput, HeaderTitlePageComponent } from '@dashboard/components/header-title-page/header-title-page.component';
 import { ListGroupDropdownComponent } from '@shared/components/list-group-dropdown/list-group-dropdown.component';
-import { forkJoin, map, tap } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, forkJoin, map, of, Subject, switchMap, timer } from 'rxjs';
 import { FormErrorLabelComponent } from 'src/app/utils/components/form-error-label/form-error-label.component';
 import { ClientesService } from '../../services/clientes.service';
 import { ProductosService } from '../../services/productos.service';
@@ -35,7 +32,7 @@ import {
 import { ClientesInterfaceResponse } from '@dashboard/interfaces/clientes-interface';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NotificationService } from '@shared/services/notification.service';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ComprobantesVentasService } from '../../services/comprobantes-ventas.service';
 import { LoaderService } from '@utils/services/loader.service';
 import { ModalComponent } from '@shared/components/modal/modal.component';
@@ -87,6 +84,9 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   };
 
   private fb = inject(FormBuilder);
+  private destroyRef = inject(DestroyRef);
+  private clienteSearchTerms = new Subject<string>();
+  private productoSearchTerms = new Subject<string>();
   clienteServicios = inject(ClientesService);
   productoServicios = inject(ProductosService);
   ventaServices = inject(ComprobantesVentasService);
@@ -101,17 +101,22 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   notasResumen = signal<FacturaNotasResumen | null>(null);
   productSeleccionados = signal<ItemFactura[]>([]);
   getAllProductos = signal<GetProductosDetalle[]>([]);
+  searchingProductos = signal<boolean>(false);
+  productSearchRequiresSelection = signal<boolean>(false);
   getAllClientes = signal<ClientesInterfaceResponse[]>([]);
   cuentasBancarias = signal<CuentaBancaria[]>([]);
   financiadoras = signal<FinanciadoraVenta[]>([]);
   empresaNombre = signal('Empresa actual');
   loading = signal<boolean>(false);
+  searchingClientes = signal<boolean>(false);
   minDate = signal<string>(new Date().toISOString().substring(0, 10));
   refreshAsientoTrigger = signal<number>(0);
   anticiposDisponibles = signal<any[]>([]);
   anticiposAsociados = signal<{ anticipoId: string; numero: string; montoOriginal: number; saldoDisponible: number; montoAplicado: number }[]>([]);
   abonosInicialesVisibles = signal(false);
   isCloningLoading = false;
+  private hasClienteSearchStarted = false;
+  private hasProductoSearchStarted = false;
 
   InvoiceStatus = InvoiceStatus;
 
@@ -164,6 +169,56 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.loaderservice.show();
+
+    this.clienteSearchTerms
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap((search) =>
+          this.clienteServicios.getClientes({
+            limit: 10,
+            offset: 0,
+            search: search || undefined,
+          }).pipe(
+            map((response) => response.clientes ?? []),
+            catchError((error) => {
+              this.notificacionService.error('Error al buscar clientes', error);
+              return of([] as ClientesInterfaceResponse[]);
+            }),
+          ),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((clientes) => {
+        this.getAllClientes.set(clientes);
+        this.searchingClientes.set(false);
+      });
+
+    this.productoSearchTerms
+      .pipe(
+        switchMap((search) =>
+          timer(300).pipe(
+            switchMap(() =>
+              this.productoServicios.getProductos({
+                limit: 10,
+                offset: 0,
+                search: search || undefined,
+              }).pipe(
+                map((response) => response.articulos ?? []),
+                catchError((error) => {
+                  this.notificacionService.error('Error al buscar artículos', error);
+                  return of([] as GetProductosDetalle[]);
+                }),
+              ),
+            ),
+          ),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((productos) => {
+        this.getAllProductos.set(productos);
+        this.searchingProductos.set(false);
+      });
 
     this.getClientesAndProductos();
     this.loadCuentasBancarias();
@@ -276,13 +331,12 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       }),
     }).subscribe({
       next: ({ clientes, productos }) => {
-        const clienteMap = clientes.clientes.map((item) => {
-          return {
-            nombre: item.nombre + item.apellido,
-          };
-        });
-        this.getAllClientes.set(clientes.clientes);
-        this.getAllProductos.set(productos.articulos);
+        if (!this.hasClienteSearchStarted) {
+          this.getAllClientes.set(clientes.clientes);
+        }
+        if (!this.hasProductoSearchStarted) {
+          this.getAllProductos.set(productos.articulos);
+        }
       },
       error: (error) => {
         // Log removed
@@ -290,6 +344,29 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
         this.loaderservice.hide();
       },
     });
+  }
+
+  onClienteSearchChange(search: string): void {
+    this.hasClienteSearchStarted = true;
+    this.formVentas.patchValue({
+      cliente: '',
+      tipoDocumento: '',
+      identificacion: '',
+      contacto: '',
+    }, { emitEvent: false });
+    this.anticiposDisponibles.set([]);
+    this.anticiposAsociados.set([]);
+    this.searchingClientes.set(true);
+    this.getAllClientes.set([]);
+    this.clienteSearchTerms.next(search.trim());
+  }
+
+  onProductoSearchChange(search: string): void {
+    this.hasProductoSearchStarted = true;
+    this.productSearchRequiresSelection.set(true);
+    this.searchingProductos.set(true);
+    this.getAllProductos.set([]);
+    this.productoSearchTerms.next(search.trim());
   }
 
   loadInvoice(id: string): void {
@@ -547,7 +624,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   }
 
   async setProductos() {
-    if (!this.productosItemsForm.valid) return;
+    if (!this.productosItemsForm.valid || this.productSearchRequiresSelection()) return;
 
     const valores = this.productosItemsForm.value as ItemFactura;
     const valorItemTotal = this.calcularItemTotal();
@@ -742,6 +819,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   }
 
   onProductoSeleccionado(producto: Partial<GetProductosDetalle>) {
+    this.productSearchRequiresSelection.set(false);
     this.productosItemsForm.patchValue({
       articulo: producto.nombre || producto.id || '',
       unitPrice: producto.precio ?? 0,
@@ -845,7 +923,9 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
       iva: this.totales.totalIVA,
       descuento: this.totales.descuentoTotal,
       total: this.totales.facturaTotal,
-      saveAsDraft: saveAsDraft,
+      saveAsDraft: saveAsDraft !== undefined
+        ? saveAsDraft
+        : (this.factura()?.status === InvoiceStatus.DRAFT),
       anticiposAsociados: this.anticiposAsociados().map(a => ({
         anticipoId: a.anticipoId,
         montoAplicado: a.montoAplicado
@@ -860,39 +940,51 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
         })) : [],
     };
 
+    const isDraft = invoiceData.saveAsDraft;
+
     if (this.invoiceID() == 'new-Item') {
-      this.ventaServices.createInvoice(invoiceData).subscribe((response) => {
-        if (response.success == false) {
+      this.ventaServices.createInvoice(invoiceData).subscribe({
+        next: (response) => {
           this.loading.set(false);
           this.loaderservice.hide();
-          this.notificacionService.error(
-            `Ocurrio un problema al crear la factura ${HelpersUtils.getMessageError(response.message)}`,
-            'Error',
-            5000,
-          );
-          return;
-        }
 
-        const msg = saveAsDraft
-          ? 'Factura guardada como borrador'
-          : 'Factura creada con exito';
-        this.notificacionService.success(msg, 'Accion Completada', 5000);
-        avisarAdvertenciasInventario(this.notificacionService, response.data);
+          if (response.success == false) {
+            this.notificacionService.error(
+              `Ocurrió un problema al crear la factura: ${HelpersUtils.getMessageError(response.message)}`,
+              'Error',
+              5000,
+            );
+            return;
+          }
 
-        setTimeout(() => {
-          this.loading.set(false);
-          this.loaderservice.hide();
-          if (saveAsDraft) {
-            const invoiceId = response.data?.id || (response as any).id;
-            if (invoiceId) {
-              this.router.navigate(['/panel/ventas/comprobantes', invoiceId]);
+          const msg = isDraft
+            ? 'Factura guardada como borrador'
+            : 'Factura creada con éxito';
+          this.notificacionService.success(msg, 'Acción Completada', 5000);
+          avisarAdvertenciasInventario(this.notificacionService, response.data);
+
+          setTimeout(() => {
+            if (isDraft) {
+              const invoiceId = response.data?.id || (response as any).id;
+              if (invoiceId) {
+                this.router.navigate(['/panel/ventas/comprobantes', invoiceId]);
+              } else {
+                this.router.navigateByUrl('/panel/ventas/comprobantes');
+              }
             } else {
               this.router.navigateByUrl('/panel/ventas/comprobantes');
             }
-          } else {
-            this.router.navigateByUrl('/panel/ventas/comprobantes');
-          }
-        }, 800);
+          }, 800);
+        },
+        error: (err) => {
+          this.loading.set(false);
+          this.loaderservice.hide();
+          this.notificacionService.error(
+            `Ocurrió un problema al crear la factura: ${HelpersUtils.getMessageError(err?.error?.message || err?.message)}`,
+            'Error',
+            5000,
+          );
+        }
       });
     } else {
       const currentInvoice = this.factura();
@@ -909,31 +1001,43 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
 
       this.ventaServices
         .updateInvoice(this.invoiceID(), invoiceData)
-        .subscribe((response) => {
-          this.loading.set(false);
-          if (response.success == false) {
+        .subscribe({
+          next: (response) => {
+            this.loading.set(false);
+            this.loaderservice.hide();
+
+            if (response.success == false) {
+              this.notificacionService.error(
+                `Ocurrió un problema al actualizar la factura: ${HelpersUtils.getMessageError(response.message)}`,
+                'Error',
+                5000,
+              );
+              return;
+            }
+
+            this.notificacionService.success(
+              'Factura actualizada con éxito',
+              'Acción Completada',
+              5000,
+            );
+
+            setTimeout(() => {
+              if (isDraft) {
+                this.refreshAsientoTrigger.update(v => v + 1);
+              } else {
+                this.router.navigateByUrl('/panel/ventas/comprobantes');
+              }
+            }, 800);
+          },
+          error: (err) => {
+            this.loading.set(false);
+            this.loaderservice.hide();
             this.notificacionService.error(
-              `Ocurrio un problema al actualizar la factura ${HelpersUtils.getMessageError(response.message)}`,
+              `Ocurrió un problema al actualizar la factura: ${HelpersUtils.getMessageError(err?.error?.message || err?.message)}`,
               'Error',
               5000,
             );
-            return;
           }
-
-          this.notificacionService.success(
-            'Factura actualizada con exito',
-            'Accion Completada',
-            5000,
-          );
-
-          setTimeout(() => {
-            this.loaderservice.hide();
-            if (saveAsDraft) {
-              this.refreshAsientoTrigger.update(v => v + 1);
-            } else {
-              this.router.navigateByUrl('/panel/ventas/comprobantes');
-            }
-          }, 800);
         });
     }
   }
@@ -954,27 +1058,39 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
 
     this.ventaServices
       .emitirEstandarInvoice(currentInvoice.id)
-      .subscribe((response) => {
-        this.loading.set(false);
-        this.loaderservice.hide();
-        if (response.success == false) {
+      .subscribe({
+        next: (response) => {
+          this.loading.set(false);
+          this.loaderservice.hide();
+          if (response.success == false) {
+            this.notificacionService.error(
+              `Ocurrió un problema al emitir la factura: ${HelpersUtils.getMessageError(response.message)}`,
+              'Error',
+              5000,
+            );
+            return;
+          }
+
+          this.notificacionService.success(
+            'Factura emitida con éxito',
+            'Acción Completada',
+            5000,
+          );
+          avisarAdvertenciasInventario(this.notificacionService, response.data);
+          setTimeout(() => {
+            this.router.navigateByUrl('/panel/ventas/comprobantes');
+          }, 800);
+        },
+        error: (err) => {
+          this.loading.set(false);
+          this.loaderservice.hide();
           this.notificacionService.error(
-            `Ocurrio un problema al emitir la factura ${HelpersUtils.getMessageError(response.message)}`,
+            `Ocurrió un problema al emitir la factura: ${HelpersUtils.getMessageError(err?.error?.message || err?.message)}`,
             'Error',
             5000,
           );
-          return;
         }
-
-        this.notificacionService.success(
-          'Factura emitida con exito',
-          'Accion Completada',
-          5000,
-        );
-        avisarAdvertenciasInventario(this.notificacionService, response.data);
-        setTimeout(() => {
-          this.router.navigateByUrl('/panel/ventas/comprobantes');
-        }, 800);
       });
   }
 }
+

@@ -15,7 +15,7 @@ export class ComprobantesVentasService {
   private http = inject(HttpClient);
 
   getComprobanteVentas(options: Options & InvoiceFilters): Observable<ComprobanteVentaResponse> {
-    const { limit = 10, page = 1, status, noStatus, type, clientName, startDate, endDate, tipoFactura, numeroFactura, dianStatus } = options;
+    const { limit = 10, page = 1, status, noStatus, type, clientName, startDate, endDate, tipoFactura, numeroFactura, dianStatus, search } = options;
 
     const params: any = { limit, page };
 
@@ -28,6 +28,7 @@ export class ComprobantesVentasService {
     if (tipoFactura) params.tipoFactura = tipoFactura;
     if (numeroFactura) params.numeroFactura = numeroFactura;
     if (dianStatus) params.dianStatus = dianStatus;
+    if (search?.trim()) params.search = search.trim();
 
     return this.http.get<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas`, {
       params
@@ -39,14 +40,22 @@ export class ComprobantesVentasService {
   createInvoice(invoice: Partial<FacturaVenta>) {
     return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas`, invoice).pipe(
       map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
-      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+      catchError((error: any): Observable<ResponseResult> => of({
+        success: false,
+        error,
+        message: error?.error?.message || error?.message || 'Error al crear la factura'
+      }))
     );
   }
 
   updateInvoice(id: string, invoice: Partial<FacturaVenta>) {
     return this.http.patch<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}`, invoice).pipe(
       map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
-      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+      catchError((error: any): Observable<ResponseResult> => of({
+        success: false,
+        error,
+        message: error?.error?.message || error?.message || 'Error al actualizar la factura'
+      }))
     );
   }
 
@@ -65,42 +74,66 @@ export class ComprobantesVentasService {
   emitirInvoice(id: string) {
     return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/emitir`, {}).pipe(
       map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
-      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+      catchError((error: any): Observable<ResponseResult> => of({
+        success: false,
+        error,
+        message: error?.error?.message || error?.message || 'Error al emitir la factura'
+      }))
     );
   }
 
   emitirEstandarInvoice(id: string) {
     return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/emitir-estandar`, {}).pipe(
       map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
-      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+      catchError((error: any): Observable<ResponseResult> => of({
+        success: false,
+        error,
+        message: error?.error?.message || error?.message || 'Error al emitir la factura'
+      }))
     );
   }
 
   anularInvoice(id: string, motivo: string) {
     return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/anular`, { motivo }).pipe(
       map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
-      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+      catchError((error: any): Observable<ResponseResult> => of({
+        success: false,
+        error,
+        message: error?.error?.message || error?.message || 'Error al anular la factura'
+      }))
     );
   }
 
   retryInvoice(id: string) {
     return this.http.post<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/reintentar`, {}).pipe(
       map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
-      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+      catchError((error: any): Observable<ResponseResult> => of({
+        success: false,
+        error,
+        message: error?.error?.message || error?.message || 'Error al reintentar la factura'
+      }))
     );
   }
 
   deleteInvoice(id: string) {
     return this.http.delete<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}`).pipe(
       map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
-      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+      catchError((error: any): Observable<ResponseResult> => of({
+        success: false,
+        error,
+        message: error?.error?.message || error?.message || 'Error al eliminar la factura'
+      }))
     );
   }
 
   registrarPago(id: string, pagoData: any) {
     return this.http.patch<ComprobanteVentaResponse>(`${baseUrl}/facturas-ventas/${id}/pago`, pagoData).pipe(
       map((response): ResponseResult => ({ success: true, data: response.data, message: response.message })),
-      catchError((error: any): Observable<ResponseResult> => of({ success: false, error, message: error.error.message }))
+      catchError((error: any): Observable<ResponseResult> => of({
+        success: false,
+        error,
+        message: error?.error?.message || error?.message || 'Error al registrar el pago'
+      }))
     );
   }
 

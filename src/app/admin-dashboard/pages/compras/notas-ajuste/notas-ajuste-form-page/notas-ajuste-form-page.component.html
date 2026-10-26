@@ -18,7 +18,9 @@
                         </label>
                         <app-list-group-dropdown title="" [dataList]="facturasDisponibles()"
                             [labelKey]="['numeroFacturaProveedor', 'numero', 'proveedor.razonSocial']"
-                            [searchable]="false" [valueInput]="form.get('facturaSearch')?.value || ''"
+                            [searchable]="false" [remoteSearch]="true" [loading]="searchingFacturas()"
+                            [valueInput]="form.get('facturaSearch')?.value || ''"
+                            (searchTermChange)="onFacturaSearchChange($event)"
                             (objectSelect)="onFacturaSeleccionada($event)" class="block w-full">
                         </app-list-group-dropdown>
                         <form-error-label [errorType]="form.get('facturaOriginalId')!" />

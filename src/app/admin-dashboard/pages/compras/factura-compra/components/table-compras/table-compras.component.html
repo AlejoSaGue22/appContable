@@ -65,11 +65,19 @@
     @if (showFilters()) {
     <div
       class="mt-6 pt-6 border-t border-gray-50 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-slide-down">
-      <!-- Numero Factura -->
+      <!-- Número interno de comprobante -->
       <div class="space-y-2">
-        <label class="text-[10px] text-gray-400 ml-1">Nº Comprobante</label>
+        <label class="text-[10px] text-gray-400 ml-1">Nº Comprobante interno</label>
         <input type="text" [ngModel]="numeroFactura()" (ngModelChange)="numeroFactura.set($event)"
           placeholder="Ej: FAC-001"
+          class="block w-full px-4 py-2 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:border-blue-500/50 transition-all" />
+      </div>
+
+      <!-- Número asignado por el proveedor -->
+      <div class="space-y-2">
+        <label class="text-[10px] text-gray-400 ml-1">Nº Factura proveedor</label>
+        <input type="text" [ngModel]="numeroFacturaProveedor()"
+          (ngModelChange)="numeroFacturaProveedor.set($event)" placeholder="Ej: factura del proveedor"
           class="block w-full px-4 py-2 bg-gray-50/50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:border-blue-500/50 transition-all" />
       </div>
 
@@ -109,6 +117,7 @@
           <tr>
             <th class="text-center">Fecha Emisión</th>
             <th class="text-center">N° Comprobante</th>
+            <th class="text-center">N° Fact Proveedor</th>
             <th class="text-center">Forma Pago</th>
             <th class="text-center">Proveedor</th>
             <th class="text-right">Monto Total</th>
@@ -124,11 +133,10 @@
               {{ compra.fecha }}
             </td>
             <td class="text-center">
-              <span class="font-semibold text-slate-900">{{
-                compra.numero
-                }}</span>
+              <span class="font-semibold text-slate-900">{{ compra.numero }}</span>
               @if (compra.notasResumen?.tieneNota) {
-              <span class="ml-1.5 inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold uppercase rounded-full border"
+              <span
+                class="ml-1.5 inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold uppercase rounded-full border"
                 [class.bg-amber-50]="(compra.notasResumen?.countNC ?? 0) > 0"
                 [class.text-amber-700]="(compra.notasResumen?.countNC ?? 0) > 0"
                 [class.border-amber-200]="(compra.notasResumen?.countNC ?? 0) > 0"
@@ -141,6 +149,9 @@
               }
             </td>
             <td class="text-center">
+              <span class="font-mono">{{ compra.numeroFacturaProveedor }}</span>
+            </td>
+            <td class="text-center">
               <span class="font-mono">{{ compra.formaPago }}</span>
             </td>
             <td class="text-center">
@@ -150,9 +161,7 @@
                 }}</span>
             </td>
             <td class="text-right tabular-nums">
-              <span class="font-semibold text-slate-900">{{
-                compra.total | currency: "" : "$" : "1.0-0"
-                }}</span>
+              <span class="font-semibold text-slate-900">{{ compra.total | currency: "" : "$" : "1.0-0" }}</span>
             </td>
             <td class="text-right tabular-nums">
               <div class="flex flex-col items-end">
@@ -199,11 +208,7 @@
             <td>
               <div class="flex justify-center gap-2">
                 @if (compra.estado !== "borrador") {
-                <a [routerLink]="[
-                        '/panel/compras/purchases/',
-                        compra.id,
-                        'details',
-                      ]"
+                <a [routerLink]="['/panel/compras/purchases/', compra.id, 'details']"
                   class="inline-flex items-center rounded-lg text-sm text-blue-600 hover:text-blue-900 cursor-pointer"
                   title="Ver Comprobante">
                   <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -215,11 +220,8 @@
                 </a>
                 }
 
-                @if (
-                compra.estado == "error_asiento" &&
-                (userAuth()?.role === "Contador" ||
-                userAuth()?.role === "Super Admin")
-                ) {
+                @if (compra.estado == "error_asiento" &&
+                (userAuth()?.role === "Contador" || userAuth()?.role === "Super Admin")) {
                 <button (click)="onRetryAsiento(compra.id)" [disabled]="busy()"
                   class="inline-flex items-center rounded-lg text-sm text-yellow-600 hover:text-yellow-900 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                   title="Reintentar Asiento">

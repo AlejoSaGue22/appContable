@@ -1,8 +1,8 @@
-import { Component, inject, OnInit, signal, effect, computed } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal, effect, computed } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { map } from 'rxjs';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { catchError, map, of, Subject, switchMap, timer } from 'rxjs';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { CurrencyPipe } from '@angular/common';
 
 import { HeaderInput, HeaderTitlePageComponent } from "@dashboard/components/header-title-page/header-title-page.component";
@@ -42,6 +42,7 @@ export class NotasAjusteComprasFormPageComponent implements OnInit {
     });
 
     private fb = inject(FormBuilder);
+    private destroyRef = inject(DestroyRef);
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private notasService = inject(ComprasNotasAjusteService);
@@ -57,8 +58,11 @@ export class NotasAjusteComprasFormPageComponent implements OnInit {
     isDraft = signal<boolean>(false);
 
     facturasDisponibles = signal<FacturaCompra[]>([]);
+    searchingFacturas = signal(false);
     itemsSeleccionados = signal<NotaAjusteCompraItem[]>([]);
     facturaSeleccionada = signal<FacturaCompra | null>(null);
+    private facturaSearchTerms = new Subject<string>();
+    private hasFacturaSearchStarted = false;
 
     // Computed signals for payment logic
     facturaEsCredito = computed(() => this.facturaSeleccionada()?.formaPago === FormaPago.CREDITO);
@@ -132,6 +136,28 @@ export class NotasAjusteComprasFormPageComponent implements OnInit {
 
     ngOnInit(): void {
         this.loaderService.show();
+        this.facturaSearchTerms
+            .pipe(
+                switchMap((search) => timer(300).pipe(
+                    switchMap(() => this.facturasService.getFacturasCompras({
+                        limit: 10,
+                        page: 1,
+                        search: search || undefined,
+                    }).pipe(
+                        map((response) => (response.data || []) as FacturaCompra[]),
+                        catchError((error) => {
+                            this.notificationService.error(error?.error?.message || 'No fue posible buscar facturas', 'Error');
+                            return of([] as FacturaCompra[]);
+                        }),
+                    )),
+                )),
+                takeUntilDestroyed(this.destroyRef),
+            )
+            .subscribe((facturas) => {
+                this.facturasDisponibles.set(facturas);
+                this.searchingFacturas.set(false);
+            });
+
         this.loadFacturas();
 
         const id = this.notaId();
@@ -147,11 +173,30 @@ export class NotasAjusteComprasFormPageComponent implements OnInit {
     }
 
     loadFacturas() {
-        this.facturasService.getFacturasCompras({ limit: 100, page: 1 }).subscribe(res => {
-            if (res && res.data) {
-                this.facturasDisponibles.set(res.data as any);
+        this.facturasService.getFacturasCompras({ limit: 10, page: 1 }).subscribe({
+            next: (res) => {
+                if (res?.data && !this.hasFacturaSearchStarted) {
+                    this.facturasDisponibles.update((current) => {
+                        const ids = new Set(current.map((invoice) => invoice.id));
+                        const fresh = (res.data as FacturaCompra[]).filter((invoice) => !ids.has(invoice.id));
+                        return [...current, ...fresh];
+                    });
+                }
+            },
+            error: (error) => {
+                this.notificationService.error(error?.error?.message || 'No fue posible cargar facturas', 'Error');
             }
         });
+    }
+
+    onFacturaSearchChange(search: string): void {
+        this.hasFacturaSearchStarted = true;
+        this.form.patchValue({ facturaOriginalId: '', facturaSearch: search }, { emitEvent: false });
+        this.facturaSeleccionada.set(null);
+        this.itemsSeleccionados.set([]);
+        this.searchingFacturas.set(true);
+        this.facturasDisponibles.set([]);
+        this.facturaSearchTerms.next(search.trim());
     }
 
     loadNota(id: string) {
@@ -198,6 +243,9 @@ export class NotasAjusteComprasFormPageComponent implements OnInit {
                     });
                     this.itemsSeleccionados.set(mappedItems);
                     const factura = nota.facturaOriginal;
+                    if (factura) {
+                        this.facturasDisponibles.update((list) => [factura, ...list.filter((item) => item.id !== factura.id)]);
+                    }
                     this.facturaSeleccionada.set(factura as any);
                     this.loaderService.hide();
                 } catch (error) {
@@ -216,6 +264,7 @@ export class NotasAjusteComprasFormPageComponent implements OnInit {
 
     onFacturaSeleccionada(factura: any) {
         const f = factura;
+        this.facturasDisponibles.update((list) => [f, ...list.filter((item) => item.id !== f.id)]);
         this.facturaSeleccionada.set(f);
         this.isDraft.set(false);
 

@@ -73,7 +73,9 @@
           <app-searchable-select formControlName="clienteId" [items]="patientsList()"
             [labelKeys]="['fullName', 'documentoLabel']" selectedLabelKey="fullName" labelSeparator=" · " valueKey="id"
             placeholder="Buscar por nombre o identificación..." emptyLabel="Buscar o seleccionar un paciente..."
-            (searchChange)="onSearchPatient($event)" [maxResults]="100" />
+            (searchChange)="onSearchPatient($event)" [maxResults]="10" [remoteSearch]="true"
+            [loading]="searchingPatients()" createOptionLabel="Agregar nuevo cliente"
+            (createOption)="openCreateClientModal()" />
           @if (form.get('clienteId')?.touched && form.get('clienteId')?.hasError('required')) {
           <span class="text-xs text-rose-500 font-medium mt-1 block">
             Debes seleccionar un paciente para la prescripción
@@ -933,4 +935,9 @@
     </div>
 
   </form>
+
+  <app-modal [(visible)]="showCreateClientModal" title="Crear nuevo cliente" size="xl">
+    <app-clients-form-page [isModal]="true" (saveSuccess)="onPatientCreated($event)"
+      (cancel)="closeCreateClientModal()" />
+  </app-modal>
 </div>

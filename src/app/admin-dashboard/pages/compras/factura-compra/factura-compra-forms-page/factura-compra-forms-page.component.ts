@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HeaderInput, HeaderTitlePageComponent } from "@dashboard/components/header-title-page/header-title-page.component";
@@ -9,12 +9,12 @@ import { NotificationService } from '@shared/services/notification.service';
 import { LoaderService } from '@utils/services/loader.service';
 import { ModalComponent } from '@shared/components/modal/modal.component';
 import { ProveedoresFormsPageComponent } from '../../proveedores/proveedores-forms-page/proveedores-forms-page.component';
-import { forkJoin, map } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, forkJoin, map, of, Subject, switchMap, timer } from 'rxjs';
 import { ProveedoresService } from '../../services/proveedores.service';
 import { ProductosService } from '@dashboard/pages/ventas/services/productos.service';
 import { ProveedoresRequest } from '@dashboard/interfaces/proveedores-interface';
 import { GetProductosDetalle } from '@dashboard/interfaces/productos-interface';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FacturaCompraService } from '../../services/factura-compra.service';
 import { FacturaCompra, ItemFacturaResponse } from '@dashboard/interfaces/factura-compra-interface';
 import { FacturaNotasResumen } from '@dashboard/interfaces/documento-venta-interface';
@@ -63,6 +63,9 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     };
 
     private fb = inject(FormBuilder);
+    private destroyRef = inject(DestroyRef);
+    private proveedorSearchTerms = new Subject<string>();
+    private productoSearchTerms = new Subject<string>();
     notificationService = inject(NotificationService);
     facturaService = inject(FacturaCompraService);
     loaderService = inject(LoaderService);
@@ -163,6 +166,11 @@ export class FacturaCompraFormsPageComponent implements OnInit {
 
 
     loading = signal<boolean>(false);
+    searchingProveedores = signal<boolean>(false);
+    searchingProductos = signal<boolean>(false);
+    productSearchRequiresSelection = signal<boolean>(false);
+    private hasProveedorSearchStarted = false;
+    private hasProductoSearchStarted = false;
     minDate = signal<string>(new Date().toISOString().substring(0, 10));
 
     productosItemsForm = this.fb.group({
@@ -179,6 +187,60 @@ export class FacturaCompraFormsPageComponent implements OnInit {
 
     ngOnInit(): void {
         this.setupPaymentLogic();
+        this.proveedorSearchTerms
+            .pipe(
+                debounceTime(300),
+                distinctUntilChanged(),
+                switchMap((search) =>
+                    this.proveedoresServicios.getProveedores({
+                        limit: 10,
+                        offset: 0,
+                        search: search || undefined,
+                    }).pipe(
+                        map((response) => (response.proveedores || []).map((proveedor: any) => ({
+                            ...proveedor,
+                            fullName: proveedor.razonSocial?.trim() || `${proveedor.nombre || ''} ${proveedor.apellido || ''}`.trim(),
+                        }))),
+                        catchError((error) => {
+                            this.notificationService.error('Error al buscar proveedores', error);
+                            return of([] as ProveedoresRequest[]);
+                        }),
+                    ),
+                ),
+                takeUntilDestroyed(this.destroyRef),
+            )
+            .subscribe((proveedores) => {
+                this.proveedoresList.set(proveedores);
+                this.searchingProveedores.set(false);
+            });
+
+        this.productoSearchTerms
+            .pipe(
+                switchMap((search) =>
+                    timer(300).pipe(
+                        switchMap(() =>
+                            this.productoServicios.getProductos({
+                                limit: 10,
+                                offset: 0,
+                                venta_compra: 'compra',
+                                search: search || undefined,
+                            }).pipe(
+                                map((response) => response.articulos || []),
+                                catchError((error) => {
+                                    this.notificationService.error('Error al buscar artículos', error);
+                                    return of([] as GetProductosDetalle[]);
+                                }),
+                            ),
+                        ),
+                    ),
+                ),
+                takeUntilDestroyed(this.destroyRef),
+            )
+            .subscribe((productos) => {
+                this.productosList.set(productos);
+                this.searchingProductos.set(false);
+            });
+
         this.activatedRoute.params.subscribe((params) => {
             const id = params['id'];
             if (id && id !== 'new') {
@@ -207,6 +269,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
             }
             prodCtrl?.setValue(null);
             cuentaCtrl?.setValue(null);
+            this.productSearchRequiresSelection.set(false);
             prodCtrl?.updateValueAndValidity();
             cuentaCtrl?.updateValueAndValidity();
 
@@ -266,8 +329,8 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     getProveedoresAndProductos() {
         this.loaderService.show();
         forkJoin({
-            proveedores: this.proveedoresServicios.getProveedores({ limit: 1000, offset: 0 }),
-            productos: this.productoServicios.getProductos({ limit: 1000, offset: 0 }),
+            proveedores: this.proveedoresServicios.getProveedores({ limit: 10, offset: 0 }),
+            productos: this.productoServicios.getProductos({ limit: 10, offset: 0, venta_compra: 'compra' }),
             cuentas: this.cuentasService.getCuentasContables(),
             activosFijos: this.activosFijosService.getActivosFijos()
         }).subscribe({
@@ -276,8 +339,12 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                     ...p,
                     fullName: p.razonSocial?.trim() || `${p.nombre || ''} ${p.apellido || ''}`.trim()
                 }));
-                this.proveedoresList.set(mappedProveedores);
-                this.productosList.set(productos.articulos);
+                if (!this.hasProveedorSearchStarted) {
+                    this.proveedoresList.set(mappedProveedores);
+                }
+                if (!this.hasProductoSearchStarted) {
+                    this.productosList.set(productos.articulos);
+                }
                 this.cuentasContables.set(cuentas.filter(c => c.aceptaMovimiento && c.isActive));
                 this.activosFijosList.set(activosFijos?.items || activosFijos?.data?.items || (Array.isArray(activosFijos) ? activosFijos : []));
             },
@@ -288,6 +355,35 @@ export class FacturaCompraFormsPageComponent implements OnInit {
                 this.loaderService.hide();
             }
         });
+    }
+
+    onProveedorSearchChange(search: string): void {
+        this.hasProveedorSearchStarted = true;
+        this.formCompra.patchValue({
+            proveedor: '',
+            numeroIdentificacion: '',
+            tipoIdentificacion: '',
+            email: '',
+            telefono: '',
+        }, { emitEvent: false });
+        this.anticiposDisponibles.set([]);
+        this.anticiposAsociados.set([]);
+        this.searchingProveedores.set(true);
+        this.proveedoresList.set([]);
+        this.proveedorSearchTerms.next(search.trim());
+    }
+
+    onProductoSearchChange(search: string): void {
+        this.hasProductoSearchStarted = true;
+        this.productSearchRequiresSelection.set(true);
+        this.searchingProductos.set(true);
+        this.productosList.set([]);
+        this.productoSearchTerms.next(search.trim());
+    }
+
+    onProductoSeleccionado(producto: GetProductosDetalle | ActivoFijo): void {
+        this.productSearchRequiresSelection.set(false);
+        this.productosItemsForm.patchValue({ producto });
     }
 
     loadFactura(id: string) {
@@ -435,7 +531,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
     }
 
     addItem() {
-        if (this.productosItemsForm.invalid) return;
+        if (this.productosItemsForm.invalid || this.productSearchRequiresSelection()) return;
 
         const itemVal = this.productosItemsForm.value;
         const qty = itemVal.quantity || 0;
@@ -480,6 +576,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
         });
 
         this.items.push(newItem);
+        this.productSearchRequiresSelection.set(false);
 
         const currentTipo = itemVal.tipoConcepto;
         this.productosItemsForm.reset({
@@ -822,6 +919,7 @@ export class FacturaCompraFormsPageComponent implements OnInit {
 
         // Select the new product in the item form
         this.productosItemsForm.patchValue({ producto: newProduct });
+        this.productSearchRequiresSelection.set(false);
 
         this.closeProductModal();
         this.notificationService.success('Producto creado y seleccionado', 'Listo');

@@ -1,42 +1,97 @@
-<div class="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-3">
- <div class="text-sm text-slate-500 order-2 sm:order-1">
- Mostrando <span class="font-bold text-slate-700">{{ length() || 0 }}</span> de
- <span class="font-bold text-slate-700">{{ paginationService.totalItems() || length() }}</span> registros
- </div>
- <div class="flex items-center gap-1 order-1 sm:order-2">
- <button class="px-3 py-1.5 min-w-9 min-h-9 text-sm font-medium text-slate-500 bg-white border border-slate-200 rounded-xl
- hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
- [disabled]="selectPage() <= 1"
- [routerLink]="[]"
- [queryParams]="{ page: selectPage() - 1 }">
- <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
- <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
- </svg>
- </button>
+<div class="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-3 select-none">
+  <div class="text-sm text-slate-500 order-2 sm:order-1 text-center sm:text-left">
+    Mostrando <span class="font-bold text-slate-700">{{ length() || 0 }}</span> de
+    <span class="font-bold text-slate-700">{{ paginationService.totalItems() || length() }}</span> registros
+    @if (pages() > 1) {
+      <span class="text-slate-400 text-xs ml-1 font-medium">(Pág. {{ selectPage() }} de {{ pages() }})</span>
+    }
+  </div>
 
- @for (page of getPagesList(); track $index) {
- <button class="min-w-9 h-9 text-sm font-bold rounded-xl transition-all duration-200 cursor-pointer"
- [class.bg-blue-600]="page == selectPage()"
- [class.text-white]="page == selectPage()"
- [class.shadow-md]="page == selectPage()"
- [class.text-slate-500]="page != selectPage()"
- [class.hover:bg-slate-100]="page != selectPage()"
- [class.border]="page != selectPage()"
- [class.border-slate-200]="page != selectPage()"
- [routerLink]="[]"
- [queryParams]="{ page: page }">
- {{ page }}
- </button>
- }
+  <div class="flex items-center gap-1 order-1 sm:order-2 flex-wrap justify-center">
+    <!-- Primera página -->
+    <button class="hidden sm:inline-flex items-center justify-center min-w-9 h-9 px-2 text-sm font-medium text-slate-500 bg-white border border-slate-200 rounded-xl
+      hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+      [disabled]="selectPage() <= 1"
+      [routerLink]="[]"
+      [queryParams]="{ page: 1 }"
+      queryParamsHandling="merge"
+      title="Primera página"
+      aria-label="Primera página">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5" />
+      </svg>
+    </button>
 
- <button class="px-3 py-1.5 min-w-9 min-h-9 text-sm font-medium text-slate-500 bg-white border border-slate-200 rounded-xl
- hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
- [disabled]="selectPage() >= pages()"
- [routerLink]="[]"
- [queryParams]="{ page: selectPage() + 1 }">
- <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
- <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
- </svg>
- </button>
- </div>
+    <!-- Página anterior -->
+    <button class="inline-flex items-center justify-center min-w-9 h-9 px-2.5 text-sm font-medium text-slate-500 bg-white border border-slate-200 rounded-xl
+      hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+      [disabled]="selectPage() <= 1"
+      [routerLink]="[]"
+      [queryParams]="{ page: selectPage() - 1 }"
+      queryParamsHandling="merge"
+      title="Página anterior"
+      aria-label="Página anterior">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+      </svg>
+    </button>
+
+    <!-- Páginas y puntos suspensivos -->
+    @for (item of getPagesList(); track $index) {
+      @if (item.isPage) {
+        <button class="min-w-9 h-9 text-sm font-bold rounded-xl transition-all duration-200"
+          [class.bg-blue-600]="item.page === selectPage()"
+          [class.text-white]="item.page === selectPage()"
+          [class.shadow-md]="item.page === selectPage()"
+          [class.cursor-default]="item.page === selectPage()"
+          [class.text-slate-600]="item.page !== selectPage()"
+          [class.bg-white]="item.page !== selectPage()"
+          [class.hover:bg-slate-100]="item.page !== selectPage()"
+          [class.hover:border-slate-300]="item.page !== selectPage()"
+          [class.border]="item.page !== selectPage()"
+          [class.border-slate-200]="item.page !== selectPage()"
+          [class.cursor-pointer]="item.page !== selectPage()"
+          [disabled]="item.page === selectPage()"
+          [routerLink]="[]"
+          [queryParams]="{ page: item.page }"
+          queryParamsHandling="merge"
+          [attr.aria-label]="'Página ' + item.page"
+          [attr.aria-current]="item.page === selectPage() ? 'page' : null">
+          {{ item.label }}
+        </button>
+      } @else {
+        <span class="flex items-center justify-center min-w-9 h-9 text-sm font-bold text-slate-400 select-none">
+          &hellip;
+        </span>
+      }
+    }
+
+    <!-- Página siguiente -->
+    <button class="inline-flex items-center justify-center min-w-9 h-9 px-2.5 text-sm font-medium text-slate-500 bg-white border border-slate-200 rounded-xl
+      hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+      [disabled]="selectPage() >= pages()"
+      [routerLink]="[]"
+      [queryParams]="{ page: selectPage() + 1 }"
+      queryParamsHandling="merge"
+      title="Página siguiente"
+      aria-label="Página siguiente">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+      </svg>
+    </button>
+
+    <!-- Última página -->
+    <button class="hidden sm:inline-flex items-center justify-center min-w-9 h-9 px-2 text-sm font-medium text-slate-500 bg-white border border-slate-200 rounded-xl
+      hover:bg-slate-50 hover:border-slate-300 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+      [disabled]="selectPage() >= pages()"
+      [routerLink]="[]"
+      [queryParams]="{ page: pages() }"
+      queryParamsHandling="merge"
+      title="Última página"
+      aria-label="Última página">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m5.25 4.5 7.5 7.5-7.5 7.5m6-15 7.5 7.5-7.5 7.5" />
+      </svg>
+    </button>
+  </div>
 </div>

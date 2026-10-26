@@ -1,8 +1,8 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal, computed } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { map } from 'rxjs';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { catchError, map, of, Subject, switchMap, timer } from 'rxjs';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { CurrencyPipe } from '@angular/common';
 
 import { HeaderInput, HeaderTitlePageComponent } from "@dashboard/components/header-title-page/header-title-page.component";
@@ -50,6 +50,7 @@ export class NotasAjusteFormPageComponent implements OnInit {
     });
 
     private fb = inject(FormBuilder);
+    private destroyRef = inject(DestroyRef);
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     private notasService = inject(NotasAjusteService);
@@ -82,12 +83,15 @@ export class NotasAjusteFormPageComponent implements OnInit {
     isDraft = signal<boolean>(false);
 
     facturasDisponibles = signal<GetFacturaRequest[]>([]);
+    searchingFacturas = signal(false);
     itemsSeleccionados = signal<NotaAjusteItem[]>([]);
     facturaSeleccionada = signal<GetFacturaRequest | null>(null);
     disponibilidad = signal<DisponibilidadFactura | null>(null);
     /** Stock físico actual por artículo (kardex): solo informativo en devolución/anulación. */
     stockFisico = signal<Record<string, number>>({});
     refreshAsientoTrigger = signal<number>(0);
+    private facturaSearchTerms = new Subject<string>();
+    private hasFacturaSearchStarted = false;
 
     // "Aplicar descuento a todo" (conceptos 3/5/6)
     tasaGlobal: number = 0;
@@ -224,6 +228,29 @@ export class NotasAjusteFormPageComponent implements OnInit {
 
     ngOnInit(): void {
         this.loaderService.show();
+        this.facturaSearchTerms
+            .pipe(
+                switchMap((search) => timer(300).pipe(
+                    switchMap(() => this.ventasService.getComprobanteVentas({
+                        limit: 10,
+                        page: 1,
+                        noStatus: 'draft',
+                        search: search || undefined,
+                    }).pipe(
+                        map((response) => response.data || []),
+                        catchError((error) => {
+                            this.notificationService.error(error?.error?.message || 'No fue posible buscar facturas', 'Error');
+                            return of([] as GetFacturaRequest[]);
+                        }),
+                    )),
+                )),
+                takeUntilDestroyed(this.destroyRef),
+            )
+            .subscribe((facturas) => {
+                this.facturasDisponibles.set(facturas);
+                this.searchingFacturas.set(false);
+            });
+
         this.loadFacturas();
 
         const id = this.notaId();
@@ -239,9 +266,29 @@ export class NotasAjusteFormPageComponent implements OnInit {
     }
 
     loadFacturas() {
-        this.ventasService.getComprobanteVentas({ limit: 100, page: 1, noStatus: 'draft' }).subscribe(res => {
-            this.facturasDisponibles.set(res.data);
+        this.ventasService.getComprobanteVentas({ limit: 10, page: 1, noStatus: 'draft' }).subscribe({
+            next: (res) => {
+                if (!this.hasFacturaSearchStarted) {
+                    this.facturasDisponibles.update((current) => {
+                        const ids = new Set(current.map((invoice) => invoice.id));
+                        return [...current, ...(res.data || []).filter((invoice) => !ids.has(invoice.id))];
+                    });
+                }
+            },
+            error: (error) => this.notificationService.error(error?.error?.message || 'No fue posible cargar facturas', 'Error'),
         });
+    }
+
+    onFacturaSearchChange(search: string): void {
+        this.hasFacturaSearchStarted = true;
+        this.form.patchValue({ facturaOriginalId: '', facturaSearch: search }, { emitEvent: false });
+        this.facturaSeleccionada.set(null);
+        this.itemsSeleccionados.set([]);
+        this.disponibilidad.set(null);
+        this.stockFisico.set({});
+        this.searchingFacturas.set(true);
+        this.facturasDisponibles.set([]);
+        this.facturaSearchTerms.next(search.trim());
     }
 
     loadNota(id: string) {
@@ -279,6 +326,7 @@ export class NotasAjusteFormPageComponent implements OnInit {
                     }));
                     this.itemsSeleccionados.set(mappedItems);
                     const factura = { ...nota.facturaOriginal, client: nota.cliente } as GetFacturaRequest;
+                    this.facturasDisponibles.update((list) => [factura, ...list.filter((item) => item.id !== factura.id)]);
                     this.facturaSeleccionada.set(factura);
                     this.cargarDisponibilidad(nota.facturaOriginalId);
                     this.cargarStockFisico();
@@ -300,6 +348,7 @@ export class NotasAjusteFormPageComponent implements OnInit {
 
     onFacturaSeleccionada(factura: GetFacturaRequest) {
         const f = factura;
+        this.facturasDisponibles.update((list) => [f, ...list.filter((item) => item.id !== f.id)]);
         this.facturaSeleccionada.set(f);
         this.disponibilidad.set(null);
         this.usoAplicarTodo.set(false);
