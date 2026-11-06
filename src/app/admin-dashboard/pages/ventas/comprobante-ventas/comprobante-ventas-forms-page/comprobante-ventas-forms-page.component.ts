@@ -851,6 +851,8 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   }
 
   async onSubmit(saveAsDraft?: boolean) {
+    if (this.loading()) return;
+
     const validFactura = this.formVentas.valid;
     const validProduct = this.productosItemsForm.valid;
     this.formVentas.markAllAsTouched();
@@ -945,10 +947,9 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     if (this.invoiceID() == 'new-Item') {
       this.ventaServices.createInvoice(invoiceData).subscribe({
         next: (response) => {
-          this.loading.set(false);
-          this.loaderservice.hide();
-
           if (response.success == false) {
+            this.loading.set(false);
+            this.loaderservice.hide();
             this.notificacionService.error(
               `Ocurrió un problema al crear la factura: ${HelpersUtils.getMessageError(response.message)}`,
               'Error',
@@ -957,6 +958,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
             return;
           }
 
+          this.loaderservice.hide();
           const msg = isDraft
             ? 'Factura guardada como borrador'
             : 'Factura creada con éxito';
@@ -967,12 +969,15 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
             if (isDraft) {
               const invoiceId = response.data?.id || (response as any).id;
               if (invoiceId) {
-                this.router.navigate(['/panel/ventas/comprobantes', invoiceId]);
+                void this.router.navigate(['/panel/ventas/comprobantes', invoiceId])
+                  .finally(() => this.loading.set(false));
               } else {
-                this.router.navigateByUrl('/panel/ventas/comprobantes');
+                void this.router.navigateByUrl('/panel/ventas/comprobantes')
+                  .finally(() => this.loading.set(false));
               }
             } else {
-              this.router.navigateByUrl('/panel/ventas/comprobantes');
+              void this.router.navigateByUrl('/panel/ventas/comprobantes')
+                .finally(() => this.loading.set(false));
             }
           }, 800);
         },
@@ -1003,10 +1008,9 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
         .updateInvoice(this.invoiceID(), invoiceData)
         .subscribe({
           next: (response) => {
-            this.loading.set(false);
-            this.loaderservice.hide();
-
             if (response.success == false) {
+              this.loading.set(false);
+              this.loaderservice.hide();
               this.notificacionService.error(
                 `Ocurrió un problema al actualizar la factura: ${HelpersUtils.getMessageError(response.message)}`,
                 'Error',
@@ -1015,6 +1019,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
               return;
             }
 
+            this.loaderservice.hide();
             this.notificacionService.success(
               'Factura actualizada con éxito',
               'Acción Completada',
@@ -1024,8 +1029,10 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
             setTimeout(() => {
               if (isDraft) {
                 this.refreshAsientoTrigger.update(v => v + 1);
+                this.loading.set(false);
               } else {
-                this.router.navigateByUrl('/panel/ventas/comprobantes');
+                void this.router.navigateByUrl('/panel/ventas/comprobantes')
+                  .finally(() => this.loading.set(false));
               }
             }, 800);
           },
@@ -1043,6 +1050,8 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
   }
 
   onEmitirFromDraft() {
+    if (this.loading()) return;
+
     const currentInvoice = this.factura();
     if (!currentInvoice || currentInvoice.status !== InvoiceStatus.DRAFT) {
       this.notificacionService.error(
@@ -1057,12 +1066,12 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
     this.loading.set(true);
 
     this.ventaServices
-      .emitirEstandarInvoice(currentInvoice.id)
-      .subscribe({
-        next: (response) => {
-          this.loading.set(false);
-          this.loaderservice.hide();
+        .emitirEstandarInvoice(currentInvoice.id)
+        .subscribe({
+          next: (response) => {
           if (response.success == false) {
+            this.loading.set(false);
+            this.loaderservice.hide();
             this.notificacionService.error(
               `Ocurrió un problema al emitir la factura: ${HelpersUtils.getMessageError(response.message)}`,
               'Error',
@@ -1071,6 +1080,7 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
             return;
           }
 
+          this.loaderservice.hide();
           this.notificacionService.success(
             'Factura emitida con éxito',
             'Acción Completada',
@@ -1078,7 +1088,8 @@ export class ComprobanteVentasFormsPageComponent implements OnInit {
           );
           avisarAdvertenciasInventario(this.notificacionService, response.data);
           setTimeout(() => {
-            this.router.navigateByUrl('/panel/ventas/comprobantes');
+            void this.router.navigateByUrl('/panel/ventas/comprobantes')
+              .finally(() => this.loading.set(false));
           }, 800);
         },
         error: (err) => {

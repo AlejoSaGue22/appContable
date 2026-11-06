@@ -621,6 +621,7 @@
         @if (invoiceID() === "new-Item") {
         @if (tipoFacturaSignal() == "ESTANDAR") {
         <button type="button"
+          [disabled]="loading()"
           class="rounded-xl w-full sm:w-auto px-6 py-2.5 bg-gray-100 hover:bg-gray-200 cursor-pointer text-center text-sm font-semibold text-gray-700 transition-all flex items-center justify-center gap-2"
           (click)="onSubmit(true)">
           @if (loading()) {
@@ -637,7 +638,7 @@
         </button>
         }
 
-        <button type="submit"
+        <button type="submit" [disabled]="loading()"
           class="rounded-xl w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg shadow-blue-100 cursor-pointer text-center text-sm transition-all flex items-center justify-center gap-2"
           (click)="onSubmit(false)">
           @if (loading()) {
@@ -653,7 +654,7 @@
           }
         </button>
         } @else {
-        <button type="submit"
+        <button type="submit" [disabled]="loading()"
           class="rounded-xl w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg shadow-blue-100 cursor-pointer text-center text-sm transition-all flex items-center justify-center gap-2"
           (click)="onSubmit()">
           @if (loading()) {
@@ -670,7 +671,7 @@
         </button>
 
         @if (factura()?.tipoFactura === "ESTANDAR" && factura()?.status === "draft") {
-        <button type="button"
+        <button type="button" [disabled]="loading()"
           class="rounded-xl w-full sm:w-auto px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-lg shadow-emerald-100 cursor-pointer text-center text-sm transition-all flex items-center justify-center gap-2"
           (click)="onEmitirFromDraft()">
           @if (loading()) {
