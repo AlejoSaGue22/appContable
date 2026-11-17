@@ -1,0 +1,12 @@
+[build]
+  command = "npm run build:prod"
+  publish = "dist/contable-soft/browser"
+
+# Rama de Producción (main / master)
+[context.production]
+  command = "npm run build:prod"
+
+# Rama Staging (Demo / Pruebas)
+[context.staging]
+  command = "npm run build:staging"
+
